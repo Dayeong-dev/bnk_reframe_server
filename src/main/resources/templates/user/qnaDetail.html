@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>qna 상세 보기</title>
+</head>
+<body>
+
+	<h1>qna 상세 보기</h1>
+
+
+	<span class="label">제목:</span>
+	<span th:text="${qna.title}">제목</span>
+
+
+	<span class="label">작성자:</span>
+	<span th:text="${qna.user.username}">작성자명</span>
+
+
+	<span class="label">작성일:</span>
+	<span th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}">작성일</span>
+
+	<span class="label">상태:</span>
+	<span th:text="${qna.status}">상태</span>
+	<hr>
+	<span class="label">내용:</span>
+	<div class="content-box" th:text="${qna.content}">게시글 내용이
+		들어갑니다.</div>
+
+	<a href="/qna/qna">← 목록으로</a>
+</body>
+</html>

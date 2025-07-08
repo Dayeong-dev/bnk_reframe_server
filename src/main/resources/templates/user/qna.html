@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>1:1 문의</title>
+<style>
+  #qna-form, #qna-list { display: none; }
+</style>
+</head>
+<body>
+  <h1>1:1 문의</h1>
+
+
+  <button onclick="showForm()">등록하기</button>
+  <button onclick="showList()">내 문의내역</button>
+
+  <hr>
+  <div id="qna-form">
+    <form action="/qna/qnaRegist" method="post">
+        <label for="title">제목:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="content">내용:</label><br>
+        <textarea id="content" name="content" rows="10" cols="50" required></textarea><br><br>
+        <button type="submit">등록</button>
+    </form>
+  </div>
+
+  <!-- 문의 목록 -->
+  <div id="qna-list" th:if="${qnalist != null}">
+    <table>
+      <thead>
+        <tr>
+          <th>글번호</th>
+          <th>제목</th>
+          <th>작성자</th>
+          <th>작성일</th>
+          <th>상태</th>
+          <th>내용</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="qna : ${qnalist}">
+          <td th:text="${qna.qnaId}"></td>
+          <td><a th:href="@{'/qna/detail/' + ${qna.qnaId}}" th:text="${qna.title}"></a></td>
+          <td th:text="${qna.user.username}"></td>
+          <td th:text="${qna.regdate}"></td>
+          <td th:text="${qna.status}"></td>
+          <td th:text="${qna.content}"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // 기본은 폼 보여줌
+    window.onload = () => {
+      showForm();
+    };
+
+    function showForm() {
+      document.getElementById('qna-form').style.display = 'block';
+      document.getElementById('qna-list').style.display = 'none';
+    }
+
+    function showList() {
+      document.getElementById('qna-form').style.display = 'none';
+      document.getElementById('qna-list').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
