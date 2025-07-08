@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>예적금 상품 상세</title>
+</head>
+<body>
+    <h1 th:text="${product.name}">상품명</h1>
+    <p><b>카테고리:</b> <span th:text="${product.category}"></span></p>
+    <p><b>추천 대상:</b> <span th:text="${product.purpose}"></span></p>
+    <p><b>최고 금리:</b> <span th:text="${product.maxRate}"></span>%</p>
+    <p><b>최저 금리:</b> <span th:text="${product.minRate}"></span>%</p>
+    <p><b>기간:</b> <span th:text="${product.period}"></span> 개월</p>
+    <p><b>상태:</b> <span th:text="${product.status}"></span></p>
+    <p><b>등록일:</b> <span th:text="${product.createdAt}"></span></p>
+    <p><b>조회수:</b> <span th:text="${product.viewCount}"></span></p>
+
+    <h3>상품 상세 설명</h3>
+    <div th:utext="${product.detail}">상세 설명</div>
+
+    <a href="/deposit/list">목록으로</a>
+</body>
+</html>

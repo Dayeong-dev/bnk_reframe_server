@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>예적금 상품 목록</title>
+</head>
+<body>
+    <h1>예적금 상품 목록</h1>
+
+    <form action="/deposit/list" method="get">
+        <input type="text" name="keyword" placeholder="상품명 검색">
+        <select name="category">
+            <option value="">전체</option>
+            <option value="예금">예금</option>
+            <option value="적금">적금</option>
+        </select>
+        <select name="status">
+            <option value="">전체</option>
+            <option value="S">판매중</option>
+            <option value="P">일시중단</option>
+            <option value="E">판매종료</option>
+        </select>
+        <button type="submit">검색</button>
+    </form>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>상품명</th>
+                <th>카테고리</th>
+                <th>최고 금리</th>
+                <th>최저 금리</th>
+                <th>기간(개월)</th>
+                <th>상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="product : ${products}">
+                <td>
+                    <a th:href="@{|/deposit/detail/${product.productId}|}" th:text="${product.name}">상품명</a>
+                </td>
+                <td th:text="${product.category}">카테고리</td>
+                <td th:text="${product.maxRate}">최고 금리</td>
+                <td th:text="${product.minRate}">최저 금리</td>
+                <td th:text="${product.period}">기간</td>
+                <td th:text="${product.status}">상태</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="/deposit/main">메인으로</a>
+</body>
+</html>
