@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>BNK 예적금 메인</title>
+<style>
+    body {
+        background: #f8f9fa;
+        font-family: 'Noto Sans KR', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .banner {
+        background: #e9ecef;
+        padding: 20px;
+        text-align: center;
+        font-size: 18px;
+        border-radius: 8px;
+        margin: 20px 0;
+        width: 90%;
+        max-width: 800px;
+    }
+    .content-wrapper {
+        display: flex;
+        width: 90%;
+        max-width: 1200px;
+        align-items: stretch;
+        gap: 20px;
+        height: 330px; /* ✅ sidebar 높이와 동일 고정 */
+    }
+    .sidebar {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .purpose-btn {
+        height: 105px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f3f5;
+        color: #212529;
+        font-weight: 500;
+        font-size: 17px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+    .purpose-btn.active {
+        background: #1565c0;
+        color: white;
+    }
+    .purpose-btn.active::after {
+        content: "";
+        position: absolute;
+        right: -10px;
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 10px solid #1565c0;
+    }
+    .recommend-wrapper {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        height: 100%;
+    }
+    .highlight-product {
+        flex: 0 0 30%; /* ✅ 작게 고정 */
+        background: #fff3f3;
+        border: 1px solid #f8d7da;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 13px;
+    }
+    .grid-cards {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* ✅ 가로형 2열 */
+        grid-template-rows: 1fr 1fr;     /* ✅ 세로형 2행 */
+        gap: 8px;
+    }
+    .card {
+        background: #fff3f3;
+        border: 1px solid #f8d7da;
+        border-radius: 8px;
+        padding: 8px;
+        text-align: center;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 12px;
+    }
+    .highlight-product:hover, .card:hover {
+        background: #ffeaea;
+    }
+</style>
+</head>
+<body>
+
+<!-- 상단 배너 -->
+<div class="banner">
+    📢 이벤트/공지 배너 영역 (예적금 신규 가입 시 최대 금리 혜택!)
+</div>
+
+<!-- 메인 영역 -->
+<div class="content-wrapper">
+
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <a th:href="@{/deposit/main(purpose='목돈 만들기')}"
+           th:classappend="${selectedPurpose} == '목돈 만들기' ? 'active' : ''"
+           class="purpose-btn">목돈 만들기</a>
+        <a th:href="@{/deposit/main(purpose='목돈 굴리기')}"
+           th:classappend="${selectedPurpose} == '목돈 굴리기' ? 'active' : ''"
+           class="purpose-btn">목돈 굴리기</a>
+        <a th:href="@{/deposit/main(purpose='입출금 자유')}"
+           th:classappend="${selectedPurpose} == '입출금 자유' ? 'active' : ''"
+           class="purpose-btn">입출금 자유</a>
+    </div>
+
+    <!-- 추천상품 전체 묶음 -->
+    <div class="recommend-wrapper">
+
+        <!-- 강력추천 -->
+        <div th:if="${highlightProduct != null}"
+             class="highlight-product"
+             th:onclick="'window.location.href=\'/deposit/detail/' + ${highlightProduct.productId} + '\''">
+            <h4 th:text="${highlightProduct.name}">강력추천 상품명</h4>
+            <p th:text="${highlightProduct.summary}">설명</p>
+            <p>최고 <b th:text="${highlightProduct.maxRate}">0.00</b>% / 최저 <b th:text="${highlightProduct.minRate}">0.00</b>%</p>
+            <p><b th:text="${highlightProduct.period}">0</b>개월</p>
+        </div>
+
+        <!-- 2x2 배열 -->
+        <div class="grid-cards">
+            <div class="card"
+                 th:each="product : ${otherProducts}"
+                 th:onclick="'window.location.href=\'/deposit/detail/' + ${product.productId} + '\''">
+                <h4 th:text="${product.name}">추천 상품명</h4>
+                <p th:text="${product.summary}">설명</p>
+                <p>최고 <b th:text="${product.maxRate}">0.00</b>% / 최저 <b th:text="${product.minRate}">0.00</b>%</p>
+                <p><b th:text="${product.period}">0</b>개월</p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
