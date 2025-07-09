@@ -22,13 +22,14 @@ public class DepositProductController {
     private final DepositProductService depositProductService;
 
     @GetMapping("/main")
-    public String depositMain(@RequestParam(value = "purpose", required = false) String purpose, Model model) {
+    public String depositMain(@RequestParam(value = "purpose", required = false) String purpose,
+                              @RequestParam(value = "theme", required = false) String theme,
+                              Model model) {
         if (purpose == null || purpose.isEmpty()) {
-            purpose = "목돈 만들기"; // 기본값
+            purpose = "목돈 만들기";
         }
 
         List<DepositProductDTO> products = depositProductService.getProductsByPurpose(purpose);
-
         products.sort((a, b) -> Long.compare(b.getViewCount(), a.getViewCount()));
 
         DepositProductDTO highlightProduct = products.isEmpty() ? null : products.get(0);
@@ -38,8 +39,15 @@ public class DepositProductController {
         model.addAttribute("otherProducts", otherProducts);
         model.addAttribute("selectedPurpose", purpose);
 
+        // ✅ 테마별 데이터 내려주기
+        model.addAttribute("workerProducts", depositProductService.getProductsByPurpose("직장인").stream().limit(3).toList());
+        model.addAttribute("housewifeProducts", depositProductService.getProductsByPurpose("주부").stream().limit(3).toList());
+        model.addAttribute("studentProducts", depositProductService.getProductsByPurpose("학생").stream().limit(3).toList());
+
         return "user/deposit_main";
     }
+
+
 
 
     @GetMapping("/detail/{id}")
@@ -49,5 +57,19 @@ public class DepositProductController {
         return "user/deposit_detail";
     }
     
+    @GetMapping("/list")
+    public String depositList(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
+        List<DepositProductDTO> products;
+        if (keyword != null && !keyword.isBlank()) {
+            products = depositProductService.searchProducts(keyword);
+        } else {
+            products = depositProductService.getAllProducts("S", null); // 판매중 전체
+        }
+        model.addAttribute("products", products);
+        model.addAttribute("keyword", keyword);
+        return "user/deposit_list";
+    }
+
+   
 
 }
