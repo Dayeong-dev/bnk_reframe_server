@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>faq 상세 보기</title>
+</head>
+<body>
+
+	<h1>faq 상세 보기</h1>
+
+	<span class="label">글번호:</span>
+	<span th:text="${faq.faqId}">글번호</span>
+
+	<span class="label">제목:</span>
+	<span th:text="${faq.question}">제목</span>
+
+	<span class="label">카테고리:</span>
+	<span th:text="${faq.category}">카테고리</span>
+
+	<span class="label">작성일:</span>
+	<span th:text="${#temporals.format(faq.regdate, 'yyyy-MM-dd HH:mm')}">작성일</span>
+	<hr>
+	<span class="label">답변:</span>
+	<div class="content-box" th:text="${faq.answer}">게시글 내용이 들어갑니다.</div>
+
+	<a href="/faq/faq">← 목록으로</a>
+</body>
+</html>
