@@ -29,17 +29,21 @@
             <h1>관리자 인덱스 페이지</h1>
             <div class="top-menu">
 	          	<button class="menu-btn" onclick="selectMenu('all')"> 전체보기 </button>  
-	          	<button class="menu-btn" onclick="selectMenu('deposit')"> 예금 </button>  
-	          	<button class="menu-btn" onclick="selectMenu('savings')"> 적금 </button>  
+	          	<button class="menu-btn" onclick="selectMenu('예금')"> 예금 </button>  
+	          	<button class="menu-btn" onclick="selectMenu('적금')"> 적금 </button>  
             </div>
             
             <div class="middle-menu">
-				<!-- <select>
-					<option value="">전체</option>
-					<option value="">활성화</option>
-					<option value="">비활성화</option>
-				</select> -->
+            
+            	<!-- 필터  -->
+				<select id="statusFilter" onchange="filterByStatus(this.value)">
+				    <option value="all">전체</option>
+				    <option value="S">판매중</option>
+				    <option value="P">판매중단</option>
+				    <option value="E">판매종료</option>
+				</select>
 				
+				<!-- 검색창 -->
                 <input type="text" id="searchInput" placeholder="상품명을 입력하세요" >
                 <button class="search-btn" onclick="">검색</button>
                 
@@ -48,9 +52,12 @@
             <!-- 데이터 출력 부분 -->
             <div id="content"></div>
             
-            <!-- 상품 활성화, 비활성화 -->
-			<button onclick="toggleProducts(true)">활성화</button>
-			<button onclick="toggleProducts(false)">비활성화</button>
+            <!-- 상품 상태 변경 버튼 -->
+			<div style="margin-top: 10px;">
+			    <button onclick="changeStatus('S')">판매중</button>
+			    <button onclick="changeStatus('P')">판매중단</button>
+			    <button onclick="changeStatus('E')">판매종료</button>
+			</div>
             
             
             <!-- 상품 디테일 출력 부분 -->
@@ -60,6 +67,9 @@
     </div>
 
 	<script>
+	
+		let currentCategory = "all";
+		let currentStatus = "all";
 	
 		$(document).on("change", "#checkAll", function () {
 		    $(".product-check").prop("checked", this.checked);
@@ -75,6 +85,7 @@
 		
 		// 전체, 예금, 적금 메뉴에 맞는 데이터 요청 
 		function selectMenu(value){
+			/* 통합처리
 			console.log("선택 메뉴:" + value);
 			$.ajax({
 				url: '/admin/products/' + value ,
@@ -88,8 +99,54 @@
 				}
 			
 			});
+			*/
+			currentCategory = value;
+		    fetchFilteredProducts();
 			
 		}
+			
+		// 상태에 따른 데이터
+		function filterByStatus(statusCode) {
+			/*	통합처리
+		    let url = "/admin/products/status";
+		
+		    if (statusCode !== "all") {
+		        url += "/" + statusCode;
+		    }
+		
+		    $.ajax({
+		        url: url,
+		        type: 'GET',
+		        success: function(response){
+		            console.log("Status 필터 응답:", response);
+		            showProductList(response);
+		        },
+		        error: function(error){
+		            console.error("Status 필터 요청 실패:", error);
+		        }
+		    });
+			*/ 
+			currentStatus = statusCode;
+		    fetchFilteredProducts();
+		}
+		
+		function fetchFilteredProducts() {
+		    $.ajax({
+		        url: "/admin/products/filter",
+		        type: "GET",
+		        data: {
+		            category: currentCategory,
+		            status: currentStatus
+		        },
+		        success: function(response) {
+		            showProductList(response);
+		        },
+		        error: function(error) {
+		            console.error("필터 요청 실패:", error);
+		        }
+		    });
+		}
+		
 		
 		// JSON 데이터를 view로 데이터 출력
 		function showProductList(products){
@@ -147,7 +204,6 @@
 		*/
 		
 		//============================================================
-		
 		// 제품 상세 불러오기
 		function loadProductDetail(productId){
 			$.ajax({
@@ -159,35 +215,121 @@
 				},
 				error: function (error){
 					console.error("요청 실패: " + error);
-				}
+				}	
 			});
 		}
 		
 		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
 		function showProductDetail(product){
-			let html = '<table border="1" style="margin-top: 10px; width: 100%;">';
+			let html = '<form id="productForm">';
+			html += '<table border="1" style="margin-top: 10px; width: 100%;">';
 			html += '<thead>';
 			html += '<tr><th colspan="2">상품 상세 정보</th></tr>';
 			html += '</thead><tbody>';
 		
-			html += `<tr><td>상품 ID</td><td>${product.productId}</td></tr>`;
-			html += `<tr><td>상품명</td><td>${product.name}</td></tr>`;
-			html += `<tr><td>유형</td><td>${product.category}</td></tr>`;
-			html += `<tr><td>추천 대상</td><td>${product.purpose}</td></tr>`;
-			html += `<tr><td>요약</td><td>${product.summary}</td></tr>`;
-			html += `<tr><td>상세 설명</td><td>${product.detail}</td></tr>`;
-			html += `<tr><td>금리</td><td>${product.minRate}% ~ ${product.maxRate}%</td></tr>`;
-			html += `<tr><td>가입 기간</td><td>${product.period}개월</td></tr>`;
-			html += `<tr><td>판매 상태</td><td>${product.status}</td></tr>`;
-			html += `<tr><td>등록일</td><td>${product.createdAt}</td></tr>`;
-			html += `<tr><td>조회수</td><td>${product.viewCount}</td></tr>`;
+			html += `<tr><td>상품 ID</td><td><input type="text" name="productId" value="${product.productId}" readonly /></td></tr>`;
+			html += `<tr><td>상품명</td><td><input type="text" name="name" value="${product.name}" readonly /></td></tr>`;
+			html += `<tr><td>유형</td><td><input type="text" name="category" value="${product.category}" readonly /></td></tr>`;
+			html += `<tr><td>추천 대상</td><td><input type="text" name="purpose" value="${product.purpose}" readonly /></td></tr>`;
+			html += `<tr><td>요약</td><td><input type="text" name="summary" value="${product.summary}" readonly /></td></tr>`;
+			html += `<tr><td>상세 설명</td><td><input type="text" name="detail" value="${product.detail}" readonly /></td></tr>`;
+			html += `<tr><td>금리</td><td><input type="text" name="rate" value="${product.minRate}% ~ ${product.maxRate}%" readonly /></td></tr>`;
+			html += `<tr><td>가입 기간</td><td><input type="text" name="period" value="${product.period}" readonly />개월</td></tr>`;
+			html += `<tr><td>판매 상태</td><td><input type="text" name="status" value="${product.status}" readonly /></td></tr>`;
+			html += `<tr><td>등록일</td><td><input type="text" name="createdAt" value="${product.createdAt}" readonly /></td></tr>`;
+			html += `<tr><td>조회수</td><td><input type="text" name="viewCount" value="${product.viewCount}" readonly /></td></tr>`;
 			html += `<tr><td>이미지</td><td><img src="${product.imageUrl}" width="100"/></td></tr>`;
 		
 			html += '</tbody></table>';
-			document.getElementById('content-detail').innerHTML = html;  
+		
+			html += `<button type="button" onclick="enableEditMode()">수정</button>`;
+			html += `<button type="button" id="saveBtn" onclick="saveProductChanges()" style="display:none;">저장</button>`;
+			html += '</form>';
+		
+			document.getElementById('content-detail').innerHTML = html;
 		}
 		
 		//============================================================
+		
+		
+		//============================================================
+			
+		// 수정모드 전환
+		function enableEditMode() {
+			const inputs = document.querySelectorAll("#productForm input[type='text']");
+			inputs.forEach(input => input.removeAttribute("readonly"));
+			document.getElementById("saveBtn").style.display = "inline";
+		}
+			
+		// 데이터 수정하기	
+		function saveProductChanges() {
+			const form = document.getElementById("productForm");
+			const formData = new FormData(form);
+			const rawRate = formData.get("rate").replace("%", "").split("~");
+
+			const data = {
+				productId: Number(formData.get("productId")),
+				name: formData.get("name"),
+				category: formData.get("category"),
+				purpose: formData.get("purpose"),
+				summary: formData.get("summary"),
+				detail: formData.get("detail"),
+				minRate: parseFloat(rawRate[0]),
+				maxRate: parseFloat(rawRate[1]),
+				period: Number(formData.get("period")),
+				status: formData.get("status")
+			};
+
+			$.ajax({
+				url: "/admin/products/update",
+				type: "PUT",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				success: function() {
+					alert("수정 완료");
+					selectMenu("all"); // 다시 전체 목록 새로고침
+				},
+				error: function(err) {
+					alert("수정 실패");
+					console.error(err);
+				}
+			});
+		}
+		
+		//============================================================
+		
+		// 제품 상태 변경 
+		function changeStatus(newStatus) {
+		    const ids = [];
+		    $(".product-check:checked").each(function () {
+		        ids.push(Number($(this).val()));
+		    });
+		
+		    if (ids.length === 0) {
+		        alert("변경할 상품을 선택하세요.");
+		        return;
+		    }
+		
+		    $.ajax({
+		        url: "/admin/products/status-update",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify({
+		            ids: ids,
+		            status: newStatus
+		        }),
+		        success: function () {
+		            alert("상태 변경 완료");
+		            selectMenu("all"); 
+		        },
+		        error: function (err) {
+		            console.error("상태 변경 실패:", err);
+		            alert("오류 발생");
+		        }
+		    });
+		}
+
+			
 	</script>
 </body>
 </html>
