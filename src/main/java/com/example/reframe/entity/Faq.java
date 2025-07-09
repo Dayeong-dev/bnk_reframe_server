@@ -21,28 +21,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "qna_board")
-public class Qna extends BaseEntity{
+@Table(name = "faq_board")
+public class Faq extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
-    private Integer qnaId;
+    private Integer faqId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "username")
-    private Userr user;
-
     private String category;
-    
-    private String title;
-    
-    private String content;
+
+    private String question;
     
     private String answer;
-
-    private String status = "대기중";
-
-
-
 
 }

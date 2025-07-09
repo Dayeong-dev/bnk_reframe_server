@@ -104,8 +104,33 @@
     document.getElementById("consent-modal").style.display = "none";
     chatBox.style.display = "block";
     inputBox.style.display = "flex";
+    showAgree();
     showIntro();
   }
+  
+  function showAgree() {
+	    const container = document.createElement("div");
+	    container.style.display = "flex";
+	    container.style.flexDirection = "column";
+	    container.style.alignItems = "flex-start";
+
+	    const img = document.createElement("img");
+	    img.src = "/images/potato.jpg";
+	    img.alt = "AI 캐릭터";
+	    img.style.width = "50px";
+	    img.style.height = "50px";
+	    img.style.borderRadius = "50%";
+	    img.style.marginBottom = "4px";
+	    container.appendChild(img);
+
+	    const msg = document.createElement("div");
+	    msg.className = "ai";
+	    msg.innerText = "개인정보 수집에 동의하셨습니다";
+	    container.appendChild(msg);
+
+	    chatBox.appendChild(container);
+	    chatBox.scrollTop = chatBox.scrollHeight;
+	  }
 
   function showIntro() {
     const container = document.createElement("div");

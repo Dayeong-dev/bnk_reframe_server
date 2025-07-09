@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reframe.entity.Qna;
 import com.example.reframe.entity.Userr;
 import com.example.reframe.repository.QnaRepository;
 import com.example.reframe.repository.UserrRepository;
-
-import jakarta.servlet.http.HttpSession;
 
 @RequestMapping("/qna")
 @Controller
@@ -29,16 +28,15 @@ public class QnaController {
 	UserrRepository userRepository;
 	
 	@PostMapping("/qnaRegist")
-	public String registBoard(Qna qna, HttpSession session) {
+	public String registBoard(Qna qna, RedirectAttributes redirectAttributes) {
 
 		
 		Userr user = userRepository.findById("user01")
               .orElseThrow(() -> new RuntimeException("로그인된 사용자 없음"));
-//		User user = userRepository.findById("user01")
-//                .orElseThrow(() -> new RuntimeException("로그인된 사용자 없음"));
+		//유저엔티티 받으면 그 코드로 수정하기
 		qna.setUser(user);
 		qnaRepository.save(qna);
-		
+		redirectAttributes.addFlashAttribute("qnaSuccess", true);
 		return "redirect:/qna/qna";
 	}
 	@GetMapping("/qna")
