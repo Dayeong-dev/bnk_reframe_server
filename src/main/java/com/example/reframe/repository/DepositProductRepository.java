@@ -24,6 +24,10 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
     List<DepositProduct> findByNameContaining(String keyword);
     
     List<DepositProduct> findByPurposeAndStatus(String purpose, String status);
+
+	List<DepositProduct> findAllByStatus(String string);
+
+	List<DepositProduct> findByCategoryAndStatus(String value, String string);
    
 
 

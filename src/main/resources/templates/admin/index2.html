@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    <style>
+    	.menu-btn{
+    		height: 50px;
+    		width: 100px;
+    		margin-right: 10px;
+    	}
+    </style>
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1>관리자 인덱스 페이지</h1>
+            <div class="top-menu">
+	          	<button class="menu-btn" onclick="selectMenu('all')"> 전체보기 </button>  
+	          	<button class="menu-btn" onclick="selectMenu('deposit')"> 예금 </button>  
+	          	<button class="menu-btn" onclick="selectMenu('savings')"> 적금 </button>  
+            </div>
+            
+            <div class="middle-menu">
+				<!-- <select>
+					<option value="">전체</option>
+					<option value="">활성화</option>
+					<option value="">비활성화</option>
+				</select> -->
+				
+                <input type="text" id="searchInput" placeholder="상품명을 입력하세요" >
+                <button class="search-btn" onclick="">검색</button>
+                
+            </div>
+            
+            <!-- 데이터 출력 부분 -->
+            <div id="content"></div>
+            
+            <!-- 상품 활성화, 비활성화 -->
+			<button onclick="toggleProducts(true)">활성화</button>
+			<button onclick="toggleProducts(false)">비활성화</button>
+            
+            
+            <!-- 상품 디테일 출력 부분 -->
+            <div id="content-detail"></div>
+            
+        </div>
+    </div>
+
+	<script>
+	
+		$(document).on("change", "#checkAll", function () {
+		    $(".product-check").prop("checked", this.checked);
+		});
+	
+		// 개별 체크에 따른 전체 선택 해제
+		$(document).on("change", ".product-check", function () {
+		    const allChecked = $(".product-check").length === $(".product-check:checked").length;
+		    $("#checkAll").prop("checked", allChecked);
+		});
+	
+		//============================================================		
+		
+		// 전체, 예금, 적금 메뉴에 맞는 데이터 요청 
+		function selectMenu(value){
+			console.log("선택 메뉴:" + value);
+			$.ajax({
+				url: '/admin/products/' + value ,
+				type: 'GET',
+				success: function(response){
+					console.log("응답 데이터: " + response);
+					showProductList(response);
+				},
+				error: function (error){
+					console.error("요청 실패: " + error);
+				}
+			
+			});
+			
+		}
+		
+		// JSON 데이터를 view로 데이터 출력
+		function showProductList(products){
+			let html = '<table border="1" style="margin-top: 10px; width:100%;">';
+			html += '<thead>';
+			html += '<tr>';
+			html += '<th><input type="checkbox" id="checkAll"></th>';
+			html += '<th>상품 ID</th>';
+			html += '<th>상품명</th>';
+			html += '<th>유형</th>';
+			html += '<th>상태</th>';
+			html += '<th>등록일</th>';
+			html += '<th>조회수</th>';
+			html += '</tr>';
+			html += '</thead><tbody>';
+		
+			for (let product of products) {
+				html += `<tr>`;
+				html += `<td><input type="checkbox" class="product-check" value="${product.productId}"></td>`;
+				html += `<td>${product.productId}</td>`;
+				html += `<td><a href="#none" onclick="loadProductDetail('${product.productId}')">${product.name}</a></td>`; // ✅ 유지됨
+				html += `<td>${product.category}</td>`;
+				html += `<td>${product.status}</td>`;
+				html += `<td>${product.createdAt}</td>`;
+				html += `<td>${product.viewCount}</td>`;
+				html += '</tr>';
+			}
+		
+			html += '</tbody></table>';
+			document.getElementById('content').innerHTML = html;
+		}
+		
+		//============================================================
+		
+		/* 
+			수정 필요함 is_active -> status 변경됨 
+		
+		// 활성화, 비활성화 상태 변경 
+		function toggleProducts(activeFlag) {
+		    const ids = [];
+		    $(".product-check:checked").each(function() {
+		        ids.push(Number($(this).val()));
+		    });
+			console.log(ids);
+		    $.ajax({
+		        url: "/admin/products/toggle",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify({ ids: ids, active: activeFlag }),
+		        success: function() {
+		            alert("상태 변경 완료");
+		        }
+		    });
+		} 
+		*/
+		
+		//============================================================
+		
+		// 제품 상세 불러오기
+		function loadProductDetail(productId){
+			$.ajax({
+				url: "/admin/products/detail/"+productId ,
+				type: "GET",
+				success: function(response){
+					console.log(response);
+					showProductDetail(response);
+				},
+				error: function (error){
+					console.error("요청 실패: " + error);
+				}
+			});
+		}
+		
+		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
+		function showProductDetail(product){
+			let html = '<table border="1" style="margin-top: 10px; width: 100%;">';
+			html += '<thead>';
+			html += '<tr><th colspan="2">상품 상세 정보</th></tr>';
+			html += '</thead><tbody>';
+		
+			html += `<tr><td>상품 ID</td><td>${product.productId}</td></tr>`;
+			html += `<tr><td>상품명</td><td>${product.name}</td></tr>`;
+			html += `<tr><td>유형</td><td>${product.category}</td></tr>`;
+			html += `<tr><td>추천 대상</td><td>${product.purpose}</td></tr>`;
+			html += `<tr><td>요약</td><td>${product.summary}</td></tr>`;
+			html += `<tr><td>상세 설명</td><td>${product.detail}</td></tr>`;
+			html += `<tr><td>금리</td><td>${product.minRate}% ~ ${product.maxRate}%</td></tr>`;
+			html += `<tr><td>가입 기간</td><td>${product.period}개월</td></tr>`;
+			html += `<tr><td>판매 상태</td><td>${product.status}</td></tr>`;
+			html += `<tr><td>등록일</td><td>${product.createdAt}</td></tr>`;
+			html += `<tr><td>조회수</td><td>${product.viewCount}</td></tr>`;
+			html += `<tr><td>이미지</td><td><img src="${product.imageUrl}" width="100"/></td></tr>`;
+		
+			html += '</tbody></table>';
+			document.getElementById('content-detail').innerHTML = html;  
+		}
+		
+		//============================================================
+	</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+*{
+    		margin: 0;
+    		padding: 0;
+    		box-sizing: border-box;
+    	}
+    	header {
+            height: 80px;
+            background-color: #ddd;
+        }
+
+        #body {
+            display: flex;
+            height: calc(100vh - 80px); 
+        }
+
+        .sidebar {
+            width: 20%;
+            height: 80%;
+        }
+
+        .content {
+            width: 70%;
+            background-color: white;
+            padding: 20px;
+        }
