@@ -2,34 +2,212 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>예적금 목록</title>
+<title>BNK 예적금 상품 목록</title>
 <style>
-    body { font-family: 'Noto Sans KR', sans-serif; padding: 20px; }
-    .product-list { display: flex; flex-wrap: wrap; gap: 15px; }
-    .product-card {
-        background: #fff3f3;
-        border: 1px solid #f8d7da;
-        border-radius: 8px;
-        padding: 15px;
-        width: calc(25% - 15px);
-        box-sizing: border-box;
-        cursor: pointer;
-        text-align: center;
-    }
-    .product-card:hover { background: #ffeaea; }
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f9fa;
+    padding: 20px;
+    margin: 0;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.search-section {
+    width: 100%;
+    background: #f1f3f5;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+.search-form {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+}
+.search-input {
+    flex: 1;
+    padding: 14px 50px 14px 20px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    font-size: 15px;
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+.search-input:focus {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
+}
+.search-icon {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    padding: 0;
+}
+.sort-container {
+    display: flex;
+    justify-content: flex-end; /* ✅ 오른쪽 정렬 */
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-right: 10px;
+}
+.sort-btn {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+}
+.sort-btn.active {
+    background: #1565c0;
+    color: white;
+    border-color: #1565c0;
+}
+
+.sort-btn:hover {
+    background: #1565c0;
+    color: white;
+    border-color: #1565c0;
+}
+.card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+.card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    width: calc(23% - 10px);
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.card h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+}
+.card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+.rate-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 10px;
+}
+.high-rate {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1565c0;
+}
+.low-rate {
+    font-size: 14px;
+    color: #868e96;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+.pagination a {
+    text-decoration: none;
+    border: 1px solid #ddd;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #333;
+}
+.pagination a.active {
+    background: #1565c0;
+    color: white;
+    border-color: #1565c0;
+}
+.pagination a:hover {
+    background: #e9ecef;
+}
 </style>
 </head>
 <body>
-<h2 th:text="'검색 결과: ' + ${keyword}"></h2>
 
-<div class="product-list">
-    <div class="product-card" th:each="product : ${products}"
-         th:onclick="'window.location.href=\'/deposit/detail/' + ${product.productId} + '\''">
-        <h4 th:text="${product.name}">상품명</h4>
-        <p th:text="${product.summary}">간단 설명</p>
-        <p>최고 <b th:text="${product.maxRate}">0.00</b>% / 최저 <b th:text="${product.minRate}">0.00</b>%</p>
-        <p><b th:text="${product.period}">0</b>개월</p>
+<h2>원하시는 상품을 검색해보세요!</h2>
+
+<!-- ✅ 검색창 -->
+<div class="search-section">
+    <form th:action="@{/deposit/list}" method="get" class="search-form">
+        <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="search-input" th:value="${keyword}">
+        <button type="submit" class="search-icon" aria-label="검색"></button>
+    </form>
+</div>
+
+<!-- ✅ 정렬 버튼 (우측 정렬) -->
+<div class="sort-container">
+    <a th:href="@{/deposit/list(sort='recommend', keyword=${keyword})}" 
+       class="sort-btn" 
+       th:classappend="${sort} == 'recommend' ? 'active' : ''">추천순</a>
+
+    <a th:href="@{/deposit/list(sort='rate', keyword=${keyword})}" 
+       class="sort-btn" 
+       th:classappend="${sort} == 'rate' ? 'active' : ''">금리순</a>
+</div>
+
+<!-- ✅ 카드 목록 -->
+<div class="card-list">
+    <div class="card" th:each="product : ${products}"
+         th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
+        <h3 th:text="${product.name}">상품명</h3>
+        <p th:text="${product.summary}">상품 요약</p>
+        <div class="rate-container">
+            <span class="high-rate" 
+                  th:text="${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
+            <span class="low-rate" 
+                  th:text="${#numbers.formatDecimal(product.minRate, 1, 'POINT', 2, 'POINT')} + '%'">2.50%</span>
+        </div>
     </div>
 </div>
+
+<!-- ✅ 페이지네이션 -->
+<div class="pagination">
+    <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+       th:href="@{/deposit/list(page=${i}, sort=${sort}, keyword=${keyword})}"
+       th:text="${i + 1}"
+       th:classappend="${i} == ${page.number} ? 'active' : ''">1</a>
+</div>
+
 </body>
 </html>

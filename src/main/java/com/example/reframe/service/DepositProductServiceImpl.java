@@ -5,6 +5,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page; // ✅ 정확한 Page 임포트
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.DepositProductDTO;
@@ -22,7 +26,6 @@ public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
     private final DepositProductImageRepository depositProductImageRepository;
-
 
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -97,6 +100,44 @@ public class DepositProductServiceImpl implements DepositProductService {
         depositProductRepository.deleteById(productId);
     }
 
+    @Override
+    public List<DepositProductDTO> getProductsByPurpose(String purpose) {
+        List<DepositProduct> products = depositProductRepository.findByPurposeAndStatus(purpose, "S");
+        return products.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DepositProductDTO> getRecommendedProducts() {
+        List<DepositProduct> products = depositProductRepository.findByStatus("S");
+        return products.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    // ✅ 📌 추가: 페이지네이션 + 정렬 + 검색 통합 메서드
+    @Override
+    public Page<DepositProductDTO> getPagedProducts(String status, String category, String keyword, String sort, int page) {
+        Pageable pageable;
+
+        if ("rate".equals(sort)) {
+            pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "maxRate"));
+        } else { // 기본 추천순
+            pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "viewCount"));
+        }
+
+        Page<DepositProduct> entityPage;
+
+        if (keyword != null && !keyword.isBlank()) {
+            entityPage = depositProductRepository.findByStatusAndNameContainingOrStatusAndSummaryContaining(
+                    status, keyword, status, keyword, pageable
+            );
+        } else if (category != null && !category.isBlank()) {
+            entityPage = depositProductRepository.findByStatusAndCategory(status, category, pageable);
+        } else {
+            entityPage = depositProductRepository.findByStatus(status, pageable);
+        }
+
+        return entityPage.map(this::convertToDTO);
+    }
+
     // ===== DTO 변환 유틸 =====
 
     private DepositProductDTO convertToDTO(DepositProduct p) {
@@ -120,8 +161,6 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .build();
     }
 
-
-
     private DepositProduct convertToEntity(DepositProductDTO dto) {
         DepositProduct p = new DepositProduct();
         p.setName(dto.getName());
@@ -137,17 +176,4 @@ public class DepositProductServiceImpl implements DepositProductService {
         p.setViewCount(0L);
         return p;
     }
-    
-    @Override
-    public List<DepositProductDTO> getProductsByPurpose(String purpose) {
-        List<DepositProduct> products = depositProductRepository.findByPurposeAndStatus(purpose, "S");
-        return products.stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DepositProductDTO> getRecommendedProducts() {
-        List<DepositProduct> products = depositProductRepository.findByStatus("S");
-        return products.stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
 }

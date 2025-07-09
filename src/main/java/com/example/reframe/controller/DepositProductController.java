@@ -2,6 +2,7 @@ package com.example.reframe.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,18 +58,26 @@ public class DepositProductController {
         return "user/deposit_detail";
     }
     
+   
     @GetMapping("/list")
-    public String depositList(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
-        List<DepositProductDTO> products;
-        if (keyword != null && !keyword.isBlank()) {
-            products = depositProductService.searchProducts(keyword);
-        } else {
-            products = depositProductService.getAllProducts("S", null); // 판매중 전체
-        }
-        model.addAttribute("products", products);
+    public String depositList(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sort", required = false, defaultValue = "recommend") String sort,
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            Model model) {
+
+        // "S" = 판매중, category = null (전체)
+        Page<DepositProductDTO> productsPage =
+                depositProductService.getPagedProducts("S", null, keyword, sort, page);
+
+        model.addAttribute("products", productsPage.getContent()); // 현재 페이지의 상품 리스트
+        model.addAttribute("page", productsPage);                  // 페이지네이션 정보
         model.addAttribute("keyword", keyword);
+        model.addAttribute("sort", sort);
+
         return "user/deposit_list";
     }
+
 
    
 
