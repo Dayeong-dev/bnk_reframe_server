@@ -51,6 +51,9 @@ public class DepositProduct {
     @Column(name = "VIEW_COUNT")
     private Long viewCount;
 
+    @Column(name = "IMAGE_URL", nullable = true)
+    private String imageUrl;
+    
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Date();

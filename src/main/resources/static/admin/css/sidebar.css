@@ -1,0 +1,88 @@
+/* 전체 배경색을 sidebar에만 적용 */
+.sidebar {
+    background-color: #D9D9D9;
+    width: 250px;
+    min-height: 100vh;
+}
+
+/* 기본 리셋 - 전체가 아닌 필요한 부분만 */
+#li-header {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    list-style: none;
+}
+
+.sidebar-list {
+    padding: 20px 0px 20px 0px;
+    position: relative; /* 드롭다운 위치 기준점 */
+    margin: 0; /* 기본 margin 제거 */
+}
+
+.sidebar-a {
+    text-decoration-line: none;
+    font-weight: bold;
+    color: black;
+    font-size: 18px;
+    display: block; /* 전체 영역 클릭 가능하게 */
+    padding: 10px 20px; /* 클릭 영역 확장 */
+    transition: color 0.3s; /* 부드러운 색상 변화 */
+}
+
+.sidebar-a:hover {
+    color: red;
+}
+
+/* 드롭다운 스타일 */
+.dropdown {
+    position: absolute;
+    top: 100%; /* 부모 요소 바로 아래 */
+    left: 0;
+    right: 0; /* 부모와 같은 너비 */
+    background-color: #C0C0C0; /* 드롭다운 배경색 */
+    display: none; /* 기본적으로 숨김 */
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 그림자 효과 */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 드롭다운 내부 아이템 */
+.dropdown li {
+    margin: 0;
+    padding: 0;
+    background-color: transparent; /* 개별 li 배경 투명 */
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px 20px;
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: normal;
+    border-bottom: 1px solid #B0B0B0;
+    transition: background-color 0.3s;
+    background-color: transparent; /* 링크 배경 투명 */
+}
+
+.dropdown a:hover {
+    background-color: #B0B0B0;
+    color: black; /* hover 시 검은색 유지 */
+}
+
+/* 마지막 드롭다운 아이템의 구분선 제거 */
+.dropdown li:last-child a {
+    border-bottom: none;
+}
+
+/* 핵심! hover 시 드롭다운 보이기 */
+.sidebar-list:hover .dropdown {
+    display: block;
+}
+
+/* 드롭다운이 열려있을 때 부모 메뉴 스타일 유지 */
+.sidebar-list:hover > .sidebar-a {
+    color: red;
+}

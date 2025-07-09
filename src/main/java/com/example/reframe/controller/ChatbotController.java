@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class ChatbotController {
 
-    @GetMapping("/")
-    public String index() {
-        return "user/index"; // 메인 페이지
-    }
+//    @GetMapping("/")
+//    public String index() {
+//        return "user/index"; // 메인 페이지
+//    }
     
     @GetMapping("/chat")
     public String chat() {
