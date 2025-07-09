@@ -1,53 +1,213 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>예적금 상품 목록</title>
+<meta charset="UTF-8">
+<title>BNK 예적금 상품 목록</title>
+<style>
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f9fa;
+    padding: 20px;
+    margin: 0;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.search-section {
+    width: 100%;
+    background: #f1f3f5;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+.search-form {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+}
+.search-input {
+    flex: 1;
+    padding: 14px 50px 14px 20px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    font-size: 15px;
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+.search-input:focus {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
+}
+.search-icon {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    padding: 0;
+}
+.sort-container {
+    display: flex;
+    justify-content: flex-end; /* ✅ 오른쪽 정렬 */
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-right: 10px;
+}
+.sort-btn {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+}
+.sort-btn.active {
+    background: #1565c0;
+    color: white;
+    border-color: #1565c0;
+}
+
+.sort-btn:hover {
+    background: #1565c0;
+    color: white;
+    border-color: #1565c0;
+}
+.card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+.card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    width: calc(23% - 10px);
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.card h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+}
+.card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+.rate-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 10px;
+}
+.high-rate {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1565c0;
+}
+.low-rate {
+    font-size: 14px;
+    color: #868e96;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+.pagination a {
+    text-decoration: none;
+    border: 1px solid #ddd;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #333;
+}
+.pagination a.active {
+    background: #1565c0;
+    color: white;
+    border-color: #1565c0;
+}
+.pagination a:hover {
+    background: #e9ecef;
+}
+</style>
 </head>
 <body>
-    <h1>예적금 상품 목록</h1>
 
-    <form action="/deposit/list" method="get">
-        <input type="text" name="keyword" placeholder="상품명 검색">
-        <select name="category">
-            <option value="">전체</option>
-            <option value="예금">예금</option>
-            <option value="적금">적금</option>
-        </select>
-        <select name="status">
-            <option value="">전체</option>
-            <option value="S">판매중</option>
-            <option value="P">일시중단</option>
-            <option value="E">판매종료</option>
-        </select>
-        <button type="submit">검색</button>
+<h2>원하시는 상품을 검색해보세요!</h2>
+
+<!-- ✅ 검색창 -->
+<div class="search-section">
+    <form th:action="@{/deposit/list}" method="get" class="search-form">
+        <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="search-input" th:value="${keyword}">
+        <button type="submit" class="search-icon" aria-label="검색"></button>
     </form>
+</div>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>상품명</th>
-                <th>카테고리</th>
-                <th>최고 금리</th>
-                <th>최저 금리</th>
-                <th>기간(개월)</th>
-                <th>상태</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="product : ${products}">
-                <td>
-                    <a th:href="@{|/deposit/detail/${product.productId}|}" th:text="${product.name}">상품명</a>
-                </td>
-                <td th:text="${product.category}">카테고리</td>
-                <td th:text="${product.maxRate}">최고 금리</td>
-                <td th:text="${product.minRate}">최저 금리</td>
-                <td th:text="${product.period}">기간</td>
-                <td th:text="${product.status}">상태</td>
-            </tr>
-        </tbody>
-    </table>
+<!-- ✅ 정렬 버튼 (우측 정렬) -->
+<div class="sort-container">
+    <a th:href="@{/deposit/list(sort='recommend', keyword=${keyword})}" 
+       class="sort-btn" 
+       th:classappend="${sort} == 'recommend' ? 'active' : ''">추천순</a>
 
-    <a href="/deposit/main">메인으로</a>
+    <a th:href="@{/deposit/list(sort='rate', keyword=${keyword})}" 
+       class="sort-btn" 
+       th:classappend="${sort} == 'rate' ? 'active' : ''">금리순</a>
+</div>
+
+<!-- ✅ 카드 목록 -->
+<div class="card-list">
+    <div class="card" th:each="product : ${products}"
+         th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
+        <h3 th:text="${product.name}">상품명</h3>
+        <p th:text="${product.summary}">상품 요약</p>
+        <div class="rate-container">
+            <span class="high-rate" 
+                  th:text="${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
+            <span class="low-rate" 
+                  th:text="${#numbers.formatDecimal(product.minRate, 1, 'POINT', 2, 'POINT')} + '%'">2.50%</span>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ 페이지네이션 -->
+<div class="pagination">
+    <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+       th:href="@{/deposit/list(page=${i}, sort=${sort}, keyword=${keyword})}"
+       th:text="${i + 1}"
+       th:classappend="${i} == ${page.number} ? 'active' : ''">1</a>
+</div>
+
 </body>
 </html>
