@@ -1,4 +1,4 @@
-package com.example.reframe.controller;
+package com.example.reframe.controller.admin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
