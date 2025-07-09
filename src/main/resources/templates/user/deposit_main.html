@@ -13,23 +13,55 @@
         flex-direction: column;
         align-items: center;
     }
-    .banner {
-        background: #e9ecef;
-        padding: 20px;
-        text-align: center;
-        font-size: 18px;
-        border-radius: 8px;
-        margin: 20px 0;
+
+    /* 슬라이드 배너 */
+    .slider-container {
+        position: relative;
         width: 90%;
         max-width: 800px;
+        height: 200px;
+        overflow: hidden;
+        border-radius: 10px;
+        margin: 20px 0;
     }
+    .slider {
+        display: flex;
+        width: 300%;
+        transition: transform 0.5s ease;
+        height: 100%;
+    }
+    .slide {
+        width: 100%;
+        object-fit: cover;
+        display: none;
+    }
+    .slide.active {
+        display: block;
+    }
+    .prev, .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.5);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 50%;
+    }
+    .prev { left: 10px; }
+    .next { right: 10px; }
+    .prev:hover, .next:hover { background: rgba(0,0,0,0.7); }
+
+    /* 메인 영역 */
     .content-wrapper {
         display: flex;
         width: 90%;
         max-width: 1200px;
         align-items: stretch;
         gap: 20px;
-        height: 330px; /* ✅ sidebar 높이와 동일 고정 */
+        height: 330px;
     }
     .sidebar {
         width: 200px;
@@ -49,6 +81,7 @@
         text-decoration: none;
         cursor: pointer;
         transition: background 0.2s, color 0.2s;
+        position: relative;
     }
     .purpose-btn.active {
         background: #1565c0;
@@ -57,13 +90,16 @@
     .purpose-btn.active::after {
         content: "";
         position: absolute;
+        top: 50%;
         right: -10px;
+        transform: translateY(-50%);
         width: 0;
         height: 0;
         border-top: 10px solid transparent;
         border-bottom: 10px solid transparent;
         border-left: 10px solid #1565c0;
     }
+
     .recommend-wrapper {
         flex: 1;
         display: flex;
@@ -71,7 +107,7 @@
         height: 100%;
     }
     .highlight-product {
-        flex: 0 0 30%; /* ✅ 작게 고정 */
+        flex: 0 0 30%;
         background: #fff3f3;
         border: 1px solid #f8d7da;
         border-radius: 8px;
@@ -86,8 +122,8 @@
     .grid-cards {
         flex: 1;
         display: grid;
-        grid-template-columns: 1fr 1fr; /* ✅ 가로형 2열 */
-        grid-template-rows: 1fr 1fr;     /* ✅ 세로형 2행 */
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
         gap: 8px;
     }
     .card {
@@ -109,15 +145,21 @@
 </head>
 <body>
 
-<!-- 상단 배너 -->
-<div class="banner">
-    📢 이벤트/공지 배너 영역 (예적금 신규 가입 시 최대 금리 혜택!)
+<!-- ✅ 상단 이미지 슬라이드 배너 -->
+<div class="slider-container">
+    <div class="slider">
+        <img src="/images/banner1.jpg" class="slide active">
+        <img src="/images/banner2.jpg" class="slide">
+        <img src="/images/banner3.jpg" class="slide">
+    </div>
+    <button class="prev" onclick="prevSlide()">❮</button>
+    <button class="next" onclick="nextSlide()">❯</button>
 </div>
 
-<!-- 메인 영역 -->
+<!-- ✅ 메인 콘텐츠 -->
 <div class="content-wrapper">
 
-    <!-- 사이드바 -->
+    <!-- 목적 사이드바 -->
     <div class="sidebar">
         <a th:href="@{/deposit/main(purpose='목돈 만들기')}"
            th:classappend="${selectedPurpose} == '목돈 만들기' ? 'active' : ''"
@@ -130,7 +172,7 @@
            class="purpose-btn">입출금 자유</a>
     </div>
 
-    <!-- 추천상품 전체 묶음 -->
+    <!-- 추천상품 영역 -->
     <div class="recommend-wrapper">
 
         <!-- 강력추천 -->
@@ -138,18 +180,17 @@
              class="highlight-product"
              th:onclick="'window.location.href=\'/deposit/detail/' + ${highlightProduct.productId} + '\''">
             <h4 th:text="${highlightProduct.name}">강력추천 상품명</h4>
-            <p th:text="${highlightProduct.summary}">설명</p>
+            <p th:text="${highlightProduct.summary}">상품 설명</p>
             <p>최고 <b th:text="${highlightProduct.maxRate}">0.00</b>% / 최저 <b th:text="${highlightProduct.minRate}">0.00</b>%</p>
             <p><b th:text="${highlightProduct.period}">0</b>개월</p>
         </div>
 
-        <!-- 2x2 배열 -->
+        <!-- 추천상품 4개 2x2 -->
         <div class="grid-cards">
             <div class="card"
                  th:each="product : ${otherProducts}"
                  th:onclick="'window.location.href=\'/deposit/detail/' + ${product.productId} + '\''">
                 <h4 th:text="${product.name}">추천 상품명</h4>
-                <p th:text="${product.summary}">설명</p>
                 <p>최고 <b th:text="${product.maxRate}">0.00</b>% / 최저 <b th:text="${product.minRate}">0.00</b>%</p>
                 <p><b th:text="${product.period}">0</b>개월</p>
             </div>
@@ -158,6 +199,30 @@
     </div>
 
 </div>
+
+<!-- ✅ 슬라이드 동작 스크립트 -->
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+
+function showSlide(index) {
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+    });
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+}
+
+setInterval(nextSlide, 4000); // 4초 간격 자동 슬라이드
+</script>
 
 </body>
 </html>
