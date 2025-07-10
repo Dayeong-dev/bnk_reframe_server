@@ -150,6 +150,28 @@ public class AdminTestController {
 	    return ResponseEntity.ok().build();
 	}
 	
+	// 상품 등록 
+	@PostMapping("/products/create")
+	public ResponseEntity<Void> createProduct(@RequestBody DepositProductDTO dto) {
+	    DepositProduct product = DepositProduct.builder()
+	        .name(dto.getName())
+	        .category(dto.getCategory())
+	        .purpose(dto.getPurpose())
+	        .summary(dto.getSummary())
+	        .detail(dto.getDetail())
+	        .minRate(dto.getMinRate())
+	        .maxRate(dto.getMaxRate())
+	        .period(dto.getPeriod())
+	        .status("S") // 기본값
+	        .imageUrl(dto.getImageUrl())
+	        .viewCount(0L)
+	        .build();
+
+	    productRepository.save(product);
+	    return ResponseEntity.ok().build();
+	}
+	
+	
 	// DTO로 컨버전
 	private DepositProductDTO convertToDTO(DepositProduct product) {
 	    return DepositProductDTO.builder()
