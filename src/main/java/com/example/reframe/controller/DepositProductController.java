@@ -50,13 +50,6 @@ public class DepositProductController {
 
 
 
-
-    @GetMapping("/detail/{id}")
-    public String depositDetail(@PathVariable("id") Long productId, Model model) {
-        DepositProductDTO product = depositProductService.getProductDetail(productId);
-        model.addAttribute("product", product);
-        return "user/deposit_detail";
-    }
     
    
     @GetMapping("/list")
@@ -78,6 +71,17 @@ public class DepositProductController {
         return "user/deposit_list";
     }
 
+
+    @GetMapping("/detail/{id}")
+    public String depositDetail(@PathVariable("id") Long productId, Model model) {
+        // 상품 상세 조회 (+ 조회수 증가)
+        DepositProductDTO product = depositProductService.getProductDetail(productId);
+
+        // DETAIL 컬럼에서 7섹션을 꺼내 그대로 뷰에 전달
+        model.addAttribute("product", product);
+
+        return "user/deposit_detail";  // user/deposit_detail.jsp or deposit_detail.html
+    }
 
    
 

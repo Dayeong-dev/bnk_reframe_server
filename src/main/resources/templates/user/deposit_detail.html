@@ -2,22 +2,46 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>예적금 상품 상세</title>
+    <title th:text="${product.name}">상품 상세</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header img { max-width: 150px; margin-bottom: 10px; }
+        .title { font-size: 22px; font-weight: bold; }
+        .subtitle { font-size: 16px; color: #555; margin-top: 10px; }
+        .info { display: flex; justify-content: space-around; margin: 15px 0; }
+        .info div { font-size: 14px; font-weight: bold; }
+        .split { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; gap: 20px; }
+        .split.reverse { flex-direction: row-reverse; }
+        .split img { width: 120px; height: auto; border-radius: 8px; }
+        .split .title { font-size: 18px; }
+        .split .subtitle { font-size: 14px; color: #555; margin-top: 5px; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
+    </style>
 </head>
 <body>
-    <h1 th:text="${product.name}">상품명</h1>
-    <p><b>카테고리:</b> <span th:text="${product.category}"></span></p>
-    <p><b>추천 대상:</b> <span th:text="${product.purpose}"></span></p>
-    <p><b>최고 금리:</b> <span th:text="${product.maxRate}"></span>%</p>
-    <p><b>최저 금리:</b> <span th:text="${product.minRate}"></span>%</p>
-    <p><b>기간:</b> <span th:text="${product.period}"></span> 개월</p>
-    <p><b>상태:</b> <span th:text="${product.status}"></span></p>
-    <p><b>등록일:</b> <span th:text="${product.createdAt}"></span></p>
-    <p><b>조회수:</b> <span th:text="${product.viewCount}"></span></p>
+    <div class="container">
 
-    <h3>상품 상세 설명</h3>
-    <div th:utext="${product.detail}">상세 설명</div>
+        <!-- 상단 요약 -->
+        <div class="header">
+           
+            <div class="title" th:text="${product.name}">상품명</div>
+            <div class="subtitle" th:text="${product.summary}">상품 요약 설명</div>
+        </div>
 
-    <a href="/deposit/list">목록으로</a>
+        <!-- 금리/기간 정보 -->
+        <div class="info">
+            <div>최대금리: <span th:text="${product.maxRate}"></span>%</div>
+            <div>최소금리: <span th:text="${product.minRate}"></span>%</div>
+            <div>기간: <span th:text="${product.period}"></span>개월</div>
+        </div>
+
+        <hr>
+
+        <!-- DETAIL: DB에서 가져온 HTML (7섹션 이미지+설명) 그대로 출력 -->
+        <div th:utext="${product.detail}"></div>
+
+    </div>
 </body>
 </html>
