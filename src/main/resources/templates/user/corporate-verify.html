@@ -3,43 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <title>회원가입</title>
+<link rel="stylesheet" href="/css/common.css"></link>
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
 	<section>
 		<h2>사업자 확인</h2>
 		<form action="/business/check" method="post">
-			<input type="text" name="businessNumber" placeholder="사업자 등록 번호를 입력하세요. " required /><br/>
-			<input type="text" name="ceoName" placeholder="대표자 명을 입력하세요. " required /><br/>
-			<input type="date" name="businessStartDate" placeholder="개업 날짜를 입력하세요. " required /><br/>
+			<input type="text" name="businessNumber" placeholder="사업자 등록 번호를 입력하세요. " />
+			<p id="businessNumber-error" class="error"></p>
+			
+			<input type="text" name="ceoName" placeholder="대표자 명을 입력하세요. " />
+			<p id="ceoName-error" class="error"></p>
+			
+			<input type="date" name="businessStartDate" placeholder="개업 날짜를 입력하세요. " />
+			<p id="businessStartDate-error" class="error"></p>
+			
 			<input type="submit" value="사업자 확인" />
 		</form>
 		<p th:if="${msg != null}" th:text="${msg}"></p>
 	</section>
 	<script>
 		const $form = document.querySelector("form");
+		const $errors = document.querySelectorAll('.error');
+		
+		const $businessNumberError = document.getElementById("businessNumber-error");
+		const $ceoNameError = document.getElementById("ceoName-error");
+		const $businessStartDateError = document.getElementById("businessStartDate-error");
+		
+		function clearErrors() {
+			$errors.forEach(el => el.innerText = "");
+		}
 		
 		$form.addEventListener("submit", async e => {
 			e.preventDefault();
+			clearErrors();
 			
 			const businessNumber = $form.businessNumber.value.trim();
 			const ceoName = $form.ceoName.value.trim();
 			const businessStartDate = $form.businessStartDate.value.trim();
 			
-			if(businessNumber.length === ""){
-				alert("사업자 등록 번호를 입력하세요.");
+			if(businessNumber === ""){
+				$businessNumberError.innerText = "사업자 등록 번호를 입력하세요.";
 				$form.businessNumber.focus();
 				return;
 			}
 			
-			if(ceoName.length === ""){
-				alert("대표자 명을 입력하세요.");
+			if(ceoName === ""){
+				$ceoNameError.innertText = "대표자 명을 입력하세요.";
 				$form.ceoName.focus();
 				return;
 			}
 			
-			if(businessStartDate.length === ""){
-				alert("개업 날짜를 입력하세요.");
+			if(businessStartDate === ""){
+				$businessStartDateError.innertText = "개업 날짜를 입력하세요.";
 				$form.businessStartDate.focus();
 				return;
 			}

@@ -1,12 +1,23 @@
 <div xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="headerFragment">
-	<header >
-		<h1><a href="/">BNK</a></h1>
-		<ul sec:authorize="isAnonymous()">
-			<li><a href="/signin/form">로그인</a></li>
-			<li><a href="/signup">회원가입</a></li>
-		</ul>
-		<ul sec:authorize="isAuthenticated()">
-			<li><a href="/signout">로그아웃</a></li>
-		</ul>
+	<header>
+		<div class="logo"><a href="/">BNK</a></div>
+		<nav class="menu">
+			<ul>
+				<li><a href="#">예적금</a></li>
+				<li><a href="#">카드</a></li>
+				<li><a href="#">고객센터</a></li>
+			</ul>
+		</nav>
+		<div class="sub-menu" sec:authorize="isAnonymous()">
+			<ul>
+				<li><a href="/signin/form">로그인</a></li>
+				<li><a href="/signup">회원가입</a></li>
+			</ul>
+		</div>
+		<div class="sub-menu" sec:authorize="isAuthenticated()">
+			<ul>
+				<li><a href="/signout">로그아웃</a></li>
+			</ul>
+		</div>
 	</header>
 </div>
