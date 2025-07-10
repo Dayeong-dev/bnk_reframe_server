@@ -2,7 +2,11 @@ package com.example.reframe.service;
 
 import com.example.reframe.dto.CardDto;
 import com.example.reframe.entity.Card;
+import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.repository.CardRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,4 +58,13 @@ public class CardService {
                 .subcategories(subcategories)
                 .build();
     }
+    
+    @Transactional
+	public void updateStatuses(List<Long> ids, String status) {
+	    for (Long id : ids) {
+	        Card card = cardRepository.findById(id)
+	            .orElseThrow(() -> new IllegalArgumentException("상품 없음: " + id));
+	        card.setStatus(status);
+	    }
+	}
 }
