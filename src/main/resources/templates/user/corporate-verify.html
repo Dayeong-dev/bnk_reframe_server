@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+</head>
+<body>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<section>
+		<h2>사업자 확인</h2>
+		<form action="/business/check" method="post">
+			<input type="text" name="businessNumber" placeholder="사업자 등록 번호를 입력하세요. " required /><br/>
+			<input type="text" name="ceoName" placeholder="대표자 명을 입력하세요. " required /><br/>
+			<input type="date" name="businessStartDate" placeholder="개업 날짜를 입력하세요. " required /><br/>
+			<input type="submit" value="사업자 확인" />
+		</form>
+		<p th:if="${msg != null}" th:text="${msg}"></p>
+	</section>
+	<script>
+		const $form = document.querySelector("form");
+		
+		$form.addEventListener("submit", async e => {
+			e.preventDefault();
+			
+			const businessNumber = $form.businessNumber.value.trim();
+			const ceoName = $form.ceoName.value.trim();
+			const businessStartDate = $form.businessStartDate.value.trim();
+			
+			if(businessNumber.length === ""){
+				alert("사업자 등록 번호를 입력하세요.");
+				$form.businessNumber.focus();
+				return;
+			}
+			
+			if(ceoName.length === ""){
+				alert("대표자 명을 입력하세요.");
+				$form.ceoName.focus();
+				return;
+			}
+			
+			if(businessStartDate.length === ""){
+				alert("개업 날짜를 입력하세요.");
+				$form.businessStartDate.focus();
+				return;
+			}
+			
+			$form.submit();
+			
+			$form.businessNumber.value = "";
+			$form.ceoName.value = "";
+			$form.businessStartDate.value = "";
+		});
+	</script>
+</body>
+</html>
