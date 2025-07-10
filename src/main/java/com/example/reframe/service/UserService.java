@@ -77,8 +77,8 @@ public class UserService {
 		// ROLE 지정
 		userDTO.setRole("ROLE_MEMBER");
 		
-		// 회원 타입 지정(1: 개인, 2: 기업)
-		userDTO.setUsertype("1");
+		// 회원 타입 지정(P: 개인, C: 기업)
+		userDTO.setUsertype("P");
 		
 		// 회원 정보 등록
 		User user = userRepository.save(userMapper.toEntity(userDTO));
@@ -96,8 +96,8 @@ public class UserService {
 		// ROLE 지정
 		userDTO.setRole("ROLE_MEMBER");
 		
-		// 회원 타입 지정(1: 개인, 2: 기업)
-		userDTO.setUsertype("2");
+		// 회원 타입 지정(P: 개인, C: 기업)
+		userDTO.setUsertype("C");
 		
 		// 회원 정보 등록
 		User user = userRepository.save(userMapper.toEntity(userDTO));
