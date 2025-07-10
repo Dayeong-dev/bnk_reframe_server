@@ -4,11 +4,17 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "DEPOSIT_PRODUCT")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class DepositProduct {
 
     @Id

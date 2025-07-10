@@ -31,6 +31,7 @@
 	          	<button class="menu-btn" onclick="selectMenu('all')"> 전체보기 </button>  
 	          	<button class="menu-btn" onclick="selectMenu('예금')"> 예금 </button>  
 	          	<button class="menu-btn" onclick="selectMenu('적금')"> 적금 </button>  
+            	<button class="menu-btn" onclick="showProductForm()"> 상품 등록 </button>
             </div>
             
             <div class="middle-menu">
@@ -182,7 +183,7 @@
 		//============================================================
 		
 		/* 
-			수정 필요함 is_active -> status 변경됨 
+			삭제 / is_active -> status 변경됨 
 		
 		// 활성화, 비활성화 상태 변경 
 		function toggleProducts(activeFlag) {
@@ -328,8 +329,66 @@
 		        }
 		    });
 		}
+	
+		//============================================================
+		
+		// 상품 등록 폼 열기
+		
+		function showProductForm() {
+		    let html = '<form id="productCreateForm">';
+		    html += '<table border="1" style="margin-top: 10px; width: 100%;">';
+		    html += '<thead><tr><th colspan="2">상품 등록</th></tr></thead><tbody>';
 
-			
+		    html += '<tr><td>상품명</td><td><input type="text" name="name" required /></td></tr>';
+		    html += '<tr><td>유형</td><td><select name="category"><option value="예금">예금</option><option value="적금">적금</option></select></td></tr>';
+		    html += '<tr><td>추천 대상</td><td><input type="text" name="purpose" /></td></tr>';
+		    html += '<tr><td>요약</td><td><input type="text" name="summary" /></td></tr>';
+		    html += '<tr><td>상세 설명</td><td><input type="text" name="detail" /></td></tr>';
+		    html += '<tr><td>최소 금리</td><td><input type="number" step="0.01" name="minRate" required /></td></tr>';
+		    html += '<tr><td>최대 금리</td><td><input type="number" step="0.01" name="maxRate" required /></td></tr>';
+		    html += '<tr><td>가입 기간(개월)</td><td><input type="number" name="period" required /></td></tr>';
+		    html += '<tr><td>이미지 URL</td><td><input type="text" name="imageUrl" /></td></tr>';
+		    html += '<tr><td colspan="2"><button type="button" onclick="submitProductForm()">등록</button></td></tr>';
+
+		    html += '</tbody></table>';
+		    html += '</form>';
+
+		    document.getElementById("content-detail").innerHTML = html;
+		}
+		
+		// 버튼 클릭시 폼 열기
+		function submitProductForm() {
+		    const form = document.getElementById("productCreateForm");
+		    const formData = new FormData(form);
+
+		    const data = {
+		        name: formData.get("name"),
+		        category: formData.get("category"),
+		        purpose: formData.get("purpose"),
+		        summary: formData.get("summary"),
+		        detail: formData.get("detail"),
+		        minRate: parseFloat(formData.get("minRate")),
+		        maxRate: parseFloat(formData.get("maxRate")),
+		        period: parseInt(formData.get("period")),
+		        imageUrl: formData.get("imageUrl"),
+		        status: "S" 
+		    };
+
+		    $.ajax({
+		        url: "/admin/products/create",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify(data),
+		        success: function () {
+		            alert("상품 등록 완료");
+		            selectMenu("all"); 
+		        },
+		        error: function (err) {
+		            alert("등록 실패");
+		            console.error(err);
+		        }
+		    });
+		}
 	</script>
 </body>
 </html>

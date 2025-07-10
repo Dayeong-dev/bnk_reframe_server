@@ -26,5 +26,10 @@ public class AdminController {
 		return "admin/fragments/layout";
 	}
 	
+	@GetMapping("/card-main")
+	public String cardMain(){
+		return "admin/card-main";
+	}
+	
 	
 }
