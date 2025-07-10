@@ -35,7 +35,7 @@ th, td {
 	display: none;
 }
 
-#faq-form, #faq-detail {
+#qna-form {
 	display: none;
 }
 </style>
@@ -51,32 +51,39 @@ th, td {
 
 		<!-- 본문 -->
 		<div class="content" id="main-content">
-			<h1>FAQ 관리</h1>
-
-			<div style="text-align: right; margin-bottom: 10px;">
-				<button onclick="toggleFaqForm()">추가하기</button>
-			</div>
+			<h1>1:1 문의 관리</h1>
 
 
-			<div id="faq-list" th:if="${faqlist != null}">
-				<table id="faq-table">
+			<div id="qna-list" th:if="${qnalist != null}">
+				<table>
 					<thead>
 						<tr>
 							<th>글번호</th>
-							<th>구분</th>
 							<th>제목</th>
+							<th>작성자</th>
+							<th>작성일</th>
+							<th>카테고리</th>
+							<th>상태</th>
+							<th>내용</th>
 						</tr>
 					</thead>
-					<tbody id="faq-tbody">
-						<tr th:each="faq, iterStat : ${faqlist}"
-							th:attr="data-index=${iterStat.index}">
-							<td th:text="${faq.faqId}"></td>
-							<td th:text="${faq.category}"></td>
-							<td><a href="#" th:attr="data-id=${faq.faqId}"
-								th:text="${faq.question}"
-								onclick="loadFaqDetail(this); return false;"></a></td>
+					<tbody id="qna-tbody">
+						<tr th:each="qna : ${qnalist}">
+							<td th:text="${qna.qnaId}"></td>
+							<td><a href="#" th:attr="data-id=${qna.qnaId}"
+								th:text="${qna.title}"
+								onclick="loadQnaDetail(this); return false;"></a></td>
+							<td th:text="${qna.username}"></td>
+							<!-- 수정됨 -->
+							<td
+								th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
+							<td th:text="${qna.category}"></td>
+							<td th:text="${qna.status}"></td>
+							<td th:text="${qna.content}"></td>
+							<!-- 답변 내용을 보여주려면 content → answer로 수정 -->
 						</tr>
 					</tbody>
+
 				</table>
 
 				<!-- 페이지네이션 -->
@@ -87,78 +94,51 @@ th, td {
 
 			<hr>
 
-			<div id="faq-detail">
+			<div id="qna-detail">
+
 				<p>
 					<strong>글번호:</strong> <span id="detail-id"></span>
 				</p>
 				<p>
-					<strong>제목:</strong> <span id="detail-question"></span>
+					<strong>제목:</strong> <span id="detail-title"></span>
 				</p>
+				<p>
+					<strong>작성자:</strong> <span id="detail-username"></span>
+				</p>
+				<p>
+					<strong>작성일:</strong> <span id="detail-regdate"></span>
+				</p>
+
+
+
 				<p>
 					<strong>카테고리:</strong> <span id="detail-category"></span>
 				</p>
+				<p>
+					<strong>상태:</strong> <span id="detail-status"></span>
+				</p>
+				<hr>
+				<p>
+					<strong>내용:</strong><span class="content-box" id="detail-content"></span>
+				</p>
+
 				<hr>
 				<p>
 					<strong>답변:</strong>
 				</p>
-				<div class="content-box" id="detail-answer"></div>
-			</div>
-
-
-			<div id="faq-form">
-				<form id="faqForm">
-					<label for="category">카테고리:</label><br> <select id="category"
-						name="category" required>
-						<option value="">-- 선택하세요 --</option>
-						<option value="예금">예적금</option>
-						<option value="카드">카드</option>
-						<option value="기타">기타</option>
-					</select><br> <br> <label for="question">제목:</label><br> <input
-						type="text" id="question" name="question" required><br>
-					<br> <label for="answer">답변:</label><br>
-					<textarea id="answer" name="answer" rows="10" cols="50" required></textarea>
-					<br> <br>
-				</form>
-				<button type="button" onclick="faqRegist()">FAQ 등록하기</button>
+				<textarea id="detail-answer" rows="5" style="width: 100%;"></textarea>
+				<br />
+				<button onclick="submitAnswer()">답변 등록</button>
 			</div>
 		</div>
 	</div>
 
 	<script>
-	
-	
-	function faqRegist() {
-	    const formData = new FormData();
-	    formData.append("category", document.getElementById("category").value);
-	    formData.append("question", document.getElementById("question").value);
-	    formData.append("answer", document.getElementById("answer").value);
-
-	    fetch('/admin/faqRegist', {
-	      method: 'POST',
-	      body: formData
-	    })
-	      .then(response => response.text())
-	      .then(result => {
-	        alert(result);
-	        location.reload(); // 등록 후 페이지 새로고침
-	      })
-	      .catch(error => {
-	        console.error('FAQ 등록 실패:', error);
-	        alert('FAQ 등록에 오류 발생.');
-	      });
-	  }
-	
-	 function toggleFaqForm() {
-		    const form = document.getElementById("faq-form");
-		    const detail = document.getElementById("faq-detail");
-		    form.style.display = "block";
-		    detail.style.display = "none";
-		  }
 
     // 클라이언트 페이지네이션 처리
     document.addEventListener("DOMContentLoaded", () => {
       const rowsPerPage = 5;
-      const rows = document.querySelectorAll("#faq-tbody tr");
+      const rows = document.querySelectorAll("#qna-tbody tr");
       const pageCount = Math.ceil(rows.length / rowsPerPage);
       const pagination = document.getElementById("pagination");
 
@@ -180,26 +160,69 @@ th, td {
       showPage(0); // 첫 페이지 기본 표시
     });
     
-    function loadFaqDetail(element) {
-        const faqId = element.getAttribute('data-id');
+    function loadQnaDetail(element) {
+    	const qnaId = element.getAttribute('data-id');
 
-        fetch('/admin/detail/' + faqId)
-          .then(response => response.json())
-          .then(faq => {
-            document.getElementById("detail-id").textContent = faq.faqId;
-            document.getElementById("detail-question").textContent = faq.question;
-            document.getElementById("detail-category").textContent = faq.category;
-            document.getElementById("detail-answer").textContent = faq.answer;
+    	fetch('/admin/qnaDetail/' + qnaId)
+    		.then(response => response.json())
+    		.then(qna => {
+    			document.getElementById("detail-id").textContent = qna.qnaId;
+    			document.getElementById("detail-title").textContent = qna.title;
+    			document.getElementById("detail-username").textContent = qna.username;
+    			document.getElementById("detail-regdate").textContent = qna.regdate;
+    			document.getElementById("detail-category").textContent = qna.category;
+    			document.getElementById("detail-status").textContent = qna.status;
+    			document.getElementById("detail-content").textContent = qna.content;
+    			document.getElementById("detail-answer").value = qna.answer;
 
-            // 상세보기 열기, 등록 폼 닫기
-            document.getElementById("faq-detail").style.display = "block";
-            document.getElementById("faq-form").style.display = "none";
-          })
-          .catch(error => {
-            console.error("FAQ 상세보기 실패:", error);
-            alert("상세보기를 불러오지 못했습니다.");
-          });
-      }
+    		})
+    		.catch(error => {
+    			console.error("QNA 상세보기 실패:", error);
+    			alert("상세보기를 불러오지 못했습니다.");
+    		});
+    }
+
+    
+    function submitAnswer() {
+        const qnaId = document.getElementById("detail-id").textContent;
+        const answer = document.getElementById("detail-answer").value;
+
+        if (!answer.trim()) {
+            alert("답변 내용을 입력하세요.");
+            return;
+        }
+
+        fetch('/admin/submitAnswer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                qnaId: qnaId,
+                answer: answer
+            })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('서버 오류');
+            return response.json();  // ✅ 서버에서 저장된 DTO를 반환한다고 가정
+        })
+        .then(updatedQna => {
+            alert("답변이 등록되었습니다.");
+
+            // ✅ 즉시 반영
+            document.getElementById("detail-answer").value = updatedQna.answer;
+            document.getElementById("detail-status").textContent = updatedQna.status;
+
+            // ✅ 테이블에 있는 해당 행도 업데이트
+            const row = document.querySelector(`a[data-id="${qnaId}"]`).closest("tr");
+            row.querySelector("td:nth-child(6)").textContent = updatedQna.status;
+            row.querySelector("td:nth-child(7)").textContent = updatedQna.answer;
+        })
+        .catch(error => {
+            console.error("답변 등록 실패:", error);
+            alert("답변 등록 중 오류가 발생했습니다.");
+        });
+    }
   </script>
 
 </body>
