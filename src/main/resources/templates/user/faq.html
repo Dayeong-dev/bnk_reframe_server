@@ -4,6 +4,37 @@
 <meta charset="UTF-8">
 <title>자주 묻는 질문</title>
 <style>
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px solid #ccc;
+}
+
+th, td {
+	padding: 10px;
+	text-align: left;
+}
+
+.pagination {
+	margin-top: 15px;
+	text-align: center;
+}
+
+.pagination button {
+	margin: 0 5px;
+	padding: 5px 10px;
+}
+
+.hidden {
+	display: none;
+}
+
+#faq-form, #faq-detail {
+	display: none;
+}
 </style>
 </head>
 <body>
@@ -15,30 +46,109 @@
 	<hr>
 
 	<!--검색하기 넣기-->
+<div style="margin-bottom: 10px;">
+  <input type="text" id="search-input" placeholder="검색어를 입력하세요..." list="autocomplete-list" style="width: 300px; padding: 5px;">
+  <datalist id="autocomplete-list">
+    <!-- 자동완성 옵션은 JS에서 채움 -->
+  </datalist>
+</div>
 
 
 	<!--검색하기 넣기-->
 
-
-
 	<div id="faq-list" th:if="${faqlist != null}">
-		<table>
-			<thead>
-				<tr>
-					<th>글번호</th>
-					<th>구분</th>
-					<th>제목</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="faq : ${faqlist}">
-					<td th:text="${faq.faqId}"></td>
-					<td th:text="${faq.category}"></td>
-					<td><a th:href="@{'/faq/detail/' + ${faq.faqId}}"
+				<table id="faq-table">
+					<thead>
+						<tr>
+							<th>글번호</th>
+							<th>구분</th>
+							<th>제목</th>
+						</tr>
+					</thead>
+					<tbody id="faq-tbody">
+						<tr th:each="faq, iterStat : ${faqlist}"
+							th:attr="data-index=${iterStat.index}">
+							<td th:text="${faq.faqId}"></td>
+							<td th:text="${faq.category}"></td>
+							<td><a th:href="@{'/faq/detail/' + ${faq.faqId}}"
 						th:text="${faq.question}"></a></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+						</tr>
+					</tbody>
+				</table>
+
+				<!-- 페이지네이션 -->
+				<div class="pagination" id="pagination"></div>
+			</div>
+			
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const rowsPerPage = 10;
+  const rows = Array.from(document.querySelectorAll("#faq-tbody tr"));
+  const pagination = document.getElementById("pagination");
+  const searchInput = document.getElementById("search-input");
+  const datalist = document.getElementById("autocomplete-list");
+
+  let filteredRows = [...rows]; // 현재 필터링된 리스트
+
+  function showPage(page, list = filteredRows) {
+    list.forEach((row, index) => {
+      row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+    });
+  }
+
+  function renderPagination(list = filteredRows) {
+    pagination.innerHTML = "";
+    const pageCount = Math.ceil(list.length / rowsPerPage);
+    for (let i = 0; i < pageCount; i++) {
+      const button = document.createElement("button");
+      button.textContent = i + 1;
+      button.addEventListener("click", () => showPage(i, list));
+      pagination.appendChild(button);
+    }
+    showPage(0, list);
+  }
+
+  function updateAutocompleteOptions() {
+    const questions = rows.map(row => row.querySelector("a").textContent.trim());
+    datalist.innerHTML = "";
+    [...new Set(questions)].forEach(text => {
+      const option = document.createElement("option");
+      option.value = text;
+      datalist.appendChild(option);
+    });
+  }
+
+  searchInput.addEventListener("input", () => {
+	  const keyword = searchInput.value.trim().toLowerCase();
+
+	  // 자동완성 리스트 갱신
+	  const matchedQuestions = rows
+	    .map(row => row.querySelector("a").textContent.trim())
+	    .filter(q => q.toLowerCase().includes(keyword));
+
+	  datalist.innerHTML = "";
+	  [...new Set(matchedQuestions)].slice(0, 10).forEach(text => {
+	    const option = document.createElement("option");
+	    option.value = text;
+	    datalist.appendChild(option);
+	  });
+
+	  // 필터링된 행 보여주기
+	  filteredRows = rows.filter(row => {
+	    const question = row.querySelector("a").textContent.toLowerCase();
+	    return question.includes(keyword);
+	  });
+
+	  rows.forEach(row => row.classList.add("hidden")); // 전체 숨기기
+	  renderPagination(filteredRows); // 필터링된 것만 보여주기
+	});
+
+
+  // 초기 실행
+  renderPagination();
+});
+</script>
+
+			
 </body>
 </html>

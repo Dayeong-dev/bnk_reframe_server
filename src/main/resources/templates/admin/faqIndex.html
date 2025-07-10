@@ -107,11 +107,13 @@ th, td {
 					<strong>답변:</strong>
 				</p>
 				<div class="content-box" id="detail-answer"></div>
+				<button onclick="enableFaqEdit()">수정</button>
+				<button onclick="deleteFaq()">삭제</button>
 			</div>
 
 
 			<div id="faq-form">
-				<form id="faqForm">
+				<form id="faqForm" data-mode="create">
 					<label for="category">카테고리:</label><br> <select id="category"
 						name="category" required>
 						<option value="">-- 선택하세요 --</option>
@@ -124,41 +126,109 @@ th, td {
 					<textarea id="answer" name="answer" rows="10" cols="50" required></textarea>
 					<br> <br>
 				</form>
-				<button type="button" onclick="faqRegist()">FAQ 등록하기</button>
+				<button id="faq-submit-btn" type="button" onclick="faqRegist()">FAQ 등록하기</button>
+
 			</div>
 		</div>
 	</div>
 
 	<script>
+//	document.getElementById("faq-submit-btn").textContent = "FAQ 수정하기";
+
 	
+	function enableFaqEdit() {
+    const faqId = document.getElementById("detail-id").textContent;
+    const category = document.getElementById("detail-category").textContent;
+    const question = document.getElementById("detail-question").textContent;
+    const answer = document.getElementById("detail-answer").textContent;
+
+    document.getElementById("category").value = category;
+    document.getElementById("question").value = question;
+    document.getElementById("answer").value = answer;
+
+    // 폼 상태 변경
+    const form = document.getElementById("faqForm");  // 여기 주목!
+    form.setAttribute("data-mode", "edit");
+    form.setAttribute("data-id", faqId);
+
+    // 폼 보이고 상세는 숨기기
+    document.getElementById("faq-form").style.display = "block";
+    document.getElementById("faq-detail").style.display = "none";
+
+    // 버튼 텍스트 변경
+    document.getElementById("faq-submit-btn").textContent = "FAQ 수정하기";
+}
+
+
 	
 	function faqRegist() {
-	    const formData = new FormData();
-	    formData.append("category", document.getElementById("category").value);
-	    formData.append("question", document.getElementById("question").value);
-	    formData.append("answer", document.getElementById("answer").value);
+		const form = document.getElementById("faqForm");
+		const mode = form.getAttribute("data-mode") || "create";
+		const faqId = form.getAttribute("data-id");
+		  const formData = new FormData();
+		  formData.append("category", document.getElementById("category").value);
+		  formData.append("question", document.getElementById("question").value);
+		  formData.append("answer", document.getElementById("answer").value);
 
-	    fetch('/admin/faqRegist', {
-	      method: 'POST',
-	      body: formData
-	    })
-	      .then(response => response.text())
-	      .then(result => {
-	        alert(result);
-	        location.reload(); // 등록 후 페이지 새로고침
-	      })
-	      .catch(error => {
-	        console.error('FAQ 등록 실패:', error);
-	        alert('FAQ 등록에 오류 발생.');
-	      });
-	  }
-	
-	 function toggleFaqForm() {
-		    const form = document.getElementById("faq-form");
-		    const detail = document.getElementById("faq-detail");
-		    form.style.display = "block";
-		    detail.style.display = "none";
+		  let url = '/admin/faqRegist';
+		  if (mode === "edit") {
+		    formData.append("faqId", faqId);
+		    url = '/admin/faqUpdate';
 		  }
+
+		  fetch(url, {
+		    method: 'POST',
+		    body: formData
+		  })
+		  .then(response => response.text())
+		  .then(result => {
+		    alert(result);
+		    location.reload();
+		  })
+		  .catch(error => {
+		    console.error('FAQ 저장 실패:', error);
+		    alert('FAQ 저장에 오류 발생.');
+		  });
+		}
+
+	function deleteFaq() {
+		  const faqId = document.getElementById("detail-id").textContent;
+
+		  if (!confirm("정말 삭제하시겠습니까?")) return;
+
+		  fetch('/admin/faqDelete/' + faqId, {
+		    method: 'DELETE'
+		  })
+		    .then(response => {
+		      if (!response.ok) throw new Error("삭제 실패");
+		      return response.text();
+		    })
+		    .then(result => {
+		      alert("삭제되었습니다.");
+		      location.reload();
+		    })
+		    .catch(error => {
+		      console.error("삭제 오류:", error);
+		      alert("FAQ 삭제 중 오류 발생.");
+		    });
+		}
+
+	
+	function toggleFaqForm() {
+	    const formDiv = document.getElementById("faq-form");
+	    const form = document.getElementById("faqForm");
+
+	    form.setAttribute("data-mode", "create");
+	    form.removeAttribute("data-id");
+	    document.getElementById("faq-submit-btn").textContent = "FAQ 등록하기";
+
+	    formDiv.style.display = "block";
+	    document.getElementById("faq-detail").style.display = "none";
+
+	    form.reset();
+	}
+
+
 
     // 클라이언트 페이지네이션 처리
     document.addEventListener("DOMContentLoaded", () => {
@@ -184,6 +254,8 @@ th, td {
 
       showPage(0); // 첫 페이지 기본 표시
     });
+    
+    
     
     function loadFaqDetail(element) {
         const faqId = element.getAttribute('data-id');
