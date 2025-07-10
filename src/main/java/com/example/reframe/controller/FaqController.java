@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reframe.entity.Faq;
 import com.example.reframe.repository.FaqRepository;
@@ -23,16 +22,11 @@ public class FaqController {
 	@Autowired
 	FaqRepository faqRepository;
 	
-	//관리자용
-	@ResponseBody
-	@PostMapping("/faqRegist")
-	public String registBoard(Faq faq) {
-		faqRepository.save(faq);
-		return "등록 성공";
-	}
+
+	
 	@GetMapping("/faq")
 	public String qna(Model model) {
-		List<Faq> faqlist = faqRepository.findAll();
+		List<Faq> faqlist = faqRepository.findAllByOrderByFaqIdAsc();
 		System.out.println(faqlist);
 		model.addAttribute("faqlist", faqlist);
 		return "user/faq";
