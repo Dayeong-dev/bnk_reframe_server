@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminController {
 
-	@GetMapping("/index")
+	@GetMapping("/product-main")
 	public String root () {
-		return "admin/index2";
+		return "admin/product-main";
 	}
 	@GetMapping("/sidebar")
 	public String sidebar () {

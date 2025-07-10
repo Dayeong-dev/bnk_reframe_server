@@ -18,4 +18,13 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     // 상세페이지: 카드 + 소분류까지 페치 조인
     @Query("SELECT c FROM Card c LEFT JOIN FETCH c.categoryRels cr LEFT JOIN FETCH cr.subcategory WHERE c.cardId = :cardId")
     Optional<Card> findByIdWithCategories(@Param("cardId") Long cardId);
+
+	List<Card> findByCategoryMajor(String categoryMajor);
+
+	List<Card> findByStatus(String status);
+
+	List<Card> findByCategoryMajorAndStatus(String categoryMajor, String status);
+    
+    
+    
 }
