@@ -2,6 +2,7 @@ package com.example.reframe.service;
 
 import java.util.Optional;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.CorporateUserDTO;
@@ -23,6 +24,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final CorporateUserRepository corporateUserRepository;
 	private final PublicApiService publicApiService;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	private final UserMapper userMapper = new UserMapper();
 	private final CorpUserMapper corpUserMapper = new CorpUserMapper();
@@ -30,11 +32,13 @@ public class UserService {
 	public UserService(HttpSession session, 
 					   UserRepository userRepository, 
 					   CorporateUserRepository corporateUserRepository, 
-					   PublicApiService publicApiService) {
+					   PublicApiService publicApiService, 
+					   BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.session = session;
 		this.userRepository = userRepository;
 		this.corporateUserRepository = corporateUserRepository;
 		this.publicApiService = publicApiService;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 		
 	}
 	
@@ -74,11 +78,8 @@ public class UserService {
 			return null;
 		}
 		
-		// ROLE 지정
-		userDTO.setRole("ROLE_MEMBER");
-		
-		// 회원 타입 지정(P: 개인, C: 기업)
-		userDTO.setUsertype("P");
+		// 회원가입 시 공통 처리
+		userDTO = prepareUserForRegistratio(userDTO, "ROLE_MEMBER", "P");
 		
 		// 회원 정보 등록
 		User user = userRepository.save(userMapper.toEntity(userDTO));
@@ -93,11 +94,8 @@ public class UserService {
 			return null;
 		}
 		
-		// ROLE 지정
-		userDTO.setRole("ROLE_MEMBER");
-		
-		// 회원 타입 지정(P: 개인, C: 기업)
-		userDTO.setUsertype("C");
+		// 회원가입 시 공통 처리
+		userDTO = prepareUserForRegistratio(userDTO, "ROLE_MEMBER", "C");
 		
 		// 회원 정보 등록
 		User user = userRepository.save(userMapper.toEntity(userDTO));
@@ -114,7 +112,24 @@ public class UserService {
 		return corpUserMapper.toDTO(corpUser);
 	}
 	
-	// 숫자 외 문자 제거
+	/** 회원가입 시 공통 처리(암호화, 포맷팅, 권한 및 유형 설정) */
+	private UserDTO prepareUserForRegistratio(UserDTO userDTO, String role, String usertype) {
+		// 비밀번호 암호화
+		userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
+		
+		// 전화번호 포맷 (특수문자 제거)
+		userDTO.setPhone(toDigits(userDTO.getPhone()));
+		
+		// ROLE 지정
+		userDTO.setRole(role);
+		
+		// 회원 타입 지정(P: 개인, C: 기업)
+		userDTO.setUsertype(usertype);
+		
+		return userDTO;
+	}
+	
+	/** 숫자 외 문자 제거 */
 	private String toDigits(String str) {
 		return str.replaceAll("[^\\d]", "");
 	}

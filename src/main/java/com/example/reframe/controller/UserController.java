@@ -52,6 +52,32 @@ public class UserController {
 		return "user/corporate-verify";
 	}
 	
+	@GetMapping("/username/check")
+	public @ResponseBody ResponseEntity<String> checkUsername(@RequestParam("username") String username) {
+		boolean result = userService.checkUsername(username);
+		
+		if(!result) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 아이디 입니다.");
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).body("사용가능한 아이디 입니다.");
+	}
+	
+	@GetMapping("/signin/form")
+	public String signinForm(@RequestParam(value="needLogin", required=false) String needLogin, 
+							 @RequestParam(value="error", required=false) String error, 
+							 Model model) {
+		
+		if(needLogin != null) {
+			model.addAttribute("msg", "로그인이 필요합니다.");
+		}
+		if(error != null) {
+			model.addAttribute("msg", "아이디 또는 비밀번호가 올바르지 않습니다.");
+		}
+		
+		return "user/signin-form";
+	}
+	
 	@PostMapping("/business/check")
 	public String checkBusiness(CorporateUserDTO corpUser, RedirectAttributes rttr) {
 		System.out.println(corpUser);
@@ -64,18 +90,6 @@ public class UserController {
 		}
 		
 		return "redirect:/signup/corporate";
-	}
-	
-	
-	@GetMapping("/username/check")
-	public @ResponseBody ResponseEntity<String> checkUsername(@RequestParam("username") String username) {
-		boolean result = userService.checkUsername(username);
-		
-		if(!result) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("중복된 아이디 입니다.");
-		}
-		
-		return ResponseEntity.status(HttpStatus.OK).body("사용가능한 아이디 입니다.");
 	}
 	
 	@PostMapping("/signup/personal")
