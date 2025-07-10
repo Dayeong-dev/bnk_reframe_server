@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>FAQ 관리</title>
+<title>1:1문의 관리</title>
 <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
@@ -97,11 +97,6 @@ th, td {
 				<p>
 					<strong>카테고리:</strong> <span id="detail-category"></span>
 				</p>
-
-				<p>
-					<strong>작성일:</strong> <span id="detail-regdate"></span>
-				</p>
-
 				<hr>
 				<p>
 					<strong>답변:</strong>
@@ -194,7 +189,6 @@ th, td {
             document.getElementById("detail-id").textContent = faq.faqId;
             document.getElementById("detail-question").textContent = faq.question;
             document.getElementById("detail-category").textContent = faq.category;
-            document.getElementById("detail-regdate").textContent = faq.regdate;
             document.getElementById("detail-answer").textContent = faq.answer;
 
             // 상세보기 열기, 등록 폼 닫기
