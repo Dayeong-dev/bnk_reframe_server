@@ -38,6 +38,9 @@ th, td {
 #qna-form {
 	display: none;
 }
+  #qna-detail {
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -62,9 +65,9 @@ th, td {
 							<th>제목</th>
 							<th>작성자</th>
 							<th>작성일</th>
+							<th>답변일</th>
 							<th>카테고리</th>
 							<th>상태</th>
-							<th>내용</th>
 						</tr>
 					</thead>
 					<tbody id="qna-tbody">
@@ -74,13 +77,12 @@ th, td {
 								th:text="${qna.title}"
 								onclick="loadQnaDetail(this); return false;"></a></td>
 							<td th:text="${qna.username}"></td>
-							<!-- 수정됨 -->
 							<td
 								th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
+							<td
+								th:text="${#temporals.format(qna.moddate, 'yyyy-MM-dd HH:mm')}"></td>
 							<td th:text="${qna.category}"></td>
 							<td th:text="${qna.status}"></td>
-							<td th:text="${qna.content}"></td>
-							<!-- 답변 내용을 보여주려면 content → answer로 수정 -->
 						</tr>
 					</tbody>
 
@@ -134,96 +136,148 @@ th, td {
 	</div>
 
 	<script>
+  const rowsPerPage = 5;
+  let currentCategory = "전체";
+  let currentPage = 0;
+  let allRows = [];
+  let filteredRows = [];
 
-    // 클라이언트 페이지네이션 처리
-    document.addEventListener("DOMContentLoaded", () => {
-      const rowsPerPage = 5;
-      const rows = document.querySelectorAll("#qna-tbody tr");
-      const pageCount = Math.ceil(rows.length / rowsPerPage);
-      const pagination = document.getElementById("pagination");
+  document.addEventListener("DOMContentLoaded", () => {
+    allRows = Array.from(document.querySelectorAll("#qna-tbody tr"));
+    initCategoryFilter();
+    showPage(0);
 
-      function showPage(page) {
-        rows.forEach((row, index) => {
-          row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
-        });
-      }
+    // 상세보기 및 답변 등록 함수 외부에서도 접근 가능
+    window.loadQnaDetail = loadQnaDetail;
+    window.submitAnswer = submitAnswer;
+  });
 
-      for (let i = 0; i < pageCount; i++) {
-        const button = document.createElement("button");
-        button.textContent = i + 1;
-        button.addEventListener("click", () => {
-          showPage(i);
-        });
-        pagination.appendChild(button);
-      }
+  function initCategoryFilter() {
+    const container = document.createElement("div");
+    container.id = "category-buttons";
+    container.style.margin = "10px 0";
 
-      showPage(0); // 첫 페이지 기본 표시
+    const uniqueCategories = [...new Set(allRows.map(row =>
+      row.querySelector("td:nth-child(6)").textContent.trim()
+    ))];
+
+    ["전체", ...uniqueCategories].forEach(category => {
+      const btn = document.createElement("button");
+      btn.textContent = category;
+      btn.className = "category-btn";
+      if (category === currentCategory) btn.classList.add("active");
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategory = category;
+        filterRows();
+        showPage(0);
+        renderPagination();
+      });
+      container.appendChild(btn);
     });
-    
-    function loadQnaDetail(element) {
-    	const qnaId = element.getAttribute('data-id');
 
-    	fetch('/admin/qnaDetail/' + qnaId)
-    		.then(response => response.json())
-    		.then(qna => {
-    			document.getElementById("detail-id").textContent = qna.qnaId;
-    			document.getElementById("detail-title").textContent = qna.title;
-    			document.getElementById("detail-username").textContent = qna.username;
-    			document.getElementById("detail-regdate").textContent = qna.regdate;
-    			document.getElementById("detail-category").textContent = qna.category;
-    			document.getElementById("detail-status").textContent = qna.status;
-    			document.getElementById("detail-content").textContent = qna.content;
-    			document.getElementById("detail-answer").value = qna.answer;
+    const listSection = document.getElementById("qna-list");
+    listSection.insertBefore(container, listSection.firstChild);
 
-    		})
-    		.catch(error => {
-    			console.error("QNA 상세보기 실패:", error);
-    			alert("상세보기를 불러오지 못했습니다.");
-    		});
+    filterRows();
+    renderPagination();
+  }
+
+  function filterRows() {
+    filteredRows = allRows.filter(row => {
+      const cat = row.querySelector("td:nth-child(6)").textContent.trim();
+      return currentCategory === "전체" || cat === currentCategory;
+    });
+  }
+
+  function showPage(page) {
+    allRows.forEach(row => row.classList.add("hidden"));
+    filteredRows.forEach((row, index) => {
+      row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+    });
+    currentPage = page;
+  }
+
+  function renderPagination() {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+
+    const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
+
+    for (let i = 0; i < pageCount; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i + 1;
+      btn.addEventListener("click", () => showPage(i));
+      pagination.appendChild(btn);
+    }
+  }
+
+  function loadQnaDetail(element) {
+	  const qnaId = element.getAttribute('data-id');
+
+	  fetch('/admin/qnaDetail/' + qnaId)
+	    .then(response => response.json())
+	    .then(qna => {
+	      document.getElementById("detail-id").textContent = qna.qnaId;
+	      document.getElementById("detail-title").textContent = qna.title;
+	      document.getElementById("detail-username").textContent = qna.username;
+	      document.getElementById("detail-regdate").textContent = qna.regdate;
+	      document.getElementById("detail-category").textContent = qna.category;
+	      document.getElementById("detail-status").textContent = qna.status;
+	      document.getElementById("detail-content").textContent = qna.content;
+	      document.getElementById("detail-answer").value = qna.answer;
+
+	      //상세보기 폼 보이기
+	      document.getElementById("qna-detail").style.display = "block";
+
+	      //스크롤 이동 (선택)
+	      document.getElementById("qna-detail").scrollIntoView({ behavior: "smooth" });
+	    })
+	    .catch(error => {
+	      console.error("QNA 상세보기 실패:", error);
+	      alert("상세보기를 불러오지 못했습니다.");
+	    });
+	}
+
+
+  function submitAnswer() {
+    const qnaId = document.getElementById("detail-id").textContent;
+    const answer = document.getElementById("detail-answer").value;
+
+    if (!answer.trim()) {
+      alert("답변 내용을 입력하세요.");
+      return;
     }
 
-    
-    function submitAnswer() {
-        const qnaId = document.getElementById("detail-id").textContent;
-        const answer = document.getElementById("detail-answer").value;
+    fetch('/admin/submitAnswer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ qnaId, answer })
+    })
+      .then(response => {
+        if (!response.ok) throw new Error('서버 오류');
+        return response.json();
+      })
+      .then(updatedQna => {
+        alert("답변이 등록되었습니다.");
+        document.getElementById("detail-answer").value = updatedQna.answer;
+        document.getElementById("detail-status").textContent = updatedQna.status;
 
-        if (!answer.trim()) {
-            alert("답변 내용을 입력하세요.");
-            return;
-        }
+        // 테이블 반영
+        const row = document.querySelector(`a[data-id="${qnaId}"]`).closest("tr");
+        row.querySelector("td:nth-child(7)").textContent = updatedQna.status;
+        row.querySelector("td:nth-child(6)").textContent = updatedQna.category;
+      })
+      .catch(error => {
+        console.error("답변 등록 실패:", error);
+        alert("답변 등록 중 오류가 발생했습니다.");
+      });
+  }
+</script>
 
-        fetch('/admin/submitAnswer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                qnaId: qnaId,
-                answer: answer
-            })
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('서버 오류');
-            return response.json();  // ✅ 서버에서 저장된 DTO를 반환한다고 가정
-        })
-        .then(updatedQna => {
-            alert("답변이 등록되었습니다.");
-
-            // ✅ 즉시 반영
-            document.getElementById("detail-answer").value = updatedQna.answer;
-            document.getElementById("detail-status").textContent = updatedQna.status;
-
-            // ✅ 테이블에 있는 해당 행도 업데이트
-            const row = document.querySelector(`a[data-id="${qnaId}"]`).closest("tr");
-            row.querySelector("td:nth-child(6)").textContent = updatedQna.status;
-            row.querySelector("td:nth-child(7)").textContent = updatedQna.answer;
-        })
-        .catch(error => {
-            console.error("답변 등록 실패:", error);
-            alert("답변 등록 중 오류가 발생했습니다.");
-        });
-    }
-  </script>
 
 </body>
 </html>
