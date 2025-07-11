@@ -45,7 +45,7 @@ th, td {
 	<p>여기서 해결되지 않는 문의사항은 1:1문의나 챗봇상담을 이용해주세요.</p>
 	<hr>
 
-	<!--검색하기 넣기-->
+	<!--검색하기 -->
 <div style="margin-bottom: 10px;">
   <input type="text" id="search-input" placeholder="검색어를 입력하세요..." list="autocomplete-list" style="width: 300px; padding: 5px;">
   <datalist id="autocomplete-list">
@@ -53,8 +53,12 @@ th, td {
   </datalist>
 </div>
 
+<!-- 카테고리 버튼 영역 -->
+<div id="category-buttons" style="margin-bottom: 15px;">
+</div>
 
-	<!--검색하기 넣기-->
+
+
 
 	<div id="faq-list" th:if="${faqlist != null}">
 				<table id="faq-table">
@@ -87,8 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const pagination = document.getElementById("pagination");
   const searchInput = document.getElementById("search-input");
   const datalist = document.getElementById("autocomplete-list");
+  const categoryContainer = document.getElementById("category-buttons");
 
-  let filteredRows = [...rows]; // 현재 필터링된 리스트
+  let filteredRows = [...rows];
+  let currentCategory = "전체";
 
   function showPage(page, list = filteredRows) {
     list.forEach((row, index) => {
@@ -118,36 +124,59 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function filterRows() {
+    const keyword = searchInput.value.trim().toLowerCase();
+
+    filteredRows = rows.filter(row => {
+      const question = row.querySelector("a").textContent.toLowerCase();
+      const category = row.querySelector("td:nth-child(2)").textContent.trim();
+      const matchKeyword = question.includes(keyword);
+      const matchCategory = currentCategory === "전체" || category === currentCategory;
+      return matchKeyword && matchCategory;
+    });
+
+    rows.forEach(row => row.classList.add("hidden"));
+    renderPagination(filteredRows);
+  }
+
+  // 검색어 입력 시 필터링
   searchInput.addEventListener("input", () => {
-	  const keyword = searchInput.value.trim().toLowerCase();
+    const keyword = searchInput.value.trim().toLowerCase();
+    const matchedQuestions = rows
+      .map(row => row.querySelector("a").textContent.trim())
+      .filter(q => q.toLowerCase().includes(keyword));
 
-	  // 자동완성 리스트 갱신
-	  const matchedQuestions = rows
-	    .map(row => row.querySelector("a").textContent.trim())
-	    .filter(q => q.toLowerCase().includes(keyword));
+    datalist.innerHTML = "";
+    [...new Set(matchedQuestions)].slice(0, 10).forEach(text => {
+      const option = document.createElement("option");
+      option.value = text;
+      datalist.appendChild(option);
+    });
 
-	  datalist.innerHTML = "";
-	  [...new Set(matchedQuestions)].slice(0, 10).forEach(text => {
-	    const option = document.createElement("option");
-	    option.value = text;
-	    datalist.appendChild(option);
-	  });
+    filterRows();
+  });
 
-	  // 필터링된 행 보여주기
-	  filteredRows = rows.filter(row => {
-	    const question = row.querySelector("a").textContent.toLowerCase();
-	    return question.includes(keyword);
-	  });
+  // 카테고리 버튼 생성
+  const categories = [...new Set(rows.map(row => row.querySelector("td:nth-child(2)").textContent.trim()))];
+  ["전체", ...categories].forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "category-btn";
+    btn.dataset.category = cat;
+    btn.textContent = cat;
+    if (cat === "전체") btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentCategory = cat;
+      filterRows();
+    });
+    categoryContainer.appendChild(btn);
+  });
 
-	  rows.forEach(row => row.classList.add("hidden")); // 전체 숨기기
-	  renderPagination(filteredRows); // 필터링된 것만 보여주기
-	});
-
-
-  // 초기 실행
   renderPagination();
 });
 </script>
+
 
 			
 </body>
