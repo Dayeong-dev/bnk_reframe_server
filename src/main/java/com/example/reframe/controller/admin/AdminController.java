@@ -16,8 +16,8 @@ import com.example.reframe.service.AccessLogService;
 @RequestMapping("/admin")
 public class AdminController {
 	
-	@Autowired
-	private AccessLogService accessLogService;
+//	@Autowired
+//	private AccessLogService accessLogService;
 
 	@GetMapping("/product-main")
 	public String root() {
@@ -43,7 +43,9 @@ public class AdminController {
 	public String cardMain() {
 		return "admin/card-main";
 	}
-
+	/*
+	 * 차트 4개를 한 페이지로 통합  -> AdminChartController로 이동 
+	 * 
 	@GetMapping("/chart-main")
 	public String chartMain(Model model){
 
@@ -59,7 +61,8 @@ public class AdminController {
 
 		model.addAttribute("labels", labels);
 		model.addAttribute("counts", counts);
-		return "admin/chart-main";
+		return "admin/chart/chart-main";
 	}
+	*/
 
 }
