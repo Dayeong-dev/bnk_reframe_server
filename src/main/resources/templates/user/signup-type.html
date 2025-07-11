@@ -4,13 +4,16 @@
 <meta charset="UTF-8">
 <title>회원가입</title>
 <link rel="stylesheet" href="/css/common.css"></link>
+<link rel="stylesheet" href="/css/user.css"></link>
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<section id="signup">
+	<section id="signup-type">
 		<h2>회원가입 유형 선택</h2>
-		<a href="/signup/personal">개인</a>
-		<a href="/signup/corporate/verify">기업</a>
+		<div class="btn-list">
+			<a href="/signup/personal">개인</a>
+			<a href="/signup/corporate/verify">기업</a>
+		</div>
 	</section>
 </body>
 </html>

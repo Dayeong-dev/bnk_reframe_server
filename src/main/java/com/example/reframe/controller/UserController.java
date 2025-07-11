@@ -23,11 +23,6 @@ public class UserController {
 		this.userService = userService;
 	}
 	
-	@GetMapping("/")
-	public String root() {
-		return "user/index";
-	}
-	
 	@GetMapping("/signup")
 	public String signUp() {
 		return "user/signup-type";
