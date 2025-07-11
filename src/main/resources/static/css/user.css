@@ -1,0 +1,20 @@
+@charset "UTF-8";
+
+#signup-form .username-wrap {
+	width: 20rem;
+    display: flex;
+    justify-content: space-betweens;
+    align-items: center;
+    margin: 0.5rem auto;
+}
+
+#signup-form .username-wrap input[type="text"] {
+    flex: 1;
+    margin: 0;
+    margin-right: 0.5rem;
+}
+
+#signup-form .username-wrap input[type="button"] {
+    padding: 0.5rem 1rem;
+    height: 2.5rem;
+}
