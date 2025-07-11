@@ -1,69 +1,370 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <title>카드 메인 페이지</title>
+<meta charset="UTF-8" />
+<title>카드 메인 페이지</title>
 
-    <!-- slick CSS CDN -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+<!-- slick CSS -->
+<link rel="stylesheet" type="text/css"
+  href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+<link rel="stylesheet" type="text/css"
+  href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
 
-    <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- slick JS CDN -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
-    <style>
-        .card-item {
-            text-align: center;
-            padding: 10px;
-        }
-        .card-item img {
-            width: 100%;
-            max-width: 300px;
-        }
-    </style>
+<style>
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+h1 {
+  text-align: center;
+  margin: 40px 0 20px;
+  font-weight: 700;
+  color: #222;
+}
+
+.search-box {
+  text-align: center;
+  margin: 20px 0 40px;
+}
+
+.search-box input {
+  width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+}
+
+.search-box button {
+  padding: 8px 16px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-box button:hover {
+  background-color: #0056b3;
+}
+
+.slider-container {
+  margin: 0 auto 40px;
+  position: relative;
+}
+
+/* 슬릭 슬라이드 아이템 스타일 */
+.slide-item {
+  text-align: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.slide-item img {
+  width: 100%;
+  max-width: 280px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+  transition: transform 0.3s ease;
+}
+
+/* 이미지 호버 시 살짝 커지는 효과 */
+.slide-item img:hover {
+  transform: scale(1.05);
+}
+
+/* 가운데 슬라이드가 커지면서 강조되는 효과 */
+.slick-center .slide-item {
+  transform: scale(1.3);
+  z-index: 2;
+}
+
+.slick-center .slide-item img {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  transform: scale(1.1);
+}
+
+.slide-item p {
+  margin-top: 10px;
+  font-weight: 700;
+  color: #333;
+  font-size: 16px;
+}
+
+/* 카드 목록 그리드 스타일 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+}
+
+.card-item {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+  transition: box-shadow 0.3s ease;
+}
+
+.card-item:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card-item img {
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+}
+
+.card-desc {
+  padding: 10px 15px;
+  flex: 1;
+}
+
+.card-desc h4 {
+  margin: 0 0 5px;
+  font-size: 18px;
+  color: #222;
+}
+
+.card-desc p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.3;
+}
+
+.banner {
+  text-align: center;
+  margin: 50px 0;
+}
+
+.banner img {
+  max-width: 600px;
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.banner img:hover {
+  transform: scale(1.03);
+}
+
+.more-link {
+  display: inline-block;
+  margin: 5px 0 20px;
+  font-size: 14px;
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.more-link:hover {
+  text-decoration: underline;
+}
+
+/* 슬릭 커스텀 좌우 화살표 스타일 */
+.slick-prev, .slick-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  z-index: 10;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.slick-prev:hover, .slick-next:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+.slick-prev {
+  left: -50px;
+}
+
+.slick-next {
+  right: -50px;
+}
+
+/* 화살표 아이콘 텍스트 */
+.slick-prev::before, .slick-next::before {
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 24px;
+  color: white;
+  opacity: 1;
+}
+
+.slick-prev::before {
+  content: '<';
+}
+
+.slick-next::before {
+  content: '>';
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  .slick-prev {
+    left: -35px;
+  }
+  .slick-next {
+    right: -35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .slick-prev, .slick-next {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+  .slick-prev {
+    left: -30px;
+  }
+  .slick-next {
+    right: -30px;
+  }
+}
+</style>
 </head>
+
 <body>
-<h1>카드 메인 페이지 - 인기 카드 TOP 6</h1>
+  <div class="container">
+    <h1>카드 메인 페이지</h1>
 
-<div class="center">
-    <div class="card-item" th:each="card : ${topCards}">
-        <a th:href="@{'/card/detail/' + ${card.cardId}}">
-            <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
+    <!-- 슬릭 슬라이더 컨테이너 -->
+    <div class="slider-container">
+      <div class="slider">
+        <div class="slide-item" th:each="card : ${topCards}">
+          <a th:href="@{'/card/detail/' + ${card.cardId}}">
+            <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+              th:alt="${card.name}" />
             <p th:text="${card.name}"></p>
-        </a>
+          </a>
+        </div>
+      </div>
     </div>
-</div>
 
-<script>
-    $(document).ready(function(){
-        $('.center').slick({
-            centerMode: true,
-            centerPadding: '60px',
-            slidesToShow: 2,
-            responsive: [
-                {
-                    breakpoint: 768,
-                    settings: {
-                        arrows: false,
-                        centerMode: true,
-                        centerPadding: '40px',
-                        slidesToShow: 2
-                    }
-                },
-                {
-                    breakpoint: 480,
-                    settings: {
-                        arrows: false,
-                        centerMode: true,
-                        centerPadding: '40px',
-                        slidesToShow: 1
-                    }
-                }
-            ]
-        });
+    <!-- 카드 이름 검색 폼 -->
+    <div class="search-box">
+      <form method="get" action="/card/list">
+        <input type="text" name="keyword" placeholder="카드 이름 검색" />
+        <button type="submit">검색</button>
+      </form>
+    </div>
+
+    <!-- 카드 목록 헤더 및 더보기 링크 -->
+    <div class="section-header">
+      <h2>카드 상품</h2>
+    </div>
+    <a href="/card/list" class="more-link">더보기 &gt;</a>
+
+    <!-- 카드 목록 그리드 -->
+    <div class="card-grid">
+      <div class="card-item" th:each="card : ${topCards}">
+        <a th:href="@{'/card/detail/' + ${card.cardId}}">
+          <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+            th:alt="${card.name}" />
+        </a>
+        <div class="card-desc">
+          <a th:href="@{'/card/detail/' + ${card.cardId}}">
+            <h4 th:text="${card.name}"></h4>
+          </a>
+          <p th:text="${card.description}"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 소비성향 테스트 배너 -->
+    <div class="banner">
+      <a href="/card/card_test_main">
+        <img src="/images/cards/card_test_banner.png" alt="소비성향 테스트" />
+      </a>
+    </div>
+  </div>
+
+
+  <script>
+    $(document).ready(function () {
+      $('.slider').slick({
+        centerMode: true,          // 가운데 슬라이드 강조 모드 활성화
+        centerPadding: '60px',     // 좌우 패딩 (슬라이드 주변 여백)
+        slidesToShow: 3,           // 한번에 보이는 슬라이드 개수
+        slidesToScroll: 1,         // 한번에 넘어가는 슬라이드 개수
+        autoplay: true,            // 자동 슬라이드 활성화
+        autoplaySpeed: 1500,       // 자동 슬라이드 속도 (1.5초)
+        infinite: true, 		   // 무한 반복 활성화
+        arrows: true,              // 좌우 화살표 표시
+        dots: true,                // 하단 점 네비게이션 표시
+        pauseOnHover: false,     // 마우스 올려도 멈추지 않게
+        pauseOnFocus: false,     // 포커스(화살표/점 클릭)해도 멈추지 않게
+        pauseOnDotsHover: false, // 점 네비게이션 hover 시 멈추지 않게
+        prevArrow: '<button type="button" class="slick-prev" aria-label="Previous slide">&lt;</button>',  // 커스텀 이전 버튼
+        nextArrow: '<button type="button" class="slick-next" aria-label="Next slide">&gt;</button>',      // 커스텀 다음 버튼
+        responsive: [
+          {
+            breakpoint: 768,
+            settings: {
+              slidesToShow: 2,
+              arrows: true,
+              dots: true,
+              centerMode: true,
+              centerPadding: '40px',
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 1,
+              arrows: false,
+              dots: true,
+              centerMode: true,
+              centerPadding: '40px',
+            }
+          }
+        ]
+      });
     });
-</script>
+  </script>
 
 </body>
 </html>

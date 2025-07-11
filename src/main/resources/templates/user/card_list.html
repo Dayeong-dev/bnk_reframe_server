@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>카드 상품</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center; /* 전체 중앙 정렬 기준 */
+}
+
+h1 {
+  margin-bottom: 30px;
+}
+
+/* 필터 폼 영역 중앙 정렬 */
+form {
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+/* 대분류 라벨 숨기기 */
+form label[for="categoryMajorSelect"] {
+  display: none;
+}
+
+form select, form input[type="text"], form button {
+  vertical-align: middle;
+  font-size: 1em;
+}
+
+form select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  min-width: 120px;
+}
+
+form input[type="text"] {
+  width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+form button {
+  padding: 8px 14px;
+  background: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background: #0056b3;
+}
+
+/* 소분류 필터 중앙 정렬 */
+.subcategory-links {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.subcategory-links a {
+  margin-right: 15px;
+  text-decoration: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.subcategory-links a:hover {
+  text-decoration: underline;
+}
+
+.subcategory-links a.selected {
+  font-weight: bold;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+/* 비교함 박스 */
+#compareBox {
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  margin: 20px auto;
+  max-width: 900px;
+  text-align: center;
+}
+
+/* 비교함 슬롯 - 중앙 정렬, 꽉 차게 */
+#compareSlots {
+  display: flex;
+  justify-content: center;  /* 중앙 정렬 */
+  gap: 20px;
+  margin-bottom: 15px;
+  flex-wrap: nowrap;
+  overflow-x: hidden; /* 가로 스크롤 제거 */
+}
+
+.compare-slot {
+  flex: 1 1 0;  /* 균등 분배 */
+  max-width: 220px;
+  height: 120px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #ccc;
+  user-select: none;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.compare-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+#compareBox button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+#compareBox button:hover {
+  background: #0056b3;
+}
+
+/* 카드 리스트 */
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.card-item {
+  width: 32%;
+  padding: 15px;
+  text-align: center;
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease;
+}
+
+.card-item img {
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+  border-radius: 6px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.card-item h3 {
+  margin: 10px 0;
+}
+
+.card-item p {
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* 카드 목록 ‘비교함 담기’ 버튼 - 진한 회색 텍스트, 배경 없음 */
+.card-item button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  color: #343a40;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.card-item:hover {
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+}
+
+.card-item button:hover {
+  color: #007bff;
+  background: none;
+  box-shadow: none;
+}
+
+/* 모달 및 기타 기존 스타일 유지 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  border-radius: 8px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content span.close-btn {
+  float: right;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+#compareContainer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+#compareContainer > div {
+  flex-shrink: 0;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  width: 250px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#compareContainer img {
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.pagination a {
+  margin: 0 5px;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.pagination span {
+  margin: 0 5px;
+}
+</style>
+</head>
+<body>
+
+<h1>카드 상품</h1>
+
+<!-- 검색 및 필터 폼 -->
+<form method="get" th:action="@{/card/list}">
+  <label for="categoryMajorSelect">대분류: </label> 
+  <select id="categoryMajorSelect" name="categoryMajor" onchange="this.form.submit()">
+    <option value="" th:selected="${categoryMajor == null or categoryMajor == ''}">전체</option>
+    <option value="P" th:selected="${categoryMajor == 'P'}">개인</option>
+    <option value="C" th:selected="${categoryMajor == 'C'}">기업</option>
+    <option value="K" th:selected="${categoryMajor == 'K'}">체크</option>
+  </select> 
+  <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" />
+  <button type="submit">검색</button>
+</form>
+
+<!-- 소분류 나열 -->
+<div class="subcategory-links">
+  <a th:each="sub : ${allSubcategories}" 
+     th:href="@{'/card/list?categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${sub}}" 
+     th:text="${sub}" 
+     th:classappend="${subcategory == sub} ? 'selected' : ''"></a>
+</div>
+
+<!-- 비교함 표시 영역 -->
+<div id="compareBox">
+  <div id="compareSlots">
+    <div class="compare-slot" data-index="0">+</div>
+    <div class="compare-slot" data-index="1">+</div>
+    <div class="compare-slot" data-index="2">+</div>
+  </div>
+  <button type="button" onclick="openCompareModal()">비교하기</button>
+</div>
+
+<!-- 카드 리스트 -->
+<div class="card-list" style="margin-top: 20px;">
+  <div class="card-item" th:each="card : ${cards}">
+    <a th:href="@{'/card/detail/' + ${card.cardId}}">
+      <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
+    </a>
+    <h3>
+      <a th:href="@{'/card/detail/' + ${card.cardId}}" th:text="${card.name}">카드 이름</a>
+    </h3>
+    <p th:text="${card.description}">카드 설명</p>
+    <p>대분류: <span th:text="${card.categoryMajorDisplay}"></span></p>
+    <p>상태: <span th:text="${card.statusDisplay}"></span></p>
+    <button type="button"
+      th:attr="onclick=|addToCompare(${card.cardId}, &quot;${card.name}&quot;, '/images/cards/' + ${card.cardId} + '_front.PNG')|">
+      비교함 담기
+    </button>
+  </div>
+</div>
+
+<!-- 페이지네이션 -->
+<div class="pagination" style="text-align: center; margin-top: 20px;">
+  <a th:if="${cards.hasPrevious()}" 
+     th:href="@{'/card/list?(page=' + ${cards.number - 1} + '&categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${subcategory} + '&keyword=' + ${keyword})'}">이전</a>
+  <span th:text="${cards.number + 1} + ' / ' + ${cards.totalPages}">페이지</span>
+  <a th:if="${cards.hasNext()}" 
+     th:href="@{'/card/list?(page=' + ${cards.number + 1} + '&categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${subcategory} + '&keyword=' + ${keyword})'}">다음</a>
+</div>
+
+<!-- 카드 비교 모달 -->
+<div id="compareModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeCompareModal()">×</span>
+    <div id="compareContainer"></div>
+  </div>
+</div>
+
+<script>
+const compareSlots = [null, null, null];
+
+function addToCompare(cardId, cardName, cardImg) {
+  const emptyIndex = compareSlots.findIndex(slot => slot === null);
+  if (emptyIndex === -1) {
+    alert("최대 3개까지 비교 가능합니다!");
+    return;
+  }
+
+  if (compareSlots.some(slot => slot && slot.cardId === cardId)) {
+    alert("이미 비교함에 담긴 카드입니다.");
+    return;
+  }
+
+  compareSlots[emptyIndex] = { cardId, cardImg };
+  updateCompareBox();
+}
+
+function removeFromCompare(index) {
+  compareSlots[index] = null;
+  updateCompareBox();
+}
+
+function updateCompareBox() {
+  const slots = document.querySelectorAll("#compareSlots .compare-slot");
+  slots.forEach((slotDiv, idx) => {
+    const data = compareSlots[idx];
+    if (data) {
+      slotDiv.innerHTML = `<img src="${data.cardImg}" alt="비교 카드 이미지" />`;
+      slotDiv.style.border = "2px dashed #ccc";
+      slotDiv.style.color = "initial";
+    } else {
+      slotDiv.innerHTML = "+";
+      slotDiv.style.border = "2px dashed #ccc";
+      slotDiv.style.color = "#ccc";
+    }
+  });
+}
+
+document.querySelectorAll("#compareSlots .compare-slot").forEach((slotDiv, idx) => {
+  slotDiv.addEventListener("click", () => {
+    if (compareSlots[idx] !== null) {
+      if (confirm("비교함에서 삭제하시겠습니까?")) {
+        removeFromCompare(idx);
+      }
+    }
+  });
+});
+
+function openCompareModal() {
+  const selectedCards = compareSlots.filter(slot => slot !== null);
+  if (selectedCards.length === 0) {
+    alert("비교할 카드를 먼저 선택하세요!");
+    return;
+  }
+
+  const ids = selectedCards.map(c => c.cardId).join(",");
+  fetch(`/card/compare?ids=${ids}`)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("compareContainer");
+      container.innerHTML = "";
+
+      data.forEach(card => {
+        const cardDiv = document.createElement("div");
+        cardDiv.innerHTML = `
+          <img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name}" />
+          <h3>${card.name}</h3>
+          <p><strong>대분류:</strong> ${card.categoryMajorDisplay}</p>
+          <p><strong>연회비:</strong> ${card.annualFee}</p>
+          <p><strong>상태:</strong> ${card.statusDisplay}</p>
+          <p><strong>서비스:</strong><br>${card.service.replace(/\n/g, "<br>")}</p>
+          <a href="/card/detail/${card.cardId}">상세보기</a>
+        `;
+        container.appendChild(cardDiv);
+      });
+
+      document.getElementById("compareModal").style.display = "block";
+    });
+}
+
+function closeCompareModal() {
+  document.getElementById("compareModal").style.display = "none";
+}
+</script>
+
+</body>
+</html>
