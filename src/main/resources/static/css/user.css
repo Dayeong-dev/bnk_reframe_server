@@ -1,5 +1,7 @@
 @charset "UTF-8";
 
+
+
 #signup-form .username-wrap {
 	width: 20rem;
     display: flex;
@@ -17,4 +19,21 @@
 #signup-form .username-wrap input[type="button"] {
     padding: 0.5rem 1rem;
     height: 2.5rem;
+}
+
+#signup-type .btn-list {
+	display: flex;
+	justify-content: center;
+	column-gap: 2rem;
+}
+
+#signup-type .btn-list a {
+	width: 8rem;
+	height: 8rem;
+	border-radius: 0.5rem;
+	background-color: #ddd;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }

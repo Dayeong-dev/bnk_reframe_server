@@ -11,7 +11,7 @@
     box-sizing: border-box;
 }
 
-body {
+html {
     font-size: 16px;
     font-family: 'BNKGothic', sans-serif;
     font-weight: 400;
@@ -20,10 +20,6 @@ body {
 a {
     color: inherit;
     text-decoration: inherit;
-}
-
-a:hover {
-    text-decoration: underline;
 }
 
 ul, ol {
@@ -47,27 +43,36 @@ header ul {
 }
 
 header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1rem 2rem;
+	position: relative;
 }
 
 header .logo {
-  flex: 1;
+	flex: 1;
 }
 
 header .menu {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	
+	font-weight: bold;
 }
 
 header .sub-menu {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
+	flex: 1;
+	display: flex;
+	justify-content: flex-end;
+	
+	font-size: 0.75rem;
+	color: #aaa;
+}
+
+header a:hover {
+	text-decoration: underline;
 }
 
 section {
