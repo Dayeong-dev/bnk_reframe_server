@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>FAQ 관리</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<style>
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px solid #ccc;
+}
+
+th, td {
+	padding: 10px;
+	text-align: left;
+}
+
+.pagination {
+	margin-top: 15px;
+	text-align: center;
+}
+
+.pagination button {
+	margin: 0 5px;
+	padding: 5px 10px;
+}
+
+.hidden {
+	display: none;
+}
+
+#faq-form, #faq-detail {
+	display: none;
+}
+</style>
+</head>
+<body>
+
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+		<!-- 본문 -->
+		<div class="content" id="main-content">
+			<h1>FAQ 관리</h1>
+
+			<div style="text-align: right; margin-bottom: 10px;">
+				<button onclick="toggleFaqForm()">추가하기</button>
+			</div>
+
+
+			<div id="faq-list" th:if="${faqlist != null}">
+				<table id="faq-table">
+					<thead>
+						<tr>
+							<th>글번호</th>
+							<th>구분</th>
+							<th>제목</th>
+						</tr>
+					</thead>
+					<tbody id="faq-tbody">
+						<tr th:each="faq, iterStat : ${faqlist}"
+							th:attr="data-index=${iterStat.index}">
+							<td th:text="${faq.faqId}"></td>
+							<td th:text="${faq.category}"></td>
+							<td><a href="#" th:attr="data-id=${faq.faqId}"
+								th:text="${faq.question}"
+								onclick="loadFaqDetail(this); return false;"></a></td>
+						</tr>
+					</tbody>
+				</table>
+
+				<!-- 페이지네이션 -->
+				<div class="pagination" id="pagination"></div>
+			</div>
+
+
+
+			<hr>
+
+			<div id="faq-detail">
+				<p>
+					<strong>글번호:</strong> <span id="detail-id"></span>
+				</p>
+				<p>
+					<strong>제목:</strong> <span id="detail-question"></span>
+				</p>
+				<p>
+					<strong>카테고리:</strong> <span id="detail-category"></span>
+				</p>
+
+				<p>
+					<strong>작성일:</strong> <span id="detail-regdate"></span>
+				</p>
+
+				<hr>
+				<p>
+					<strong>답변:</strong>
+				</p>
+				<div class="content-box" id="detail-answer"></div>
+				<button onclick="enableFaqEdit()">수정</button>
+				<button onclick="deleteFaq()">삭제</button>
+			</div>
+
+
+			<div id="faq-form">
+				<form id="faqForm" data-mode="create">
+					<label for="category">카테고리:</label><br> <select id="category"
+						name="category" required>
+						<option value="">-- 선택하세요 --</option>
+						<option value="예금">예적금</option>
+						<option value="카드">카드</option>
+						<option value="기타">기타</option>
+					</select><br> <br> <label for="question">제목:</label><br> <input
+						type="text" id="question" name="question" required><br>
+					<br> <label for="answer">답변:</label><br>
+					<textarea id="answer" name="answer" rows="10" cols="50" required></textarea>
+					<br> <br>
+				</form>
+				<button id="faq-submit-btn" type="button" onclick="faqRegist()">FAQ 등록하기</button>
+
+			</div>
+		</div>
+	</div>
+
+	<script>
+//	document.getElementById("faq-submit-btn").textContent = "FAQ 수정하기";
+
+	
+	function enableFaqEdit() {
+    const faqId = document.getElementById("detail-id").textContent;
+    const category = document.getElementById("detail-category").textContent;
+    const question = document.getElementById("detail-question").textContent;
+    const answer = document.getElementById("detail-answer").textContent;
+
+    document.getElementById("category").value = category;
+    document.getElementById("question").value = question;
+    document.getElementById("answer").value = answer;
+
+    // 폼 상태 변경
+    const form = document.getElementById("faqForm");  // 여기 주목!
+    form.setAttribute("data-mode", "edit");
+    form.setAttribute("data-id", faqId);
+
+    // 폼 보이고 상세는 숨기기
+    document.getElementById("faq-form").style.display = "block";
+    document.getElementById("faq-detail").style.display = "none";
+
+    // 버튼 텍스트 변경
+    document.getElementById("faq-submit-btn").textContent = "FAQ 수정하기";
+}
+
+
+	
+	function faqRegist() {
+		const form = document.getElementById("faqForm");
+		const mode = form.getAttribute("data-mode") || "create";
+		const faqId = form.getAttribute("data-id");
+		  const formData = new FormData();
+		  formData.append("category", document.getElementById("category").value);
+		  formData.append("question", document.getElementById("question").value);
+		  formData.append("answer", document.getElementById("answer").value);
+
+		  let url = '/admin/faqRegist';
+		  if (mode === "edit") {
+		    formData.append("faqId", faqId);
+		    url = '/admin/faqUpdate';
+		  }
+
+		  fetch(url, {
+		    method: 'POST',
+		    body: formData
+		  })
+		  .then(response => response.text())
+		  .then(result => {
+		    alert(result);
+		    location.reload();
+		  })
+		  .catch(error => {
+		    console.error('FAQ 저장 실패:', error);
+		    alert('FAQ 저장에 오류 발생.');
+		  });
+		}
+
+	function deleteFaq() {
+		  const faqId = document.getElementById("detail-id").textContent;
+
+		  if (!confirm("정말 삭제하시겠습니까?")) return;
+
+		  fetch('/admin/faqDelete/' + faqId, {
+		    method: 'DELETE'
+		  })
+		    .then(response => {
+		      if (!response.ok) throw new Error("삭제 실패");
+		      return response.text();
+		    })
+		    .then(result => {
+		      alert("삭제되었습니다.");
+		      location.reload();
+		    })
+		    .catch(error => {
+		      console.error("삭제 오류:", error);
+		      alert("FAQ 삭제 중 오류 발생.");
+		    });
+		}
+
+	
+	function toggleFaqForm() {
+	    const formDiv = document.getElementById("faq-form");
+	    const form = document.getElementById("faqForm");
+
+	    form.setAttribute("data-mode", "create");
+	    form.removeAttribute("data-id");
+	    document.getElementById("faq-submit-btn").textContent = "FAQ 등록하기";
+
+	    formDiv.style.display = "block";
+	    document.getElementById("faq-detail").style.display = "none";
+
+	    form.reset();
+	}
+
+
+
+    // 클라이언트 페이지네이션 처리
+    document.addEventListener("DOMContentLoaded", () => {
+      const rowsPerPage = 5;
+      const rows = document.querySelectorAll("#faq-tbody tr");
+      const pageCount = Math.ceil(rows.length / rowsPerPage);
+      const pagination = document.getElementById("pagination");
+
+      function showPage(page) {
+        rows.forEach((row, index) => {
+          row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+        });
+      }
+
+      for (let i = 0; i < pageCount; i++) {
+        const button = document.createElement("button");
+        button.textContent = i + 1;
+        button.addEventListener("click", () => {
+          showPage(i);
+        });
+        pagination.appendChild(button);
+      }
+
+      showPage(0); // 첫 페이지 기본 표시
+    });
+    
+    
+    
+    function loadFaqDetail(element) {
+        const faqId = element.getAttribute('data-id');
+
+        fetch('/admin/detail/' + faqId)
+          .then(response => response.json())
+          .then(faq => {
+            document.getElementById("detail-id").textContent = faq.faqId;
+            document.getElementById("detail-question").textContent = faq.question;
+            document.getElementById("detail-category").textContent = faq.category;
+            document.getElementById("detail-regdate").textContent = faq.regdate;
+            document.getElementById("detail-answer").textContent = faq.answer;
+
+            // 상세보기 열기, 등록 폼 닫기
+            document.getElementById("faq-detail").style.display = "block";
+            document.getElementById("faq-form").style.display = "none";
+          })
+          .catch(error => {
+            console.error("FAQ 상세보기 실패:", error);
+            alert("상세보기를 불러오지 못했습니다.");
+          });
+      }
+  </script>
+
+</body>
+</html>

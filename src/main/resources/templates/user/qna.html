@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>1:1 문의</title>
+<style>
+#qna-form, #qna-list {
+	display: none;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px solid #ccc;
+}
+
+th, td {
+	padding: 10px;
+	text-align: left;
+}
+
+.pagination {
+	margin-top: 15px;
+	text-align: center;
+}
+
+.pagination button {
+	margin: 0 5px;
+	padding: 5px 10px;
+}
+.hidden {
+  display: none;
+}
+</style>
+</head>
+<body>
+	<h1>1:1 문의</h1>
+
+
+	<button onclick="showForm()">등록하기</button>
+	<button onclick="showList()">내 문의내역</button>
+
+	<hr>
+	<div id="qna-form">
+		<form action="/qna/qnaRegist" method="post">
+			<label for="category">카테고리:</label><br> <select id="category"
+				name="category" required>
+				<option value="">-- 선택하세요 --</option>
+				<option value="예금">예적금</option>
+				<option value="카드">카드</option>
+				<option value="기타">기타</option>
+			</select> <br> <br> <label for="title">제목:</label><br> <input
+				type="text" id="title" name="title" required><br> <br>
+			<label for="content">내용:</label><br>
+			<textarea id="content" name="content" rows="10" cols="50" required></textarea>
+			<br> <br>
+			<button type="submit">등록</button>
+		</form>
+	</div>
+
+	<!-- 문의 목록 -->
+	<div id="qna-list" th:if="${qnalist != null}">
+		<table>
+			<thead>
+				<tr>
+					<th>글번호</th>
+					<th>제목</th>
+					<th>작성자</th>
+					<th>작성일</th>
+					<th>카테고리</th>
+					<th>상태</th>
+					<th>내용</th>
+				</tr>
+			</thead>
+			<tbody id="qna-tbody">
+				<tr th:each="qna : ${qnalist}">
+					<td th:text="${qna.qnaId}"></td>
+					<td><a th:href="@{'/qna/detail/' + ${qna.qnaId}}"
+						th:text="${qna.title}"></a></td>
+					<td th:text="${qna.user.username}"></td>
+					<td th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
+					<td th:text="${qna.category}"></td>
+					<td th:text="${qna.status}"></td>
+					<td th:text="${qna.content}"></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="pagination" id="pagination"></div>
+	</div>
+
+
+<script>
+  // 페이지네이션용 전역 변수
+  const rowsPerPage = 10;
+  let currentPage = 0;
+
+  function showForm() {
+    document.getElementById('qna-form').style.display = 'block';
+    document.getElementById('qna-list').style.display = 'none';
+  }
+
+  function showList() {
+    document.getElementById('qna-form').style.display = 'none';
+    document.getElementById('qna-list').style.display = 'block';
+    initPagination(); // 페이지네이션 여기서 실행해야 실제 DOM 요소 인식 가능
+  }
+
+  // 페이지네이션 함수
+  function initPagination() {
+    const rows = document.querySelectorAll("#qna-tbody tr");
+    const pageCount = Math.ceil(rows.length / rowsPerPage);
+    const pagination = document.getElementById("pagination");
+
+    pagination.innerHTML = ""; // 중복 제거
+    currentPage = 0;
+
+    function showPage(page) {
+      rows.forEach((row, index) => {
+        row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+      });
+      currentPage = page;
+    }
+
+    for (let i = 0; i < pageCount; i++) {
+      const button = document.createElement("button");
+      button.textContent = i + 1;
+      button.addEventListener("click", () => {
+        showPage(i);
+      });
+      pagination.appendChild(button);
+    }
+
+    showPage(0);
+  }
+
+  // 초기 실행
+  document.addEventListener("DOMContentLoaded", () => {
+    window.showForm = showForm;
+    window.showList = showList;
+
+    // 기본 화면: 등록 폼 보이기
+    showForm();
+
+    // 등록 성공 시 리스트 자동 전환
+    const success = /*[[${qnaSuccess != null and qnaSuccess}]]*/ false;
+    if (success === true) {
+      alert("등록되었습니다!");
+      showList();
+    }
+  });
+</script>
+
+
+
+
+	<script th:inline="javascript">
+/*<![CDATA[*/
+let success = /*[[${qnaSuccess != null and qnaSuccess}]]*/ false;
+if (success === true) {
+  alert('등록되었습니다!');
+  // showList는 window에 등록되어 있으므로 호출 가능
+  showList();
+}
+/*]]>*/
+</script>
+
+
+
+
+
+
+</body>
+</html>

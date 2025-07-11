@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>관리자 메인</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+		<!-- 본문 -->
+		<div class="content">
+			<h1>카드 관리</h1>
+			<div class="top-menu">
+				<button class="menu-btn" onclick="selectMenu('all')">전체보기</button>
+				<button class="menu-btn" onclick="selectMenu('개인')">개인카드</button>
+				<button class="menu-btn" onclick="selectMenu('기업')">기업카드</button>
+				<button class="menu-btn" onclick="selectMenu('체크')">체크카드</button>
+				<button class="menu-btn" onclick="showCardForm()">상품 등록
+				</button>
+			</div>
+
+			<div class="middle-menu">
+
+				<!-- 필터  -->
+				<select id="statusFilter" onchange="filterByStatus(this.value)">
+					<option value="all">전체</option>
+					<option value="S">판매중</option>
+					<option value="P">판매중단</option>
+					<option value="E">판매종료</option>
+				</select>
+
+				<!-- 검색창 -->
+				<input type="text" id="searchInput" placeholder="상품명을 입력하세요">
+				<button class="search-btn" onclick="">검색</button>
+
+			</div>
+
+			<!-- 데이터 출력 부분 -->
+			<div id="content"></div>
+
+			<!-- 상품 상태 변경 버튼 -->
+			<div style="margin-top: 10px;">
+				<button onclick="changeStatus('S')">판매중</button>
+				<button onclick="changeStatus('P')">판매중단</button>
+				<button onclick="changeStatus('E')">판매종료</button>
+			</div>
+
+			<!-- 상품 디테일 출력 부분 -->
+			<div id="content-detail"></div>
+		</div>
+	</div>
+
+
+	<script>
+		let currentCategory = "all";
+		let currentStatus = "all";
+		
+		//============================================================
+		
+		// 메뉴 선택 ( 전체, 개인, 기업, 체크 )
+		function selectMenu(value){
+			currentCategory = value;
+		    fetchFilteredProducts();
+		}
+		// 상태 선택 ( 전체, 판매중, 판매중단, 판매종료 )
+		function filterByStatus(statusCode) {
+			currentStatus = statusCode;
+		    fetchFilteredProducts();
+		}
+		
+		// 메뉴 및 상태에 따른 데이터 요청 
+		function fetchFilteredProducts() {
+		    $.ajax({
+		        url: "/admin/card/filter",
+		        type: "GET",
+		        data: {
+		            categoryMajor: currentCategory,
+		            status: currentStatus
+		        },
+		        success: function(response) {
+		            showProductList(response);
+		        },
+		        error: function(error) {
+		            console.error("필터 요청 실패:", error);
+		        }
+		    });
+		}
+		
+		// 요청한 데이터 view에 출력하기 
+		function showProductList(cards) {
+		    let html = '<table border="1" style="margin-top: 10px; width:100%;">';
+		    html += '<thead>';
+		    html += '<tr>';
+		    html += '<th><input type="checkbox" id="checkAll"></th>';
+		    html += '<th>카드 ID</th>';
+		    html += '<th>카드명</th>';
+		    html += '<th>카드 유형</th>';  
+		    html += '<th>상태</th>';
+		    html += '<th>조회수</th>';
+		    html += '</tr>';
+		    html += '</thead><tbody>';
+		
+		    for (let card of cards) {
+		        html += `<tr>`;
+		        html += `<td><input type="checkbox" class="card-check" value="${card.cardId}"></td>`;
+		        html += `<td>${card.cardId}</td>`;
+		        html += `<td><a href="#none" onclick="loadCardDetail('${card.cardId}')">${card.name}</a></td>`;
+		        html += `<td>${card.categoryMajor}</td>`;
+		        html += `<td>${card.status}</td>`;
+		        html += `<td>${card.viewCount}</td>`;
+		        html += `</tr>`;
+		    }
+		
+		    html += '</tbody></table>';
+		    document.getElementById('content').innerHTML = html;
+		}
+		
+		//============================================================
+		
+		// 제품 상세 불러오기
+		function loadCardDetail(cardId){
+			$.ajax({
+				url: "/admin/card/detail/"+cardId ,
+				type: "GET",
+				success: function(response){
+					console.log(response);
+					showCardDetail(response);
+				},
+				error: function (error){
+					console.error("요청 실패: " + error);
+				}	
+			});
+		}
+		
+		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
+		function showCardDetail(card) {
+		    let html = '<form id="cardDetailForm">';
+		    html += '<table border="1" style="margin-top: 10px; width: 100%;">';
+		    html += '<thead><tr><th colspan="2">카드 상세 정보</th></tr></thead>';
+		    html += '<tbody>';
+
+		    html += `<tr><td>카드 ID</td><td><input type="text" name="cardId" value="${card.cardId}" readonly></td></tr>`;
+		    html += `<tr><td>카드명</td><td><input type="text" name="name" value="${card.name}" readonly></td></tr>`;
+		    html += `<tr><td>설명</td><td><input type="text" name="description" value="${card.description}" readonly></td></tr>`;
+		    html += `<tr><td>해시태그</td><td><input type="text" name="tags" value="${card.tags}" readonly></td></tr>`;
+		    html += `<tr><td>대분류</td><td><input type="text" name="categoryMajor" value="${card.categoryMajor}" readonly></td></tr>`;
+		    html += `<tr><td>상태</td><td><input type="text" name="status" value="${card.status}" readonly></td></tr>`;
+		    html += `<tr><td>연회비</td><td><input type="text" name="annualFee" value="${card.annualFee}" readonly></td></tr>`;
+		    html += `<tr><td>카드 서비스</td><td><textarea name="service" readonly>${card.service}</textarea></td></tr>`;
+		    html += `<tr><td>발급 정보</td><td><textarea name="issuedInfo" readonly>${card.issuedInfo}</textarea></td></tr>`;
+		    html += `<tr><td>적립/할인</td><td><textarea name="pointInfo" readonly>${card.pointInfo}</textarea></td></tr>`;
+		    html += `<tr><td>조회수</td><td><input type="text" name="viewCount" value="${card.viewCount}" readonly></td></tr>`;
+		    html += `<tr><td>상품 안내</td><td><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></td></tr>`;
+		    html += `<tr><td>온라인 결제 안내</td><td><textarea name="onlinePaymentGuide" readonly>${card.onlinePaymentGuide}</textarea></td></tr>`;
+		    html += `<tr><td>기타 안내</td><td><textarea name="etcGuide" readonly>${card.etcGuide}</textarea></td></tr>`;
+		    html += `<tr><td>이용 약관</td><td><textarea name="termsGuide" readonly>${card.termsGuide}</textarea></td></tr>`;
+
+		    // 소분류 리스트 출력
+		    if (card.subcategories && card.subcategories.length > 0) {
+		        html += `<tr><td>소분류</td><td>${card.subcategories.join(', ')}</td></tr>`;
+		    }
+
+		    html += '</tbody></table>';
+		    html += `<button type="button" onclick="enableEditMode()">수정</button>`;
+			html += `<button type="button" id="saveBtn" onclick="saveProductChanges()" style="display:none;">저장</button>`;
+		    html += '</form>';
+
+		    document.getElementById('content-detail').innerHTML = html;
+		}
+		
+		//============================================================
+			
+		// 수정모드 전환
+		function enableEditMode() {
+			const inputs = document.querySelectorAll("#cardDetailForm input[type='text'] , #cardDetailForm textarea");
+			inputs.forEach(input => input.removeAttribute("readonly"));
+			document.getElementById("saveBtn").style.display = "inline";
+		}
+	
+		// 데이터 수정하기	
+		function saveProductChanges() {
+			const form = document.getElementById("cardDetailForm");
+			const formData = new FormData(form);
+
+			const data = {
+				cardId: Number(formData.get("cardId")),
+				name: formData.get("name"),
+				description: formData.get("description"),
+				tags: formData.get("tags"),
+				categoryMajor: formData.get("categoryMajor"),
+				status: formData.get("status"),
+				annualFee: Number(formData.get("annualFee")),
+				service: formData.get("service"),
+				issuedInfo: formData.get("issuedInfo"),
+				pointInfo: formData.get("pointInfo"),
+				onlinePaymentGuide: formData.get("onlinePaymentGuide"),
+				etcGuide: formData.get("etcGuide"),
+				termsGuide: formData.get("termsGuide"),
+			};
+			console.log(data);
+			
+			$.ajax({
+				url: "/admin/card/update",
+				type: "PUT",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				success: function() {
+					alert("수정 완료");
+					selectMenu("all");
+				},
+				error: function(err) {
+					alert("수정 실패");
+					console.error(err);
+				}
+			});
+		}
+		
+		//============================================================
+		
+		// 상품 등록 폼 열기
+		
+		function showCardForm() {
+			
+		    let html = '<form id="cardCreateFo	rm">';
+		    html += '<table border="1" style="margin-top: 10px; width: 100%;">';
+		    html += '<thead><tr><th colspan="2">카드 등록</th></tr></thead><tbody>';
+		
+		    html += '<tr><td>카드명</td><td><input type="text" name="name" required /></td></tr>';
+		    html += '<tr><td>설명</td><td><input type="text" name="description" /></td></tr>';
+		    html += '<tr><td>해시태그</td><td><input type="text" name="tags" /></td></tr>';
+		
+		    html += '<tr><td>대분류</td><td><select name="categoryMajor">';
+		    html += '<option value="P">개인</option>';
+		    html += '<option value="C">기업</option>';
+		    html += '<option value="K">체크</option>';
+		    html += '</select></td></tr>';
+		
+		    html += '<tr><td>연회비</td><td><input type="number" name="annualFee" /></td></tr>';
+		    html += '<tr><td>카드 서비스</td><td><textarea name="service"></textarea></td></tr>';
+		    html += '<tr><td>발급 정보</td><td><textarea name="issuedInfo"></textarea></td></tr>';
+		    html += '<tr><td>적립/할인</td><td><textarea name="pointInfo"></textarea></td></tr>';
+		    html += '<tr><td>상품 안내</td><td><textarea name="guideInfo"></textarea></td></tr>';
+		    html += '<tr><td>온라인 결제 안내</td><td><textarea name="onlinePaymentGuide"></textarea></td></tr>';
+		    html += '<tr><td>기타 안내</td><td><textarea name="etcGuide"></textarea></td></tr>';
+		    html += '<tr><td>이용 약관</td><td><textarea name="termsGuide"></textarea></td></tr>';
+		    html += '<tr><td>소분류</td><td><input type="text" name="subcategories" placeholder="쉼표(,)로 구분" /></td></tr>';
+		
+		    html += '<tr><td colspan="2"><button type="button" onclick="submitCardForm()">등록</button></td></tr>';
+		    html += '</tbody></table>';
+		    html += '</form>';
+		
+		    document.getElementById("content-detail").innerHTML = html;
+		}
+
+		
+		// 버튼 클릭시 폼 열기
+		function submitCardForm() {
+		    const form = document.getElementById("cardCreateForm");
+		    const formData = new FormData(form);
+		
+		    const subcategoriesStr = formData.get("subcategories") || "";
+		    const subcategoryList = subcategoriesStr.split(",").map(item => item.trim()).filter(Boolean);
+		
+		    const data = {
+		        name: formData.get("name"),
+		        description: formData.get("description"),
+		        tags: formData.get("tags"),
+		        categoryMajor: formData.get("categoryMajor"),
+		        annualFee: parseInt(formData.get("annualFee")),
+		        service: formData.get("service"),
+		        issuedInfo: formData.get("issuedInfo"),
+		        pointInfo: formData.get("pointInfo"),
+		        guideInfo: formData.get("guideInfo"),
+		        onlinePaymentGuide: formData.get("onlinePaymentGuide"),
+		        etcGuide: formData.get("etcGuide"),
+		        termsGuide: formData.get("termsGuide"),
+		        subcategories: subcategoryList,
+		        status: "S"  
+		    };
+		
+		    $.ajax({
+		        url: "/admin/card/create", 
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify(data),
+		        success: function () {
+		            alert("카드 등록 완료");
+		            selectMenu("all");
+		        },
+		        error: function (err) {
+		            alert("등록 실패");
+		            console.error(err);
+		        }
+		    });
+		}
+		
+		//============================================================
+		
+		// 제품 상태 변경 
+		function changeStatus(newStatus) {
+		    const ids = [];
+		    $(".card-check:checked").each(function () {
+		        ids.push(Number($(this).val()));
+		    });
+		
+		    if (ids.length === 0) {
+		        alert("변경할 상품을 선택하세요.");
+		        return;
+		    }
+		
+		    $.ajax({
+		        url: "/admin/card/status-update",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify({
+		            ids: ids,
+		            status: newStatus
+		        }),
+		        success: function () {
+		            alert("상태 변경 완료");
+		            selectMenu("all"); 
+		        },
+		        error: function (err) {
+		            console.error("상태 변경 실패:", err);
+		            alert("오류 발생");
+		        }
+		    });
+		}
+		
+		// 체크 박스 
+		$(document).on("change", "#checkAll", function () {
+		    $(".card-check").prop("checked", this.checked);
+		});
+	
+		// 개별 체크에 따른 전체 선택 해제
+		$(document).on("change", ".card-check", function () {
+		    const allChecked = $(".card-check").length === $(".card-check:checked").length;
+		    $("#checkAll").prop("checked", allChecked);
+		});
+		
+	</script>	
+	
+</body>
+</html>

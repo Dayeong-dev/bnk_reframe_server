@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    <style>
+    	.menu-btn{
+    		height: 50px;
+    		width: 100px;
+    		margin-right: 10px;
+    	}
+    </style>
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1>예/적금 관리</h1>
+            <div class="top-menu">
+	          	<button class="menu-btn" onclick="selectMenu('all')"> 전체보기 </button>  
+	          	<button class="menu-btn" onclick="selectMenu('예금')"> 예금 </button>  
+	          	<button class="menu-btn" onclick="selectMenu('적금')"> 적금 </button>  
+            	<button class="menu-btn" onclick="showProductForm()"> 상품 등록 </button>
+            </div>
+            
+            <div class="middle-menu">
+            
+            	<!-- 필터  -->
+				<select id="statusFilter" onchange="filterByStatus(this.value)">
+				    <option value="all">전체</option>
+				    <option value="S">판매중</option>
+				    <option value="P">판매중단</option>
+				    <option value="E">판매종료</option>
+				</select>
+				
+				<!-- 검색창 -->
+                <input type="text" id="searchInput" placeholder="상품명을 입력하세요" >
+                <button class="search-btn" onclick="">검색</button>
+                
+            </div>
+            
+            <!-- 데이터 출력 부분 -->
+            <div id="content"></div>
+            
+            <!-- 상품 상태 변경 버튼 -->
+			<div style="margin-top: 10px;">
+			    <button onclick="changeStatus('S')">판매중</button>
+			    <button onclick="changeStatus('P')">판매중단</button>
+			    <button onclick="changeStatus('E')">판매종료</button>
+			</div>
+            
+            
+            <!-- 상품 디테일 출력 부분 -->
+            <div id="content-detail"></div>
+            
+        </div>
+    </div>
+
+	<script>
+	
+		let currentCategory = "all";
+		let currentStatus = "all";
+	
+		$(document).on("change", "#checkAll", function () {
+		    $(".product-check").prop("checked", this.checked);
+		});
+	
+		// 개별 체크에 따른 전체 선택 해제
+		$(document).on("change", ".product-check", function () {
+		    const allChecked = $(".product-check").length === $(".product-check:checked").length;
+		    $("#checkAll").prop("checked", allChecked);
+		});
+	
+		//============================================================		
+		
+		// 전체, 예금, 적금 메뉴에 맞는 데이터 요청 
+		function selectMenu(value){
+			/* 통합처리
+			console.log("선택 메뉴:" + value);
+			$.ajax({
+				url: '/admin/products/' + value ,
+				type: 'GET',
+				success: function(response){
+					console.log("응답 데이터: " + response);
+					showProductList(response);
+				},
+				error: function (error){
+					console.error("요청 실패: " + error);
+				}
+			
+			});
+			*/
+			currentCategory = value;
+		    fetchFilteredProducts();
+			
+		}
+			
+		// 상태에 따른 데이터
+		function filterByStatus(statusCode) {
+			/*	통합처리
+		    let url = "/admin/products/status";
+		
+		    if (statusCode !== "all") {
+		        url += "/" + statusCode;
+		    }
+		
+		    $.ajax({
+		        url: url,
+		        type: 'GET',
+		        success: function(response){
+		            console.log("Status 필터 응답:", response);
+		            showProductList(response);
+		        },
+		        error: function(error){
+		            console.error("Status 필터 요청 실패:", error);
+		        }
+		    });
+			*/ 
+			currentStatus = statusCode;
+		    fetchFilteredProducts();
+		}
+		
+		function fetchFilteredProducts() {
+		    $.ajax({
+		        url: "/admin/products/filter",
+		        type: "GET",
+		        data: {
+		            category: currentCategory,
+		            status: currentStatus
+		        },
+		        success: function(response) {
+		            showProductList(response);
+		        },
+		        error: function(error) {
+		            console.error("필터 요청 실패:", error);
+		        }
+		    });
+		}
+		
+		
+		// JSON 데이터를 view로 데이터 출력
+		function showProductList(products){
+			let html = '<table border="1" style="margin-top: 10px; width:100%;">';
+			html += '<thead>';
+			html += '<tr>';
+			html += '<th><input type="checkbox" id="checkAll"></th>';
+			html += '<th>상품 ID</th>';
+			html += '<th>상품명</th>';
+			html += '<th>유형</th>';
+			html += '<th>상태</th>';
+			html += '<th>등록일</th>';
+			html += '<th>조회수</th>';
+			html += '</tr>';
+			html += '</thead><tbody>';
+		
+			for (let product of products) {
+				html += `<tr>`;
+				html += `<td><input type="checkbox" class="product-check" value="${product.productId}"></td>`;
+				html += `<td>${product.productId}</td>`;
+				html += `<td><a href="#none" onclick="loadProductDetail('${product.productId}')">${product.name}</a></td>`; // ✅ 유지됨
+				html += `<td>${product.category}</td>`;
+				html += `<td>${product.status}</td>`;
+				html += `<td>${product.createdAt}</td>`;
+				html += `<td>${product.viewCount}</td>`;
+				html += '</tr>';
+			}
+		
+			html += '</tbody></table>';
+			document.getElementById('content').innerHTML = html;
+		}
+		
+		//============================================================
+		
+		/* 
+			삭제 / is_active -> status 변경됨 
+		
+		// 활성화, 비활성화 상태 변경 
+		function toggleProducts(activeFlag) {
+		    const ids = [];
+		    $(".product-check:checked").each(function() {
+		        ids.push(Number($(this).val()));
+		    });
+			console.log(ids);
+		    $.ajax({
+		        url: "/admin/products/toggle",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify({ ids: ids, active: activeFlag }),
+		        success: function() {
+		            alert("상태 변경 완료");
+		        }
+		    });
+		} 
+		*/
+		
+		//============================================================
+		
+		// 제품 상세 불러오기
+		function loadProductDetail(productId){
+			$.ajax({
+				url: "/admin/products/detail/"+productId ,
+				type: "GET",
+				success: function(response){
+					console.log(response);
+					showProductDetail(response);
+				},
+				error: function (error){
+					console.error("요청 실패: " + error);
+				}	
+			});
+		}
+		
+		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
+		function showProductDetail(product){
+			let html = '<form id="productForm">';
+			html += '<table border="1" style="margin-top: 10px; width: 100%;">';
+			html += '<thead>';
+			html += '<tr><th colspan="2">상품 상세 정보</th></tr>';
+			html += '</thead><tbody>';
+		
+			html += `<tr><td>상품 ID</td><td><input type="text" name="productId" value="${product.productId}" readonly /></td></tr>`;
+			html += `<tr><td>상품명</td><td><input type="text" name="name" value="${product.name}" readonly /></td></tr>`;
+			html += `<tr><td>유형</td><td><input type="text" name="category" value="${product.category}" readonly /></td></tr>`;
+			html += `<tr><td>추천 대상</td><td><input type="text" name="purpose" value="${product.purpose}" readonly /></td></tr>`;
+			html += `<tr><td>요약</td><td><input type="text" name="summary" value="${product.summary}" readonly /></td></tr>`;
+			html += `<tr><td>상세 설명</td><td><input type="text" name="detail" value="${product.detail}" readonly /></td></tr>`;
+			html += `<tr><td>금리</td><td><input type="text" name="rate" value="${product.minRate}% ~ ${product.maxRate}%" readonly /></td></tr>`;
+			html += `<tr><td>가입 기간</td><td><input type="text" name="period" value="${product.period}" readonly />개월</td></tr>`;
+			html += `<tr><td>판매 상태</td><td><input type="text" name="status" value="${product.status}" readonly /></td></tr>`;
+			html += `<tr><td>등록일</td><td><input type="text" name="createdAt" value="${product.createdAt}" readonly /></td></tr>`;
+			html += `<tr><td>조회수</td><td><input type="text" name="viewCount" value="${product.viewCount}" readonly /></td></tr>`;
+			html += `<tr><td>이미지</td><td><img src="${product.imageUrl}" width="100"/></td></tr>`;
+		
+			html += '</tbody></table>';
+		
+			html += `<button type="button" onclick="enableEditMode()">수정</button>`;
+			html += `<button type="button" id="saveBtn" onclick="saveProductChanges()" style="display:none;">저장</button>`;
+			html += '</form>';
+		
+			document.getElementById('content-detail').innerHTML = html;
+		}
+		
+		//============================================================
+		
+		
+		//============================================================
+			
+		// 수정모드 전환
+		function enableEditMode() {
+			const inputs = document.querySelectorAll("#productForm input[type='text']");
+			inputs.forEach(input => input.removeAttribute("readonly"));
+			document.getElementById("saveBtn").style.display = "inline";
+		}
+			
+		// 데이터 수정하기	
+		function saveProductChanges() {
+			const form = document.getElementById("productForm");
+			const formData = new FormData(form);
+			const rawRate = formData.get("rate").replace("%", "").split("~");
+
+			const data = {
+				productId: Number(formData.get("productId")),
+				name: formData.get("name"),
+				category: formData.get("category"),
+				purpose: formData.get("purpose"),
+				summary: formData.get("summary"),
+				detail: formData.get("detail"),
+				minRate: parseFloat(rawRate[0]),
+				maxRate: parseFloat(rawRate[1]),
+				period: Number(formData.get("period")),
+				status: formData.get("status")
+			};
+
+			$.ajax({
+				url: "/admin/products/update",
+				type: "PUT",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				success: function() {
+					alert("수정 완료");
+					selectMenu("all"); // 다시 전체 목록 새로고침
+				},
+				error: function(err) {
+					alert("수정 실패");
+					console.error(err);
+				}
+			});
+		}
+		
+		//============================================================
+		
+		// 제품 상태 변경 
+		function changeStatus(newStatus) {
+		    const ids = [];
+		    $(".product-check:checked").each(function () {
+		        ids.push(Number($(this).val()));
+		    });
+		
+		    if (ids.length === 0) {
+		        alert("변경할 상품을 선택하세요.");
+		        return;
+		    }
+		
+		    $.ajax({
+		        url: "/admin/products/status-update",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify({
+		            ids: ids,
+		            status: newStatus
+		        }),
+		        success: function () {
+		            alert("상태 변경 완료");
+		            selectMenu("all"); 
+		        },
+		        error: function (err) {
+		            console.error("상태 변경 실패:", err);
+		            alert("오류 발생");
+		        }
+		    });
+		}
+	
+		//============================================================
+		
+		// 상품 등록 폼 열기
+		
+		function showProductForm() {
+		    let html = '<form id="productCreateForm">';
+		    html += '<table border="1" style="margin-top: 10px; width: 100%;">';
+		    html += '<thead><tr><th colspan="2">상품 등록</th></tr></thead><tbody>';
+
+		    html += '<tr><td>상품명</td><td><input type="text" name="name" required /></td></tr>';
+		    html += '<tr><td>유형</td><td><select name="category"><option value="예금">예금</option><option value="적금">적금</option></select></td></tr>';
+		    html += '<tr><td>추천 대상</td><td><input type="text" name="purpose" /></td></tr>';
+		    html += '<tr><td>요약</td><td><input type="text" name="summary" /></td></tr>';
+		    html += '<tr><td>상세 설명</td><td><input type="text" name="detail" /></td></tr>';
+		    html += '<tr><td>최소 금리</td><td><input type="number" step="0.01" name="minRate" required /></td></tr>';
+		    html += '<tr><td>최대 금리</td><td><input type="number" step="0.01" name="maxRate" required /></td></tr>';
+		    html += '<tr><td>가입 기간(개월)</td><td><input type="number" name="period" required /></td></tr>';
+		    html += '<tr><td>이미지 URL</td><td><input type="text" name="imageUrl" /></td></tr>';
+		    html += '<tr><td colspan="2"><button type="button" onclick="submitProductForm()">등록</button></td></tr>';
+
+		    html += '</tbody></table>';
+		    html += '</form>';
+
+		    document.getElementById("content-detail").innerHTML = html;
+		}
+		
+		// 버튼 클릭시 폼 열기
+		function submitProductForm() {
+		    const form = document.getElementById("productCreateForm");
+		    const formData = new FormData(form);
+
+		    const data = {
+		        name: formData.get("name"),
+		        category: formData.get("category"),
+		        purpose: formData.get("purpose"),
+		        summary: formData.get("summary"),
+		        detail: formData.get("detail"),
+		        minRate: parseFloat(formData.get("minRate")),
+		        maxRate: parseFloat(formData.get("maxRate")),
+		        period: parseInt(formData.get("period")),
+		        imageUrl: formData.get("imageUrl"),
+		        status: "S" 
+		    };
+
+		    $.ajax({
+		        url: "/admin/products/create",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify(data),
+		        success: function () {
+		            alert("상품 등록 완료");
+		            selectMenu("all"); 
+		        },
+		        error: function (err) {
+		            alert("등록 실패");
+		            console.error(err);
+		        }
+		    });
+		}
+	</script>
+</body>
+</html>

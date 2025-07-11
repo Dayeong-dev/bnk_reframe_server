@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>1:1문의 관리</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<style>
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px solid #ccc;
+}
+
+th, td {
+	padding: 10px;
+	text-align: left;
+}
+
+.pagination {
+	margin-top: 15px;
+	text-align: center;
+}
+
+.pagination button {
+	margin: 0 5px;
+	padding: 5px 10px;
+}
+
+.hidden {
+	display: none;
+}
+
+#qna-form {
+	display: none;
+}
+</style>
+</head>
+<body>
+
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+		<!-- 본문 -->
+		<div class="content" id="main-content">
+			<h1>1:1 문의 관리</h1>
+
+
+			<div id="qna-list" th:if="${qnalist != null}">
+				<table>
+					<thead>
+						<tr>
+							<th>글번호</th>
+							<th>제목</th>
+							<th>작성자</th>
+							<th>작성일</th>
+							<th>카테고리</th>
+							<th>상태</th>
+							<th>내용</th>
+						</tr>
+					</thead>
+					<tbody id="qna-tbody">
+						<tr th:each="qna : ${qnalist}">
+							<td th:text="${qna.qnaId}"></td>
+							<td><a href="#" th:attr="data-id=${qna.qnaId}"
+								th:text="${qna.title}"
+								onclick="loadQnaDetail(this); return false;"></a></td>
+							<td th:text="${qna.username}"></td>
+							<!-- 수정됨 -->
+							<td
+								th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
+							<td th:text="${qna.category}"></td>
+							<td th:text="${qna.status}"></td>
+							<td th:text="${qna.content}"></td>
+							<!-- 답변 내용을 보여주려면 content → answer로 수정 -->
+						</tr>
+					</tbody>
+
+				</table>
+
+				<!-- 페이지네이션 -->
+				<div class="pagination" id="pagination"></div>
+			</div>
+
+
+
+			<hr>
+
+			<div id="qna-detail">
+
+				<p>
+					<strong>글번호:</strong> <span id="detail-id"></span>
+				</p>
+				<p>
+					<strong>제목:</strong> <span id="detail-title"></span>
+				</p>
+				<p>
+					<strong>작성자:</strong> <span id="detail-username"></span>
+				</p>
+				<p>
+					<strong>작성일:</strong> <span id="detail-regdate"></span>
+				</p>
+
+
+
+				<p>
+					<strong>카테고리:</strong> <span id="detail-category"></span>
+				</p>
+				<p>
+					<strong>상태:</strong> <span id="detail-status"></span>
+				</p>
+				<hr>
+				<p>
+					<strong>내용:</strong><span class="content-box" id="detail-content"></span>
+				</p>
+
+				<hr>
+				<p>
+					<strong>답변:</strong>
+				</p>
+				<textarea id="detail-answer" rows="5" style="width: 100%;"></textarea>
+				<br />
+				<button onclick="submitAnswer()">답변 등록</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+
+    // 클라이언트 페이지네이션 처리
+    document.addEventListener("DOMContentLoaded", () => {
+      const rowsPerPage = 5;
+      const rows = document.querySelectorAll("#qna-tbody tr");
+      const pageCount = Math.ceil(rows.length / rowsPerPage);
+      const pagination = document.getElementById("pagination");
+
+      function showPage(page) {
+        rows.forEach((row, index) => {
+          row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+        });
+      }
+
+      for (let i = 0; i < pageCount; i++) {
+        const button = document.createElement("button");
+        button.textContent = i + 1;
+        button.addEventListener("click", () => {
+          showPage(i);
+        });
+        pagination.appendChild(button);
+      }
+
+      showPage(0); // 첫 페이지 기본 표시
+    });
+    
+    function loadQnaDetail(element) {
+    	const qnaId = element.getAttribute('data-id');
+
+    	fetch('/admin/qnaDetail/' + qnaId)
+    		.then(response => response.json())
+    		.then(qna => {
+    			document.getElementById("detail-id").textContent = qna.qnaId;
+    			document.getElementById("detail-title").textContent = qna.title;
+    			document.getElementById("detail-username").textContent = qna.username;
+    			document.getElementById("detail-regdate").textContent = qna.regdate;
+    			document.getElementById("detail-category").textContent = qna.category;
+    			document.getElementById("detail-status").textContent = qna.status;
+    			document.getElementById("detail-content").textContent = qna.content;
+    			document.getElementById("detail-answer").value = qna.answer;
+
+    		})
+    		.catch(error => {
+    			console.error("QNA 상세보기 실패:", error);
+    			alert("상세보기를 불러오지 못했습니다.");
+    		});
+    }
+
+    
+    function submitAnswer() {
+        const qnaId = document.getElementById("detail-id").textContent;
+        const answer = document.getElementById("detail-answer").value;
+
+        if (!answer.trim()) {
+            alert("답변 내용을 입력하세요.");
+            return;
+        }
+
+        fetch('/admin/submitAnswer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                qnaId: qnaId,
+                answer: answer
+            })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('서버 오류');
+            return response.json();  // ✅ 서버에서 저장된 DTO를 반환한다고 가정
+        })
+        .then(updatedQna => {
+            alert("답변이 등록되었습니다.");
+
+            // ✅ 즉시 반영
+            document.getElementById("detail-answer").value = updatedQna.answer;
+            document.getElementById("detail-status").textContent = updatedQna.status;
+
+            // ✅ 테이블에 있는 해당 행도 업데이트
+            const row = document.querySelector(`a[data-id="${qnaId}"]`).closest("tr");
+            row.querySelector("td:nth-child(6)").textContent = updatedQna.status;
+            row.querySelector("td:nth-child(7)").textContent = updatedQna.answer;
+        })
+        .catch(error => {
+            console.error("답변 등록 실패:", error);
+            alert("답변 등록 중 오류가 발생했습니다.");
+        });
+    }
+  </script>
+
+</body>
+</html>
