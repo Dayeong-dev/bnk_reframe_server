@@ -8,6 +8,9 @@
 
 	<h1>qna 상세 보기</h1>
 
+	<span class="label">번호:</span>
+	<span th:text="${qna.qnaId}">번호</span>
+
 
 	<span class="label">제목:</span>
 	<span th:text="${qna.title}">제목</span>
@@ -28,6 +31,11 @@
 	<hr>
 	<span class="label">내용:</span>
 	<div class="content-box" th:text="${qna.content}">게시글 내용이 들어갑니다.</div>
+	
+	<hr>
+	<span class="label">답변:</span>
+	<div class="content-box" th:text="${qna.answer}">게시글 답변이 들어갑니다.</div>
+	
 
 	<a href="/qna/qna">← 목록으로</a>
 </body>

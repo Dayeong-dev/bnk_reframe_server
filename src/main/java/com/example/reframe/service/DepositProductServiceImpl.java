@@ -57,17 +57,7 @@ public class DepositProductServiceImpl implements DepositProductService {
         return products.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional
-    public DepositProductDTO getProductDetail(Long productId) {
-        DepositProduct product = depositProductRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
-
-        // 조회수 증가
-        product.setViewCount(product.getViewCount() == null ? 1 : product.getViewCount() + 1);
-
-        return convertToDTO(product);
-    }
+    
 
     @Override
     public Long saveProduct(DepositProductDTO dto) {
@@ -175,5 +165,28 @@ public class DepositProductServiceImpl implements DepositProductService {
         p.setCreatedAt(new Date());
         p.setViewCount(0L);
         return p;
+    }
+    
+    @Override
+    public DepositProductDTO getProductDetail(Long productId) {
+        DepositProduct product = depositProductRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
+
+        // 조회수 증가
+        product.setViewCount(product.getViewCount() + 1);
+        depositProductRepository.save(product);
+
+        // Entity → DTO 변환
+        return DepositProductDTO.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .summary(product.getSummary())
+                .detail(product.getDetail()) // ✅ 여기서 DETAIL 꺼냄
+                .maxRate(product.getMaxRate())
+                .minRate(product.getMinRate())
+                .period(product.getPeriod())
+                .viewCount(product.getViewCount())
+                .imageUrl(product.getImageUrl())
+                .build();
     }
 }
