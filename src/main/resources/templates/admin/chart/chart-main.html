@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1>차트</h1>
+				<canvas id="visitChart" width="400" height="200" style="display:block;"></canvas>
+        <div><canvas id="productChart"></canvas></div>
+        </div>
+    </div>
+    
+
+	<script th:inline="javascript">
+	
+		// 방문자 수 
+		
+	    const labels = /*[[${visitLabels}]]*/ [];
+	    const counts = /*[[${visitCounts}]]*/ [];
+	    console.log("✅ labels:", labels);
+	    console.log("✅ counts:", counts);
+	
+	    const ctx = document.getElementById('visitChart').getContext('2d');
+	    new Chart(ctx, {
+	        type: 'bar',
+	        data: {
+	            labels: labels,
+	            datasets: [{
+	                label: '방문자 수',
+	                data: counts,
+	                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+	                borderColor: 'rgba(54, 162, 235, 1)',
+	                borderWidth: 1
+	            }]
+	        },
+	        options: {
+	            scales: {
+	                y: { beginAtZero: true }
+	            }
+	        }
+	    });
+	    
+	    //==================================================================
+	    
+	    //상품 조회수
+	    const productLabels = /*[[${labels}]]*/ [];
+	    const productCounts = /*[[${counts}]]*/ [];
+
+	    const ctxProduct = document.getElementById('productChart').getContext('2d');
+	    new Chart(ctxProduct, {
+	        type: 'bar',
+	        data: {
+	            labels: productLabels,
+	            datasets: [{
+	                label: '상품별 조회수',
+	                data: productCounts,
+	                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+	                borderColor: 'rgba(54, 162, 235, 1)',
+	                borderWidth: 1
+	            }]
+	        },
+	        options: {
+	            indexAxis: 'x', // 수평 막대그래프
+	            responsive: true,
+	            scales: {
+	                x: {
+	                    beginAtZero: true,
+	                    title: {
+	                        display: true,
+	                        text: '조회수'
+	                    }
+	                },
+	                y: {
+	                    title: {
+	                        display: true,
+	                        text: '상품명'
+	                    }
+	                }
+	            },
+	            plugins: {
+	                legend: { display: false },
+	                title: {
+	                    display: true,
+	                    text: '📊 인기 상품 TOP 10 (조회수 기준)'
+	                }
+	            }
+	        }
+	    });
+	    
+	    
+	    
+	    
+	</script>
+</body>
+</html>
