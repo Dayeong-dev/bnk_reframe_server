@@ -20,18 +20,23 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.reframe.dto.QnaDTO;
 import com.example.reframe.entity.Faq;
 import com.example.reframe.entity.Qna;
+import com.example.reframe.entity.Review;
 import com.example.reframe.repository.FaqRepository;
 import com.example.reframe.repository.QnaRepository;
+import com.example.reframe.repository.ReviewRepository;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminFaqController {
+public class AdminGangController {
 	
 	@Autowired
 	FaqRepository faqRepository;
 	
 	@Autowired
 	QnaRepository qnaRepository;
+	
+	@Autowired
+	ReviewRepository reviewRepository;
 	
 	@GetMapping("/index2")
 	public String index2(Model model) {
@@ -104,6 +109,14 @@ public class AdminFaqController {
 	public ResponseEntity<String> deleteFaq(@PathVariable("faqId") Integer faqId) {
 	    faqRepository.deleteById(faqId);
 	    return ResponseEntity.ok("삭제 완료");
+	}
+	
+	@GetMapping("/index4")
+	public String index4(Model model) {
+		List<Review> reviewlist = reviewRepository.findAll();
+		System.out.println(reviewlist);
+		model.addAttribute("reviewlist", reviewlist);
+		return "admin/reviewIndex";
 	}
 
 

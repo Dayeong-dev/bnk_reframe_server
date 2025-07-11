@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<!-- 리뷰 팝업 -->
+<div id="review-popup" style="display:none; position:fixed; bottom:30px; right:30px; background:white; border:1px solid #ccc; padding:20px;">
+  <p>사이트 이용은 어떠셨나요?</p>
+  <textarea id="review-content" rows="4" cols="30"></textarea><br/>
+  <button onclick="submitReview()">제출</button>
+</div>
+
+<script>
+  // 쿠키 확인 후 팝업 표시
+  document.addEventListener("DOMContentLoaded", () => {
+    const cookie = document.cookie;
+    if (!cookie.includes("reviewed=true")) {
+      document.getElementById("review-popup").style.display = "block";
+    }
+  });
+
+  function submitReview() {
+    const content = document.getElementById("review-content").value;
+    if (!content.trim()) return alert("리뷰를 입력해주세요");
+
+    fetch("/api/review/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: content })
+    }).then(res => res.text()).then(msg => {
+      alert(msg);
+      document.getElementById("review-popup").style.display = "none";
+      document.cookie = "reviewed=true; path=/; max-age=86400"; // 1일 유지
+    });
+  }
+</script>
+
+
+
+</body>
+</html>
