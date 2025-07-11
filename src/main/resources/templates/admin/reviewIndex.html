@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>리뷰 관리</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<style>
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table, th, td {
+	border: 1px solid #ccc;
+}
+
+th, td {
+	padding: 10px;
+	text-align: left;
+}
+
+.pagination {
+	margin-top: 15px;
+	text-align: center;
+}
+
+.pagination button {
+	margin: 0 5px;
+	padding: 5px 10px;
+}
+
+.hidden {
+	display: none;
+}
+</style>
+</head>
+<body>
+
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+		<!-- 본문 -->
+		<div class="content" id="main-content">
+			<h1>리뷰 관리</h1>
+
+			<!-- 필터 버튼 영역 -->
+			<div id="filter-buttons" style="margin-bottom: 15px;">
+				<button class="filter-btn active" data-filter="전체">전체</button>
+				<button class="filter-btn" data-filter="긍정">긍정</button>
+				<button class="filter-btn" data-filter="부정">부정</button>
+			</div>
+
+			<div id="review-list" th:if="${reviewlist != null}">
+				<table id="review-table">
+					<thead>
+						<tr>
+							<th>리뷰 ID</th>
+<!--							<th>사용자 ID</th>-->
+							<th>내용</th>
+							<th>부정 여부</th>
+						</tr>
+					</thead>
+					<tbody id="review-tbody">
+						<tr th:each="review : ${reviewlist}">
+							<td th:text="${review.id}"></td>
+<!--  							<td th:text="${review.user.username}"></td>-->
+							<td th:text="${review.content}"></td>
+							<td th:text="${review.negative} ? '부정' : '긍정'"></td>
+						</tr>
+					</tbody>
+				</table>
+
+				<!-- 페이지네이션 -->
+				<div class="pagination" id="pagination"></div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const rowsPerPage = 5;
+		const rows = Array.from(document.querySelectorAll("#review-tbody tr"));
+		const pagination = document.getElementById("pagination");
+		let currentFilter = "전체";
+		let filteredRows = [...rows];
+
+		function showPage(page) {
+			rows.forEach(row => row.classList.add("hidden"));
+			filteredRows.forEach((row, index) => {
+				row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+			});
+		}
+
+		function renderPagination() {
+			pagination.innerHTML = "";
+			const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
+			for (let i = 0; i < pageCount; i++) {
+				const btn = document.createElement("button");
+				btn.textContent = i + 1;
+				btn.addEventListener("click", () => showPage(i));
+				pagination.appendChild(btn);
+			}
+			showPage(0);
+		}
+
+		function applyFilter() {
+			filteredRows = rows.filter(row => {
+				const sentiment = row.querySelector("td:nth-child(5)").textContent.trim();
+				return currentFilter === "전체" || sentiment === currentFilter;
+			});
+			renderPagination();
+		}
+
+		// 필터 버튼 클릭 이벤트
+		document.querySelectorAll(".filter-btn").forEach(btn => {
+			btn.addEventListener("click", () => {
+				document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+				btn.classList.add("active");
+				currentFilter = btn.dataset.filter;
+				applyFilter();
+			});
+		});
+
+		applyFilter(); // 초기 실행
+	});
+
+</script>
+</body>
+</html>

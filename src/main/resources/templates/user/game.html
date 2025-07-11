@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>맥북 룰렛 이벤트</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 50px;
+    }
+    #wheel {
+      margin: 0 auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #28a745;
+      position: relative;
+      background: conic-gradient(#f4f4f4 0% 60%, gold 60% 61%, #f4f4f4 61%);
+      transition: transform 4s ease-out;
+    }
+    #pointer {
+      width: 0; 
+      height: 0; 
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid red;
+      position: absolute;
+      top: -30px;
+      left: 130px;
+    }
+    #spin-btn {
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 20px;
+    }
+    #macbook-link {
+      margin-top: 20px;
+      display: none;
+    }
+    a {
+      color: #0074cc;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 맥북 룰렛 이벤트 🎉</h1>
+  <div id="wheel">
+    <div id="pointer"></div>
+  </div>
+  <button id="spin-btn">룰렛 돌리기</button>
+  <div id="result"></div>
+  <div id="macbook-link">
+    👉 <a href="https://www.coupang.com/np/search?component=&q=맥북+에어" target="_blank">맥북 최저가 보러가기</a>
+  </div>
+
+  <script>
+    let hasSpunToday = false;
+
+    document.getElementById('spin-btn').addEventListener('click', function () {
+      if (hasSpunToday) {
+        alert('하루에 한 번만 참여할 수 있어요!');
+        return;
+      }
+
+      const wheel = document.getElementById('wheel');
+      const result = document.getElementById('result');
+      const link = document.getElementById('macbook-link');
+
+      const spinDeg = 360 * 10 + Math.floor(Math.random() * 360); // 최소 10바퀴
+      wheel.style.transform = `rotate(${spinDeg}deg)`;
+      hasSpunToday = true;
+      result.textContent = "돌리는 중...";
+      link.style.display = 'none';
+
+      setTimeout(() => {
+        const angle = spinDeg % 360;
+        // 금색 범위는 216도~219도 (약 0.8%) → 당첨
+        if (angle >= 1 && angle <= 350) {
+          result.textContent = "🎉 축하합니다! 맥북에 당첨되셨어요! (…는 농담)";
+        } else {
+          result.textContent = "아쉽지만 다음 기회를 노려보세요!";
+        }
+        link.style.display = 'block';
+      }, 4000);
+    });
+  </script>
+</body>
+</html>
