@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-//	@GetMapping("/")
-//	public String homeRedirect() {
-//	    return "redirect:/deposit/main";
-//	}
+	@GetMapping("/")
+	public String homeRedirect() {
+	    return "redirect:/deposit/main";
+	}
 
 }

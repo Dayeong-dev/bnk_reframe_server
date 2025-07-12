@@ -52,4 +52,7 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
             String status,
             Pageable pageable
     );
+    List<DepositProduct> findByPurposeInAndStatus(List<String> purposes, String status);
+
+    
 }

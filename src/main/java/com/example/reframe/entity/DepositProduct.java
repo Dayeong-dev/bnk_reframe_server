@@ -54,6 +54,9 @@ public class DepositProduct {
     @Column(name = "IMAGE_URL", nullable = true)
     private String imageUrl;
     
+    @Column(name = "MODAL_DETAIL")
+    private String modalDetail;
+    
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Date();
