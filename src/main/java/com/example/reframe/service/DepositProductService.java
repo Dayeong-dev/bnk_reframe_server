@@ -1,8 +1,6 @@
 package com.example.reframe.service;
 
 import com.example.reframe.dto.DepositProductDTO;
-import com.example.reframe.entity.DepositProduct;
-
 import org.springframework.data.domain.Page;  // ✅ 올바른 Page 임포트
 import java.util.List;
 
@@ -36,6 +34,8 @@ public interface DepositProductService {
             String sort,
             int page
     );
+    
 
+    
 
 }

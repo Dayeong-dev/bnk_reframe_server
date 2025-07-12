@@ -22,36 +22,51 @@ public class DepositProductController {
 
     private final DepositProductService depositProductService;
 
+    /**
+     * 예적금 메인 (추천상품, 테마별 추천 상품)
+     */
     @GetMapping("/main")
-    public String depositMain(@RequestParam(value = "purpose", required = false) String purpose,
-                              @RequestParam(value = "theme", required = false) String theme,
-                              Model model) {
-        if (purpose == null || purpose.isEmpty()) {
-            purpose = "목돈 만들기";
+    public String depositMain(
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "theme", required = false) String theme,
+            Model model) {
+
+        // ✅ 기본 카테고리: 적금 (목돈만들기)
+        if (category == null || category.isEmpty()) {
+            category = "적금";
         }
 
-        List<DepositProductDTO> products = depositProductService.getProductsByPurpose(purpose);
-        products.sort((a, b) -> Long.compare(b.getViewCount(), a.getViewCount()));
+        // ✅ 카테고리 기준 추천상품 조회 + 정렬
+        List<DepositProductDTO> products = depositProductService.getAllProducts("S", category);
+        products.sort((a, b) -> Long.compare(b.getViewCount(), a.getViewCount())); // 조회수 내림차순
 
         DepositProductDTO highlightProduct = products.isEmpty() ? null : products.get(0);
-        List<DepositProductDTO> otherProducts = products.size() > 1 ? products.subList(1, Math.min(products.size(), 5)) : List.of();
+        List<DepositProductDTO> otherProducts = products.size() > 1
+                ? products.subList(1, Math.min(products.size(), 5)) : List.of();
 
+        // ✅ 모델에 담기
         model.addAttribute("highlightProduct", highlightProduct);
         model.addAttribute("otherProducts", otherProducts);
-        model.addAttribute("selectedPurpose", purpose);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("selectedTheme", theme);
 
-        // ✅ 테마별 데이터 내려주기
-        model.addAttribute("workerProducts", depositProductService.getProductsByPurpose("직장인").stream().limit(3).toList());
-        model.addAttribute("housewifeProducts", depositProductService.getProductsByPurpose("주부").stream().limit(3).toList());
-        model.addAttribute("studentProducts", depositProductService.getProductsByPurpose("학생").stream().limit(3).toList());
-
+        // ✅ 테마 추천상품 (직장인 / 주부 / 학생)
+        model.addAttribute("workerProducts",
+        	    depositProductService.getThemeRecommended("직장인").stream().limit(3).toList());
+        	model.addAttribute("housewifeProducts",
+        	    depositProductService.getThemeRecommended("주부").stream().limit(3).toList());
+        	model.addAttribute("studentProducts",
+        	    depositProductService.getThemeRecommended("학생").stream().limit(3).toList());
+        	
         return "user/deposit_main";
     }
 
 
 
-    
-   
+
+    /**
+     * 예적금 상품 목록 (페이징, 정렬, 검색)
+     */
     @GetMapping("/list")
     public String depositList(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -59,30 +74,34 @@ public class DepositProductController {
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             Model model) {
 
-        // "S" = 판매중, category = null (전체)
-        Page<DepositProductDTO> productsPage =
-                depositProductService.getPagedProducts("S", null, keyword, sort, page);
+        Page<DepositProductDTO> productsPage = depositProductService.getPagedProducts("S", null, keyword, sort, page);
 
-        model.addAttribute("products", productsPage.getContent()); // 현재 페이지의 상품 리스트
-        model.addAttribute("page", productsPage);                  // 페이지네이션 정보
+        model.addAttribute("products", productsPage.getContent());
+        model.addAttribute("page", productsPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sort", sort);
 
         return "user/deposit_list";
     }
 
-
+    /**
+     * 예적금 상품 상세 (상세 + 모달 데이터)
+     */
     @GetMapping("/detail/{id}")
     public String depositDetail(@PathVariable("id") Long productId, Model model) {
-        // 상품 상세 조회 (+ 조회수 증가)
         DepositProductDTO product = depositProductService.getProductDetail(productId);
 
-        // DETAIL 컬럼에서 7섹션을 꺼내 그대로 뷰에 전달
+        // DETAIL (본문용) 그대로 사용
+        String detailForPage = product.getDetail();
+
+        // MODAL_DETAIL (모달용) 그대로 사용
+        String modalDetailForModal = product.getModalDetail();
+
         model.addAttribute("product", product);
+        model.addAttribute("detailForPage", detailForPage);
+        model.addAttribute("modalDetailForModal", modalDetailForModal);
 
-        return "user/deposit_detail";  // user/deposit_detail.jsp or deposit_detail.html
+        return "user/deposit_detail";
     }
-
-   
 
 }
