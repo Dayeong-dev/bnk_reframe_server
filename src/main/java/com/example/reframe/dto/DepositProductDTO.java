@@ -28,7 +28,7 @@ public class DepositProductDTO {
     
     private String imageUrl;     // 썸네일 이미지 URL
 
-    private String modalDetail;  // ✅ 모달용 안내 내용 추가
+    
 
 }
 
