@@ -8,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
 </head>
 <body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- 공통 헤더 -->
     <div th:replace="admin/fragments/header :: header" class="header"></div>
@@ -19,12 +20,77 @@
         <!-- 본문 -->
         <div class="content">
             <h1>관리자 회원 관리</h1>
-        
+        	
+        	<div class="top-menu">
+	          	<button class="menu-btn" onclick="selectMenu('P')"> 개인 </button>  
+	          	<button class="menu-btn" onclick="selectMenu('C')"> 기업 </button>  
+            </div>
+            
+            <!-- 검색창 -->
+            <input type="text" id="searchInput" placeholder="상품명을 입력하세요" >
+            <button class="search-btn" onclick="">검색</button>
+            
+        	<!-- 데이터 출력 부분 -->
+            <div id="content"></div>
         
         
         </div>
         
     </div>
 
+
+	<script>
+    function selectMenu(type){
+        console.log("선택된 메뉴: " + type);
+        $.ajax({
+            url: '/admin/user/' + type,
+            type: 'GET',
+            success: function(response){
+                console.log("응답 데이터:", response);
+                showUserList(response, type);
+            },
+            error: function(error){
+                console.error("요청 실패:", error);
+            }
+        });
+    }
+
+    // 회원 리스트 출력 (개인/기업 공통 처리)
+    function showUserList(users, type){
+        let html = '<table border="1" style="margin-top: 10px; width:100%;">';
+        html += '<thead><tr>';
+        html += '<th>아이디</th>';
+        html += '<th>이름</th>';
+        html += '<th>이메일</th>';
+        html += '<th>전화번호</th>';
+
+        if (type === 'C') {
+            html += '<th>사업자등록번호</th>';
+            html += '<th>개업일자</th>';
+            html += '<th>대표자명</th>';
+        }
+
+        html += '</tr></thead><tbody>';
+
+        for (let user of users) {
+            html += '<tr>';
+            html += `<td>${user.username}</td>`;
+            html += `<td>${user.name || user.user?.name}</td>`;
+            html += `<td>${user.email || user.user?.email}</td>`;
+            html += `<td>${user.phone || user.user?.phone}</td>`;
+
+            if (type === 'C') {
+                html += `<td>${user.businessNumber}</td>`;
+                html += `<td>${user.businessStartDate}</td>`;
+                html += `<td>${user.ceoName}</td>`;
+            }
+
+            html += '</tr>';
+        }
+
+        html += '</tbody></table>';
+        document.getElementById('content').innerHTML = html;
+    }
+</script>
 </body>
 </html>
