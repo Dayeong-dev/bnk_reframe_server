@@ -1,0 +1,9 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="mainSearchFragment" id="main-search" class="content-wrapper">
+	<h4>상품을 검색해보세요!</h4>
+	<form class="search-form" action="/search" method="get">
+		<input type="text" name="keywords" placeholder="검색어를 입력하세요. " />
+		<button type="submit">
+			<img class="icon" src="/icons/search.svg" alt="search" />
+		</button>
+	</form>
+</div>

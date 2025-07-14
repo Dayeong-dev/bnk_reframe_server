@@ -13,8 +13,8 @@
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
 	<div id="container">
-		<section id="main" class="content-wrapper">
-			<div class="swiper">
+		<section id="main">
+			<div class="swiper content-wrapper">
 				<div class="swiper-wrapper">
 					<div class="swiper-slide">
 						<a href="#">
@@ -33,16 +33,10 @@
 					</div>
 				</div>
 			</div>
-			<div class="search-area">
-				<h4>상품을 검색해보세요!</h4>
-				<div class="search-form">
-					<input type="text" name="search" placeholder="검색어를 입력하세요. " />
-					<img class="icon" src="/icons/search.svg" alt="search" />
-				</div>
-			</div>
+			<div th:replace="~{user/fragments/main-search :: mainSearchFragment}"></div>
 			<div class="recommend-area">
 				<h4>추천하는 상품</h4>
-				<div class="btn-list">
+				<div class="btn-list content-wrapper">
 					<button id="deposit-btn" onclick="getDepositList()">예적금</button>
 					<button id="card-btn" onclick="getCardList()">카드</button>
 				</div>

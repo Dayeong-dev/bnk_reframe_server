@@ -11,23 +11,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.dto.CardDto;
+import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.entity.Card;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.repository.CardRepository;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.example.reframe.entity.CardCategoryRel;
 import com.example.reframe.entity.CardSubcategory;
 import com.example.reframe.entity.CardTestResult;
-import com.example.reframe.repository.CardRepository;
 import com.example.reframe.repository.CardSubcategoryRepository;
 import com.example.reframe.repository.CardTestResultRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 @Service
 public class CardService {
@@ -40,6 +37,9 @@ public class CardService {
 
     @Autowired
     private CardTestResultRepository cardTestResultRepository;
+    
+    @Autowired
+    private EntityManager em;
     
     // 메인 - 조회수 상위 6개 카드 가져오기
     public List<CardDto> getTop6Cards() {
@@ -170,5 +170,27 @@ public class CardService {
     	List<Card> cardList = cardRepository.findTopFiveByViewCount();
     	
     	return cardList.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+    
+    @Transactional
+    public List<CardDto> searchByKeywords(String keywords) {
+        String[] words = keywords.split(" ");
+        StringBuilder sql = new StringBuilder("SELECT * FROM card WHERE 1=1 ");
+
+        for (int i = 0; i < words.length; i++) {
+            sql.append("AND (name LIKE :word").append(i)
+               .append(" OR description LIKE :word").append(i)
+               .append(" OR service LIKE :word").append(i).append(") ");
+        }
+
+        Query query = em.createNativeQuery(sql.toString(), Card.class);
+        for (int i = 0; i < words.length; i++) {
+            query.setParameter("word" + i, "%" + words[i] + "%");
+        }
+        
+        @SuppressWarnings("unchecked")
+		List<Card> result = query.getResultList();
+
+        return result.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 }

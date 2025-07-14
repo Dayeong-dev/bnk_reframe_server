@@ -21,35 +21,6 @@
 	border-radius: 1rem;
 }
 
-#main .search-area {
-	width: 100%;
-	padding: 4rem;
-	text-align: center;
-}
-
-#main .search-area .search-form {
-	width: 60%;
-	max-width: 50rem;
-	border: 1px solid #000;
-	border-radius: 2rem;
-	margin: 0 auto;
-	padding: 0.5rem 1rem;
-	
-	display: flex;
-	align-items: center;
-	column-gap: 1rem;
-}
-
-#main .search-area .search-form input {
-	flex: 1;
-	border: none;
-	padding: 0.5rem;
-}
-
-#main .search-area .search-form input {
-	outline: none;
-}
-
 #main .recommend-area {
 	padding: 4rem;
 	width: 100%;
