@@ -6,8 +6,6 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,18 +38,15 @@ public class Card {
     private String tags; // 해시태그 (검색용)
 
     @Column(name = "category_major")
-    private String categoryMajor; // 대분류 (개인/기업/체크)
+    private String categoryMajor; // 대분류 (개인(P)/기업(C)/체크(K)
 
-    private String status; // 신청 가능 상태 (가능/대기/불가)
+    private String status; // 신청 가능 상태 (S/P/E)
 
     @Column(name = "annual_fee")
     private Integer annualFee; // 연회비
 
-    @Column(length = 2000)
+    @Lob
     private String service; //서비스
-
-//    @Column(name = "issued_info", length = 2000)
-//    private String issuedInfo; // 발급 정보
 
     @Lob
     @Column(name = "point_info")

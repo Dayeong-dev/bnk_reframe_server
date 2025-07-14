@@ -31,8 +31,18 @@ public class ChatbotController {
 		return "user/chat"; // 챗봇 페이지
 	}
 
-	@GetMapping("/chatbot")
-	public String chatbot() {
-		return "user/chatbot"; // 챗봇 페이지
-	}
+    @GetMapping("/chatbot")
+    public String chatbot() {
+        return "user/chatbot"; // 챗봇 페이지
+    }
+    
+    @GetMapping("/game")
+    public String game() {
+        return "user/game"; // 게임 페이지
+    }
+    
+    @GetMapping("/review")
+    public String review() {
+        return "user/review"; // 리뷰 페이지
+    }
 }

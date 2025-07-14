@@ -1,173 +1,203 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <title>카드 상세 페이지</title>
-    <style>
-        .card-container {
-            max-width: 900px;
-            margin: 40px auto;
-            font-family: Arial, sans-serif;
-        }
-        .card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 30px;
-        }
-        .card-header img {
-            width: 300px;
-            border-radius: 10px;
-        }
-        .card-info {
-            flex: 1;
-        }
-        .tags {
-            margin-bottom: 10px;
-        }
-        .tags span {
-            background: #eee;
-            padding: 5px 10px;
-            margin-right: 5px;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-        .card-description {
-            margin: 15px 0;
-        }
-        .view-count {
-            font-size: 25px;
-            text-align: center;
-            margin: 50px 0;
-            font-weight: bold;
-        }
-        .card-details {
-            margin: 20px 0;
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .card-details h3 {
-            margin-top: 0;
-        }
-        .grid-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 30px auto;
-            max-width: 500px;
-        }
-        .grid-buttons button {
-            padding: 20px;
-            background: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .grid-buttons button:hover {
-            background: #0056b3;
-        }
-        .modal {
-            display: none;
-            position: fixed; z-index: 999;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background: #fff;
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 600px;
-        }
-        .close-btn {
-            float: right;
-            font-size: 1.5em;
-            cursor: pointer;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8" />
+<title>카드 상세 페이지</title>
+<style>
+.card-container {
+	max-width: 900px;
+	margin: 40px auto;
+	font-family: Arial, sans-serif;
+}
+
+.card-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 30px;
+}
+
+.card-header img {
+	width: 300px;
+	border-radius: 10px;
+}
+
+.card-info {
+	flex: 1;
+}
+
+.tags {
+	margin-bottom: 10px;
+}
+
+.tags span {
+	background: #eee;
+	padding: 5px 10px;
+	margin-right: 5px;
+	border-radius: 5px;
+	font-size: 0.9em;
+}
+
+.card-description {
+	margin: 15px 0;
+}
+
+.view-count {
+	font-size: 25px;
+	text-align: center;
+	margin: 50px 0;
+	font-weight: bold;
+}
+
+.card-details {
+	margin: 20px 0;
+	background: #f9f9f9;
+	padding: 20px;
+	border-radius: 10px;
+}
+
+.card-details h3 {
+	margin-top: 0;
+}
+
+.grid-buttons {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 15px;
+	margin: 30px auto;
+	max-width: 500px;
+}
+
+.grid-buttons button {
+	padding: 20px;
+	background: #007bff;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 1em;
+}
+
+.grid-buttons button:hover {
+	background: #0056b3;
+}
+
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 999;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+	background: #fff;
+	margin: 10% auto;
+	padding: 30px;
+	border-radius: 10px;
+	width: 80%;
+	max-width: 600px;
+}
+
+.close-btn {
+	float: right;
+	font-size: 1.5em;
+	cursor: pointer;
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
 
-<div class="card-container" th:if="${card != null}">
+	<div class="card-container" th:if="${card != null}">
 
-    <!-- 사진 + 오른쪽 정보 -->
-    <div class="card-header">
-        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
-        <div class="card-info">
-            <div class="tags">
-                <span th:each="tag : ${#strings.arraySplit(card.tags, ' ')}" th:text="${tag}">#태그</span>
-            </div>
-            <h1 th:text="${card.name}">카드 이름</h1>
-            <p>
-                <strong>대분류:</strong> <span th:text="${card.categoryMajor}"></span> |
-                <strong>신청 상태:</strong> <span th:text="${card.status}"></span>
-            </p>
-            <p class="card-description" th:text="${card.description}">카드 요약 설명</p>
-        </div>
-    </div>
+		<!-- 사진 + 오른쪽 정보 -->
+		<div class="card-header">
+			<img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+				th:alt="${card.name}" />
+			<div class="card-info">
+				<div class="tags">
+					<span th:each="tag : ${#strings.arraySplit(card.tags, ' ')}"
+						th:text="${tag}">#태그</span>
+				</div>
+				<h1 th:text="${card.name}">카드 이름</h1>
+				<p>
+					<strong>대분류:</strong> <span th:text="${card.categoryMajorDisplay}"></span>
+					| <strong>신청 상태:</strong> <span th:text="${card.statusDisplay}"></span>
+				</p>
+				<p class="card-description" th:text="${card.description}">카드 요약
+					설명</p>
+			</div>
+		</div>
 
-    <!-- 조회수 -->
-    <div class="view-count">
-        현재 이 카드를 <span th:text="${card.viewCount}"></span>명이 조회했습니다.
-    </div>
+		<!-- 조회수 -->
+		<div class="view-count">
+			현재 이 카드를 <span th:text="${card.viewCount}"></span>명이 조회했습니다.
+		</div>
 
-    <!-- 서비스 / 발급 / 적립 정보 -->
-    <div class="card-details">
-        <h3>서비스</h3>
-        <p th:text="${card.service}">서비스 내용</p>
+		<!-- 서비스 / 적립 정보 -->
+		<div class="card-details">
+			<h3>서비스</h3>
+			<div th:utext="${card.service}" style="white-space: pre-wrap;">서비스
+				내용</div>
+			<br>
+			<h3>적립/할인 정보</h3>
+			<div th:utext="${card.pointInfo}" style="white-space: pre-wrap;">적립/할인
+				정보 내용</div>
+		</div>
 
         <h3>적립/할인 정보</h3>
         <p th:text="${card.pointInfo}">적립/할인 정보 내용</p>
     </div>
+    <div>
+		<!-- 2x2 모달 버튼 -->
+		<div class="grid-buttons">
+			<button onclick="openModal('guideModal')">상품 안내</button>
+			<button onclick="openModal('onlinePaymentModal')">온라인 결제 안내</button>
+			<button onclick="openModal('etcGuideModal')">기타 안내</button>
+			<button onclick="openModal('termsModal')">상품 설명서 및 이용약관</button>
+		</div>
 
-    <!-- 2x2 모달 버튼 -->
-    <div class="grid-buttons">
-        <button onclick="openModal('guideModal')">상품 안내</button>
-        <button onclick="openModal('onlinㄴePaymentModal')">온라인 결제 안내</button>
-        <button onclick="openModal('etcGuideModal')">기타 안내</button>
-        <button onclick="openModal('termsModal')">상품 설명서 및 이용약관</button>
-    </div>
+		<!-- 모달들 -->
+		<div id="guideModal" class="modal">
+			<div class="modal-content">
+				<span class="close-btn" onclick="closeModal('guideModal')">&times;</span>
+				<h2>상품 안내</h2>
+				<pre th:text="${card.guideInfo}"></pre>
 
-    <!-- 모달들 -->
-    <div id="guideModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('guideModal')">&times;</span>
-            <h2>상품 안내</h2>
-            <pre th:text="${card.guideInfo}"></pre>
-        </div>
-    </div>
+			</div>
+		</div>
 
-    <div id="onlinePaymentModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('onlinePaymentModal')">&times;</span>
-            <h2>온라인 결제 안내</h2>
-            <pre th:text="${card.onlinePaymentGuide}"></pre>
-        </div>
-    </div>
+		<div id="onlinePaymentModal" class="modal">
+			<div class="modal-content">
+				<span class="close-btn" onclick="closeModal('onlinePaymentModal')">&times;</span>
+				<h2>온라인 결제 안내</h2>
+				<pre th:text="${card.onlinePaymentGuide}"></pre>
 
-    <div id="etcGuideModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('etcGuideModal')">&times;</span>
-            <h2>기타 안내</h2>
-            <pre th:text="${card.etcGuide}"></pre>
-        </div>
-    </div>
+			</div>
+		</div>
 
-    <div id="termsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('termsModal')">&times;</span>
-            <h2>상품 설명서 및 이용약관</h2>
-            <pre th:text="${card.termsGuide}"></pre>
-        </div>
-    </div>
+		<div id="etcGuideModal" class="modal">
+			<div class="modal-content">
+				<span class="close-btn" onclick="closeModal('etcGuideModal')">&times;</span>
+				<h2>기타 안내</h2>
+				<pre th:text="${card.etcGuide}"></pre>
+			</div>
+		</div>
 
-</div>
+		<div id="termsModal" class="modal">
+			<div class="modal-content">
+				<span class="close-btn" onclick="closeModal('termsModal')">&times;</span>
+				<h2>상품 설명서 및 이용약관</h2>
+				<pre th:text="${card.termsGuide}"></pre>
+			</div>
+		</div>
 
-<script>
+	</div>
+
+	<script>
     function openModal(id) {
         document.getElementById(id).style.display = "block";
     }
