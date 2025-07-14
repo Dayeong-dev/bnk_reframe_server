@@ -1,10 +1,13 @@
 package com.example.reframe.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.reframe.dto.CorporateDTO;
 import com.example.reframe.dto.CorporateUserDTO;
 import com.example.reframe.dto.UserDTO;
 import com.example.reframe.entity.CorporateUser;
@@ -133,5 +136,34 @@ public class UserService {
 	private String toDigits(String str) {
 		return str.replaceAll("[^\\d]", "");
 	}
+	
+	
+	/** 개인 회원 목록 불러오기*/
+	public List<User> getPersonalUsers() {
+		return userRepository.findByUsertype("P");
+	}
+
+	/** 기업 회원 목록 불러오기 */
+	@Transactional
+	public List<CorporateDTO> getCorporateUsers() {
+		List<CorporateUser> corpList = corporateUserRepository.findAll();
+
+		return corpList.stream().map(corp -> {
+			CorporateDTO dto = new CorporateDTO();
+
+			dto.setUsername(corp.getUsername());
+			dto.setBusinessNumber(corp.getBusinessNumber());
+			dto.setBusinessStartDate(corp.getBusinessStartDate());
+			dto.setCeoName(corp.getCeoName());
+
+			User user = corp.getUser();
+			dto.setName(user.getName());
+			dto.setEmail(user.getEmail());
+			dto.setPhone(user.getPhone());
+
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
 
 }
