@@ -43,7 +43,7 @@ public class Card {
     private String status; // 신청 가능 상태 (S/P/E)
 
     @Column(name = "annual_fee")
-    private Integer annualFee; // 연회비
+    private String annualFee; // 연회비
 
     @Lob
     private String service; //서비스
