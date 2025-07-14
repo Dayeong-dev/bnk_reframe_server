@@ -43,6 +43,8 @@ public class AdminController {
 	public String cardMain() {
 		return "admin/card-main";
 	}
+	
+	
 	/*
 	 * 차트 4개를 한 페이지로 통합  -> AdminChartController로 이동 
 	 * 
