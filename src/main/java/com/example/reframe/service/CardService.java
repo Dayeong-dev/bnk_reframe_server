@@ -48,7 +48,7 @@ public class CardService {
                 .status(card.getStatus())
                 .annualFee(card.getAnnualFee())
                 .service(card.getService())
-                .issuedInfo(card.getIssuedInfo())
+//                .issuedInfo(card.getIssuedInfo())
                 .pointInfo(card.getPointInfo())
                 .viewCount(card.getViewCount())
                 .guideInfo(card.getGuideInfo())

@@ -50,8 +50,8 @@ public class Card {
     @Column(length = 2000)
     private String service; //서비스
 
-    @Column(name = "issued_info", length = 2000)
-    private String issuedInfo; // 발급 정보
+//    @Column(name = "issued_info", length = 2000)
+//    private String issuedInfo; // 발급 정보
 
     @Lob
     @Column(name = "point_info")
