@@ -79,7 +79,7 @@ public class AdminCardController {
 		    card.setStatus(dto.getStatus());
 		    card.setAnnualFee(dto.getAnnualFee());
 		    card.setService(dto.getService());
-		    card.setIssuedInfo(dto.getIssuedInfo());
+//		    card.setIssuedInfo(dto.getIssuedInfo());
 		    card.setPointInfo(dto.getPointInfo());
 		    card.setOnlinePaymentGuide(dto.getOnlinePaymentGuide());
 		    card.setEtcGuide(dto.getEtcGuide());
@@ -101,7 +101,7 @@ public class AdminCardController {
 		        .status(dto.getStatus())
 		        .annualFee(dto.getAnnualFee())
 		        .service(dto.getService())
-		        .issuedInfo(dto.getIssuedInfo())
+//		        .issuedInfo(dto.getIssuedInfo())
 		        .pointInfo(dto.getPointInfo())
 		        .onlinePaymentGuide(dto.getOnlinePaymentGuide())
 		        .etcGuide(dto.getEtcGuide())
@@ -134,7 +134,7 @@ public class AdminCardController {
 	                .status(card.getStatus())
 	                .annualFee(card.getAnnualFee())
 	                .service(card.getService())
-	                .issuedInfo(card.getIssuedInfo())
+//	                .issuedInfo(card.getIssuedInfo())
 	                .pointInfo(card.getPointInfo())
 	                .viewCount(card.getViewCount())
 	                .guideInfo(card.getGuideInfo())

@@ -16,7 +16,6 @@ import com.example.reframe.entity.Card;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.repository.CardRepository;
 
-import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

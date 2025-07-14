@@ -157,7 +157,6 @@
 		    html += `<tr><td>상태</td><td><input type="text" name="status" value="${card.status}" readonly></td></tr>`;
 		    html += `<tr><td>연회비</td><td><input type="text" name="annualFee" value="${card.annualFee}" readonly></td></tr>`;
 		    html += `<tr><td>카드 서비스</td><td><textarea name="service" readonly>${card.service}</textarea></td></tr>`;
-		    html += `<tr><td>발급 정보</td><td><textarea name="issuedInfo" readonly>${card.issuedInfo}</textarea></td></tr>`;
 		    html += `<tr><td>적립/할인</td><td><textarea name="pointInfo" readonly>${card.pointInfo}</textarea></td></tr>`;
 		    html += `<tr><td>조회수</td><td><input type="text" name="viewCount" value="${card.viewCount}" readonly></td></tr>`;
 		    html += `<tr><td>상품 안내</td><td><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></td></tr>`;
@@ -201,7 +200,6 @@
 				status: formData.get("status"),
 				annualFee: Number(formData.get("annualFee")),
 				service: formData.get("service"),
-				issuedInfo: formData.get("issuedInfo"),
 				pointInfo: formData.get("pointInfo"),
 				onlinePaymentGuide: formData.get("onlinePaymentGuide"),
 				etcGuide: formData.get("etcGuide"),
@@ -247,7 +245,6 @@
 		
 		    html += '<tr><td>연회비</td><td><input type="number" name="annualFee" /></td></tr>';
 		    html += '<tr><td>카드 서비스</td><td><textarea name="service"></textarea></td></tr>';
-		    html += '<tr><td>발급 정보</td><td><textarea name="issuedInfo"></textarea></td></tr>';
 		    html += '<tr><td>적립/할인</td><td><textarea name="pointInfo"></textarea></td></tr>';
 		    html += '<tr><td>상품 안내</td><td><textarea name="guideInfo"></textarea></td></tr>';
 		    html += '<tr><td>온라인 결제 안내</td><td><textarea name="onlinePaymentGuide"></textarea></td></tr>';
@@ -278,7 +275,6 @@
 		        categoryMajor: formData.get("categoryMajor"),
 		        annualFee: parseInt(formData.get("annualFee")),
 		        service: formData.get("service"),
-		        issuedInfo: formData.get("issuedInfo"),
 		        pointInfo: formData.get("pointInfo"),
 		        guideInfo: formData.get("guideInfo"),
 		        onlinePaymentGuide: formData.get("onlinePaymentGuide"),
