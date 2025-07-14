@@ -5,10 +5,10 @@
 <title>메인</title>
 <link rel="stylesheet" href="/css/common.css"></link>
 <link rel="stylesheet" href="/css/user.css"></link>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script
+	src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
@@ -17,18 +17,15 @@
 			<div class="swiper">
 				<div class="swiper-wrapper">
 					<div class="swiper-slide">
-						<a href="#">
-							<img src="/img/image1.jpg" alt="slide1" />
+						<a href="#"> <img src="/img/image1.jpg" alt="slide1" />
 						</a>
 					</div>
 					<div class="swiper-slide">
-						<a href="#">
-							<img src="/img/image2.jpg" alt="slide2" />
+						<a href="#"> <img src="/img/image2.jpg" alt="slide2" />
 						</a>
 					</div>
 					<div class="swiper-slide">
-						<a href="#">
-							<img src="/img/image3.jpg" alt="slide3" />
+						<a href="#"> <img src="/img/image3.jpg" alt="slide3" />
 						</a>
 					</div>
 				</div>
@@ -36,8 +33,8 @@
 			<div class="search-area">
 				<h4>상품을 검색해보세요!</h4>
 				<div class="search-form">
-					<input type="text" name="search" placeholder="검색어를 입력하세요. " />
-					<img class="icon" src="/icons/search.svg" alt="search" />
+					<input type="text" name="search" placeholder="검색어를 입력하세요. " /> <img
+						class="icon" src="/icons/search.svg" alt="search" />
 				</div>
 			</div>
 			<div class="recommend-area">
@@ -50,6 +47,18 @@
 			</div>
 		</section>
 	</div>
+
+	<!-- 리뷰 팝업 -->
+	<div id="review-popup" sec:authorize="isAuthenticated()" 
+		style="display: none; position: fixed; bottom: 30px; right: 30px; background: white; border: 1px solid #ccc; padding: 20px;">
+		<p>사이트 이용은 어떠셨나요?</p>
+		<textarea id="review-content" rows="4" cols="30"></textarea>
+		<br />
+		<button onclick="submitReview()">제출</button>
+	</div>
+
+
+
 	<script>
 		const $productList = document.querySelector(".product-list");
 		const $depositBtn = document.getElementById("deposit-btn");
@@ -142,6 +151,31 @@
 				$productList.appendChild(li);
 			}
 		}
+		
+		  window.onload = () => {
+			    const cookie = document.cookie;
+			    if (!cookie.includes("reviewed=true")) {
+			      document.getElementById("review-popup").style.display = "block";
+			    }
+			  }
+
+			  function submitReview() {
+			    const content = document.getElementById("review-content").value;
+			    if (!content.trim()) return alert("리뷰를 입력해주세요");
+
+			    fetch("/api/review/submit", {
+			      method: "POST",
+			      headers: { "Content-Type": "application/json" },
+			      body: JSON.stringify({ content: content })
+			    }).then(res => res.text()).then(msg => {
+			      alert(msg);
+			      document.getElementById("review-popup").style.display = "none";
+			      document.cookie = "reviewed=true; path=/; max-age=" + (86400 * 7);
+			    });
+			  }
+		
+		
+		
 	</script>
 </body>
 </html>
