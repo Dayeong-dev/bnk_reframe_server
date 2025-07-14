@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>소비성향 테스트</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	text-align: center;
+}
+
+.section {
+	display: none;
+	padding: 40px;
+}
+
+.section.active {
+	display: block;
+}
+
+.question {
+	margin: 30px 0;
+}
+
+.option-btn {
+	padding: 15px 30px;
+	margin: 10px;
+	cursor: pointer;
+	font-size: 18px;
+}
+
+.card-list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-top: 30px;
+}
+
+.card-item {
+	width: 200px;
+	margin: 10px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: 10px;
+}
+
+.card-item img {
+	width: 100%;
+	border-radius: 5px;
+}
+</style>
+</head>
+
+<body>
+	<h1>💳 내 통장이 텅장이 된 이유는?</h1>
+
+	<!-- 시작화면 -->
+	<div id="start-section" class="section active">
+		<img src="/images/card_test_main.png" alt="텅장 분석기" width="400" />
+		<h2>텅장분석기 테스트</h2>
+		<p>내 통장이 텅장이 된 이유를 분석해드립니다!</p>
+		<p>나의 소비성향을 확인해보세요!</p>
+		<button onclick="startTest()">테스트 시작</button>
+	</div>
+
+	<!-- 질문 화면 -->
+	<div id="question-section" class="section">
+		<img id="question-img" src="" alt="질문 이미지" width="300" />
+		<div id="question-text" class="question"></div>
+		<div>
+			<button class="option-btn" onclick="selectOption('A')">A</button>
+			<button class="option-btn" onclick="selectOption('B')">B</button>
+		</div>
+		<div id="progress"></div>
+	</div>
+
+	<!-- 결과 화면 -->
+	<div id="result-section" class="section">
+		<h2 id="result-title"></h2>
+		<img id="result-img" src="" alt="결과 이미지" width="400" />
+		<p id="result-desc"></p>
+		<h3>추천 카드</h3>
+		<div id="recommended-cards" class="card-list"></div>
+	</div>
+
+	<script>
+    // 질문 데이터
+    const questions = [
+  {
+    img: '/images/test/q1.png',
+    text: '1️⃣ 쇼핑할 때 더 설레는 순간은?',
+    A: '택배 도착 알림 똑딱📦',
+    B: '매장 가서 실물 딱 보는 순간✨',
+    typeA: '온라인',
+    typeB: '오프라인'
+  },
+  {
+    img: '/images/test/q2.png',
+    text: '2️⃣ 결제할 땐?',
+    A: '‘폰만 있으면 끝! 간편결제 최고’',
+    B: '‘카드 꺼내서 긁는 맛 있어야지~’',
+    typeA: '온라인',
+    typeB: '오프라인'
+  },
+  {
+    img: '/images/test/q3.png',
+    text: '3️⃣ 급하게 필요한 물건이 생겼을 땐?',
+    A: '‘이럴 땐 로켓 배송!! 바로 주문 ㄱ ㄱ’',
+    B: '‘지금 나가서 사와야지!!’',
+    typeA: '온라인',
+    typeB: '오프라인'
+  },
+  // 이하 동일 패턴으로~
+  {
+    img: '/images/test/q4.png',
+    text: '4️⃣ 월급 들어오면 제일 먼저 하는 생각?',
+    A: '‘일단 저축부터 하고.. 남은 돈으로 버텨보자!’',
+    B: '‘휴 한달동안 넘 고생했다~~ 오늘은 엽떡에 허니콤보~~’',
+    typeA: '저축',
+    typeB: '소비'
+  },
+  {
+    img: '/images/test/q5.png',
+    text: '5️⃣ 할인 쿠폰이 생겼을 때 나는?',
+    A: '‘아깝지만.. 필요한 건 아니니깐 안 살래🙅‍♀️’',
+    B: '‘싸면 일단 득템이지~🛍️’',
+    typeA: '저축',
+    typeB: '소비'
+  },
+  {
+    img: '/images/test/q6.png',
+    text: '6️⃣ 통장 잔고가 넉넉할 때 나는?',
+    A: '‘이번 달은 더 모아야지!’ 하고 통장 보며 뿌듯하다.',
+    B: '‘이 정도면 뭐 하나 사도 되겠는데?’ 하고 장바구니부터 찾는다.',
+    typeA: '저축',
+    typeB: '소비'
+  },
+  {
+    img: '/images/test/q7.png',
+    text: '7️⃣ 큰 돈 쓸 땐?',
+    A: '비교하고 적립하고 신중🗂️',
+    B: '고민하다 귀찮으면 그냥 삼',
+    typeA: '계획',
+    typeB: '충동'
+  },
+  {
+    img: '/images/test/q8.png',
+    text: '8️⃣ 쇼핑몰 들어가면?',
+    A: '살 거만 딱 보고 나옴',
+    B: '돌아다니다가 광고에 홀려서 이것저것 담음',
+    typeA: '계획',
+    typeB: '충동'
+  },
+  {
+    img: '/images/test/q9.png',
+    text: '9️⃣ 결제 직전 내 루틴은?',
+    A: '‘쿠폰, 포인트 싹 긁어 모아서 받을 수 있는 할인은 다 받을테다!!’',
+    B: '‘아웅 귀찮아..’ 그냥 결제 누르고 끝👆',
+    typeA: '계획',
+    typeB: '충동'
+  }
+];
+
+
+    let current = 0;
+    let counts = { 온라인:0, 오프라인:0, 저축:0, 소비:0, 계획:0, 충동:0 };
+
+    function startTest() {
+      document.getElementById('start-section').classList.remove('active');
+      document.getElementById('question-section').classList.add('active');
+      showQuestion();
+    }
+
+    function showQuestion() {
+    	  const q = questions[current];
+    	  document.getElementById('question-img').src = q.img;
+    	  document.getElementById('question-text').innerText = q.text;
+    	  document.querySelectorAll('.option-btn')[0].innerText = `A. ${q.A}`;
+    	  document.querySelectorAll('.option-btn')[1].innerText = `B. ${q.B}`;
+    	  document.getElementById('progress').innerText = `${current+1} / ${questions.length}`;
+    	}
+
+    function selectOption(option) {
+    	  const q = questions[current];
+    	  const selectedType = option === 'A' ? q.typeA : q.typeB;
+    	  counts[selectedType]++;
+    	  current++;
+    	  if (current < questions.length) {
+    	    showQuestion();
+    	  } else {
+    	    finishTest();
+    	  }
+    	}
+
+    function finishTest() {
+      document.getElementById('question-section').classList.remove('active');
+      document.getElementById('result-section').classList.add('active');
+
+      // 결과유형 계산
+      const type1 = counts.온라인 >= counts.오프라인 ? 'ONLINE' : 'OFFLINE';
+      const type2 = counts.저축 >= counts.소비 ? 'SAVE' : 'SPEND';
+      const type3 = counts.계획 >= counts.충동 ? 'PLAN' : 'IMPULSE';
+      const resultType = `${type1}-${type2}-${type3}`;
+
+      document.getElementById('result-title').innerText = `당신의 소비유형은 ${resultType}!`;
+      document.getElementById('result-img').src = `/images/test/result/${resultType}.png`;
+      document.getElementById('result-desc').innerText = `${resultType} 유형 설명이 여기에 들어갑니다.`;
+
+      // 서버에 저장 + 추천카드 받기
+      fetch('/card/card_test_result', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'resultType=' + resultType
+      })
+      .then(res => res.json())
+      .then(cards => {
+        const container = document.getElementById('recommended-cards');
+        container.innerHTML = '';
+        cards.forEach(card => {
+          container.innerHTML += `
+            <div class="card-item">
+              <img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name}" />
+              <h4>${card.name}</h4>
+              <p>${card.description}</p>
+            </div>`;
+        });
+      });
+    }
+  </script>
+</body>
+</html>

@@ -12,22 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.dto.CardDto;
 import com.example.reframe.entity.Card;
-
-import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.repository.CardRepository;
-
-import jakarta.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.example.reframe.entity.CardCategoryRel;
 import com.example.reframe.entity.CardSubcategory;
+import com.example.reframe.entity.CardTestResult;
 import com.example.reframe.repository.CardRepository;
 import com.example.reframe.repository.CardSubcategoryRepository;
+import com.example.reframe.repository.CardTestResultRepository;
 
 @Service
 public class CardService {
@@ -38,6 +28,9 @@ public class CardService {
     @Autowired
     private CardSubcategoryRepository cardSubcategoryRepository;
 
+    @Autowired
+    private CardTestResultRepository cardTestResultRepository;
+    
     // 메인 - 조회수 상위 6개 카드 가져오기
     public List<CardDto> getTop6Cards() {
         return cardRepository.findTop6()
@@ -131,5 +124,35 @@ public class CardService {
             });
         }
         cardRepository.save(card); // Cascade로 REL도 같이 저장
+    }
+    
+    @Transactional
+    public void saveOrUpdateTestResult(String resultType) {
+        CardTestResult cardTestResult = cardTestResultRepository.findByResultType(resultType)
+            .orElseGet(() -> new CardTestResult(resultType));
+
+        cardTestResult.incrementCount();
+        cardTestResultRepository.save(cardTestResult);
+    }
+
+    public List<CardDto> getRecommendedCardsByResult(String resultType) {
+        // 예시: 결과유형에 따라 카드 아이디 고정
+        List<Long> cardIds;
+
+        switch (resultType) {
+            case "ONLINE-SAVE-PLAN":
+                cardIds = List.of(1L, 2L, 3L); // 결과유형에 맞는 카드 ID
+                break;
+            case "OFFLINE-SPEND-IMPULSE":
+                cardIds = List.of(4L, 5L, 6L);
+                break;
+            default:
+                cardIds = List.of(); // fallback
+        }
+
+        return cardRepository.findAllById(cardIds)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 }
