@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.QnaDTO;
+import com.example.reframe.entity.AdminAlert;
 import com.example.reframe.entity.Faq;
 import com.example.reframe.entity.Qna;
 import com.example.reframe.entity.Review;
+import com.example.reframe.repository.AdminAlertRepository;
 import com.example.reframe.repository.FaqRepository;
 import com.example.reframe.repository.QnaRepository;
 import com.example.reframe.repository.ReviewRepository;
@@ -37,6 +39,9 @@ public class AdminGangController {
 	
 	@Autowired
 	ReviewRepository reviewRepository;
+	
+	@Autowired
+	AdminAlertRepository adminAlertRepository;
 	
 	@GetMapping("/index2")
 	public String index2(Model model) {
@@ -114,9 +119,24 @@ public class AdminGangController {
 	@GetMapping("/index4")
 	public String index4(Model model) {
 		List<Review> reviewlist = reviewRepository.findAll();
-		System.out.println(reviewlist);
+		
+	    // 🚨 알림 카운트 초기화
+	    AdminAlert alert = adminAlertRepository.findById(1).orElse(null);
+	    if (alert != null) {
+	        alert.setNegativeReviewCount(0);
+	        adminAlertRepository.save(alert);
+	    }
+		
 		model.addAttribute("reviewlist", reviewlist);
 		return "admin/reviewIndex";
+	}
+
+	@GetMapping("/alertCount")
+	@ResponseBody
+	public int getAlertCount() {
+	    return adminAlertRepository.findById(1)
+	            .map(AdminAlert::getNegativeReviewCount)
+	            .orElse(0);
 	}
 
 
