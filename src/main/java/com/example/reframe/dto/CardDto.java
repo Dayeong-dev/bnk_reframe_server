@@ -21,7 +21,7 @@ public class CardDto {
 	private String status;            // 신청 가능 상태 (ex: 가능(S), 대기(P), 불가(E))
 	private Integer annualFee;        // 연회비
 	private String service;           // 카드 서비스 설명 
-	private String issuedInfo;        // 카드 발급 정보
+//	private String issuedInfo;        // 카드 발급 정보
 	private String pointInfo;         // 적립/할인 정보
 	private Integer viewCount;        // 카드 조회수
 	private String guideInfo;         // 상품 안내

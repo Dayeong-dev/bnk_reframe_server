@@ -28,7 +28,7 @@ public class User {
 	
 	@NotNull
 	@Size(min = 1, max = 1)
-	private String usertype;	// 회원 타입		// 1: 개인, 2: 기업
+	private String usertype;	// 회원 타입		// P : 개인, C : 기업
 	
 	@NotNull
 	private String role;		// 회원 역할		// 회원: ROLE_MEMBER

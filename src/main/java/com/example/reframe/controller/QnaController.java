@@ -29,8 +29,6 @@ public class QnaController {
 	
 	@PostMapping("/qnaRegist")
 	public String registBoard(Qna qna, RedirectAttributes redirectAttributes) {
-
-		
 		Userr user = userRepository.findById("user01")
               .orElseThrow(() -> new RuntimeException("로그인된 사용자 없음"));
 		//유저엔티티 받으면 그 코드로 수정하기
@@ -39,6 +37,7 @@ public class QnaController {
 		redirectAttributes.addFlashAttribute("qnaSuccess", true);
 		return "redirect:/qna/qna";
 	}
+	
 	@GetMapping("/qna")
 	public String qna(Model model) {
 		List<Qna> qnalist = qnaRepository.findByUser_Username("user01");
