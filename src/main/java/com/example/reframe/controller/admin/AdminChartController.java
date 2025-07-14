@@ -2,6 +2,7 @@ package com.example.reframe.controller.admin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import com.example.reframe.dto.DailyVisitDTO;
 import com.example.reframe.dto.ProductViewDTO;
 import com.example.reframe.service.AccessLogService;
 import com.example.reframe.service.ProductService;
+import com.example.reframe.service.ReviewService;
 
 @Controller
 @RequestMapping("/admin/chart")
@@ -20,9 +22,12 @@ public class AdminChartController {
 
 	@Autowired
 	private AccessLogService accessLogService;
-	
 	@Autowired
 	private ProductService ProductService;
+	@Autowired
+	private ReviewService reviewService;
+	
+	
 	// 차트
 	@GetMapping("/chart-main")
 	public String chartMain(Model model){
@@ -51,10 +56,10 @@ public class AdminChartController {
 	    model.addAttribute("labels", labels);
 	    model.addAttribute("counts", counts);
 
-	
-		
-		
-		
+	    // 리뷰 긍정, 부정 
+	    Map<String, Long> sentimentStats = reviewService.getReviewSentimentStats();
+        model.addAttribute("sentimentLabels", sentimentStats.keySet());
+        model.addAttribute("sentimentCounts", sentimentStats.values());
 		
 		
 		
