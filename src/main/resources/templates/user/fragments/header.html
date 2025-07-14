@@ -1,23 +1,74 @@
-<div xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="headerFragment">
-	<header>
-		<div class="logo"><a href="/">BNK</a></div>
-		<nav class="menu">
-			<ul>
-				<li><a href="#">예적금</a></li>
-				<li><a href="#">카드</a></li>
-				<li><a href="#">고객센터</a></li>
-			</ul>
-		</nav>
-		<div class="sub-menu" sec:authorize="isAnonymous()">
-			<ul>
-				<li><a href="/signin/form">로그인</a></li>
-				<li><a href="/signup">회원가입</a></li>
-			</ul>
+<header xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="headerFragment">
+	<div class="content-wrapper">
+		<div id="main-header">
+			<div class="left-group">
+				<div class="logo"><a href="/">BNK</a></div>
+				<div class="menu">
+					<ul>
+						<li><a href="#">예적금</a></li>
+						<li><a href="#">카드</a></li>
+						<li><a href="#">고객센터</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="right-group">
+				<div class="login-menu" sec:authorize="isAnonymous()">
+					<ul>
+						<li><a href="/signin/form">로그인</a></li>
+						<li><a href="/signup">회원가입</a></li>
+					</ul>
+				</div>
+				<div class="login-menu" sec:authorize="isAuthenticated()">
+					<ul>
+						<li><a href="/signout">로그아웃</a></li>
+					</ul>
+				</div>
+			</div>
 		</div>
-		<div class="sub-menu" sec:authorize="isAuthenticated()">
-			<ul>
-				<li><a href="/signout">로그아웃</a></li>
+	</div>
+	<div id="sub-header">
+		<div class="content-wrapper">
+			<ul class="sub-menu">
+				<li class="title">예적금</li>
+				<li><a href="#">전체 상품</a></li>
+				<li><a href="#">예적금 상품 1</a></li>
+				<li><a href="#">예적금 상품 2</a></li>
+				<li><a href="#">예적금 상품 3</a></li>
+				<li><a href="#">예적금 상품 4</a></li>
+				<li><a href="#">예적금 상품 5</a></li>
 			</ul>
-		</div>
-	</header>
-</div>
+			<ul class="sub-menu">
+				<li class="title">카드</li>
+				<li><a href="#">전체 상품</a></li>
+				<li><a href="#">신용카드</a></li>
+				<li><a href="#">기업카드</a></li>
+				<li><a href="#">체크카드</a></li>
+			</ul>
+			<ul class="sub-menu">
+				<li class="title">고객센터</li>
+				<li><a href="#">1:1 문의</a></li>
+				<li><a href="#">자주 묻는 질문</a></li>
+			</ul>
+	    </div>
+	</div>
+    <script>
+    	const $menu = document.querySelector("#main-header .menu");
+    	const $subHeader = document.getElementById("sub-header");
+    	
+    	$menu.addEventListener("mouseenter", e => {
+			$subHeader.classList.add("active");
+		});
+		
+		$menu.addEventListener("mouseleave", e => {
+			$subHeader.classList.remove("active");
+		});
+		
+		$subHeader.addEventListener("mouseenter", e => {
+			$subHeader.classList.add("active");
+		});
+		
+		$subHeader.addEventListener("mouseleave", e => {
+			$subHeader.classList.remove("active");
+		});
+    </script>
+</header>

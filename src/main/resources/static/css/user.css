@@ -1,26 +1,168 @@
 @charset "UTF-8";
 
-
-
-#signup-form .username-wrap {
-	width: 20rem;
-    display: flex;
-    justify-content: space-betweens;
-    align-items: center;
-    margin: 0.5rem auto;
+:root {
+    --primary-color: #D7191F;
+    --secondary-color: #B4161B;
 }
 
-#signup-form .username-wrap input[type="text"] {
-    flex: 1;
-    margin: 0;
-    margin-right: 0.5rem;
+/* ============================== */
+/* 메인 페이지                      */
+/* ============================== */
+#main h4 {
+	font-size: 1.5rem;
+	margin-bottom: 1rem;
 }
 
-#signup-form .username-wrap input[type="button"] {
-    padding: 0.5rem 1rem;
-    height: 2.5rem;
+#main .swiper {
+	width: 90%;
+	max-width: 1197px;
+	height: 480px;
+	box-shadow: 0px 0px 8px #777;
+	border-radius: 1rem;
 }
 
+#main .search-area {
+	width: 100%;
+	padding: 4rem;
+	text-align: center;
+}
+
+#main .search-area .search-form {
+	width: 60%;
+	max-width: 50rem;
+	border: 1px solid #000;
+	border-radius: 2rem;
+	margin: 0 auto;
+	padding: 0.5rem 1rem;
+	
+	display: flex;
+	align-items: center;
+	column-gap: 1rem;
+}
+
+#main .search-area .search-form input {
+	flex: 1;
+	border: none;
+	padding: 0.5rem;
+}
+
+#main .search-area .search-form input {
+	outline: none;
+}
+
+#main .recommend-area {
+	padding: 4rem;
+	width: 100%;
+	min-height: 25rem;
+	background-color: #eee;
+	text-align: center;
+}
+
+#main .recommend-area .btn-list {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	column-gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+#main .recommend-area .btn-list button {
+	width: 5rem;
+	border: 2px solid #262626;
+	border-radius: 2rem;
+	
+	padding: 0.4rem;
+	color: #262626;
+	font-weight: bold;
+	background-color: transparent;
+	cursor: pointer;
+	
+	transition: all 0.2s ease;
+}
+
+#main .recommend-area .btn-list button:hover {
+	color: #fff;
+	background-color: #262626;
+}
+
+#main .recommend-area .btn-list button.active {
+	color: #fff;
+	background-color: #262626;
+}
+
+#main .recommend-area ul {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin: 0 auto;
+} 
+
+#main .recommend-area li a {
+	transition: transform 0.2s ease;
+}
+
+#main .recommend-area li a:hover {
+	transform: translateY(-0.5rem);
+}
+
+#main .recommend-area li.deposit-item a {
+	border-radius: 1rem;
+	width: 10rem;
+	height: 10rem;
+	background-color: #fff;
+	box-shadow: 0px 2px 4px #ddd;
+	padding: 1.5rem;
+	cursor: pointer;
+	text-align: left;
+	word-break: keep-all;
+	
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+
+#main .recommend-area li.deposit-item .name {
+	font-weight: bold;
+}
+
+#main .recommend-area li.deposit-item .max-rate {
+	color: var(--primary-color);
+	font-size: 1.25rem;
+	font-weight: bold;
+}
+
+#main .recommend-area li.deposit-item .max-rate:before {
+	content: "최대";
+	color: #000;
+	font-size: 1rem;
+	font-weight: normal;
+	margin-right: 0.25rem;
+}
+
+#main .recommend-area li.card-item a {
+	display: block;
+	width: 10rem;
+}
+
+#main .recommend-area li.card-item img {
+	width: 90%;
+	border-radius: 5%;
+	box-shadow: 0px 2px 4px #777;
+	margin-bottom: 0.5rem;
+	
+	min-width: 90%;
+	min-height: 91px;
+}
+
+#main .recommend-area li.card-item p {
+	font-weight: bold;
+}
+
+/* ============================== */
+/* 회원가입 타입 선택 페이지            */
+/* ============================== */
 #signup-type .btn-list {
 	display: flex;
 	justify-content: center;
@@ -36,4 +178,88 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+/* ============================== */
+/* 회원가입 폼 페이지                 */
+/* ============================== */
+#signup-form .username-wrap {
+	width: 20rem;
+    display: flex;
+    justify-content: space-betweens;
+    align-items: center;
+    margin: 0.5rem auto;
+}
+#signup-form .username-wrap input[type="text"] {
+    flex: 1;
+    margin: 0;
+    margin-right: 0.5rem;
+}
+#signup-form .username-wrap input[type="button"] {
+    padding: 0.5rem 1rem;
+    height: 2.5rem;
+}
+
+/* ============================== */
+/* 회원가입, 로그인 페이지 공통 요소      */
+/* ============================== */
+.user-form input[type="text"], 
+.user-form input[type="password"], 
+.user-form input[type="date"], 
+.user-form input[type="tel"], 
+.user-form input[type="email"], 
+.user-form textarea{
+    width: 20rem;
+    padding: 0.75rem 1rem;
+    margin: 0.5rem;
+    font-size: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    color: #444;
+    outline: none;
+    resize: none;
+}
+
+.user-form input:focus, 
+.user-form textarea:focus {
+    border-color: var(--primary-color);
+}
+
+.user-form button,
+.user-form input[type="submit"], 
+.user-form input[type="button"] {
+    padding: 0.5rem 2rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.user-form input[type="submit"] {
+    width: 20rem;
+    height: 2.5rem;
+    margin: 1rem 0;
+
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.user-form button, 
+.user-form input[type="button"] {
+    background-color: #262626;
+}
+
+.user-form button:hover, 
+.user-form input[type="button"]:hover {
+    background-color: #000;
+}
+
+.user-form input[type="submit"] {
+    background-color: var(--primary-color);
+}
+
+.user-form input[type="submit"]:hover {
+    background-color: var(--secondary-color);
 }

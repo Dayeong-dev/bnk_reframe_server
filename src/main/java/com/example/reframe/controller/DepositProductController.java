@@ -3,15 +3,19 @@ package com.example.reframe.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.service.DepositProductService;
+import com.example.reframe.service.DepositProductServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class DepositProductController {
 
     private final DepositProductService depositProductService;
+    private final DepositProductServiceImpl depositProductServiceImpl;
 
     @GetMapping("/main")
     public String depositMain(@RequestParam(value = "purpose", required = false) String purpose,
@@ -82,7 +87,17 @@ public class DepositProductController {
 
         return "user/deposit_detail";  // user/deposit_detail.jsp or deposit_detail.html
     }
-
-   
+    
+    // 조회수 기준으로 Top 5 예적금 추천 : 메인 페이지
+    @GetMapping("/recommend/list")
+    public @ResponseBody ResponseEntity<List<DepositProductDTO>> getRecommendDeposits() {
+    	List<DepositProductDTO> depositList = depositProductServiceImpl.getTopFiveByViewCount();
+    	
+    	if(depositList == null) {
+    		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    	}
+    	
+    	return ResponseEntity.status(HttpStatus.OK).body(depositList);
+    }
 
 }

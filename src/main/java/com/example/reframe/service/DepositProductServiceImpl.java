@@ -189,4 +189,10 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .imageUrl(product.getImageUrl())
                 .build();
     }
+    
+    public List<DepositProductDTO> getTopFiveByViewCount() {
+    	List<DepositProduct> depositList = depositProductRepository.findTopFiveByViewCount();
+    	
+    	return depositList.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
 }
