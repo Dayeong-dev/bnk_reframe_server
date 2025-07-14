@@ -20,6 +20,7 @@ public class SecurityConfig {
 		
 		http.authorizeHttpRequests(auth -> auth
 //				.requestMatchers("/admin/**").hasRole("ADMIN")
+				.requestMatchers("/qna/**").hasRole("MEMBER")
 				.anyRequest().permitAll());
 		
 		http.formLogin(auth -> auth
