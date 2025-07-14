@@ -1,100 +1,185 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>맥북 룰렛 이벤트</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      margin: 50px;
+      margin: 40px;
+      background: #f0f8ff;
+      color: #333;
+    }
+    h1 {
+      color: #28a745;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+    #wheel-container {
+      position: relative;
+      margin: 0 auto;
+      width: 320px;
+      height: 320px;
     }
     #wheel {
-      margin: 0 auto;
-      width: 300px;
-      height: 300px;
+      width: 320px;
+      height: 320px;
       border-radius: 50%;
-      border: 10px solid #28a745;
-      position: relative;
-      background: conic-gradient(#f4f4f4 0% 60%, gold 60% 61%, #f4f4f4 61%);
-      transition: transform 4s ease-out;
+      border: 12px solid #28a745;
+      background: conic-gradient(
+        #f4f4f4 0deg 216deg, 
+        gold 216deg 219deg, 
+        #f4f4f4 219deg 360deg
+      );
+      transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+      user-select: none;
     }
     #pointer {
       width: 0; 
       height: 0; 
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 30px solid red;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-bottom: 40px solid #dc3545;
       position: absolute;
-      top: -30px;
-      left: 130px;
+      top: -40px;
+      left: calc(50% - 25px);
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
+      user-select: none;
     }
     #spin-btn {
-      margin-top: 30px;
-      padding: 15px 30px;
-      font-size: 18px;
+      margin-top: 40px;
+      padding: 15px 40px;
+      font-size: 20px;
       background-color: #28a745;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
+      box-shadow: 0 5px 12px rgba(40,167,69,0.5);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #spin-btn:disabled {
+      background-color: #94d3a2;
+      cursor: not-allowed;
+      box-shadow: none;
     }
     #result {
       margin-top: 30px;
-      font-size: 20px;
+      font-size: 22px;
+      min-height: 30px;
+      color: #333;
+      user-select: none;
     }
     #macbook-link {
       margin-top: 20px;
       display: none;
     }
-    a {
+    #macbook-link a {
       color: #0074cc;
       font-weight: bold;
       font-size: 18px;
+      text-decoration: none;
+    }
+    #macbook-link a:hover {
+      text-decoration: underline;
+    }
+    #message-log {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #666;
+      user-select: none;
     }
   </style>
 </head>
 <body>
+
   <h1>🎉 맥북 룰렛 이벤트 🎉</h1>
-  <div id="wheel">
-    <div id="pointer"></div>
-  </div>
-  <button id="spin-btn">룰렛 돌리기</button>
-  <div id="result"></div>
-  <div id="macbook-link">
-    👉 <a href="https://www.coupang.com/np/search?component=&q=맥북+에어" target="_blank">맥북 최저가 보러가기</a>
+
+  <div id="wheel-container">
+    <div id="wheel"></div>
+    <div id="pointer" title="포인터"></div>
   </div>
 
-  <script>
-    let hasSpunToday = false;
+  <button id="spin-btn" type="button" aria-label="룰렛 돌리기">룰렛 돌리기</button>
 
-    document.getElementById('spin-btn').addEventListener('click', function () {
-      if (hasSpunToday) {
+  <div id="result" role="alert" aria-live="polite"></div>
+  <div id="macbook-link" aria-hidden="true">
+    👉 <a href="https://www.coupang.com/np/search?component=&q=맥북+에어" target="_blank" rel="noopener noreferrer">맥북 최저가 보러가기</a>
+  </div>
+
+  <div id="message-log" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+  (function(){
+    const wheel = document.getElementById('wheel');
+    const btn = document.getElementById('spin-btn');
+    const result = document.getElementById('result');
+    const macbookLink = document.getElementById('macbook-link');
+    const messageLog = document.getElementById('message-log');
+
+    // 하루 1회 룰렛 돌리기 저장용 (localStorage)
+    const STORAGE_KEY = 'rouletteSpunDate';
+
+    function hasSpunToday() {
+      const lastSpin = localStorage.getItem(STORAGE_KEY);
+      if (!lastSpin) return false;
+      const lastDate = new Date(lastSpin);
+      const now = new Date();
+      return lastDate.toDateString() === now.toDateString();
+    }
+
+    function setSpunToday() {
+      localStorage.setItem(STORAGE_KEY, new Date().toISOString());
+    }
+
+    function spin() {
+      if (hasSpunToday()) {
         alert('하루에 한 번만 참여할 수 있어요!');
         return;
       }
+      btn.disabled = true;
+      result.textContent = '돌리는 중... 잠시만 기다려주세요.';
+      macbookLink.style.display = 'none';
+      messageLog.textContent = '';
 
-      const wheel = document.getElementById('wheel');
-      const result = document.getElementById('result');
-      const link = document.getElementById('macbook-link');
+      // 최소 10회전 + 랜덤 각도 (0~359)
+      const spins = 360 * 10 + Math.floor(Math.random() * 360);
 
-      const spinDeg = 360 * 10 + Math.floor(Math.random() * 360); // 최소 10바퀴
-      wheel.style.transform = `rotate(${spinDeg}deg)`;
-      hasSpunToday = true;
-      result.textContent = "돌리는 중...";
-      link.style.display = 'none';
+      wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+      wheel.style.transform = `rotate(${spins}deg)`;
 
-      setTimeout(() => {
-        const angle = spinDeg % 360;
-        // 금색 범위는 216도~219도 (약 0.8%) → 당첨
-        if (angle >= 1 && angle <= 350) {
+      // 스핀 애니메이션 끝나면 결과 판단
+      wheel.addEventListener('transitionend', function handler() {
+        wheel.removeEventListener('transitionend', handler);
+
+        // 0~359도 내 최종 각도
+        const finalAngle = spins % 360;
+
+        // 당첨 범위 : 216도~219도 (약 0.8%)
+        if(finalAngle >= 216 && finalAngle <= 219) {
           result.textContent = "🎉 축하합니다! 맥북에 당첨되셨어요! (…는 농담)";
         } else {
-          result.textContent = "아쉽지만 다음 기회를 노려보세요!";
+          result.textContent = "아쉽지만 내일 다시 시도해주세요!";
         }
-        link.style.display = 'block';
-      }, 4000);
-    });
-  </script>
+
+        macbookLink.style.display = 'block';
+        setSpunToday();
+      });
+    }
+
+    // 초기 버튼 상태 설정
+    if(hasSpunToday()) {
+      btn.disabled = true;
+      result.textContent = '오늘 이미 룰렛을 돌리셨습니다. 내일 다시 도전하세요!';
+      macbookLink.style.display = 'block';
+    }
+
+    btn.addEventListener('click', spin);
+  })();
+</script>
+
 </body>
 </html>
