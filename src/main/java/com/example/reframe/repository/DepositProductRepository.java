@@ -53,10 +53,5 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
             Pageable pageable
     );
 
-
 	List<DepositProduct> findTop10ByOrderByViewCountDesc();
-
-    List<DepositProduct> findByPurposeInAndStatus(List<String> purposes, String status);
-
-   
 }
