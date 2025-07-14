@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>상품 검색</title>
+<link rel="stylesheet" href="/css/common.css"></link>
+<link rel="stylesheet" href="/css/user.css"></link>
+<style>
+	h4 {
+		font-size: 1.25rem;
+		margin-bottom: 1rem;
+	}
+
+	table {
+		width: 42rem;
+    	text-align: center;
+    	border-collapse: collapse;
+    	margin-bottom: 2rem;
+	}
+	
+	thead {
+	    background-color: #f6f6f6;
+	}
+	
+	thead th {
+	    color: #444;
+	    padding: 0.5rem 1rem;
+	    font-weight: 700;
+	}
+	
+	tbody td {
+	    padding: 0.5rem 1rem;
+	}
+	
+	th, td {
+		word-break: keep-all;
+	}
+</style>
+</head>
+<body>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div id="container">
+		<section id="search-list" class="content-wrapper">
+			<div th:replace="~{user/fragments/main-search :: mainSearchFragment}"></div>
+			<h4>예적금 상품</h4>
+			<table border="1">
+				<thead>
+					<tr>
+						<th>상품 ID</th>
+						<th>상품 이름</th>
+						<th>상품 요약</th>
+						<th>상품 유형</th>
+						<th>최고 금리</th>
+						<th>최소 금리</th>
+					</tr>
+				</thead>
+				<tbody th:if="${depositList != null and not #lists.isEmpty(depositList)}">
+					<tr th:each="deposit : ${depositList}">
+						<td th:text="${deposit.productId}"></td>
+						<td th:text="${deposit.name}"></td>
+						<td th:text="${deposit.summary}"></td>
+						<td th:text="${deposit.category}"></td>
+						<td th:text="${deposit.maxRate}"></td>
+						<td th:text="${deposit.minRate}"></td>
+					</tr>
+				</tbody>
+				<tbody th:if="${depositList == null or #lists.isEmpty(depositList)}">
+					<tr>
+						<td colspan="6">검색된 상품이 없습니다. </td>
+					</tr>
+				</tbody>
+			</table>
+			<hr/>
+			<h4>카드 상품</h4>
+			<table border="1">
+				<thead>
+					<tr>
+						<th>카드 ID</th>
+						<th>카드 이름</th>
+						<th>카드 요약</th>
+						<th>카드 대분류</th>
+					</tr>
+				</thead>
+				<tbody th:if="${cardList != null and not #lists.isEmpty(cardList)}">
+					<tr th:each="card : ${cardList}">
+						<td th:text="${card.cardId}"></td>
+						<td th:text="${card.name}"></td>
+						<td th:text="${card.description}"></td>
+						<td th:text="${card.categoryMajor}"></td>
+					</tr>
+				</tbody>
+				<tbody th:if="${cardList == null or #lists.isEmpty(cardList)}">
+					<tr>
+						<td colspan="6">검색된 상품이 없습니다. </td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+	</div>
+</body>
+</html>
