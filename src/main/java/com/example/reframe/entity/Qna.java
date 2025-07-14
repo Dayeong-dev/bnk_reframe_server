@@ -30,7 +30,7 @@ public class Qna extends BaseEntity{
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "username")
-    private Userr user;
+    private User user;
 
     private String category;
     

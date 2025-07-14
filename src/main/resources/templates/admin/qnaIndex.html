@@ -38,9 +38,10 @@ th, td {
 #qna-form {
 	display: none;
 }
-  #qna-detail {
-    display: none;
-  }
+
+#qna-detail {
+	display: none;
+}
 </style>
 </head>
 <body>
@@ -53,8 +54,15 @@ th, td {
 		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
 
 		<!-- 본문 -->
+
+
+
 		<div class="content" id="main-content">
 			<h1>1:1 문의 관리</h1>
+
+			<div id="alert-banner" style="display: none;">
+				🚨 부정 리뷰가 <span id="alert-count"></span>건 있습니다!
+			</div>
 
 
 			<div id="qna-list" th:if="${qnalist != null}">
@@ -276,6 +284,24 @@ th, td {
         alert("답변 등록 중 오류가 발생했습니다.");
       });
   }
+  
+  fetch('/admin/alertCount')
+  .then(res => res.json())
+  .then(count => {
+    if (count > 0) {
+      const banner = document.getElementById("alert-banner");
+      const countSpan = document.getElementById("alert-count");
+      countSpan.textContent = count;
+      banner.style.display = "block";
+
+      // 자동 사라짐
+      setTimeout(() => {
+        banner.style.display = "none";
+      }, 10000);
+
+      
+    }
+  });
 </script>
 
 

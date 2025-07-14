@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.reframe.auth.CustomUserDetails;
 import com.example.reframe.entity.Qna;
-import com.example.reframe.entity.Userr;
+import com.example.reframe.entity.User;
 import com.example.reframe.repository.QnaRepository;
-import com.example.reframe.repository.UserrRepository;
+import com.example.reframe.repository.UserRepository;
 
 @RequestMapping("/qna")
 @Controller
@@ -25,22 +27,21 @@ public class QnaController {
 	QnaRepository qnaRepository;
 	
 	@Autowired
-	UserrRepository userRepository;
+	UserRepository userRepository;
 	
 	@PostMapping("/qnaRegist")
-	public String registBoard(Qna qna, RedirectAttributes redirectAttributes) {
-		Userr user = userRepository.findById("user01")
+	public String registBoard(Qna qna, RedirectAttributes redirectAttributes,@AuthenticationPrincipal CustomUserDetails user) {
+		User user1 = userRepository.findById(user.getUsername())
               .orElseThrow(() -> new RuntimeException("로그인된 사용자 없음"));
-		//유저엔티티 받으면 그 코드로 수정하기
-		qna.setUser(user);
+		qna.setUser(user1);
 		qnaRepository.save(qna);
 		redirectAttributes.addFlashAttribute("qnaSuccess", true);
 		return "redirect:/qna/qna";
 	}
 	
 	@GetMapping("/qna")
-	public String qna(Model model) {
-		List<Qna> qnalist = qnaRepository.findByUser_Username("user01");
+	public String qna(Model model,@AuthenticationPrincipal CustomUserDetails user) {
+		List<Qna> qnalist = qnaRepository.findByUser_Username(user.getUsername());
 		System.out.println(qnalist);
 		model.addAttribute("qnalist", qnalist);
 		return "user/qna";

@@ -61,16 +61,19 @@ th, td {
 					<thead>
 						<tr>
 							<th>리뷰 ID</th>
-<!--							<th>사용자 ID</th>-->
+							<th>사용자 ID</th>
 							<th>내용</th>
+							<th>작성일</th>
 							<th>부정 여부</th>
 						</tr>
 					</thead>
 					<tbody id="review-tbody">
 						<tr th:each="review : ${reviewlist}">
 							<td th:text="${review.id}"></td>
-<!--  							<td th:text="${review.user.username}"></td>-->
+							<td th:text="${review.user.username}"></td>
 							<td th:text="${review.content}"></td>
+							<td
+								th:text="${#temporals.format(review.regdate, 'yyyy-MM-dd HH:mm')}"></td>
 							<td th:text="${review.negative} ? '부정' : '긍정'"></td>
 						</tr>
 					</tbody>
@@ -111,7 +114,7 @@ th, td {
 
 		function applyFilter() {
 			filteredRows = rows.filter(row => {
-				const sentiment = row.querySelector("td:nth-child(5)").textContent.trim();
+				const sentiment = row.querySelector("td:nth-child(4)").textContent.trim();
 				return currentFilter === "전체" || sentiment === currentFilter;
 			});
 			renderPagination();
