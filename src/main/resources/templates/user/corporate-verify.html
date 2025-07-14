@@ -8,22 +8,24 @@
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<section>
-		<h2>사업자 확인</h2>
-		<form action="/business/check" method="post">
-			<input type="text" name="businessNumber" placeholder="사업자 등록 번호를 입력하세요. " />
-			<p id="businessNumber-error" class="error"></p>
-			
-			<input type="text" name="ceoName" placeholder="대표자 명을 입력하세요. " />
-			<p id="ceoName-error" class="error"></p>
-			
-			<input type="date" name="businessStartDate" placeholder="개업 날짜를 입력하세요. " />
-			<p id="businessStartDate-error" class="error"></p>
-			
-			<input type="submit" value="사업자 확인" />
-		</form>
-		<p th:if="${msg != null}" th:text="${msg}"></p>
-	</section>
+	<div id="container">
+		<section>
+			<h2>사업자 확인</h2>
+			<form class="user-form" action="/business/check" method="post">
+				<input type="text" name="businessNumber" placeholder="사업자 등록 번호를 입력하세요. " />
+				<p id="businessNumber-error" class="error"></p>
+				
+				<input type="text" name="ceoName" placeholder="대표자 명을 입력하세요. " />
+				<p id="ceoName-error" class="error"></p>
+				
+				<input type="date" name="businessStartDate" placeholder="개업 날짜를 입력하세요. " />
+				<p id="businessStartDate-error" class="error"></p>
+				
+				<input type="submit" value="사업자 확인" />
+			</form>
+			<p th:if="${msg != null}" th:text="${msg}"></p>
+		</section>
+	</div>
 	<script>
 		const $form = document.querySelector("form");
 		const $errors = document.querySelectorAll('.error');

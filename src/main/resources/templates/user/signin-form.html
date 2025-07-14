@@ -8,14 +8,42 @@
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<section>
-		<h2>로그인</h2>
-		<form action="/signin" method="POST">
-			<input type="text" name="username" placeholder="아이디를 입력하세요." /><br/>
-			<input type="password" name="password" placeholder="비밀번호를 입력하세요." /><br/>
-			<input type="submit" value="로그인" /> 
-		</form>
-		<p th:if="${msg != null}" th:text="${msg}"></p>
-	</section>
+	<div id="container">
+		<section id="signin-form">
+			<h2>로그인</h2>
+			<form class="user-form" action="/signin" method="POST">
+				<input type="text" name="username" placeholder="아이디를 입력하세요." /><br/>
+				<input type="password" name="password" placeholder="비밀번호를 입력하세요." /><br/>
+				<input type="submit" value="로그인" /> 
+			</form>
+			<p th:if="${msg != null}" th:text="${msg}"></p>
+		</section>
+	</div>
+	<script>
+		const $form = document.querySelector("form");
+		
+		$form.addEventListener("submit", e => {
+			e.preventDefault();
+			
+			const username = $form.username.value.trim();
+			const password = $form.password.value.trim();
+			
+			if(username === "") {
+				alert("아이디를 입력하세요. ");
+				$form.username.focus();
+				return;
+			}
+			if(password === "") {
+				alert("비밀번호를 입력하세요. ");
+				$form.password.focus();
+				return;
+			}
+			
+			$form.submit();
+			
+			$form.username.value = "";
+			$form.password.value = "";
+		});
+	</script>
 </body>
 </html>

@@ -41,5 +41,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 		    @Param("keyword") String keyword,
 		    Pageable pageable
 		);
-
+	
+	
+	@Query(value = "SELECT * FROM (SELECT * FROM card WHERE view_count IS NOT NULL AND status = 'S' ORDER BY view_count DESC) WHERE ROWNUM <= 5", nativeQuery = true)
+	public List<Card> findTopFiveByViewCount();
 }
