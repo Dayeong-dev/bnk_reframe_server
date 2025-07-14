@@ -8,6 +8,35 @@
     <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            padding: 24px;
+        }
+
+        .chart-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 20px;
+            position: relative;
+            height: 300px; /* ✅ 도넛 포함 모든 차트의 높이 통일 */
+        }
+
+        .chart-box canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        h1 {
+            padding-left: 24px;
+        }
+    </style>
+    
 </head>
 <body>
 
@@ -20,12 +49,22 @@
 
         <!-- 본문 -->
         <div class="content">
-            <h1>차트</h1>
-			<canvas id="visitChart" width="400" height="200" style="display:block;"></canvas>
-	        <canvas id="productChart"></canvas>
-	        <canvas id="sentimentChart" width="400" height="200"></canvas>
-        </div>
-    </div>
+		    <div class="chart-grid">
+                <div class="chart-box">
+                    <canvas id="visitChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <canvas id="productChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <canvas id="testResultChart"></canvas>
+                </div>
+            </div>
+		</div>
+	</div>
     
 
 	<script th:inline="javascript">
@@ -83,7 +122,7 @@
 	                x: {
 	                    beginAtZero: true,
 	                    title: {
-	                        display: true,
+	                        display: false,
 	                        text: '조회수'
 	                    }
 	                },
@@ -131,6 +170,7 @@
 	     },
 	     options: {
 	         responsive: true,
+	         maintainAspectRatio: false,
 	         plugins: {
 	             legend: { position: 'top' },
 	             title: {
@@ -140,8 +180,54 @@
 	         }
 	     }
 	 });
+	
+	 
+	 // =============================================
+	 // 소비유형 결과 
+	
+	 const testResultLabels = /*[[${testResultLabels}]]*/ [];
+	 const testResultCounts = /*[[${testResultCounts}]]*/ [];
 
-	    
+	 const ctxTestResult = document.getElementById('testResultChart').getContext('2d');
+	 new Chart(ctxTestResult, {
+	     type: 'bar',
+	     data: {
+	         labels: testResultLabels,
+	         datasets: [{
+	             label: '테스트 결과 분포',
+	             data: testResultCounts,
+	             backgroundColor: 'rgba(255, 206, 86, 0.5)',
+	             borderColor: 'rgba(255, 206, 86, 1)',
+	             borderWidth: 1
+	         }]
+	     },
+	     options: {
+	         responsive: true,
+	         scales: {
+	             y: {
+	                 beginAtZero: true,
+	                 title: {
+	                     display: true,
+	                     text: '응답 수'
+	                 }
+	             },
+	             x: {
+	                 title: {
+	                     display: true,
+	                     text: '테스트 유형'
+	                 }
+	             }
+	         },
+	         plugins: {
+	             legend: { display: false },
+	             title: {
+	                 display: true,
+	                 text: '🧠 테스트 결과 통계'
+	             }
+	         }
+	     }
+	 });
+	 
 	    
 	</script>
 </body>
