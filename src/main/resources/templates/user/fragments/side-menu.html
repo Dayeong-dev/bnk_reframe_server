@@ -1,0 +1,27 @@
+<div id="side-menu" xmlns:th="http://www.thymeleaf.org" th:fragment="sideMenuFragment">
+	<div class="item" onclick="btn1()">
+		<img class="icon" src="/icons/search.svg" alt="아이콘" />
+		<span>고객센터</span>
+	</div>
+	<div class="item" onclick="btn2()">
+		<img class="icon" src="/icons/card.svg" alt="아이콘" />
+		<span>카드 비교함</span>
+	</div>
+	<div class="item" onclick="btn3()">
+		<img class="icon" src="/icons/chatbot.svg" alt="아이콘" />
+		<span>챗봇 문의</span>
+	</div>
+	<script>		
+		function btn1() {	// 고객센터
+			location.href = "/faq/faq";
+		}
+				
+		function btn2() {
+			console.log("카드 비교함");
+		}
+		
+		function btn3() {	// 챗봇 문의
+			window.open("/chatbot", "ChatbotWindow", "width=500,height=650,resizable=yes");
+		}
+	</script>
+</div>
