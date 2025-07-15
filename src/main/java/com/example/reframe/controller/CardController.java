@@ -1,7 +1,7 @@
 package com.example.reframe.controller;
 
 import java.util.List;
-
+import com.example.reframe.session.RecentViewManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +24,14 @@ import com.example.reframe.service.CardService;
 public class CardController {
 
 	@Autowired
+    private RecentViewManager recentViewManager;
+
+	@Autowired
 	private CardService cardService;
+
+    CardController(RecentViewManager recentViewManager) {
+        this.recentViewManager = recentViewManager;
+    }
 
 	// 메인 페이지
 	@GetMapping("/main")
@@ -41,6 +48,10 @@ public class CardController {
 		cardService.incrementViewCount(cardId); // 카드 상세페이지 클릭할 때마다 조회수 +1
 		CardDto cardDto = cardService.getCardDetail(cardId);
 		model.addAttribute("card", cardDto);
+
+		// 최근 본 상품 등록
+		recentViewManager.setProduct("card", cardDto.getCardId(), cardDto.getName());
+		
 		return "user/card_detail";
 	}
 
