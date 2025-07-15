@@ -2,6 +2,7 @@ package com.example.reframe.controller.admin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -41,10 +42,14 @@ public class AdminController {
 		return "admin/user-main";
 	}
 	
-	@GetMapping("/signin")
-	public String signin() {
+	@GetMapping("/signin-form")
+	public String getSignin() {
 		return "admin/signin-form";
 	}
+//	@PostMapping("/login")
+//	public String postSignin() {
+//		return "admin/signin-form";
+//	}
 	
 	
 	/*
