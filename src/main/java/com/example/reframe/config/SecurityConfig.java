@@ -7,9 +7,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.example.reframe.auth.CustomAuthenticationEntryPoint;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+	
+	public SecurityConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+		this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+	}
+	
 	@Bean
 	BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -20,12 +29,12 @@ public class SecurityConfig {
 		
 		http.authorizeHttpRequests(auth -> auth
 //				.requestMatchers("/admin/**").hasRole("ADMIN")
+				.requestMatchers("/qna/**").hasRole("MEMBER")
 				.anyRequest().permitAll());
 		
 		http.formLogin(auth -> auth
 				.loginPage("/signin/form")
 				.loginProcessingUrl("/signin")
-				.failureUrl("/signin/form?error")
 				.defaultSuccessUrl("/")
 				.permitAll())
 			.exceptionHandling(exception -> exception
@@ -47,6 +56,8 @@ public class SecurityConfig {
 				.invalidateHttpSession(true)
 				.deleteCookies("JSESSIONID")
 				.permitAll());
+		
+		http.exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint));
 		
 		http.csrf(auth -> auth.disable());
 		

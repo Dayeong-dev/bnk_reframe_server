@@ -36,34 +36,40 @@ public class ReviewController {
 	@Autowired
 	AdminAlertRepository adminAlertRepository;
 
-    @PostMapping("/submit")
-    public ResponseEntity<String> submitReview(@RequestBody ReviewDTO dto, HttpServletRequest request,@AuthenticationPrincipal CustomUserDetails user) {
-        // 부정 리뷰 판별
-        String prompt = "다음 리뷰가 부정적인 리뷰인지 감지해줘. 부정이면 true, 아니면 false로만 답해줘: " + dto.getContent();
-        String result = openAIService.askChatGPT(prompt);
-        System.out.println(prompt);
-        System.out.println(result);
+	@PostMapping("/submit")
+	public ResponseEntity<String> submitReview(@RequestBody ReviewDTO dto, 
+	                                           @AuthenticationPrincipal CustomUserDetails user) {
+	    // 유저 정보 확인 및 리뷰 저장
+	    User user1 = userRepository.findById(user.getUsername())
+	            .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
 
-        boolean isNegative = result.trim().toLowerCase().contains("true");
+	    Review review = Review.builder()
+	            .user(user1)
+	            .content(dto.getContent())
+	            .build();
+	    reviewRepository.save(review); // 먼저 저장
 
-        User user1 = userRepository.findById(user.getUsername())
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다: " + dto.getUserId()));
-        Review review = Review.builder()
-                .user(user1)
-                .content(dto.getContent())
-                .negative(isNegative)
-                .build();
-        reviewRepository.save(review);
+	    // 비동기로 AI 분석 처리 (새 스레드)
+	    new Thread(() -> {
+	        try {
+	            String prompt = "다음 리뷰가 부정적인 리뷰인지 감지해줘. 부정이면 true, 아니면 false로만 답해줘: " + dto.getContent();
+	            String result = openAIService.askChatGPT(prompt);
 
-        if (isNegative) {
-            // 관리자 알림 시스템 연동 지점
-            System.out.println("⚠ 부정 리뷰 감지됨! 고객센터에 알림 발송 필요.");
-            
-            AdminAlert alert = adminAlertRepository.findById(1).orElse(new AdminAlert());
-            alert.setNegativeReviewCount(alert.getNegativeReviewCount() + 1);
-            adminAlertRepository.save(alert);
-        }
+	            boolean isNegative = result.trim().toLowerCase().contains("true");
+	            review.setNegative(isNegative);
+	            reviewRepository.save(review);
 
-        return ResponseEntity.ok("리뷰가 등록되었습니다.");
-    }
+	            if (isNegative) {
+	                AdminAlert alert = adminAlertRepository.findById(1).orElse(new AdminAlert());
+	                alert.setNegativeReviewCount(alert.getNegativeReviewCount() + 1);
+	                adminAlertRepository.save(alert);
+	            }
+	        } catch (Exception e) {
+	            System.err.println("AI 분석 실패: " + e.getMessage());
+	        }
+	    }).start();
+
+	    return ResponseEntity.ok("리뷰가 등록되었습니다.");
+	}
+
 }

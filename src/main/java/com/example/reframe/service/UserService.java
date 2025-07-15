@@ -136,7 +136,7 @@ public class UserService {
 	private String toDigits(String str) {
 		return str.replaceAll("[^\\d]", "");
 	}
-
+	
 	/** 개인 회원 목록 불러오기*/
 	public List<User> getPersonalUsers() {
 		return userRepository.findByUsertype("P");

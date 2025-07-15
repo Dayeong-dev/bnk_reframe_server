@@ -183,28 +183,31 @@
   }
 
   function sendMessage() {
-    const input = document.getElementById("message");
-    const text = input.value.trim();
-    if (text === "") return;
+	  const input = document.getElementById("message");
+	  const userText = input.value.trim();
+	  if (userText === "") return;
 
-    appendMessage("user", text);
-    input.value = "";
+	  appendMessage("user", userText);
+	  input.value = "";
 
-    fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(text)
-    })
-      .then(response => response.text())
-      .then(data => {
-        appendMessage("ai", data);
-      })
-      .catch(err => {
-        appendMessage("ai", "⚠️ 오류 발생: " + err);
-      });
-  }
+	  // 앞에 "bnk에서"를 붙여서 보냄
+	  const promptText = "bnk에서 " + userText;
+
+	  fetch("/api/chat", {
+	    method: "POST",
+	    headers: {
+	      "Content-Type": "application/json"
+	    },
+	    body: JSON.stringify(promptText)  // 수정된 부분
+	  })
+	    .then(response => response.text())
+	    .then(data => {
+	      appendMessage("ai", data);
+	    })
+	    .catch(err => {
+	      appendMessage("ai", "⚠️ 오류 발생: " + err);
+	    });
+	}
 
   // 엔터로 전송
   document.getElementById("message").addEventListener("keypress", function (e) {

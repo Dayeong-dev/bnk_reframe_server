@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>1:1 문의</title>
+  
+  <link rel="stylesheet" href="/css/common.css"></link>
   <style>
     #qna-form, #qna-list {
       display: none;
@@ -38,6 +40,10 @@
   </style>
 </head>
 <body>
+<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+
+<br><br><br><br>
+
   <h1>1:1 문의</h1>
 
   <button onclick="showForm()">등록하기</button>
@@ -191,6 +197,24 @@
     }
   });
 </script>
+
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", () => {
+    window.showForm = showForm;
+    window.showList = showList;
+
+    showForm(); // 처음엔 등록폼 보여줌
+
+    /*[[${qnaSuccess}]]*/  // 불린 값이 JS에서 자동으로 true/false로 렌더링됨
+    const success = /*[[${qnaSuccess != null and qnaSuccess}]]*/ false;
+
+    if (success) {
+      alert("등록되었습니다!");
+      showList();
+    }
+  });
+</script>
+
 
 </body>
 </html>
