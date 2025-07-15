@@ -1,13 +1,14 @@
 package com.example.reframe.repository;
 
-import com.example.reframe.entity.DepositProduct;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.example.reframe.entity.DepositProduct;
 
 @Repository
 public interface DepositProductRepository extends JpaRepository<DepositProduct, Long> {
@@ -54,9 +55,12 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
             Pageable pageable
     );
 
+
 	List<DepositProduct> findTop10ByOrderByViewCountDesc();
-	
-	
-	@Query(value = "SELECT * FROM (SELECT * FROM DEPOSIT_PRODUCT WHERE view_count IS NOT NULL AND status = 'S' ORDER BY view_count DESC) WHERE ROWNUM <= 5", nativeQuery = true)
+
+    List<DepositProduct> findByPurposeInAndStatus(List<String> purposes, String status);
+
+    @Query(value = "SELECT * FROM (SELECT * FROM DEPOSIT_PRODUCT WHERE view_count IS NOT NULL AND status = 'S' ORDER BY view_count DESC) WHERE ROWNUM <= 5", nativeQuery = true)
 	List<DepositProduct> findTopFiveByViewCount();
+   
 }

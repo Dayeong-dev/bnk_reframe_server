@@ -28,7 +28,7 @@ public class DepositProduct {
     @Column(name = "CATEGORY", nullable = false, length = 20)
     private String category;
 
-    @Column(name = "PURPOSE", length = 20)
+    @Column(name = "PURPOSE", length = 30) // 수정됨
     private String purpose;
 
     @Column(name = "SUMMARY", length = 500)
@@ -37,6 +37,10 @@ public class DepositProduct {
     @Lob
     @Column(name = "DETAIL")
     private String detail;
+
+    @Lob
+    @Column(name = "MODAL_DETAIL") // 추가됨
+    private String modalDetail;
 
     @Column(name = "MAX_RATE", precision = 5, scale = 2)
     private BigDecimal maxRate;
@@ -59,7 +63,7 @@ public class DepositProduct {
 
     @Column(name = "IMAGE_URL", nullable = true)
     private String imageUrl;
-    
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Date();
