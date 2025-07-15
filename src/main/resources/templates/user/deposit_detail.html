@@ -80,18 +80,40 @@ body {
 	overflow-y: auto;
 }
 /* 추가 스타일 (필요 시 head 영역에 포함) */
-.close {
-	position: absolute;
-	top: 10px;
-	right: 20px;
-	font-size: 1.5rem;
-	font-weight: bold;
-	cursor: pointer;
+#detailContent section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+  flex-direction: row;
 }
 
-section.reverse {
-	flex-direction: row-reverse;
+#detailContent section.reverse {
+  flex-direction: row-reverse;
 }
+
+#detailContent section h2,
+#detailContent section p {
+  margin: 0;
+}
+
+#detailContent section .text-wrap {
+  flex: 1;
+  min-width: 300px;
+}
+
+#detailContent section img {
+  width: 280px;         /* ✅ 적당한 고정 너비 */
+  height: auto;         /* ✅ 비율 유지 */
+  max-width: 100%;      /* ✅ 모바일 대응 */
+  border-radius: 8px;
+  object-fit: cover;    /* ✅ 이미지 비율 유지하면서 잘림 방지 */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* 선택: 살짝 그림자 */
+}
+
+
 </style>
 </head>
 <body>
@@ -127,10 +149,6 @@ section.reverse {
 	<!-- 상세 설명 영역 (7개 섹션 포함) -->
 	<div id="detailContent" th:utext="${product.detail}">상세 설명</div>
 
-	<div style="text-align: center;">
-		<a href="/deposit/list" class="btn">목록으로</a>
-		<button class="btn" onclick="openModal()">상품 이용 가이드</button>
-	</div>
 	</div>
 
 	<div class="calc-container" style="text-align: center;">
@@ -163,6 +181,10 @@ section.reverse {
 		</div>
 	</div>
 
+	<div style="text-align: center;">
+		<a href="/deposit/list" class="btn">목록으로</a>
+		<button class="btn" onclick="openModal()">상품 이용 가이드</button>
+	</div>
 
 
 	<!-- 모달창 -->
@@ -214,13 +236,32 @@ function calcInterest() {
 }
 
 
-  // reverse 클래스 적용 (짝수번째 섹션만)
-  window.addEventListener("load", () => {
-    const sections = document.querySelectorAll("#detailContent section");
-    sections.forEach((s, i) => {
-      if ([2, 4, 6].includes(i + 1)) s.classList.add("reverse");
-    });
-  });
+  
+  
+window.addEventListener("load", () => {
+	  const sections = document.querySelectorAll("#detailContent section");
+
+	  sections.forEach((section, i) => {
+	    const h2 = section.querySelector("h2");
+	    const p = section.querySelector("p");
+	    const img = section.querySelector("img");
+
+	    if (h2 && p && img) {
+	      const wrapper = document.createElement("div");
+	      wrapper.className = "text-wrap";
+	      wrapper.appendChild(h2);
+	      wrapper.appendChild(p);
+	      section.insertBefore(wrapper, img);
+	    }
+
+	    // ✅ 짝수 번째에 reverse 클래스 적용
+	    if ([2, 4, 6].includes(i + 1)) {
+	      section.classList.add("reverse");
+	    }
+	  });
+	});
+
+
 </script>
 </body>
 </html>
