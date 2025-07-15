@@ -18,15 +18,85 @@ body {
 	display: block;
 }
 
+#progress-area {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+#prev-btn {
+	background: none;
+	border: none;
+	color: #555;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+#prev-btn:hover {
+	color: #000;
+	text-decoration: underline;
+}
+
+#progress-bar {
+	width: 80%;
+	background: #eee;
+	height: 10px;
+	margin: 20px auto;
+	border-radius: 5px;
+	overflow: hidden;
+}
+
+#progress-fill {
+	width: 0%;
+	height: 100%;
+	background: #4CAF50;
+	transition: width 0.3s;
+}
+
+.progress-text {
+	margin-top: 5px;
+	font-size: 14px;
+}
+
+.question-img {
+	width: 600px;
+	border-radius: 8px;
+	margin: 20px 0;
+}
+
 .question {
-	margin: 30px 0;
+	margin: 20px 0;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+#options {
+	display: flex;
+	justify-content: center;
+	gap: 40px; /* 버튼 간격 */
+	margin-top: 30px;
+	flex-wrap: wrap;
 }
 
 .option-btn {
-	padding: 15px 30px;
+	display: inline-block;
+	width: 500px;
+	height: 80px;
+	padding: 20px;
 	margin: 10px;
-	cursor: pointer;
 	font-size: 18px;
+	border: 2px solid #ccc;
+	border-radius: 50px;
+	background-color: #f9f9f9;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+	background-color: #e6f7ff;
+	border-color: #0099ff;
+	transform: translateY(-3px);
 }
 
 .card-list {
@@ -54,9 +124,10 @@ body {
 <body>
 	<h1>💳 내 통장이 텅장이 된 이유는?</h1>
 
-	<!-- 시작화면 -->
+	<!-- 시작 화면 -->
 	<div id="start-section" class="section active">
-		<img src="/images/card_test_main.png" alt="텅장 분석기" width="400" />
+		<img src="/images/cardTest/card_test_main.png" alt="텅장 분석기"
+			width="400" />
 		<h2>텅장분석기 테스트</h2>
 		<p>내 통장이 텅장이 된 이유를 분석해드립니다!</p>
 		<p>나의 소비성향을 확인해보세요!</p>
@@ -65,13 +136,28 @@ body {
 
 	<!-- 질문 화면 -->
 	<div id="question-section" class="section">
-		<img id="question-img" src="" alt="질문 이미지" width="300" />
-		<div id="question-text" class="question"></div>
-		<div>
-			<button class="option-btn" onclick="selectOption('A')">A</button>
-			<button class="option-btn" onclick="selectOption('B')">B</button>
+		<!-- 진행 영역 -->
+		<div id="progress-area">
+			<button id="prev-btn" onclick="goBack()">← 이전</button>
+			<div id="progress"></div>
 		</div>
-		<div id="progress"></div>
+		<!-- 진행바 -->
+		<div id="progress-bar">
+			<div id="progress-fill"></div>
+		</div>
+		<div class="progress-text" id="progress-text"></div>
+
+		<!-- 질문 이미지 -->
+		<img id="question-img" src="" alt="질문 이미지" class="question-img" />
+
+		<!-- 질문 텍스트 -->
+		<div id="question-text" class="question"></div>
+
+		<!-- 선택 버튼 -->
+		<div id="options">
+			<button class="option-btn" onclick="selectOption('A')"></button>
+			<button class="option-btn" onclick="selectOption('B')"></button>
+		</div>
 	</div>
 
 	<!-- 결과 화면 -->
@@ -84,148 +170,275 @@ body {
 	</div>
 
 	<script>
-    // 질문 데이터
-    const questions = [
-  {
-    img: '/images/test/q1.png',
-    text: '1️⃣ 쇼핑할 때 더 설레는 순간은?',
-    A: '택배 도착 알림 똑딱📦',
-    B: '매장 가서 실물 딱 보는 순간✨',
-    typeA: '온라인',
-    typeB: '오프라인'
-  },
-  {
-    img: '/images/test/q2.png',
-    text: '2️⃣ 결제할 땐?',
-    A: '‘폰만 있으면 끝! 간편결제 최고’',
-    B: '‘카드 꺼내서 긁는 맛 있어야지~’',
-    typeA: '온라인',
-    typeB: '오프라인'
-  },
-  {
-    img: '/images/test/q3.png',
-    text: '3️⃣ 급하게 필요한 물건이 생겼을 땐?',
-    A: '‘이럴 땐 로켓 배송!! 바로 주문 ㄱ ㄱ’',
-    B: '‘지금 나가서 사와야지!!’',
-    typeA: '온라인',
-    typeB: '오프라인'
-  },
-  // 이하 동일 패턴으로~
-  {
-    img: '/images/test/q4.png',
-    text: '4️⃣ 월급 들어오면 제일 먼저 하는 생각?',
-    A: '‘일단 저축부터 하고.. 남은 돈으로 버텨보자!’',
-    B: '‘휴 한달동안 넘 고생했다~~ 오늘은 엽떡에 허니콤보~~’',
-    typeA: '저축',
-    typeB: '소비'
-  },
-  {
-    img: '/images/test/q5.png',
-    text: '5️⃣ 할인 쿠폰이 생겼을 때 나는?',
-    A: '‘아깝지만.. 필요한 건 아니니깐 안 살래🙅‍♀️’',
-    B: '‘싸면 일단 득템이지~🛍️’',
-    typeA: '저축',
-    typeB: '소비'
-  },
-  {
-    img: '/images/test/q6.png',
-    text: '6️⃣ 통장 잔고가 넉넉할 때 나는?',
-    A: '‘이번 달은 더 모아야지!’ 하고 통장 보며 뿌듯하다.',
-    B: '‘이 정도면 뭐 하나 사도 되겠는데?’ 하고 장바구니부터 찾는다.',
-    typeA: '저축',
-    typeB: '소비'
-  },
-  {
-    img: '/images/test/q7.png',
-    text: '7️⃣ 큰 돈 쓸 땐?',
-    A: '비교하고 적립하고 신중🗂️',
-    B: '고민하다 귀찮으면 그냥 삼',
-    typeA: '계획',
-    typeB: '충동'
-  },
-  {
-    img: '/images/test/q8.png',
-    text: '8️⃣ 쇼핑몰 들어가면?',
-    A: '살 거만 딱 보고 나옴',
-    B: '돌아다니다가 광고에 홀려서 이것저것 담음',
-    typeA: '계획',
-    typeB: '충동'
-  },
-  {
-    img: '/images/test/q9.png',
-    text: '9️⃣ 결제 직전 내 루틴은?',
-    A: '‘쿠폰, 포인트 싹 긁어 모아서 받을 수 있는 할인은 다 받을테다!!’',
-    B: '‘아웅 귀찮아..’ 그냥 결제 누르고 끝👆',
-    typeA: '계획',
-    typeB: '충동'
+  // 질문 데이터
+  const questions = [
+    {
+      img: '/images/cardTest/q1.png',
+      text: '1️⃣ 쇼핑할 때 더 설레는 순간은?',
+      A: '택배 도착 알림 똑딱📦',
+      B: '매장 가서 실물 딱 보는 순간✨',
+      typeA: '온라인',
+      typeB: '오프라인'
+    },
+    {
+      img: '/images/cardTest/q2.png',
+      text: '2️⃣ 결제할 땐?',
+      A: '‘폰만 있으면 끝! 간편결제 최고’',
+      B: '‘카드 꺼내서 긁는 맛 있어야지~’',
+      typeA: '온라인',
+      typeB: '오프라인'
+    },
+    {
+      img: '/images/cardTest/q3.png',
+      text: '3️⃣ 급하게 필요한 물건이 생겼을 땐?',
+      A: '‘이럴 땐 로켓 배송!! 바로 주문 ㄱ ㄱ’',
+      B: '‘지금 나가서 사와야지!!’',
+      typeA: '온라인',
+      typeB: '오프라인'
+    },
+    {
+      img: '/images/cardTest/q4.png',
+      text: '4️⃣ 월급 들어오면 제일 먼저 하는 생각?',
+      A: '‘일단 저축부터 하고.. 남은 돈으로 버텨보자!’',
+      B: '‘휴 한달동안 넘 고생했다~~ 오늘은 엽떡에 허니콤보~~’',
+      typeA: '저축',
+      typeB: '소비'
+    },
+    {
+      img: '/images/cardTest/q5.png',
+      text: '5️⃣ 할인 쿠폰이 생겼을 때 나는?',
+      A: '‘아깝지만.. 필요한 건 아니니깐 안 살래🙅‍♀️’',
+      B: '‘싸면 일단 득템이지~🛍️’',
+      typeA: '저축',
+      typeB: '소비'
+    },
+    {
+      img: '/images/cardTest/q6.png',
+      text: '6️⃣ 통장 잔고가 넉넉할 때 나는?',
+      A: '‘이번 달은 더 모아야지!’ 하고 통장 보며 뿌듯하다.',
+      B: '‘이 정도면 뭐 하나 사도 되겠는데?’ 하고 장바구니부터 찾는다.',
+      typeA: '저축',
+      typeB: '소비'
+    },
+    {
+      img: '/images/cardTest/q7.png',
+      text: '7️⃣ 큰 돈 쓸 땐?',
+      A: '비교하고 적립하고 신중🗂️',
+      B: '고민하다 귀찮으면 그냥 삼',
+      typeA: '계획',
+      typeB: '충동'
+    },
+    {
+      img: '/images/cardTest/q8.png',
+      text: '8️⃣ 쇼핑몰 들어가면?',
+      A: '살 거만 딱 보고 나옴',
+      B: '돌아다니다가 광고에 홀려서 이것저것 담음',
+      typeA: '계획',
+      typeB: '충동'
+    },
+    {
+      img: '/images/cardTest/q9.png',
+      text: '9️⃣ 결제 직전 내 루틴은?',
+      A: '‘쿠폰, 포인트 싹 모아서 받을 수 있는 할인은 다 받아야지!’',
+      B: '‘아웅 귀찮아..’ 그냥 결제 누르고 끝👆',
+      typeA: '계획',
+      typeB: '충동'
+    }
+  ];
+
+  // 결과 유형 이름, 설명
+	const resultMap = {
+	  'ONLINE-SAVE-PLAN': {
+	    id: 1,
+	    name: '통장 철옹성',
+	    front: '새는 돈도 다시 보자!\n지름신이 와도 철벽수비하는',
+	    percentage: '텅장력 10%',
+	    back: '꼼꼼하게 비교하여 소비하는 당신!\n잔고가 쌓이는 통장을 보면 밥 안 먹어도 배부르다~~',
+	    card: {
+	      name: 'My플러스카드',
+	      reason: '온라인 결제·자동이체 할인 집중, 계획적 저축에 적합한'
+	    }
+	  },
+	  'OFFLINE-SAVE-PLAN': {
+	    id: 2,
+	    name: '명예 통장지킴이',
+	    front: '통장.. 넌 내가 지킨다.\n시켜줘 너만의',
+	    percentage: '텅장력 20%',
+	    back: '지름신이 찾아오는 그 순간에도\n이성의 끈을 놓지 않는 명예 통장지킴이!',
+	    card: {
+	      name: 'Green 카드',
+	      reason: '교통, 주유, 편의점 등 오프라인 생활밀착 할인으로 절약에 유리한'
+	    }
+	  },
+	  'ONLINE-SAVE-IMPULSE': {
+	    id: 3,
+	    name: '팔랑팔랑 팔랑귀',
+	    front: '분명히 계획에 없었는데..\n어라랍스타?',
+	    percentage: '텅장력 40%',
+	    back: '처음 계획과는 다르게 점점 늘어나는 소비..\n분명히 통장 잔고가 있었는데요? 없어졌습니다?',
+	    card: {
+	      name: '오늘은e 신용카드',
+	      reason: '온라인 생활서비스 및 충동성 소비 할인과 일부 저축성 혜택 포함된'
+	    }
+	  },
+	  'OFFLINE-SAVE-IMPULSE': {
+	    id: 4,
+	    name: '무계획 지출러',
+	    front: '나는 가끔 눈물을 흘린다..⭐',
+	    percentage: '텅장력 50%',
+	    back: '저축도 열심이지만 소비도 열심히 하는 당신!\n내 통장은 울지만 잠깐이나마 행복했으니 그걸로 된 거 아닐까..? ㅜ',
+	    card: {
+	      name: 'SK OIL&LPG카드',
+	      reason: '주유 특화 할인으로 오프라인 소액 충동과 저축 방어 가능한'
+	    }
+	  },
+	  'ONLINE-SPEND-PLAN': {
+	    id: 5,
+	    name: '계획소비러',
+	    front: '저 결심했어요. 돈 쓸 결심..',
+	    percentage: '텅장력 60%',
+	    back: '내 소비엔 다 계획이 있다구~\n이 정도는 써줘야 인생 살 맛 나지!! 오늘도 온라인 쇼핑 한번 해볼까~',
+	    card: {
+	      name: 'BNK 부자되세요 홈쇼핑카드',
+	      reason: '홈쇼핑과 온라인 쇼핑 계획적 소비에 특화된'
+	    }
+	  },
+	  'OFFLINE-SPEND-PLAN': {
+	    id: 6,
+	    name: '소비요정',
+	    front: '요정 등장! 내가 나간다!',
+	    percentage: '텅장력 70%',
+	    back: '노는 게 제일 좋아!\n밖에 나가면 일단 지갑부터 여는 소비요정!! 그런데 어디서 우는 소리 안 들리나요? 통장 우는 소리..',
+	    card: {
+	      name: '부산체육사랑카드',
+	      reason: '스포츠, 의료, 문화 등 오프라인 계획적 지출에 맞춤 할인이 가능한'
+	    }
+	  },
+	  'ONLINE-SPEND-IMPULSE': {
+	    id: 7,
+	    name: '이 구역 지름신',
+	    front: '핸드폰만 키면 왜 잔고가 줄줄 새니..',
+	    percentage: '텅장력 90%',
+	    back: '일단 담고보자!\n장바구니가 항상 풀로 차있는.. 오늘 밤 지름신은 나야 나!',
+	    card: {
+	      name: 'Dynamic 카드',
+	      reason: 'OTT, 배달, 간편결제 등 충동성 온라인 소비 적립에 최적화 된'
+	    }
+	  },
+	  'OFFLINE-SPEND-IMPULSE': {
+	    id: 8,
+	    name: '프로탕진러',
+	    front: '사고싶은 건 못 참아 다 사고말테야!!',
+	    percentage: '텅장력 100%',
+	    back: '이것도 내 거, 저것도 내 거..\n맘에 드는 건 다 내 거야! 일단 맘에 드는 건 사고보는 프로탕진러',
+	    card: {
+	      name: '딩딩 체크카드',
+	      reason: '외식, 카페, 영화 등 오프라인 충동성 소비에 특화된'
+	    }
+	  }
+	};
+
+
+
+  let current = 0;
+  let counts = { 온라인: 0, 오프라인: 0, 저축: 0, 소비: 0, 계획: 0, 충동: 0 };
+  let lastAnswers = [];
+
+  function startTest() {
+    document.getElementById('start-section').classList.remove('active');
+    document.getElementById('question-section').classList.add('active');
+    showQuestion();
   }
-];
 
+  function showQuestion() {
+    const q = questions[current];
+    document.getElementById('question-img').src = q.img;
+    document.getElementById('question-text').innerText = q.text;
+    document.querySelectorAll('.option-btn')[0].innerText = `${q.A}`;
+    document.querySelectorAll('.option-btn')[1].innerText = `${q.B}`;
 
-    let current = 0;
-    let counts = { 온라인:0, 오프라인:0, 저축:0, 소비:0, 계획:0, 충동:0 };
+    const progressPercent = ((current + 1) / questions.length) * 100;
+    document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+    document.getElementById('progress-text').innerText = `${current + 1} / ${questions.length}`;
+  }
 
-    function startTest() {
-      document.getElementById('start-section').classList.remove('active');
-      document.getElementById('question-section').classList.add('active');
+  function selectOption(option) {
+    const q = questions[current];
+    const selectedType = option === 'A' ? q.typeA : q.typeB;
+    counts[selectedType]++;
+    lastAnswers.push(selectedType);
+    current++;
+    if (current < questions.length) {
+      showQuestion();
+    } else {
+      finishTest();
+    }
+  }
+
+  function goBack() {
+    if (current > 0) {
+      const lastSelectedType = lastAnswers.pop();
+      if (lastSelectedType) {
+        counts[lastSelectedType]--;
+      }
+      current--;
       showQuestion();
     }
+  }
 
-    function showQuestion() {
-    	  const q = questions[current];
-    	  document.getElementById('question-img').src = q.img;
-    	  document.getElementById('question-text').innerText = q.text;
-    	  document.querySelectorAll('.option-btn')[0].innerText = `A. ${q.A}`;
-    	  document.querySelectorAll('.option-btn')[1].innerText = `B. ${q.B}`;
-    	  document.getElementById('progress').innerText = `${current+1} / ${questions.length}`;
-    	}
+  function finishTest() {
+	  document.getElementById('question-section').classList.remove('active');
+	  document.getElementById('result-section').classList.add('active');
 
-    function selectOption(option) {
-    	  const q = questions[current];
-    	  const selectedType = option === 'A' ? q.typeA : q.typeB;
-    	  counts[selectedType]++;
-    	  current++;
-    	  if (current < questions.length) {
-    	    showQuestion();
-    	  } else {
-    	    finishTest();
-    	  }
-    	}
+	  const type1 = counts.온라인 >= counts.오프라인 ? 'ONLINE' : 'OFFLINE';
+	  const type2 = counts.저축 >= counts.소비 ? 'SAVE' : 'SPEND';
+	  const type3 = counts.계획 >= counts.충동 ? 'PLAN' : 'IMPULSE';
+	  const resultType = `${type1}-${type2}-${type3}`;
 
-    function finishTest() {
-      document.getElementById('question-section').classList.remove('active');
-      document.getElementById('result-section').classList.add('active');
+	  const result = resultMap[resultType] || { id: 0, name: '알 수 없음' };
 
-      // 결과유형 계산
-      const type1 = counts.온라인 >= counts.오프라인 ? 'ONLINE' : 'OFFLINE';
-      const type2 = counts.저축 >= counts.소비 ? 'SAVE' : 'SPEND';
-      const type3 = counts.계획 >= counts.충동 ? 'PLAN' : 'IMPULSE';
-      const resultType = `${type1}-${type2}-${type3}`;
+	  // 순서: front -> name -> result img -> percentage -> back
+	  const resultHTML = `
+	    <p style="font-size: 20px; white-space: pre-line; margin-bottom: 10px;">${result.front}</p>
+	    <h2 style="font-size: 28px; margin: 10px 0;">${result.name}</h2>
+	    <img src="/images/cardTest/r${result.id}.png" alt="결과 이미지"
+	        style="display:block; margin: 15px auto; max-width: 400px; border-radius: 8px;" />
 
-      document.getElementById('result-title').innerText = `당신의 소비유형은 ${resultType}!`;
-      document.getElementById('result-img').src = `/images/test/result/${resultType}.png`;
-      document.getElementById('result-desc').innerText = `${resultType} 유형 설명이 여기에 들어갑니다.`;
+	    <p style="font-size: 16px; margin: 10px 0;">${result.percentage}</p>
+	    <p style="font-size: 12px; color: #555; white-space: pre-line; margin: 10px 0;">${result.back}</p>
+	  `;
 
-      // 서버에 저장 + 추천카드 받기
-      fetch('/card/card_test_result', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'resultType=' + resultType
-      })
-      .then(res => res.json())
-      .then(cards => {
-        const container = document.getElementById('recommended-cards');
-        container.innerHTML = '';
-        cards.forEach(card => {
-          container.innerHTML += `
-            <div class="card-item">
-              <img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name}" />
-              <h4>${card.name}</h4>
-              <p>${card.description}</p>
-            </div>`;
-        });
-      });
-    }
-  </script>
+	  document.getElementById('result-title').innerHTML = resultHTML;
+
+	  // 추천카드 이유 + 카드 이미지 + 카드 이름
+		const container = document.getElementById('recommended-cards');
+		container.innerHTML = `
+		  <p style="font-size: 14px; color: #333; margin: 10px 0; white-space: pre-line;">
+		    ${result.card.reason}
+		  </p>
+		`;
+
+	  fetch('/card/card_test_result', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	    body: 'resultId=' + result.id
+	  })
+	  .then(res => res.json())
+	  .then(cards => {
+	    cards.forEach(card => {
+	      container.innerHTML += `
+	    	  <div class="card-item" style="text-align: center;">
+	          <img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name}" style="max-width:200px; border-radius:8px;" />
+	          <h4 style="font-size: 18px; margin: 5px 0;">${card.name}</h4>
+	        </div>
+	      `;
+	    });
+	  });
+	}
+
+
+</script>
+
+
 </body>
 </html>

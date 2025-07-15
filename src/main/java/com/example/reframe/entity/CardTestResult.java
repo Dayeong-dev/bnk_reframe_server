@@ -17,13 +17,13 @@ public class CardTestResult {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
     @Column(name = "RESULT_ID")
-    private Long resultId;
+    private Long resultId;//결과ID, 자동증가
 
     @Column(name = "RESULT_TYPE", nullable = false)
-    private String resultType;
+    private String resultType;// 결과 유형
 
     @Column(name = "COUNT", nullable = false)
-    private Long count = 0L;  // 기본값 0
+    private Long count = 0L;  // 결과 유형 카운트
 
     public CardTestResult(String resultType) {
         this.resultType = resultType;
