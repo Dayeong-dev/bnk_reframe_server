@@ -1,47 +1,226 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${product.name}">상품 상세</title>
-    <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header img { max-width: 150px; margin-bottom: 10px; }
-        .title { font-size: 22px; font-weight: bold; }
-        .subtitle { font-size: 16px; color: #555; margin-top: 10px; }
-        .info { display: flex; justify-content: space-around; margin: 15px 0; }
-        .info div { font-size: 14px; font-weight: bold; }
-        .split { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; gap: 20px; }
-        .split.reverse { flex-direction: row-reverse; }
-        .split img { width: 120px; height: auto; border-radius: 8px; }
-        .split .title { font-size: 18px; }
-        .split .subtitle { font-size: 14px; color: #555; margin-top: 5px; }
-        hr { border: none; border-top: 1px solid #ddd; margin: 30px 0; }
-    </style>
+<meta charset="UTF-8">
+<title th:text="${product.name}">예적금 상품 상세</title>
+<style>
+body {
+	font-family: 'Noto Sans KR', sans-serif;
+	margin: 0;
+	background: #f5f5f5;
+}
+
+.container {
+	max-width: 1000px;
+	margin: 30px auto;
+	background: white;
+	padding: 30px;
+	border-radius: 10px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+	margin: 0;
+	font-size: 1.8rem;
+}
+
+.info-box {
+	display: flex;
+	justify-content: space-around;
+	margin: 20px 0;
+	text-align: center;
+}
+
+.info-box div {
+	font-weight: bold;
+	font-size: 1.1rem;
+}
+
+.calc-container {
+	background: #fefefe;
+	padding: 20px;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	margin: 40px 0;
+}
+
+.btn {
+	background: #007bff;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	margin: 10px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.btn:hover {
+	background: #0056b3;
+}
+
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 999;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+	background: white;
+	margin: 5% auto;
+	padding: 20px;
+	border-radius: 10px;
+	width: 90%;
+	max-width: 600px;
+	max-height: 80vh;
+	overflow-y: auto;
+}
+/* 추가 스타일 (필요 시 head 영역에 포함) */
+.close {
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	font-size: 1.5rem;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+section.reverse {
+	flex-direction: row-reverse;
+}
+</style>
 </head>
 <body>
-    <div class="container">
+	<!-- 🟢 상단 정보 -->
+	<div class="header" style="text-align: center;">
+		<h1 th:text="${product.name}" style="margin-bottom: 8px;">상품명</h1>
+		<p th:text="${product.summary}" style="font-size: 1rem; color: #666;">상품
+			요약</p>
+	</div>
 
-        <!-- 상단 요약 -->
-        <div class="header">
-           
-            <div class="title" th:text="${product.name}">상품명</div>
-            <div class="subtitle" th:text="${product.summary}">상품 요약 설명</div>
-        </div>
+	<!-- 🟢 금리/기간 정보 박스 -->
+	<div class="info-box">
+		<div>
+			<span style="color: #d9230f; font-size: 1.4rem;"
+				th:text="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')} + '%'">4.50%</span><br>
+			<small>최고금리</small>
+		</div>
+		<div>
+			<span style="font-size: 1.2rem;"
+				th:text="${#numbers.formatDecimal(product.minRate,1,'POINT',2,'POINT')} + '%'">2.50%</span><br>
+			<small>최저금리</small>
+		</div>
+		<div>
+			<span style="font-size: 1.2rem;" th:text="${product.period}">12</span>
+			개월<br> <small>가입기간</small>
+		</div>
+	</div>
 
-        <!-- 금리/기간 정보 -->
-        <div class="info">
-            <div>최대금리: <span th:text="${product.maxRate}"></span>%</div>
-            <div>최소금리: <span th:text="${product.minRate}"></span>%</div>
-            <div>기간: <span th:text="${product.period}"></span>개월</div>
-        </div>
 
-        <hr>
 
-        <!-- DETAIL: DB에서 가져온 HTML (7섹션 이미지+설명) 그대로 출력 -->
-        <div th:utext="${product.detail}"></div>
+	<hr>
 
-    </div>
+	<!-- 상세 설명 영역 (7개 섹션 포함) -->
+	<div id="detailContent" th:utext="${product.detail}">상세 설명</div>
+
+	<div style="text-align: center;">
+		<a href="/deposit/list" class="btn">목록으로</a>
+		<button class="btn" onclick="openModal()">상품 이용 가이드</button>
+	</div>
+	</div>
+
+	<div class="calc-container" style="text-align: center;">
+		<h3 style="font-size: 1.5rem; margin-bottom: 20px;">💰 간편 이자 계산기</h3>
+
+		<div
+			style="display: inline-flex; flex-wrap: wrap; align-items: center; gap: 15px; font-size: 1.2rem; justify-content: center;">
+			<label> 이 상품을 <input id="monthsInput" type="text"
+				th:value="${product.period}"
+				style="width: 60px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+				<span>개월 간</span>
+			</label> <label> <input id="depositAmount" type="text"
+				value="1,000,000"
+				style="width: 170px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+				<span>원으로</span>
+			</label> <label> 금리 연 <input id="rateInput" type="text"
+				th:value="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')}"
+				style="width: 70px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+				<span>%를 적용하면?</span>
+			</label>
+		</div>
+
+		<br>
+		<button class="btn" style="margin-top: 20px;" onclick="calcInterest()">✔
+			결과보기</button>
+
+		<div style="margin-top: 25px; font-size: 1.3rem;">
+			세전 이자: <b id="interestResult"
+				style="font-size: 1.5rem; color: #1565c0;">0</b> 원
+		</div>
+	</div>
+
+
+
+	<!-- 모달창 -->
+	<div id="productModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">상품 이용 가이드</h2>
+			<div th:utext="${modalDetailForModal}" style="margin-bottom: 20px;">가이드
+				내용</div>
+
+			<!-- ✅ 하단 닫기 버튼 -->
+			<div style="text-align: center;">
+				<button class="btn" onclick="closeModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+  function openModal() {
+    document.getElementById("productModal").style.display = "block";
+  }
+  function closeModal() {
+    document.getElementById("productModal").style.display = "none";
+  }
+  window.onclick = function(e) {
+    if (e.target == document.getElementById("productModal")) {
+      closeModal();
+    }
+  }
+
+  // 쉼표 자동 삽입
+ document.getElementById("depositAmount").addEventListener("input", function() {
+  const val = this.value.replace(/,/g, '').replace(/\D/g, '');
+  this.value = Number(val).toLocaleString();
+});
+
+function calcInterest() {
+  const amount = Number(document.getElementById("depositAmount").value.replace(/,/g, ''));
+  const months = Number(document.getElementById("monthsInput").value);
+  const rate = Number(document.getElementById("rateInput").value);
+
+  if (isNaN(amount) || isNaN(months) || isNaN(rate)) {
+    alert("모든 값을 숫자로 입력해주세요.");
+    return;
+  }
+
+  const interest = (amount * rate * months) / (12 * 100);
+  document.getElementById("interestResult").innerText = Math.floor(interest).toLocaleString();
+}
+
+
+  // reverse 클래스 적용 (짝수번째 섹션만)
+  window.addEventListener("load", () => {
+    const sections = document.querySelectorAll("#detailContent section");
+    sections.forEach((s, i) => {
+      if ([2, 4, 6].includes(i + 1)) s.classList.add("reverse");
+    });
+  });
+</script>
 </body>
 </html>

@@ -1,9 +1,8 @@
 package com.example.reframe.service;
 
 import com.example.reframe.dto.DepositProductDTO;
-import com.example.reframe.entity.DepositProduct;
+import org.springframework.data.domain.Page;
 
-import org.springframework.data.domain.Page;  // ✅ 올바른 Page 임포트
 import java.util.List;
 
 public interface DepositProductService {
@@ -28,7 +27,7 @@ public interface DepositProductService {
     // ✅ 강력추천 상품 목록
     List<DepositProductDTO> getRecommendedProducts();
 
-    // ✅ 📌 추가: 페이징 + 정렬 + 검색 통합 조회
+    // ✅ 페이징 + 정렬 + 검색 통합 조회
     Page<DepositProductDTO> getPagedProducts(
             String status,
             String category,
@@ -37,5 +36,11 @@ public interface DepositProductService {
             int page
     );
 
+    // ✅ 카테고리 기반 추천 (예금/적금/입출금자유)
+    List<DepositProductDTO> getProductsByCategory(String category);
 
+    // ✅ 테마 기반 추천 (직장인, 주부, 학생)
+    List<DepositProductDTO> getThemeRecommended(String theme);
+    
+    
 }
