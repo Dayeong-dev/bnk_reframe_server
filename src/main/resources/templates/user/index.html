@@ -1,47 +1,175 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <title>메인</title>
 <link rel="stylesheet" href="/css/common.css"></link>
 <link rel="stylesheet" href="/css/user.css"></link>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<style>
-	.slider {
-		width: 100%;
-		max-width: 800px;
-		margin: 0 auto;
-	}
-	.slider img {
-		width: 100%;
-		height: 400px;
-		object-fit: cover;
-	}
-</style>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script
+	src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<section id="main">
-		<div class="slider">
-			<div><img th:src="@{/img/image1.jpg}" alt="Slide 1"></div>
-			<div><img th:src="@{/img/image2.jpg}" alt="Slide 2"></div>
-			<div><img th:src="@{/img/image3.jpg}" alt="Slide 3"></div>
-		</div>
-	</section>
+	<div id="container">
+		<section id="main">
+			<div class="swiper content-wrapper">
+				<div class="swiper-wrapper">
+					<div class="swiper-slide">
+						<a href="#"> <img src="/img/image1.jpg" alt="slide1" />
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a href="#"> <img src="/img/image2.jpg" alt="slide2" />
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a href="#"> <img src="/img/image3.jpg" alt="slide3" />
+						</a>
+					</div>
+				</div>
+			</div>
+			<div th:replace="~{user/fragments/main-search :: mainSearchFragment}"></div>
+			<div class="recommend-area">
+				<h4>추천하는 상품</h4>
+				<div class="btn-list content-wrapper">
+					<button id="deposit-btn" onclick="getDepositList()">예적금</button>
+					<button id="card-btn" onclick="getCardList()">카드</button>
+				</div>
+				<ul class="product-list"></ul>
+			</div>
+		</section>
+	</div>
+
+	<!-- 리뷰 팝업 -->
+	<div id="review-popup" sec:authorize="isAuthenticated()" 
+		style="display: none; position: fixed; bottom: 30px; right: 30px; background: white; border: 1px solid #ccc; padding: 20px;">
+		<p>사이트 이용은 어떠셨나요?</p>
+		<textarea id="review-content" rows="4" cols="30"></textarea>
+		<br />
+		<button onclick="submitReview()">제출</button>
+	</div>
+
+
+
 	<script>
-		$(document).ready(function(){
-			$('.slider').slick({
-				autoplay: true,
-				dots: true,
-				arrows: true,
-				infinite: true,
-				slidesToShow: 1,
-				slidesToScroll: 1
-			});
+		const $productList = document.querySelector(".product-list");
+		const $depositBtn = document.getElementById("deposit-btn");
+		const $cardBtn = document.getElementById("card-btn");
+		
+		// 첫 화면 시 예적금 상품 조회
+		getDepositList();
+		
+		const swiper = new Swiper('.swiper', {
+			loop: true,
+			speed: 500,
+			autoplay: {
+				delay: 3000
+			}
 		});
+		
+		async function getDepositList() {
+			$productList.innerHTML = "";
+			$depositBtn.classList.add("active");
+			$cardBtn.classList.remove("active");
+			
+			const response = await fetch("/deposit/recommend/list");
+			
+			if(response.status !== 200) {
+				$productList.innerHTML = "현재 추천드릴 상품이 없습니다.";
+			}
+			
+			const depositList = await response.json();
+			
+			for(let deposit of depositList) {
+				const li = document.createElement("li");
+				const a = document.createElement("a");
+
+				const name = document.createElement("p");
+				const maxRate = document.createElement("p");
+				
+				li.classList.add("deposit-item");
+				name.classList.add("name");
+				maxRate.classList.add("max-rate");
+				
+				a.href = "/deposit/detail/" + deposit.productId;
+				
+				name.innerText = deposit.name
+				maxRate.innerText = deposit.maxRate.toFixed(2);
+				
+				a.appendChild(name);
+				a.appendChild(maxRate);
+				li.appendChild(a);
+				
+				$productList.appendChild(li);
+			}
+		}
+		
+		async function getCardList() {
+			$productList.innerHTML = "";
+			$depositBtn.classList.remove("active");
+			$cardBtn.classList.add("active");
+			
+			const response = await fetch("/card/recommend/list");
+			
+			if(response.status !== 200) {
+				$productList.innerHTML = "현재 추천드릴 상품이 없습니다.";
+			}
+			
+			const cardList = await response.json();
+			
+			console.log(cardList);
+			
+			for(let card of cardList) {
+				const li = document.createElement("li");
+				const a = document.createElement("a");
+
+				const img = document.createElement("img");
+				const name = document.createElement("p");
+				
+				img.src = `/images/cards/${card.cardId}_front.PNG`;
+				img.alt = card.name;
+				
+				li.classList.add("card-item");
+				name.classList.add("name");
+				
+				a.href = "/card/detail/" + card.cardId;
+				
+				name.innerText = card.name;
+				
+				a.appendChild(img);
+				a.appendChild(name);
+				li.appendChild(a);
+				
+				$productList.appendChild(li);
+			}
+		}
+		
+		  window.onload = () => {
+			    const cookie = document.cookie;
+			    if (!cookie.includes("reviewed=true")) {
+			      document.getElementById("review-popup").style.display = "block";
+			    }
+			  }
+
+			  function submitReview() {
+			    const content = document.getElementById("review-content").value;
+			    if (!content.trim()) return alert("리뷰를 입력해주세요");
+
+			    fetch("/api/review/submit", {
+			      method: "POST",
+			      headers: { "Content-Type": "application/json" },
+			      body: JSON.stringify({ content: content })
+			    }).then(res => res.text()).then(msg => {
+			      alert(msg);
+			      document.getElementById("review-popup").style.display = "none";
+			      document.cookie = "reviewed=true; path=/; max-age=" + (86400 * 7);
+			    });
+			  }
+		
+		
+		
 	</script>
 </body>
 </html>

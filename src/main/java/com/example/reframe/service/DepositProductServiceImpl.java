@@ -17,6 +17,8 @@ import com.example.reframe.entity.DepositProductImage;
 import com.example.reframe.repository.DepositProductImageRepository;
 import com.example.reframe.repository.DepositProductRepository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +28,7 @@ public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
     private final DepositProductImageRepository depositProductImageRepository;
+    private final EntityManager em;
 
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -188,5 +191,33 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .viewCount(product.getViewCount())
                 .imageUrl(product.getImageUrl())
                 .build();
+    }
+    
+    public List<DepositProductDTO> getTopFiveByViewCount() {
+    	List<DepositProduct> depositList = depositProductRepository.findTopFiveByViewCount();
+    	
+    	return depositList.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+    
+	@Transactional
+    public List<DepositProductDTO> searchByKeywords(String keywords) {
+        String[] words = keywords.split(" ");
+        StringBuilder sql = new StringBuilder("SELECT * FROM deposit_product WHERE 1=1 ");
+
+        for (int i = 0; i < words.length; i++) {
+            sql.append("AND (name LIKE :word").append(i)
+               .append(" OR summary LIKE :word").append(i)
+               .append(" OR detail LIKE :word").append(i).append(") ");
+        }
+
+        Query query = em.createNativeQuery(sql.toString(), DepositProduct.class);
+        for (int i = 0; i < words.length; i++) {
+            query.setParameter("word" + i, "%" + words[i] + "%");
+        }
+        
+        @SuppressWarnings("unchecked")
+		List<DepositProduct> result = query.getResultList();
+
+        return result.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 }

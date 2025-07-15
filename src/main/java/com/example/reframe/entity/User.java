@@ -5,11 +5,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "bnk_user")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 	@Id
 	private String username;	// 회원 아이디

@@ -21,8 +21,9 @@
         <!-- 본문 -->
         <div class="content">
             <h1>차트</h1>
-				<canvas id="visitChart" width="400" height="200" style="display:block;"></canvas>
-        <div><canvas id="productChart"></canvas></div>
+			<canvas id="visitChart" width="400" height="200" style="display:block;"></canvas>
+	        <canvas id="productChart"></canvas>
+	        <canvas id="sentimentChart" width="400" height="200"></canvas>
         </div>
     </div>
     
@@ -38,7 +39,7 @@
 	
 	    const ctx = document.getElementById('visitChart').getContext('2d');
 	    new Chart(ctx, {
-	        type: 'bar',
+	        type: 'bar',	
 	        data: {
 	            labels: labels,
 	            datasets: [{
@@ -103,7 +104,43 @@
 	        }
 	    });
 	    
-	    
+	 // =============================================
+	 // 리뷰 긍정 부정 통계 	 
+	
+	 const sentimentLabels = /*[[${sentimentLabels}]]*/ [];
+	 const sentimentCounts = /*[[${sentimentCounts}]]*/ [];
+
+	 const ctxSentiment = document.getElementById('sentimentChart').getContext('2d');
+	 new Chart(ctxSentiment, {
+	     type: 'doughnut',  
+	     data: {
+	         labels: sentimentLabels,
+	         datasets: [{
+	             label: '리뷰 감정 통계',
+	             data: sentimentCounts,
+	             backgroundColor: [
+	                 'rgba(75, 192, 192, 0.6)',  // 긍정
+	                 'rgba(255, 99, 132, 0.6)'   // 부정
+	             ],
+	             borderColor: [
+	                 'rgba(75, 192, 192, 1)',
+	                 'rgba(255, 99, 132, 1)'
+	             ],
+	             borderWidth: 1
+	         }]
+	     },
+	     options: {
+	         responsive: true,
+	         plugins: {
+	             legend: { position: 'top' },
+	             title: {
+	                 display: true,
+	                 text: '👍 리뷰 감정 통계 (긍정 vs 부정)'
+	             }
+	         }
+	     }
+	 });
+
 	    
 	    
 	</script>

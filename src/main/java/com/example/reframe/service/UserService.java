@@ -137,7 +137,6 @@ public class UserService {
 		return str.replaceAll("[^\\d]", "");
 	}
 	
-	
 	/** 개인 회원 목록 불러오기*/
 	public List<User> getPersonalUsers() {
 		return userRepository.findByUsertype("P");
@@ -164,6 +163,5 @@ public class UserService {
 			return dto;
 		}).collect(Collectors.toList());
 	}
-
 
 }

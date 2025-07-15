@@ -8,34 +8,36 @@
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<section id="signup-form">
-		<h2>회원가입</h2>
-		<form th:action="@{${(signupType == 'personal') ? '/signup/personal' : '/signup/corporate'}}" th:method="'post'">
-			<div class="username-wrap">
-				<input type="text" id="username" name="username" placeholder="아이디를 입력하세요." onchange="changeUsername()" />
-				<input type="button" value="중복확인" onclick="checkUsername()" />
-			</div>
-			<p id="username-error" class="error"></p>
-			
-			<input type="password" name="password" placeholder="비밀번호를 입력하세요." />
-			<p id="password-error" class="error"></p>
-			
-			<input type="password" name="check_password" placeholder="비밀번호 확인을 입력하세요." />
-			<p id="check-password-error" class="error"></p>
-			
-			<input type="text" name="name" placeholder="이름을 입력하세요." />
-			<p id="name-error" class="error"></p>
-			
-			<input type="tel" name="phone" placeholder="전화번호를 입력하세요." />
-			<p id="phone-error" class="error"></p>
-			
-			<input type="email" name="email" placeholder="이메일을 입력하세요." />
-			<p id="email-error" class="error"></p>
-			
-			<input type="submit" value="회원가입" />
-		</form>
-		<p th:if="${msg != null}" th:text="${msg}"></p>
-	</section>
+	<div id="container">
+		<section id="signup-form">
+			<h2>회원가입</h2>
+			<form class="user-form" th:action="@{${(signupType == 'personal') ? '/signup/personal' : '/signup/corporate'}}" th:method="'post'">
+				<div class="username-wrap">
+					<input type="text" id="username" name="username" placeholder="아이디를 입력하세요." onchange="changeUsername()" />
+					<input type="button" value="중복확인" onclick="checkUsername()" />
+				</div>
+				<p id="username-error" class="error"></p>
+				
+				<input type="password" name="password" placeholder="비밀번호를 입력하세요." />
+				<p id="password-error" class="error"></p>
+				
+				<input type="password" name="check_password" placeholder="비밀번호 확인을 입력하세요." />
+				<p id="check-password-error" class="error"></p>
+				
+				<input type="text" name="name" placeholder="이름을 입력하세요." />
+				<p id="name-error" class="error"></p>
+				
+				<input type="tel" name="phone" placeholder="전화번호를 입력하세요." />
+				<p id="phone-error" class="error"></p>
+				
+				<input type="email" name="email" placeholder="이메일을 입력하세요." />
+				<p id="email-error" class="error"></p>
+				
+				<input type="submit" value="회원가입" />
+			</form>
+			<p th:if="${msg != null}" th:text="${msg}"></p>
+		</section>
+	</div>
 	<script>
 		const $form = document.querySelector("form");
 		const $errors = document.querySelectorAll('.error');

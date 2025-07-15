@@ -36,6 +36,16 @@ public class AdminController {
 		return "admin/card-main";
 	}
 	
+	@GetMapping("/user-main")
+	public String userMain() {
+		return "admin/user-main";
+	}
+	
+	@GetMapping("/signin")
+	public String signin() {
+		return "admin/signin-form";
+	}
+	
 	
 	/*
 	 * 차트 4개를 한 페이지로 통합  -> AdminChartController로 이동 

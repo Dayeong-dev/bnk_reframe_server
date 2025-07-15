@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="/css/common.css"></link>
 <title>자주 묻는 질문</title>
 <style>
 table {
@@ -38,6 +39,8 @@ th, td {
 </style>
 </head>
 <body>
+<br><br><br>
+<div th:replace="~{user/fragments/header :: headerFragment}"></div>
 	<h1>자주 묻는 질문</h1>
 
 	<hr>

@@ -8,12 +8,14 @@
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<section id="signup-type">
-		<h2>회원가입 유형 선택</h2>
-		<div class="btn-list">
-			<a href="/signup/personal">개인</a>
-			<a href="/signup/corporate/verify">기업</a>
-		</div>
-	</section>
+	<div id="container">
+		<section id="signup-type">
+			<h2>회원가입 유형 선택</h2>
+			<div class="btn-list">
+				<a href="/signup/personal">개인</a>
+				<a href="/signup/corporate/verify">기업</a>
+			</div>
+		</section>
+	</div>
 </body>
 </html>

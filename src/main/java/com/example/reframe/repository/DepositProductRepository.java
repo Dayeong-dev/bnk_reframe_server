@@ -4,6 +4,7 @@ import com.example.reframe.entity.DepositProduct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -54,4 +55,8 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
     );
 
 	List<DepositProduct> findTop10ByOrderByViewCountDesc();
+	
+	
+	@Query(value = "SELECT * FROM (SELECT * FROM DEPOSIT_PRODUCT WHERE view_count IS NOT NULL AND status = 'S' ORDER BY view_count DESC) WHERE ROWNUM <= 5", nativeQuery = true)
+	List<DepositProduct> findTopFiveByViewCount();
 }
