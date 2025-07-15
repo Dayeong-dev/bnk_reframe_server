@@ -42,10 +42,9 @@
 }
 
 .view-count {
-	font-size: 25px;
+	font-size: 15px;
 	text-align: center;
 	margin: 50px 0;
-	font-weight: bold;
 }
 
 .card-details {
@@ -134,7 +133,16 @@
 
 		<!-- 조회수 -->
 		<div class="view-count">
-			현재 이 카드를 <span th:text="${card.viewCount}"></span>명이 조회했습니다.
+			현재 이 카드를 <span th:text="${card.viewCount}" style="color: #007bff; font-weight: bold;"></span>명이 조회했습니다.
+		</div>
+
+		<!-- 비교함 담기 버튼 -->
+		<div style="text-align: center; margin-top: 20px;">
+		  <button type="button"
+		  th:attr="onclick=|addToCompare(${card.cardId})|"
+		  style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">
+		  비교함 담기
+		</button>
 		</div>
 
 		<!-- 서비스 / 적립 정보 -->
@@ -148,8 +156,6 @@
 				정보 내용</div>
 		</div>
 
-        <h3>적립/할인 정보</h3>
-        <p th:text="${card.pointInfo}">적립/할인 정보 내용</p>
     </div>
     <div>
 		<!-- 2x2 모달 버튼 -->
@@ -212,6 +218,49 @@
             }
         });
     }
+    
+    //비교함
+    async function addToCompare(cardId) {
+	  // 현재 비교함 상태 가져오기
+	  try {
+	    const resList = await fetch("/card/compare/list");
+	    if (!resList.ok) {
+	      alert("비교함 상태를 가져오지 못했습니다.");
+	      return;
+	    }
+	    const compareList = await resList.json();
+	
+	    // 이미 담긴 카드인지 체크
+	    if (compareList.some(card => card.cardId === cardId)) {
+	      alert("이미 비교함에 담긴 카드입니다.");
+	      return;
+	    }
+	
+	    // 최대 3개 제한
+	    if (compareList.length >= 3) {
+	      alert("최대 3개까지 비교 가능합니다!");
+	      return;
+	    }
+	
+	    // 추가 요청
+	    const formData = new URLSearchParams();
+	    formData.append("cardId", cardId);
+	
+	    const resAdd = await fetch("/card/compare/add", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	      body: formData.toString()
+	    });
+	
+	    if (resAdd.ok) {
+	      alert("비교함에 담았습니다!");
+	    } else {
+	      alert("서버 오류로 담기에 실패했습니다!");
+	    }
+	  } catch (e) {
+	    alert("통신 중 오류가 발생했습니다!");
+	  }
+}
 </script>
 
 </body>

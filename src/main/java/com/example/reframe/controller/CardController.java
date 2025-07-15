@@ -1,6 +1,9 @@
 package com.example.reframe.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import com.example.reframe.session.RecentViewManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,12 +15,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.CardDto;
 import com.example.reframe.service.CardService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/card")
@@ -36,9 +42,12 @@ public class CardController {
 	// 메인 페이지
 	@GetMapping("/main")
 	public String cardMain(Model model) {
+	    List<CardDto> allCards = cardService.findAllCards(); // 전체 카드
 		List<CardDto> topCards = cardService.getTop6Cards(); // 기준: 조회수TOP6
-
+		
+		model.addAttribute("allCards", allCards);
 		model.addAttribute("topCards", topCards);
+		
 		return "user/card_main";
 	}
 
@@ -73,12 +82,53 @@ public class CardController {
 
 		return "user/card_list";
 	}
-
-	@GetMapping("/compare") // 카드 비교
+	
+	
+	//카드 비교함
+	//카드 추가
+	@PostMapping("/compare/add")
 	@ResponseBody
-	public List<CardDto> compareCards(@RequestParam("ids") List<Long> ids) {
-		return cardService.getCardsForCompare(ids);
+	public ResponseEntity<?> addToCompare(@RequestParam("cardId") Long cardId, HttpSession session) {
+	    List<Long> compareList = (List<Long>) session.getAttribute("compareList");
+	    if (compareList == null) {
+	        compareList = new ArrayList<>();
+	    }
+	    if (!compareList.contains(cardId)) {
+	        compareList.add(cardId);
+	    }
+	    session.setAttribute("compareList", compareList);
+	    return ResponseEntity.ok().build();
 	}
+
+	//카드 삭제
+	@PostMapping("/compare/remove")
+	@ResponseBody
+	public ResponseEntity<?> removeFromCompare(@RequestBody Map<String, Long> payload, HttpSession session) {
+	    Long cardId = payload.get("cardId");
+	    if (cardId == null) {
+	        return ResponseEntity.badRequest().build();
+	    }
+
+	    List<Long> compareList = (List<Long>) session.getAttribute("compareList");
+	    if (compareList != null) {
+	        compareList.remove(cardId);
+	        session.setAttribute("compareList", compareList);
+	    }
+	    return ResponseEntity.ok().build();
+	}
+	
+	//카드 비교
+	@GetMapping("/compare/list")
+	@ResponseBody
+	public List<CardDto> getCompareList(HttpSession session) {
+	    List<Long> compareList = (List<Long>) session.getAttribute("compareList");
+	    if (compareList == null) {
+	        return List.of();
+	    }
+	    return cardService.getCardsForCompare(compareList);
+	}
+	
+	
 
 	// 카드 테스트 시작화면
 	@GetMapping("/card_test")
