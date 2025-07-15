@@ -41,4 +41,36 @@ public class TestUserFactory {
 			userRepository.save(user);
 		});
 	}
+	
+	@Test
+	/* 관리자 회원 더미 데이터 추가 */
+	public void setAdminDummy () {
+		User user = User.builder()
+				.username("1234567")
+				.password(bCryptPasswordEncoder.encode("1234"))
+				.name("김법진1")
+				.phone("01011112222")
+				.email("beobjin-_-@naver.com")
+				.usertype("P")
+				.role("ROLE_ADMIN")
+				.build();
+		
+		userRepository.save(user);
+	}
+	
+	@Test
+	/* 상위 관리자 회원 더미 데이터 추가 */
+	public void setSuperAdminDummy() {
+		User user = User.builder()
+				.username("2345678")
+				.password(bCryptPasswordEncoder.encode("1234"))
+				.name("김법진2")
+				.phone("01011113333")
+				.email("beobjin-_-@naver.com")
+				.usertype("P")
+				.role("ROLE_SUPERADMIN")
+				.build();
+		
+		userRepository.save(user);
+	}
 }
