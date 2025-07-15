@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.service.DepositProductService;
+import com.example.reframe.service.DepositProductServiceImpl;
+import com.example.reframe.session.RecentViewManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class DepositProductController {
 
     private final DepositProductService depositProductService;
+    private final DepositProductServiceImpl depositProductServiceImpl;
+    private final RecentViewManager recentViewManager;
 
     /**
      * 예적금 메인 (추천상품, 테마별 추천 상품)
@@ -133,11 +139,23 @@ public class DepositProductController {
         model.addAttribute("product", product);
         model.addAttribute("detailForPage", detailForPage);
         model.addAttribute("modalDetailForModal", modalDetailForModal);
-
+        
+        // 최근 본 상품에 리스트 기입
+        recentViewManager.setProduct("deposit", product.getProductId(), product.getName());
        
         return "user/deposit_detail";  // user/deposit_detail.jsp or deposit_detail.html
     }
 
-   
+    // 조회수 기준으로 Top 5 예적금 추천 : 메인 페이지
+    @GetMapping("/recommend/list")
+    public @ResponseBody ResponseEntity<List<DepositProductDTO>> getRecommendDeposits() {
+    	List<DepositProductDTO> depositList = depositProductServiceImpl.getTopFiveByViewCount();
+    	
+    	if(depositList == null) {
+    		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    	}
+    	
+    	return ResponseEntity.status(HttpStatus.OK).body(depositList);
+    }
 
 }
