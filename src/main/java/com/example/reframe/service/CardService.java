@@ -11,15 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.dto.CardDto;
-import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.entity.Card;
-import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.repository.CardRepository;
-
-
 import com.example.reframe.entity.CardCategoryRel;
 import com.example.reframe.entity.CardSubcategory;
 import com.example.reframe.entity.CardTestResult;
+import com.example.reframe.repository.CardRepository;
 import com.example.reframe.repository.CardSubcategoryRepository;
 import com.example.reframe.repository.CardTestResultRepository;
 
@@ -49,6 +45,12 @@ public class CardService {
                 .collect(Collectors.toList());
     }
 
+    // 메인 - 슬라이더: 전체 카드 가져오기
+    public List<CardDto> findAllCards() {
+        List<Card> cards = cardRepository.findAll();
+        return cards.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+    
     // 상세 - 카드 상세정보 가져오기 + 소분류명 리스트
     public CardDto getCardDetail(Long cardId) {
         Card card = cardRepository.findByIdWithCategories(cardId)
@@ -193,4 +195,5 @@ public class CardService {
 
         return result.stream().map(this::convertToDto).collect(Collectors.toList());
     }
+
 }

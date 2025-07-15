@@ -340,29 +340,60 @@ form button:hover {
 </div>
 
 <script>
+// 프론트 상태: 슬롯 3개
 const compareSlots = [null, null, null];
 
-function addToCompare(cardId, cardName, cardImg) {
+// 비교함 담기
+async function addToCompare(cardId, cardName, cardImg) {
+  if (compareSlots.some(slot => slot && slot.cardId === cardId)) {
+    alert("이미 비교함에 담긴 카드입니다.");
+    return;
+  }
+
   const emptyIndex = compareSlots.findIndex(slot => slot === null);
   if (emptyIndex === -1) {
     alert("최대 3개까지 비교 가능합니다!");
     return;
   }
 
-  if (compareSlots.some(slot => slot && slot.cardId === cardId)) {
-    alert("이미 비교함에 담긴 카드입니다.");
-    return;
+  // 서버에 추가 요청
+  const formData = new URLSearchParams();
+  formData.append("cardId", cardId);
+
+  const res = await fetch("/card/compare/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: formData.toString()
+  });
+
+  if (res.ok) {
+    compareSlots[emptyIndex] = { cardId, cardImg };
+    updateCompareBox();
+  } else {
+    alert("서버 오류로 담기에 실패했습니다!");
   }
-
-  compareSlots[emptyIndex] = { cardId, cardImg };
-  updateCompareBox();
 }
 
-function removeFromCompare(index) {
-  compareSlots[index] = null;
-  updateCompareBox();
+// 비교함 제거
+async function removeFromCompare(index) {
+  const slot = compareSlots[index];
+  if (!slot) return;
+
+  const res = await fetch("/card/compare/remove", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ cardId: slot.cardId })
+  });
+
+  if (res.ok) {
+    compareSlots[index] = null;
+    updateCompareBox();
+  } else {
+    alert("서버 오류로 삭제에 실패했습니다!");
+  }
 }
 
+// 비교함 슬롯 UI 갱신
 function updateCompareBox() {
   const slots = document.querySelectorAll("#compareSlots .compare-slot");
   slots.forEach((slotDiv, idx) => {
@@ -379,52 +410,74 @@ function updateCompareBox() {
   });
 }
 
+// 슬롯 클릭 시 제거
 document.querySelectorAll("#compareSlots .compare-slot").forEach((slotDiv, idx) => {
-  slotDiv.addEventListener("click", () => {
-    if (compareSlots[idx] !== null) {
-      if (confirm("비교함에서 삭제하시겠습니까?")) {
-        removeFromCompare(idx);
-      }
-    }
+	slotDiv.addEventListener("click", () => {
+		  if (compareSlots[idx] !== null) {
+		    removeFromCompare(idx);
+		  }
+	});
   });
-});
 
-function openCompareModal() {
-  const selectedCards = compareSlots.filter(slot => slot !== null);
-  if (selectedCards.length === 0) {
+// 비교 모달 열기
+async function openCompareModal() {
+  const res = await fetch("/card/compare/list");
+  if (!res.ok) {
+    alert("비교함 정보를 불러오지 못했습니다!");
+    return;
+  }
+
+  const data = await res.json();
+  if (data.length === 0) {
     alert("비교할 카드를 먼저 선택하세요!");
     return;
   }
 
-  const ids = selectedCards.map(c => c.cardId).join(",");
-  fetch(`/card/compare?ids=${ids}`)
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById("compareContainer");
-      container.innerHTML = "";
+  // 모달 내용 채우기
+  const container = document.getElementById("compareContainer");
+  container.innerHTML = "";
 
-      data.forEach(card => {
-        const cardDiv = document.createElement("div");
-        cardDiv.innerHTML = `
-          <img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name}" />
-          <h3>${card.name}</h3>
-          <p><strong>대분류:</strong> ${card.categoryMajorDisplay}</p>
-          <p><strong>연회비:</strong> ${card.annualFee}</p>
-          <p><strong>상태:</strong> ${card.statusDisplay}</p>
-          <p><strong>서비스:</strong><br>${card.service.replace(/\n/g, "<br>")}</p>
-          <a href="/card/detail/${card.cardId}">상세보기</a>
-        `;
-        container.appendChild(cardDiv);
-      });
+  data.forEach(card => {
+	const serviceText = card.service ? card.service.replace(/\n/g, '<br>') : '정보 없음';
+    const cardDiv = document.createElement("div");
+    cardDiv.innerHTML = `
+      <img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name}" />
+      <h3>${card.name}</h3>
+      <p><strong>대분류:</strong> ${card.categoryMajorDisplay}</p>
+      <p><strong>연회비:</strong> ${card.annualFee}</p>
+      <p><strong>상태:</strong> ${card.statusDisplay}</p>
+      <p><strong>서비스:</strong><br>${serviceText}</p>
+      <a href="/card/detail/${card.cardId}">상세보기</a>
+    `;
+    container.appendChild(cardDiv);
+  });
 
-      document.getElementById("compareModal").style.display = "block";
-    });
+  document.getElementById("compareModal").style.display = "block";
 }
 
+// 모달 닫기
 function closeCompareModal() {
   document.getElementById("compareModal").style.display = "none";
 }
+
+// 페이지 로드시 세션 데이터로 초기화
+window.addEventListener("DOMContentLoaded", async () => {
+  const res = await fetch("/card/compare/list");
+  if (res.ok) {
+    const data = await res.json();
+    data.forEach((card, idx) => {
+      if (idx < 3) {
+        compareSlots[idx] = {
+          cardId: card.cardId,
+          cardImg: `/images/cards/${card.cardId}_front.PNG`
+        };
+      }
+    });
+    updateCompareBox();
+  }
+});
 </script>
+
 
 </body>
 </html>
