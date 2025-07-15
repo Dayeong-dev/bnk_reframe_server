@@ -1,0 +1,19 @@
+<div id="global-modal" xmlns:th="http://www.thymeleaf.org" th:fragment="modalFragment">
+	<div id="modal-wrapper" >
+		<div id="modal-content">
+			<span id="modal-close">&times;</span>
+			<div class="modal-content"></div>
+		</div>
+	</div>
+	<script>
+		const $modalClose = document.getElementById("modal-close");
+		
+		$modalClose.addEventListener("click", e => {
+			const $globalModal = document.getElementById("global-modal");
+			
+			$globalModal.style.display = "none";
+			document.body.style.overflow = 'auto';
+			$modalContent.innerHTML = "";
+		});
+	</script>
+</div>

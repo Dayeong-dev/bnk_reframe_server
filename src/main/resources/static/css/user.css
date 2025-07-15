@@ -234,3 +234,58 @@
 .user-form input[type="submit"]:hover {
     background-color: var(--secondary-color);
 }
+
+/* ============================== */
+/* 모달 - 카드 비교함                 */
+/* ============================== */
+table.compare-list, 
+table.compare-list th, 
+table.compare-list td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+table.compare-list {
+	margin: 0 auto;
+}
+
+table.compare-list th {
+	width: 5rem;
+}
+
+table.compare-list td {
+	width: 15rem;
+	padding: 0.5rem;
+}
+
+table.compare-list .image {
+	position: relative;
+	text-align: center;
+	padding: 1rem;
+}
+
+table.compare-list .image .remove-btn {
+	position: absolute;
+	top: 0;
+	right: 0;
+	
+	color: #fff;
+	border-bottom-left-radius: 0.25rem;
+	background-color: #262626;
+	
+	width: 1rem;
+	height: 1rem;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	cursor: pointer;
+}
+
+table.compare-list img {
+	width: 80%;
+	display: inline-block;
+	box-shadow: 0px 0px 4px #aaa;
+	border-radius: 5%;
+}
