@@ -83,35 +83,50 @@ body {
 #detailContent section {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 30px;
-  margin-bottom: 50px;
-  flex-wrap: wrap;
+  justify-content: center; /* ✅ 전체를 페이지 가운데 정렬 */
+  margin: 50px 0;
   flex-direction: row;
+  max-width: 900px; /* ✅ 넓이 제한 */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #detailContent section.reverse {
   flex-direction: row-reverse;
 }
 
-#detailContent section h2,
+#detailContent section .text-wrap {
+  flex: 1;
+  padding: 0 20px;
+  text-align: left;
+}
+
+#detailContent section.reverse .text-wrap {
+  text-align: right;
+}
+
+#detailContent section h2 {
+  font-size: 1.6rem;       /* 기존 1.4 → 더 큼 */
+  font-weight: bold;       /* ✅ 볼드 적용 */
+  margin-bottom: 10px;
+}
+
 #detailContent section p {
+  font-size: 1.2rem;       /* 기존 1.1 → 조금 키움 */
+  font-weight: 500;        /* ✅ 중간 볼드 (너무 두껍지 않게) */
+  line-height: 1.7;
   margin: 0;
 }
 
-#detailContent section .text-wrap {
-  flex: 1;
-  min-width: 300px;
+#detailContent section img {
+  width: 240px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-#detailContent section img {
-  width: 280px;         /* ✅ 적당한 고정 너비 */
-  height: auto;         /* ✅ 비율 유지 */
-  max-width: 100%;      /* ✅ 모바일 대응 */
-  border-radius: 8px;
-  object-fit: cover;    /* ✅ 이미지 비율 유지하면서 잘림 방지 */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* 선택: 살짝 그림자 */
-}
+
 
 
 </style>
@@ -281,7 +296,7 @@ window.addEventListener("load", () => {
 	      section.insertBefore(wrapper, img);
 	    }
 
-	    // ✅ 짝수 번째에 reverse 클래스 적용
+	    // 짝수번째 reverse 적용
 	    if ([2, 4, 6].includes(i + 1)) {
 	      section.classList.add("reverse");
 	    }
