@@ -46,9 +46,9 @@
 	</div>
 
 	<!-- 리뷰 팝업 -->
-<div id="review-popup">
-  <button id="review-close" onclick="closePopup()">×</button>
-  <p>사이트 이용은 어떠셨나요?</p>
+<div id="review-popup" sec:authorize="isAuthenticated()">
+  <button id="review-close"  onclick="closePopup()">×</button>
+  <p>사이트 이용은 어떠신가요?</p>
   <textarea id="review-content" placeholder="간단한 리뷰를 남겨주세요 :)"></textarea><br/>
   <button onclick="submitReview()">제출</button>
 </div>
