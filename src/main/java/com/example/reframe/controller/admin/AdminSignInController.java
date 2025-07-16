@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.reframe.entity.User;
+import com.example.reframe.repository.UserRepository;
 import com.example.reframe.service.AdminSignInService;
 
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +20,8 @@ public class AdminSignInController {
 
 	@Autowired
 	private AdminSignInService adminSignInService;
+	@Autowired
+	private UserRepository userRepository;
 
 	@PostMapping("/login")
 	public String login(@RequestParam("username") String username,
@@ -81,8 +85,16 @@ public class AdminSignInController {
 		if (authCode != null && !authCode.isEmpty()) {
 			String savedCode = (String) session.getAttribute("authCode");
 			if (authCode.equals(savedCode)) {
+
+				// 인증 코드 삭제 
 				session.removeAttribute("authCode"); 
+				
+				// 관리자의 등급 확인
+				User user = userRepository.findByUsername(username);
+			    session.setAttribute("role", user.getRole());
+			    session.setAttribute("loginInfo", user);
 				return "redirect:/admin/card-main"; // 로그인 완료
+				
 			} else {
 				model.addAttribute("step3", true);
 				model.addAttribute("username", username);
@@ -92,6 +104,10 @@ public class AdminSignInController {
 				return "admin/signin-form";
 			}
 		}
+		
+		// STEP 4: 관리자, 상위관리자 확인
+		
+		
 		return "admin/signin-form";
 	}
 	

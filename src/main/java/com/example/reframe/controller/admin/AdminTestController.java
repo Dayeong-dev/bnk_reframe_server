@@ -19,8 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.ProductStatusUpdateRequestDTO;
 import com.example.reframe.entity.DepositProduct;
+import com.example.reframe.entity.admin.ApprovalRequest;
+import com.example.reframe.repository.ApprovalRequestRepository;
 import com.example.reframe.repository.DepositProductRepository;
+import com.example.reframe.service.ApprovalService;
 import com.example.reframe.service.ProductService;
+import com.example.reframe.util.SessionUtil;
+
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/admin")
@@ -31,6 +37,14 @@ public class AdminTestController {
 	
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private ApprovalService approvalService;
+
+	@Autowired
+	private ApprovalRequestRepository approvalRequestRepository;
+	
+	
 	/*
 	 * 이중 필터 사용 -> filterProducts() 메서드로 통합 
 	 * 
@@ -124,11 +138,14 @@ public class AdminTestController {
 	
 	// 상세보기에서 수정 데이터 받기 
 	@PutMapping("/products/update")
-	public ResponseEntity<Void> updateProduct(@RequestBody DepositProductDTO dto) {
+	public ResponseEntity<Void> updateProduct(@RequestBody DepositProductDTO dto,
+										      HttpSession session) {
+		/*
+		 * 결재 프로세스로 삭제
 	    DepositProduct product = productRepository.findById(dto.getProductId())
 	        .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않음"));
-
-	    product.setName(dto.getName());
+		
+	    product.setName(dto.getName());	
 	    product.setCategory(dto.getCategory());
 	    product.setPurpose(dto.getPurpose());
 	    product.setSummary(dto.getSummary());
@@ -137,9 +154,10 @@ public class AdminTestController {
 	    product.setMaxRate(dto.getMaxRate());
 	    product.setPeriod(dto.getPeriod());
 	    product.setStatus(dto.getStatus());
-
-	    productRepository.save(product);
-
+		*/
+		
+	    approvalService.requestApproval(dto, SessionUtil.getLoginUser(session).getUsername());
+	    
 	    return ResponseEntity.ok().build();
 	}
 	
@@ -171,6 +189,39 @@ public class AdminTestController {
 	    return ResponseEntity.ok().build();
 	}
 	
+	// 결재 승인
+	@PostMapping("/approvals/{id}/approve")
+	public ResponseEntity<Void> approveRequest(@PathVariable("id") Long id,
+											  HttpSession session) {
+	    approvalService.approveRequest(id, SessionUtil.getLoginUser(session).getUsername()); // TODO: 로그인 정보로 대체
+	    return ResponseEntity.ok().build();
+	}
+	
+	// 결재 반려
+	@PostMapping("/approvals/{id}/reject")
+	public ResponseEntity<Void> rejectRequest(@PathVariable("id") Long id,
+											  @RequestBody Map<String, String> body,
+											  HttpSession session) {
+	    String reason = body.get("reason");
+	    approvalService.rejectRequest(id, SessionUtil.getLoginUser(session).getUsername(), reason); // TODO: 로그인 정보로 대체
+	    return ResponseEntity.ok().build();
+	}
+	
+	// 결재 요청 목록 반환
+	@GetMapping("/approvals")
+	public List<ApprovalRequest> getAllPendingRequests() {
+		List<ApprovalRequest> list = approvalRequestRepository.findByStatus("PENDING");
+	    System.out.println(list);
+		return list ;
+	}
+	
+	// 결재 요청 상세보기 
+	@GetMapping("/approvals/{id}")
+	public ApprovalRequest getApprovalDetail(@PathVariable("id")Long id) {
+	    return approvalRequestRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("요청 없음"));
+	}
+
 	
 	// DTO로 컨버전
 	private DepositProductDTO convertToDTO(DepositProduct product) {

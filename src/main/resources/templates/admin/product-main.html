@@ -71,7 +71,9 @@
 	
 		let currentCategory = "all";
 		let currentStatus = "all";
-	
+		//============================================================	
+			
+		// 체크박스
 		$(document).on("change", "#checkAll", function () {
 		    $(".product-check").prop("checked", this.checked);
 		});
@@ -131,6 +133,7 @@
 		    fetchFilteredProducts();
 		}
 		
+		// 선택 메뉴, 선택 상태에 따른 List 출력 
 		function fetchFilteredProducts() {
 		    $.ajax({
 		        url: "/admin/products/filter",
