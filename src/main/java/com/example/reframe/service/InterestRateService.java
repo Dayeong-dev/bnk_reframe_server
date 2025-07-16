@@ -5,5 +5,6 @@ import com.example.reframe.dto.InterestRateDTO;
 import java.util.List;
 
 public interface InterestRateService {
-    List<InterestRateDTO> getRatesByProductId(Long productId);
+   
+    String getRateHtmlByProductId(Long productId); // 🔹 이 메소드 추가
 }

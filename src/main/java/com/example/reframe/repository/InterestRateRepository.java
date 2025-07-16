@@ -1,10 +1,14 @@
 package com.example.reframe.repository;
 
-import com.example.reframe.entity.InterestRate;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.example.reframe.entity.InterestRate;
 
 public interface InterestRateRepository extends JpaRepository<InterestRate, Long> {
-    List<InterestRate> findByProductIdOrderByCategoryAscTypeAsc(Long productId);
+   
+    
+    Optional<InterestRate> findFirstByProductId(Long productId);
+
 }

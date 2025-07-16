@@ -184,6 +184,7 @@ body {
 	<div style="text-align: center;">
 		<a href="/deposit/list" class="btn">목록으로</a>
 		<button class="btn" onclick="openModal()">상품 이용 가이드</button>
+		<button class="btn" onclick="openRateModal()">금리표 보기</button>
 	</div>
 
 
@@ -201,6 +202,21 @@ body {
 			</div>
 		</div>
 	</div>
+	
+	<!-- 금리표 모달 -->
+<div id="rateModal" class="modal">
+  <div class="modal-content" style="position: relative;">
+    <span class="close" onclick="closeRateModal()">&times;</span>
+    <h2 style="text-align: center; margin-top: 0;">금리표</h2>
+    <div th:utext="${modalRateTable}" style="margin-bottom: 20px;">
+      <!-- 금리표 HTML 출력 -->
+    </div>
+    <div style="text-align: center;">
+      <button class="btn" onclick="closeRateModal()">닫기</button>
+    </div>
+  </div>
+</div>
+	
 
 	<script>
   function openModal() {
@@ -214,6 +230,17 @@ body {
       closeModal();
     }
   }
+  
+  function openRateModal() {
+	  document.getElementById("rateModal").style.display = "block";
+	}
+	function closeRateModal() {
+	  document.getElementById("rateModal").style.display = "none";
+	}
+	window.onclick = function(e) {
+	  if (e.target === document.getElementById("productModal")) closeModal();
+	  if (e.target === document.getElementById("rateModal")) closeRateModal();
+	};
 
   // 쉼표 자동 삽입
  document.getElementById("depositAmount").addEventListener("input", function() {
