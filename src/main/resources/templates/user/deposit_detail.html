@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="/css/user.css" />
 <title th:text="${product.name}">예적금 상품 상세</title>
 <style>
 body {
@@ -132,74 +134,79 @@ body {
 </style>
 </head>
 <body>
-	<!-- 🟢 상단 정보 -->
-	<div class="header" style="text-align: center;">
-		<h1 th:text="${product.name}" style="margin-bottom: 8px;">상품명</h1>
-		<p th:text="${product.summary}" style="font-size: 1rem; color: #666;">상품
-			요약</p>
-	</div>
-
-	<!-- 🟢 금리/기간 정보 박스 -->
-	<div class="info-box">
-		<div>
-			<span style="color: #d9230f; font-size: 1.4rem;"
-				th:text="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')} + '%'">4.50%</span><br>
-			<small>최고금리</small>
-		</div>
-		<div>
-			<span style="font-size: 1.2rem;"
-				th:text="${#numbers.formatDecimal(product.minRate,1,'POINT',2,'POINT')} + '%'">2.50%</span><br>
-			<small>최저금리</small>
-		</div>
-		<div>
-			<span style="font-size: 1.2rem;" th:text="${product.period}">12</span>
-			개월<br> <small>가입기간</small>
-		</div>
-	</div>
-
-
-
-	<hr>
-
-	<!-- 상세 설명 영역 (7개 섹션 포함) -->
-	<div id="detailContent" th:utext="${product.detail}">상세 설명</div>
-
-	</div>
-
-	<div class="calc-container" style="text-align: center;">
-		<h3 style="font-size: 1.5rem; margin-bottom: 20px;">💰 간편 이자 계산기</h3>
-
-		<div
-			style="display: inline-flex; flex-wrap: wrap; align-items: center; gap: 15px; font-size: 1.2rem; justify-content: center;">
-			<label> 이 상품을 <input id="monthsInput" type="text"
-				th:value="${product.period}"
-				style="width: 60px; padding: 10px; text-align: right; font-size: 1.1rem;" />
-				<span>개월 간</span>
-			</label> <label> <input id="depositAmount" type="text"
-				value="1,000,000"
-				style="width: 170px; padding: 10px; text-align: right; font-size: 1.1rem;" />
-				<span>원으로</span>
-			</label> <label> 금리 연 <input id="rateInput" type="text"
-				th:value="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')}"
-				style="width: 70px; padding: 10px; text-align: right; font-size: 1.1rem;" />
-				<span>%를 적용하면?</span>
-			</label>
-		</div>
-
-		<br>
-		<button class="btn" style="margin-top: 20px;" onclick="calcInterest()">✔
-			결과보기</button>
-
-		<div style="margin-top: 25px; font-size: 1.3rem;">
-			세전 이자: <b id="interestResult"
-				style="font-size: 1.5rem; color: #1565c0;">0</b> 원
-		</div>
-	</div>
-
-	<div style="text-align: center;">
-		<a href="/deposit/list" class="btn">목록으로</a>
-		<button class="btn" onclick="openModal()">상품 이용 가이드</button>
-		<button class="btn" onclick="openRateModal()">금리표 보기</button>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	
+	<div id="container">
+		<section>
+			<!-- 🟢 상단 정보 -->
+			<div class="header" style="text-align: center;">
+				<h1 th:text="${product.name}" style="margin-bottom: 8px;">상품명</h1>
+				<p th:text="${product.summary}" style="font-size: 1rem; color: #666;">상품요약</p>
+			</div>
+		
+			<!-- 🟢 금리/기간 정보 박스 -->
+			<div class="info-box">
+				<div>
+					<span style="color: #d9230f; font-size: 1.4rem;"
+						th:text="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')} + '%'">4.50%</span><br>
+					<small>최고금리</small>
+				</div>
+				<div>
+					<span style="font-size: 1.2rem;"
+						th:text="${#numbers.formatDecimal(product.minRate,1,'POINT',2,'POINT')} + '%'">2.50%</span><br>
+					<small>최저금리</small>
+				</div>
+				<div>
+					<span style="font-size: 1.2rem;" th:text="${product.period}">12</span>
+					개월<br> <small>가입기간</small>
+				</div>
+			</div>
+		
+		
+		
+			<hr>
+		
+			<!-- 상세 설명 영역 (7개 섹션 포함) -->
+			<div id="detailContent" th:utext="${product.detail}">상세 설명</div>
+		
+			<div class="calc-container" style="text-align: center;">
+				<h3 style="font-size: 1.5rem; margin-bottom: 20px;">💰 간편 이자 계산기</h3>
+		
+				<div
+					style="display: inline-flex; flex-wrap: wrap; align-items: center; gap: 15px; font-size: 1.2rem; justify-content: center;">
+					<label> 이 상품을 <input id="monthsInput" type="text"
+						th:value="${product.period}"
+						style="width: 60px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+						<span>개월 간</span>
+					</label> <label> <input id="depositAmount" type="text"
+						value="1,000,000"
+						style="width: 170px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+						<span>원으로</span>
+					</label> <label> 금리 연 <input id="rateInput" type="text"
+						th:value="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')}"
+						style="width: 70px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+						<span>%를 적용하면?</span>
+					</label>
+				</div>
+		
+				<br>
+				<button class="btn" style="margin-top: 20px;" onclick="calcInterest()">✔
+					결과보기</button>
+		
+				<div style="margin-top: 25px; font-size: 1.3rem;">
+					세전 이자: <b id="interestResult"
+						style="font-size: 1.5rem; color: #1565c0;">0</b> 원
+				</div>
+			</div>
+		
+			<div style="text-align: center;">
+				<a href="/deposit/list" class="btn">목록으로</a>
+				<button class="btn" onclick="openModal()">상품 이용 가이드</button>
+				<button class="btn" onclick="openRateModal()">금리표 보기</button>
+			</div>
+		</section>
 	</div>
 
 

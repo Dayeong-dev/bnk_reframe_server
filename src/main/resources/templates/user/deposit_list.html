@@ -2,12 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
 <title>BNK 예적금 상품 목록</title>
 <style>
 body {
     font-family: 'Noto Sans KR', sans-serif;
     background: #f8f9fa;
-    padding: 20px;
     margin: 0;
 }
 h2 {
@@ -164,50 +165,57 @@ h2 {
 </style>
 </head>
 <body>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	
+	<div id="container">
+		<section>
+			<h2>원하시는 상품을 검색해보세요!</h2>
 
-<h2>원하시는 상품을 검색해보세요!</h2>
-
-<!-- ✅ 검색창 -->
-<div class="search-section">
-    <form th:action="@{/deposit/list}" method="get" class="search-form">
-        <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="search-input" th:value="${keyword}">
-        <button type="submit" class="search-icon" aria-label="검색"></button>
-    </form>
-</div>
-
-<!-- ✅ 정렬 버튼 (우측 정렬) -->
-<div class="sort-container">
-    <a th:href="@{/deposit/list(sort='recommend', keyword=${keyword})}" 
-       class="sort-btn" 
-       th:classappend="${sort} == 'recommend' ? 'active' : ''">추천순</a>
-
-    <a th:href="@{/deposit/list(sort='rate', keyword=${keyword})}" 
-       class="sort-btn" 
-       th:classappend="${sort} == 'rate' ? 'active' : ''">금리순</a>
-</div>
-
-<!-- ✅ 카드 목록 -->
-<div class="card-list">
-    <div class="card" th:each="product : ${products}"
-         th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
-        <h3 th:text="${product.name}">상품명</h3>
-        <p th:text="${product.summary}">상품 요약</p>
-        <div class="rate-container">
-            <span class="high-rate" 
-                  th:text="${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
-            <span class="low-rate" 
-                  th:text="${#numbers.formatDecimal(product.minRate, 1, 'POINT', 2, 'POINT')} + '%'">2.50%</span>
-        </div>
-    </div>
-</div>
-
-<!-- ✅ 페이지네이션 -->
-<div class="pagination">
-    <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
-       th:href="@{/deposit/list(page=${i}, sort=${sort}, keyword=${keyword})}"
-       th:text="${i + 1}"
-       th:classappend="${i} == ${page.number} ? 'active' : ''">1</a>
-</div>
+			<!-- ✅ 검색창 -->
+			<div class="search-section">
+			    <form th:action="@{/deposit/list}" method="get" class="search-form">
+			        <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="search-input" th:value="${keyword}">
+			        <button type="submit" class="search-icon" aria-label="검색"></button>
+			    </form>
+			</div>
+			
+			<!-- ✅ 정렬 버튼 (우측 정렬) -->
+			<div class="sort-container">
+			    <a th:href="@{/deposit/list(sort='recommend', keyword=${keyword})}" 
+			       class="sort-btn" 
+			       th:classappend="${sort} == 'recommend' ? 'active' : ''">추천순</a>
+			
+			    <a th:href="@{/deposit/list(sort='rate', keyword=${keyword})}" 
+			       class="sort-btn" 
+			       th:classappend="${sort} == 'rate' ? 'active' : ''">금리순</a>
+			</div>
+			
+			<!-- ✅ 카드 목록 -->
+			<div class="card-list">
+			    <div class="card" th:each="product : ${products}"
+			         th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
+			        <h3 th:text="${product.name}">상품명</h3>
+			        <p th:text="${product.summary}">상품 요약</p>
+			        <div class="rate-container">
+			            <span class="high-rate" 
+			                  th:text="${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
+			            <span class="low-rate" 
+			                  th:text="${#numbers.formatDecimal(product.minRate, 1, 'POINT', 2, 'POINT')} + '%'">2.50%</span>
+			        </div>
+			    </div>
+			</div>
+			
+			<!-- ✅ 페이지네이션 -->
+			<div class="pagination">
+			    <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+			       th:href="@{/deposit/list(page=${i}, sort=${sort}, keyword=${keyword})}"
+			       th:text="${i + 1}"
+			       th:classappend="${i} == ${page.number} ? 'active' : ''">1</a>
+			</div>
+		</section>
+	</div>
 
 </body>
 </html>

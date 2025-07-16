@@ -4,77 +4,82 @@
   <meta charset="UTF-8">
   <title>1:1 문의</title>
   <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
   <link rel="stylesheet" href="/css/qna.css" />
 </head>
 <body>
-  <div th:replace="~{user/fragments/header :: headerFragment}"></div>
+  	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
 
-  <section class="qna-section">
-    <h2 class="page-title">1:1 문의</h2>
-    <div class="qna-tabs">
-      <button id="tab-form" class="active" onclick="showForm()">등록하기</button>
-      <button id="tab-list" onclick="showList()">조회하기</button>
-    </div>
-
-    <!-- 등록 폼 -->
-    <div id="qna-form" class="qna-form-box">
-      <form method="post" action="/qna/qnaRegist">
-        <div class="form-row">
-          <label for="category">문의 유형</label>
-          <select name="category" id="category" required>
-            <option value="">선택하세요</option>
-            <option value="예금">예적금</option>
-            <option value="카드">카드</option>
-            <option value="기타">기타</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <label for="title">제목</label>
-          <input type="text" id="title" name="title" placeholder="제목을 입력해 주세요" required />
-        </div>
-
-        <div class="form-row">
-          <label for="content">내용</label>
-          <textarea name="content" id="content" rows="15" placeholder="내용을 입력해 주세요" required></textarea>
-        </div>
-
-        <div class="form-buttons">
-          <button type="button" class="btn-cancel" onclick="showList()">취소하기</button>
-          <button type="submit" class="btn-submit">문의하기</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- 문의 목록 -->
-    <div id="qna-list" class="qna-list-box" style="display:none;" th:if="${qnalist != null}">
-      <div id="category-buttons"></div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>글번호</th>
-            <th>제목</th>
-            <th>작성자</th>
-            <th>작성일</th>
-            <th>구분</th>
-            <th>상태</th>
-          </tr>
-        </thead>
-        <tbody id="qna-tbody">
-          <tr th:each="qna : ${qnalist}">
-            <td><a th:href="@{'/qna/detail/' + ${qna.qnaId}}" th:text="${qna.qnaId}"></a></td>
-            <td th:text="${qna.title}"></td>
-            <td th:text="${qna.user.username}"></td>
-            <td th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
-            <td th:text="${qna.category}"></td>
-            <td th:text="${qna.status}"></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="pagination" id="pagination"></div>
-    </div>
-  </section>
+	<div id="container">
+	<section class="qna-section">
+	    <h2 class="page-title">1:1 문의</h2>
+	    <div class="qna-tabs">
+	      <button id="tab-form" class="active" onclick="showForm()">등록하기</button>
+	      <button id="tab-list" onclick="showList()">조회하기</button>
+	    </div>
+	
+	    <!-- 등록 폼 -->
+	    <div id="qna-form" class="qna-form-box">
+	      <form method="post" action="/qna/qnaRegist">
+	        <div class="form-row">
+	          <label for="category">문의 유형</label>
+	          <select name="category" id="category" required>
+	            <option value="">선택하세요</option>
+	            <option value="예금">예적금</option>
+	            <option value="카드">카드</option>
+	            <option value="기타">기타</option>
+	          </select>
+	        </div>
+	
+	        <div class="form-row">
+	          <label for="title">제목</label>
+	          <input type="text" id="title" name="title" placeholder="제목을 입력해 주세요" required />
+	        </div>
+	
+	        <div class="form-row">
+	          <label for="content">내용</label>
+	          <textarea name="content" id="content" rows="15" placeholder="내용을 입력해 주세요" required></textarea>
+	        </div>
+	
+	        <div class="form-buttons">
+	          <button type="button" class="btn-cancel" onclick="showList()">취소하기</button>
+	          <button type="submit" class="btn-submit">문의하기</button>
+	        </div>
+	      </form>
+	    </div>
+	
+	    <!-- 문의 목록 -->
+	    <div id="qna-list" class="qna-list-box" style="display:none;" th:if="${qnalist != null}">
+	      <div id="category-buttons"></div>
+	
+	      <table>
+	        <thead>
+	          <tr>
+	            <th>글번호</th>
+	            <th>제목</th>
+	            <th>작성자</th>
+	            <th>작성일</th>
+	            <th>구분</th>
+	            <th>상태</th>
+	          </tr>
+	        </thead>
+	        <tbody id="qna-tbody">
+	          <tr th:each="qna : ${qnalist}">
+	            <td><a th:href="@{'/qna/detail/' + ${qna.qnaId}}" th:text="${qna.qnaId}"></a></td>
+	            <td th:text="${qna.title}"></td>
+	            <td th:text="${qna.user.username}"></td>
+	            <td th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
+	            <td th:text="${qna.category}"></td>
+	            <td th:text="${qna.status}"></td>
+	          </tr>
+	        </tbody>
+	      </table>
+	      <div class="pagination" id="pagination"></div>
+	    </div>
+	  </section>
+	</div>
 
   <script>
     const rowsPerPage = 10;

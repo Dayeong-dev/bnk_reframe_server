@@ -38,7 +38,10 @@
 </style>
 </head>
 <body>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	
 	<div id="container">
 		<section id="search-list" class="content-wrapper">
 			<div th:replace="~{user/fragments/main-search :: mainSearchFragment}"></div>

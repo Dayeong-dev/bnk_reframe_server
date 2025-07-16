@@ -2,13 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
+<link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="/css/user.css" />
 <title>카드 상품</title>
 <style>
 body {
-  font-family: Arial, sans-serif;
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 20px;
   text-align: center; /* 전체 중앙 정렬 기준 */
 }
 
@@ -108,7 +106,7 @@ form button:hover {
 
 .compare-slot {
   flex: 1 1 0;  /* 균등 분배 */
-  max-width: 220px;
+  width: 220px;
   height: 120px;
   border: 2px dashed #ccc;
   border-radius: 8px;
@@ -287,62 +285,66 @@ form button:hover {
 </style>
 </head>
 <body>
+<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
 
-<h1>카드 상품</h1>
-
-<!-- 검색 및 필터 폼 -->
-<form method="get" th:action="@{/card/list}">
-  <label for="categoryMajorSelect">대분류: </label> 
-  <select id="categoryMajorSelect" name="categoryMajor" onchange="this.form.submit()">
-    <option value="" th:selected="${categoryMajor == null or categoryMajor == ''}">전체</option>
-    <option value="P" th:selected="${categoryMajor == 'P'}">개인</option>
-    <option value="C" th:selected="${categoryMajor == 'C'}">기업</option>
-    <option value="K" th:selected="${categoryMajor == 'K'}">체크</option>
-  </select> 
-  <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" />
-  <button type="submit">검색</button>
-</form>
-
-<!-- 소분류 나열 -->
-<div class="subcategory-links">
-  <a th:each="sub : ${allSubcategories}" 
-     th:href="@{'/card/list?categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${sub}}" 
-     th:text="${sub}" 
-     th:classappend="${subcategory == sub} ? 'selected' : ''"></a>
+<div id="container">
+	<section>
+		<h1>카드 상품</h1>
+		<!-- 검색 및 필터 폼 -->
+		<form method="get" th:action="@{/card/list}">
+		  <label for="categoryMajorSelect">대분류: </label> 
+		  <select id="categoryMajorSelect" name="categoryMajor" onchange="this.form.submit()">
+		    <option value="" th:selected="${categoryMajor == null or categoryMajor == ''}">전체</option>
+		    <option value="P" th:selected="${categoryMajor == 'P'}">개인</option>
+		    <option value="C" th:selected="${categoryMajor == 'C'}">기업</option>
+		    <option value="K" th:selected="${categoryMajor == 'K'}">체크</option>
+		  </select> 
+		  <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" />
+		  <button type="submit">검색</button>
+		</form>
+		
+		<!-- 소분류 나열 -->
+		<div class="subcategory-links">
+		  <a th:each="sub : ${allSubcategories}" 
+		     th:href="@{'/card/list?categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${sub}}" 
+		     th:text="${sub}" 
+		     th:classappend="${subcategory == sub} ? 'selected' : ''"></a>
+		</div>
+		
+		<!-- 비교함 표시 영역 -->
+		<div id="compareBox">
+		  <div id="compareSlots">
+		    <div class="compare-slot" data-index="0">+</div>
+		    <div class="compare-slot" data-index="1">+</div>
+		    <div class="compare-slot" data-index="2">+</div>
+		  </div>
+		  <div class="compare-actions">
+		    <button type="button" onclick="openCompareModal()">비교하기</button>
+		  </div>
+		</div>
+		
+		<!-- 카드 리스트 -->
+		<div class="card-list" style="margin-top: 20px;">
+		  <div class="card-item" th:each="card : ${cards}">
+		    <a th:href="@{'/card/detail/' + ${card.cardId}}">
+		      <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
+		    </a>
+		    <h3>
+		      <a th:href="@{'/card/detail/' + ${card.cardId}}" th:text="${card.name}">카드 이름</a>
+		    </h3>
+		    <p th:utext="${card.description}">카드 설명</p>
+		    <p><span th:text="${card.categoryMajorDisplay}"></span></p>
+		    <p><span th:text="${card.statusDisplay}"></span></p>
+		    <button type="button"
+		      th:attr="onclick=|addToCompare(${card.cardId}, &quot;${card.name}&quot;, '/images/cards/' + ${card.cardId} + '_front.PNG')|">
+		      비교함 담기
+		    </button>
+		  </div>
+		</div>
+	</section>
 </div>
-
-<!-- 비교함 표시 영역 -->
-<div id="compareBox">
-  <div id="compareSlots">
-    <div class="compare-slot" data-index="0">+</div>
-    <div class="compare-slot" data-index="1">+</div>
-    <div class="compare-slot" data-index="2">+</div>
-  </div>
-  <div class="compare-actions">
-    <button type="button" onclick="openCompareModal()">비교하기</button>
-  </div>
-</div>
-
-<!-- 카드 리스트 -->
-<div class="card-list" style="margin-top: 20px;">
-  <div class="card-item" th:each="card : ${cards}">
-    <a th:href="@{'/card/detail/' + ${card.cardId}}">
-      <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
-    </a>
-    <h3>
-      <a th:href="@{'/card/detail/' + ${card.cardId}}" th:text="${card.name}">카드 이름</a>
-    </h3>
-    <p th:utext="${card.description}">카드 설명</p>
-    <p><span th:text="${card.categoryMajorDisplay}"></span></p>
-    <p><span th:text="${card.statusDisplay}"></span></p>
-    <button type="button"
-      th:attr="onclick=|addToCompare(${card.cardId}, &quot;${card.name}&quot;, '/images/cards/' + ${card.cardId} + '_front.PNG')|">
-      비교함 담기
-    </button>
-  </div>
-</div>
-
-
 <!-- 카드 비교 모달 -->
 <div id="compareModal" class="modal">
   <div class="modal-content">
