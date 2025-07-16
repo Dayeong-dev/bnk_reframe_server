@@ -9,10 +9,18 @@ public class ChatbotController {
 	public String chat() {
 		return "user/chat"; // 챗봇 페이지
 	}
+	@GetMapping("/chat2")
+	public String chat2() {
+		return "user/chat2"; // 챗봇 페이지
+	}
 
     @GetMapping("/chatbot")
     public String chatbot() {
         return "user/chatbot"; // 챗봇 페이지
+    }
+    @GetMapping("/chatbot2")
+    public String chatbot2() {
+        return "user/chatbot2"; // 챗봇 페이지
     }
     
     @GetMapping("/game")
