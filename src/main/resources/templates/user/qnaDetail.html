@@ -1,44 +1,59 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>qna 상세 보기</title>
-<link rel="stylesheet" href="/css/common.css"></link>
+  <meta charset="UTF-8">
+  <title>1:1 문의 상세</title>
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
 </head>
 <body>
-<br><br><br>
-	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<h1>qna 상세 보기</h1>
 
-	<span class="label">번호:</span>
-	<span th:text="${qna.qnaId}">번호</span>
+<div th:replace="~{user/fragments/header :: headerFragment}"></div>
 
+<!-- ✅ section 컨테이너 안으로 제목과 상세 테이블 넣기 -->
+<section class="qna-section">
+  <h2 class="page-title">1:1 문의 상세</h2>
 
-	<span class="label">제목:</span>
-	<span th:text="${qna.title}">제목</span>
+  <div class="qna-detail-container">
 
+    <table class="qna-detail-table">
+      <tr>
+        <th>번호</th>
+        <td th:text="${qna.qnaId}">1</td>
+      </tr>
+      <tr>
+        <th>제목</th>
+        <td th:text="${qna.title}">문의 제목입니다</td>
+      </tr>
+      <tr>
+        <th>작성자</th>
+        <td th:text="${qna.user.username}">사용자이름</td>
+      </tr>
+      <tr>
+        <th>작성일</th>
+        <td th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}">2025-07-15</td>
+      </tr>
+      <tr>
+        <th>카테고리</th>
+        <td th:text="${qna.category}">예금</td>
+      </tr>
+      <tr>
+        <th>상태</th>
+        <td th:text="${qna.status}">답변대기</td>
+      </tr>
+      <tr>
+        <th>내용</th>
+        <td><div class="content" th:text="${qna.content}">문의 내용입니다</div></td>
+      </tr>
+      <tr>
+        <th>답변</th>
+        <td><div class="answer" th:text="${qna.answer}">관리자 답변입니다</div></td>
+      </tr>
+    </table>
 
-	<span class="label">작성자:</span>
-	<span th:text="${qna.user.username}">작성자명</span>
+    <a href="/qna/qna" class="back-link">← 목록으로 돌아가기</a>
+  </div>
+</section>
 
-
-	<span class="label">작성일:</span>
-	<span th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}">작성일</span>
-
-	<span class="label">카테고리:</span>
-	<span th:text="${qna.category}">작성자명</span>
-
-	<span class="label">상태:</span>
-	<span th:text="${qna.status}">상태</span>
-	<hr>
-	<span class="label">내용:</span>
-	<div class="content-box" th:text="${qna.content}">게시글 내용이 들어갑니다.</div>
-	
-	<hr>
-	<span class="label">답변:</span>
-	<div class="content-box" th:text="${qna.answer}">게시글 답변이 들어갑니다.</div>
-	
-
-	<a href="/qna/qna">← 목록으로</a>
 </body>
 </html>

@@ -15,6 +15,7 @@ import com.example.reframe.dto.ProductViewDTO;
 import com.example.reframe.service.AccessLogService;
 import com.example.reframe.service.ProductService;
 import com.example.reframe.service.ReviewService;
+import com.example.reframe.service.TestResultService;
 
 @Controller
 @RequestMapping("/admin/chart")
@@ -26,6 +27,8 @@ public class AdminChartController {
 	private ProductService ProductService;
 	@Autowired
 	private ReviewService reviewService;
+	@Autowired
+	private TestResultService testResultService;
 	
 	
 	// 차트
@@ -60,9 +63,11 @@ public class AdminChartController {
 	    Map<String, Long> sentimentStats = reviewService.getReviewSentimentStats();
         model.addAttribute("sentimentLabels", sentimentStats.keySet());
         model.addAttribute("sentimentCounts", sentimentStats.values());
-		
-		
-		
+        
+        // MBTI 테스트 결과 통계 바인딩
+        Map<String, Long> testResultStats = testResultService.getTestResultStats();
+        model.addAttribute("testResultLabels", testResultStats.keySet());
+        model.addAttribute("testResultCounts", testResultStats.values());
 		
 		return "admin/chart/chart-main";
 	}

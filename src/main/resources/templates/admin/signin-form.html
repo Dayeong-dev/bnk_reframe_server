@@ -7,18 +7,93 @@
 <link rel="stylesheet" href="/css/user.css"></link>
 </head>
 <body>
-<script src='https://www.google.com/recaptcha/api.js'></script>
+	<script src='https://www.google.com/recaptcha/api.js'></script>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
 	<section>
 		<h2>관리자 로그인</h2>
-		<form action="/signin" method="POST">
-			<input type="text" name="username" placeholder="아이디를 입력하세요." /><br/>
-			<input type="password" name="password" placeholder="비밀번호를 입력하세요." /><br/>
-			<input type="submit" value="로그인" /> 
+		
+		<form id="adminLoginForm" method="post" th:action="@{/admin/login}">
+			<div>
+				<label for="username">행번</label> 
+				<input type="text" id="username" name="username" 
+				 	   th:value="${username}" th:readonly="${step2}" required />
+			</div>
+			<div>
+				<label for="password">비밀번호</label> 
+				<input type="password" id="password" name="password" 
+					   th:value="${password}"th:readonly="${step2}" required />
+			</div>
+
+			<!-- step2 username, password 입력 완료 시 -->
+			<div th:if="${step2}">
+				<label for="email">이메일</label> 
+				<input type="email" id="email" name="email" required />
+				<button type="button" id="sendCodeBtn">인증번호 보내기</button>
+			</div>
+			
+			<!-- step3 email 입력 완료 시 -->
+			<div id="authCodeField" style="display: none;">
+		        <label>인증번호</label>
+		        <input type="text" name="authCode" />
+		        <button type="submit">로그인</button>
+		    </div>
+
+			<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red;"></p>
 		</form>
 		<p th:if="${msg != null}" th:text="${msg}"></p>
-		<!--recaptcha-->
-		<div class="g-recaptcha" data-sitekey="6LdSKIIrAAAAABtlxvz5c2umoClI4p58xZozuRbR"></div>
+		
 	</section>
+
+	<script>
+		const $form = document.querySelector("form");
+		
+		$form.addEventListener("submit", e => {
+			e.preventDefault();
+			
+			const username = $form.username.value.trim();
+			const password = $form.password.value.trim();
+			if(username === "") {
+				alert("아이디를 입력하세요. ");
+				$form.username.focus();
+				return;
+			}
+			if(password === "") {
+				alert("비밀번호를 입력하세요. ");
+				$form.password.focus();
+				return;
+			}
+			
+			$form.submit();
+			console.log(username);
+			console.log(password);
+			
+			$form.username.value = "";
+			$form.password.value = "";
+		});
+		
+		
+		document.getElementById("sendCodeBtn")?.addEventListener("click", async () => {
+		    const email = document.querySelector("input[name='email']").value;
+		    const username = document.querySelector("input[name='username']").value;
+
+		    if (!email) {
+		        alert("이메일을 입력하세요.");
+		        return;
+		    }
+
+		    const response = await fetch("/admin/send-auth-code", {
+		        method: "POST",
+		        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		        body: `username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`
+		    });
+
+		    if (response.ok) {
+		        alert("인증번호를 전송했습니다.");
+		        document.getElementById("authCodeField").style.display = "block";
+		    } else {
+		        alert("이메일 전송 실패: 다시 시도해주세요.");
+		    }
+		});
+	</script>
 </body>
 </html>

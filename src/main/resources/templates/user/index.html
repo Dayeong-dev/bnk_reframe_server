@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <title>메인</title>
@@ -45,13 +46,12 @@
 	</div>
 
 	<!-- 리뷰 팝업 -->
-	<div id="review-popup" sec:authorize="isAuthenticated()" 
-		style="display: none; position: fixed; bottom: 30px; right: 30px; background: white; border: 1px solid #ccc; padding: 20px;">
-		<p>사이트 이용은 어떠셨나요?</p>
-		<textarea id="review-content" rows="4" cols="30"></textarea>
-		<br />
-		<button onclick="submitReview()">제출</button>
-	</div>
+<div id="review-popup">
+  <button id="review-close" onclick="closePopup()">×</button>
+  <p>사이트 이용은 어떠셨나요?</p>
+  <textarea id="review-content" placeholder="간단한 리뷰를 남겨주세요 :)"></textarea><br/>
+  <button onclick="submitReview()">제출</button>
+</div>
 
 
 
@@ -169,6 +169,9 @@
 			      document.cookie = "reviewed=true; path=/; max-age=" + (86400 * 7);
 			    });
 			  }
+			  function closePopup() {
+				    document.getElementById("review-popup").style.display = "none";
+				  }
 		
 		
 		

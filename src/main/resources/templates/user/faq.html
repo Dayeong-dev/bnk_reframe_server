@@ -1,93 +1,67 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/css/common.css"></link>
 <title>자주 묻는 질문</title>
-<style>
-table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-table, th, td {
-	border: 1px solid #ccc;
-}
-
-th, td {
-	padding: 10px;
-	text-align: left;
-}
-
-.pagination {
-	margin-top: 15px;
-	text-align: center;
-}
-
-.pagination button {
-	margin: 0 5px;
-	padding: 5px 10px;
-}
-
-.hidden {
-	display: none;
-}
-
-#faq-form, #faq-detail {
-	display: none;
-}
-</style>
+<link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="/css/faq.css" />
 </head>
 <body>
-<br><br><br>
-<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<h1>자주 묻는 질문</h1>
 
-	<hr>
-	<p>자주 문의하시는 상담 내용 답변을 한 곳에 모아놓았습니다.</p>
-	<p>여기서 해결되지 않는 문의사항은 1:1문의나 챗봇상담을 이용해주세요.</p>
-	<hr>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
 
-	<!--검색하기 -->
-<div style="margin-bottom: 10px;">
-  <input type="text" id="search-input" placeholder="검색어를 입력하세요..." list="autocomplete-list" style="width: 300px; padding: 5px;">
-  <datalist id="autocomplete-list">
-    <!-- 자동완성 옵션은 JS에서 채움 -->
-  </datalist>
-</div>
+	<div
+		style="max-width: 1000px; margin: 6rem auto 1rem; padding: 0 1rem;">
+		<h1
+			style="text-align: center; font-size: 2rem; margin-bottom: 1rem; font-family: 'BNKGothic', sans-serif;">
+			자주 묻는 질문</h1>
+		<hr>
+		<p style="text-align: center; color: #555; margin: 0.5rem 0;">자주
+			문의하시는 상담 내용을 모았습니다.</p>
+		<p style="text-align: center; color: #555; margin: 0.5rem 0;">
+			해결되지 않는 문의는 1:1 문의나 챗봇을 이용해 주세요.</p>
+	</div>
 
-<!-- 카테고리 버튼 영역 -->
-<div id="category-buttons" style="margin-bottom: 15px;">
-</div>
+	<div class="faq-container">
 
 
+		<!-- 검색 -->
+		<div class="faq-search">
+			<input type="text" id="search-input" placeholder="검색어를 입력하세요..."
+				list="autocomplete-list">
+			<datalist id="autocomplete-list"></datalist>
+		</div>
 
+		<!-- 카테고리 -->
+		<div id="category-buttons"></div>
 
-	<div id="faq-list" th:if="${faqlist != null}">
-				<table id="faq-table">
-					<thead>
-						<tr>
-							<th>글번호</th>
-							<th>구분</th>
-							<th>제목</th>
-						</tr>
-					</thead>
-					<tbody id="faq-tbody">
-						<tr th:each="faq, iterStat : ${faqlist}"
-							th:attr="data-index=${iterStat.index}">
-							<td th:text="${faq.faqId}"></td>
-							<td th:text="${faq.category}"></td>
-							<td><a th:href="@{'/faq/detail/' + ${faq.faqId}}"
-						th:text="${faq.question}"></a></td>
-						</tr>
-					</tbody>
-				</table>
+		<!-- 리스트 -->
+		<div id="faq-list" th:if="${faqlist != null}">
+			<table>
+				<thead>
+					<tr>
+						<th>글번호</th>
+						<th>구분</th>
+						<th>제목</th>
+					</tr>
+				</thead>
+				<tbody id="faq-tbody">
+					<tr th:each="faq, iterStat : ${faqlist}"
+						th:attr="data-index=${iterStat.index}">
+						<td><a th:href="@{'/faq/detail/' + ${faq.faqId}}"
+							th:text="${faq.faqId}"></a></td>
+						<td th:text="${faq.category}"></td>
+						<td th:text="${faq.question}"></td>
+					</tr>
+				</tbody>
+			</table>
 
-				<!-- 페이지네이션 -->
-				<div class="pagination" id="pagination"></div>
-			</div>
-			
-<script>
+			<!-- 페이지네이션 -->
+			<div class="pagination" id="pagination"></div>
+		</div>
+	</div>
+
+	<script>
 document.addEventListener("DOMContentLoaded", () => {
   const rowsPerPage = 10;
   const rows = Array.from(document.querySelectorAll("#faq-tbody tr"));
@@ -106,16 +80,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderPagination(list = filteredRows) {
-    pagination.innerHTML = "";
-    const pageCount = Math.ceil(list.length / rowsPerPage);
-    for (let i = 0; i < pageCount; i++) {
-      const button = document.createElement("button");
-      button.textContent = i + 1;
-      button.addEventListener("click", () => showPage(i, list));
-      pagination.appendChild(button);
-    }
-    showPage(0, list);
-  }
+	  pagination.innerHTML = "";
+	  const pageCount = Math.ceil(list.length / rowsPerPage);
+
+	  for (let i = 0; i < pageCount; i++) {
+	    const button = document.createElement("button");
+	    button.textContent = i + 1;
+
+	    // ✅ 첫 번째 버튼은 기본으로 active
+	    if (i === 0) button.classList.add("active");
+
+	    button.addEventListener("click", () => {
+	      // ✅ 모든 버튼에서 active 제거
+	      pagination.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+
+	      // ✅ 현재 클릭된 버튼에 active 추가
+	      button.classList.add("active");
+
+	      // ✅ 페이지 내용 표시
+	      showPage(i, list);
+	    });
+
+	    pagination.appendChild(button);
+	  }
+
+	  showPage(0, list);
+	}
+
 
   function updateAutocompleteOptions() {
     const questions = rows.map(row => row.querySelector("a").textContent.trim());
@@ -129,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function filterRows() {
     const keyword = searchInput.value.trim().toLowerCase();
-
     filteredRows = rows.filter(row => {
       const question = row.querySelector("a").textContent.toLowerCase();
       const category = row.querySelector("td:nth-child(2)").textContent.trim();
@@ -180,7 +170,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-
-			
 </body>
 </html>

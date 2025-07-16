@@ -29,6 +29,7 @@ public class SecurityConfig {
 		
 		http.authorizeHttpRequests(auth -> auth
 //				.requestMatchers("/admin/**").hasRole("ADMIN")
+//				.requestMatchers("/admin/**").hasRole("SUPERADMIN")
 				.requestMatchers("/qna/**").hasRole("MEMBER")
 				.anyRequest().permitAll());
 		
@@ -36,6 +37,7 @@ public class SecurityConfig {
 				.loginPage("/signin/form")
 				.loginProcessingUrl("/signin")
 				.defaultSuccessUrl("/")
+				.failureUrl("/signin/form?error")
 				.permitAll())
 			.exceptionHandling(exception -> exception
 			    .authenticationEntryPoint((request, response, authException) -> {
