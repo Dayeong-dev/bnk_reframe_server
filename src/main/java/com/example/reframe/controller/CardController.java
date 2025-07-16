@@ -72,13 +72,9 @@ public class CardController {
 	public String cardList(@RequestParam(name = "categoryMajor", defaultValue = "전체") String categoryMajor, // 카드 대분류
 			@RequestParam(name = "subcategory", defaultValue = "전체") String subcategory, // 카드 소분류
 			@RequestParam(name = "keyword", required = false) String keyword, // 검색 키워드
-			Pageable pageable, Model model) {
-
-	    if (pageable.getSort().isUnsorted()) {
-	        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("cardId").ascending());
-	    }
+			 Model model) {
 	    
-		Page<CardDto> cards = cardService.getCards(categoryMajor, subcategory, keyword, pageable);
+		List<CardDto> cards = cardService.getCards(categoryMajor, subcategory, keyword);
 		List<String> allSubcategories = cardService.getAllSubcategories();
 
 		model.addAttribute("cards", cards);

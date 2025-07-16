@@ -28,18 +28,17 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
 	List<Card> findByCategoryMajorAndStatus(String categoryMajor, String status);
 
-	// 목록페이지: 대분류, 소분류, 키워드로 동적 조건 검색 + 페이지네이션 지원
+	// 목록페이지: 대분류, 소분류, 키워드로 동적 조건 검색
 	@Query("SELECT c FROM Card c WHERE "
 		    + "(:categoryMajor = '전체' OR c.categoryMajor = :categoryMajor) "
 		    + "AND (:subcategory = '전체' OR EXISTS ("
 		    + "SELECT 1 FROM CardCategoryRel rel WHERE rel.card = c AND rel.subcategory.name = :subcategory"
 		    + ") OR c.tags LIKE CONCAT('%', :subcategory, '%')) "
 		    + "AND (:keyword IS NULL OR c.name LIKE CONCAT('%', :keyword, '%') OR c.tags LIKE CONCAT('%', :keyword, '%'))")
-		Page<Card> findByDynamicCondition(
+		List<Card> findByDynamicCondition(
 		    @Param("categoryMajor") String categoryMajor,
 		    @Param("subcategory") String subcategory,
-		    @Param("keyword") String keyword,
-		    Pageable pageable
+		    @Param("keyword") String keyword
 		);
 	
 	

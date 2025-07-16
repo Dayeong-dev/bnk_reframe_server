@@ -28,186 +28,161 @@ import jakarta.persistence.Query;
 @Service
 public class CardService {
 
-    @Autowired
-    private CardRepository cardRepository;
+	@Autowired
+	private CardRepository cardRepository;
 
-    @Autowired
-    private CardSubcategoryRepository cardSubcategoryRepository;
+	@Autowired
+	private CardSubcategoryRepository cardSubcategoryRepository;
 
-    @Autowired
-    private CardTestResultRepository cardTestResultRepository;
-    
-    @Autowired
-    private EntityManager em;
-    
-    // 메인 - 조회수 상위 6개 카드 가져오기
-    public List<CardDto> getTop6Cards() {
-        return cardRepository.findTop6()
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
+	@Autowired
+	private CardTestResultRepository cardTestResultRepository;
 
-    // 메인 - 슬라이더: 전체 카드 가져오기
-    public List<CardDto> findAllCards() {
-        List<Card> cards = cardRepository.findAll();
-        return cards.stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-    
-    // 상세 - 카드 상세정보 가져오기 + 소분류명 리스트
-    public CardDto getCardDetail(Long cardId) {
-        Card card = cardRepository.findByIdWithCategories(cardId)
-                .orElseThrow(() -> new RuntimeException("해당 카드 없음: " + cardId));
-        System.out.println(cardId);
-        return convertToDto(card);
-    }
+	@Autowired
+	private EntityManager em;
 
-    // 상세 - 조회수 +1 증가
-    public void incrementViewCount(Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new RuntimeException("카드가 없습니다."));
-        card.setViewCount(card.getViewCount() + 1);
-        cardRepository.save(card);
-    }
-
-
-    // 카드 목록 -  Entity → DTO 변환 메서드
-    private CardDto convertToDto(Card card) {
-        return CardDto.builder()
-                .cardId(card.getCardId())
-                .name(card.getName())
-                .description(card.getDescription().replace("\\n", "<br>"))
-                .tags(card.getTags())
-                .categoryMajor(card.getCategoryMajor())
-                .status(card.getStatus())
-                .annualFee(card.getAnnualFee())
-                .service(card.getService().replace("\\n", "<br>"))
-                .pointInfo(card.getPointInfo().replace("\\n", "<br>"))
-                .viewCount(card.getViewCount())
-                .guideInfo(card.getGuideInfo())
-                .onlinePaymentGuide(card.getOnlinePaymentGuide())
-                .etcGuide(card.getEtcGuide())
-                .termsGuide(card.getTermsGuide())
-                .build();
-    }
-    
-    @Transactional
-	public void updateStatuses(List<Long> ids, String status) {
-	    for (Long id : ids) {
-	        Card card = cardRepository.findById(id)
-	            .orElseThrow(() -> new IllegalArgumentException("상품 없음: " + id));
-	        card.setStatus(status);
-	    }
+	// 메인 - 조회수 상위 6개 카드 가져오기
+	public List<CardDto> getTop6Cards() {
+		return cardRepository.findTop6().stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
-    // 목록 -  대분류/소분류/키워드로 카드 검색 + 페이징
-    public Page<CardDto> getCards(String categoryMajor, String subcategory, String keyword, Pageable pageable) {
-        Page<Card> cards = cardRepository.findByDynamicCondition(categoryMajor, subcategory, keyword, pageable);
-        return cardRepository.findByDynamicCondition(categoryMajor, subcategory, keyword, pageable)
-                .map(card -> convertToDto(card));
-    }
+	// 메인 - 슬라이더: 전체 카드 가져오기
+	public List<CardDto> findAllCards() {
+		List<Card> cards = cardRepository.findAll();
+		return cards.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
 
-    // 비교함 -  선택한 카드 리스트 반환
-    public List<CardDto> getCardsForCompare(List<Long> ids) {
-        List<Card> cards = cardRepository.findAllById(ids);
+	// 상세 - 카드 상세정보 가져오기 + 소분류명 리스트
+	public CardDto getCardDetail(Long cardId) {
+		Card card = cardRepository.findByIdWithCategories(cardId)
+				.orElseThrow(() -> new RuntimeException("해당 카드 없음: " + cardId));
+		System.out.println(cardId);
+		return convertToDto(card);
+	}
 
-        // 카드 ID별 DTO 맵 생성
-        Map<Long, CardDto> cardMap = cards.stream()
-            .map(this::convertToDto)
-            .collect(Collectors.toMap(CardDto::getCardId, Function.identity()));
+	// 상세 - 조회수 +1 증가
+	public void incrementViewCount(Long cardId) {
+		Card card = cardRepository.findById(cardId).orElseThrow(() -> new RuntimeException("카드가 없습니다."));
+		card.setViewCount(card.getViewCount() + 1);
+		cardRepository.save(card);
+	}
 
-        // 원래 ID 리스트 순서대로 DTO 리스트 생성
-        List<CardDto> sortedCards = ids.stream()
-            .map(cardMap::get)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+	// 카드 목록 - Entity → DTO 변환 메서드
+	private CardDto convertToDto(Card card) {
+		return CardDto.builder().cardId(card.getCardId()).name(card.getName())
+				.description(card.getDescription().replace("\\n", "<br>")).tags(card.getTags())
+				.categoryMajor(card.getCategoryMajor()).status(card.getStatus()).annualFee(card.getAnnualFee())
+				.service(card.getService().replace("\\n", "<br>")).pointInfo(card.getPointInfo().replace("\\n", "<br>"))
+				.viewCount(card.getViewCount()).guideInfo(card.getGuideInfo())
+				.onlinePaymentGuide(card.getOnlinePaymentGuide()).etcGuide(card.getEtcGuide())
+				.termsGuide(card.getTermsGuide()).build();
+	}
 
-        return sortedCards;
-    }
+	@Transactional
+	public void updateStatuses(List<Long> ids, String status) {
+		for (Long id : ids) {
+			Card card = cardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("상품 없음: " + id));
+			card.setStatus(status);
+		}
+	}
 
-    // 목록 -  전체 소분류명 리스트 가져오기
-    public List<String> getAllSubcategories() {
-        return cardSubcategoryRepository.findAll()
-                .stream()
-                .map(CardSubcategory::getName)
-                .collect(Collectors.toList());
-    }
+	// 목록 - 대분류/소분류/키워드로 카드 검색
+	public List<CardDto> getCards(String categoryMajor, String subcategory, String keyword) {
+		List<Card> cards = cardRepository.findByDynamicCondition(categoryMajor, subcategory, keyword);
+		return cards.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
 
-    // 목록 -  태그 기반으로 소분류 연결 후 저장
-    @Transactional
-    public void saveCard(Card card) {
-        String[] tags = card.getTags().split("#");
-        for (String tag : tags) {
-            String name = tag.trim();
-            if (name.isEmpty()) continue;
+	// 비교함 - 선택한 카드 리스트 반환
+	public List<CardDto> getCardsForCompare(List<Long> ids) {
+		List<Card> cards = cardRepository.findAllById(ids);
 
-            Optional<CardSubcategory> subcategoryOpt = cardSubcategoryRepository.findByName(name);
-            subcategoryOpt.ifPresent(subcategory -> {
-                CardCategoryRel rel = new CardCategoryRel();
-                rel.setCard(card);
-                rel.setSubcategory(subcategory);
-                card.getCategoryRels().add(rel);
-            });
-        }
-        cardRepository.save(card); // Cascade로 REL도 같이 저장
-    }
-    
-    @Transactional
-    public void saveOrUpdateTestResult(String resultType) {
-        CardTestResult cardTestResult = cardTestResultRepository.findByResultType(resultType)
-            .orElseGet(() -> new CardTestResult(resultType));
+		// 카드 ID별 DTO 맵 생성
+		Map<Long, CardDto> cardMap = cards.stream().map(this::convertToDto)
+				.collect(Collectors.toMap(CardDto::getCardId, Function.identity()));
 
-        cardTestResult.incrementCount();
-        cardTestResultRepository.save(cardTestResult);
-    }
+		// 원래 ID 리스트 순서대로 DTO 리스트 생성
+		List<CardDto> sortedCards = ids.stream().map(cardMap::get).filter(Objects::nonNull)
+				.collect(Collectors.toList());
 
-    public List<CardDto> getRecommendedCardsByResult(String resultType) {
-        // 예시: 결과유형에 따라 카드 아이디 고정
-        List<Long> cardIds;
+		return sortedCards;
+	}
 
-        switch (resultType) {
-            case "ONLINE-SAVE-PLAN":
-                cardIds = List.of(1L, 2L, 3L); // 결과유형에 맞는 카드 ID
-                break;
-            case "OFFLINE-SPEND-IMPULSE":
-                cardIds = List.of(4L, 5L, 6L);
-                break;
-            default:
-                cardIds = List.of(); // fallback
-        }
+	// 목록 - 전체 소분류명 리스트 가져오기
+	public List<String> getAllSubcategories() {
+		return cardSubcategoryRepository.findAll().stream().map(CardSubcategory::getName).collect(Collectors.toList());
+	}
 
-        return cardRepository.findAllById(cardIds)
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-    
-    public List<CardDto> getTopFiveByViewCount() {
-    	List<Card> cardList = cardRepository.findTopFiveByViewCount();
-    	
-    	return cardList.stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-    
-    @Transactional
-    public List<CardDto> searchByKeywords(String keywords) {
-        String[] words = keywords.split(" ");
-        StringBuilder sql = new StringBuilder("SELECT * FROM card WHERE 1=1 ");
+	// 목록 - 태그 기반으로 소분류 연결 후 저장
+	@Transactional
+	public void saveCard(Card card) {
+		String[] tags = card.getTags().split("#");
+		for (String tag : tags) {
+			String name = tag.trim();
+			if (name.isEmpty())
+				continue;
 
-        for (int i = 0; i < words.length; i++) {
-            sql.append("AND (name LIKE :word").append(i)
-               .append(" OR description LIKE :word").append(i)
-               .append(" OR service LIKE :word").append(i).append(") ");
-        }
+			Optional<CardSubcategory> subcategoryOpt = cardSubcategoryRepository.findByName(name);
+			subcategoryOpt.ifPresent(subcategory -> {
+				CardCategoryRel rel = new CardCategoryRel();
+				rel.setCard(card);
+				rel.setSubcategory(subcategory);
+				card.getCategoryRels().add(rel);
+			});
+		}
+		cardRepository.save(card); // Cascade로 REL도 같이 저장
+	}
 
-        Query query = em.createNativeQuery(sql.toString(), Card.class);
-        for (int i = 0; i < words.length; i++) {
-            query.setParameter("word" + i, "%" + words[i] + "%");
-        }
-        
-        @SuppressWarnings("unchecked")
+	@Transactional
+	public void saveOrUpdateTestResult(String resultType) {
+		CardTestResult cardTestResult = cardTestResultRepository.findByResultType(resultType)
+				.orElseGet(() -> new CardTestResult(resultType));
+
+		cardTestResult.incrementCount();
+		cardTestResultRepository.save(cardTestResult);
+	}
+
+	public List<CardDto> getRecommendedCardsByResult(String resultType) {
+		// 예시: 결과유형에 따라 카드 아이디 고정
+		List<Long> cardIds;
+
+		switch (resultType) {
+		case "ONLINE-SAVE-PLAN":
+			cardIds = List.of(1L, 2L, 3L); // 결과유형에 맞는 카드 ID
+			break;
+		case "OFFLINE-SPEND-IMPULSE":
+			cardIds = List.of(4L, 5L, 6L);
+			break;
+		default:
+			cardIds = List.of(); // fallback
+		}
+
+		return cardRepository.findAllById(cardIds).stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+
+	public List<CardDto> getTopFiveByViewCount() {
+		List<Card> cardList = cardRepository.findTopFiveByViewCount();
+
+		return cardList.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+
+	@Transactional
+	public List<CardDto> searchByKeywords(String keywords) {
+		String[] words = keywords.split(" ");
+		StringBuilder sql = new StringBuilder("SELECT * FROM card WHERE 1=1 ");
+
+		for (int i = 0; i < words.length; i++) {
+			sql.append("AND (name LIKE :word").append(i).append(" OR description LIKE :word").append(i)
+					.append(" OR service LIKE :word").append(i).append(") ");
+		}
+
+		Query query = em.createNativeQuery(sql.toString(), Card.class);
+		for (int i = 0; i < words.length; i++) {
+			query.setParameter("word" + i, "%" + words[i] + "%");
+		}
+
+		@SuppressWarnings("unchecked")
 		List<Card> result = query.getResultList();
 
-        return result.stream().map(this::convertToDto).collect(Collectors.toList());
-    }
+		return result.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
 
 }

@@ -342,14 +342,6 @@ form button:hover {
   </div>
 </div>
 
-<!-- 페이지네이션 -->
-<div class="pagination" style="text-align: center; margin-top: 20px;">
-  <a th:if="${cards.hasPrevious()}" 
-     th:href="@{'/card/list?(page=' + ${cards.number - 1} + '&categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${subcategory} + '&keyword=' + ${keyword})'}">이전</a>
-  <span th:text="${cards.number + 1} + ' / ' + ${cards.totalPages}">페이지</span>
-  <a th:if="${cards.hasNext()}" 
-     th:href="@{'/card/list?(page=' + ${cards.number + 1} + '&categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${subcategory} + '&keyword=' + ${keyword})'}">다음</a>
-</div>
 
 <!-- 카드 비교 모달 -->
 <div id="compareModal" class="modal">
