@@ -1,5 +1,6 @@
 package com.example.reframe.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,12 +13,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reframe.dto.CorporateUserDTO;
 import com.example.reframe.dto.UserDTO;
+import com.example.reframe.service.RecaptchaService;
 import com.example.reframe.service.UserService;
 
 @Controller
 public class UserController {
 	
 	private final UserService userService;
+	
+	@Autowired
+	private RecaptchaService recaptchaService;	
 	
 	public UserController(UserService userService) {
 		this.userService = userService;
@@ -87,8 +92,20 @@ public class UserController {
 		return "redirect:/signup/corporate";
 	}
 	
+	// 개인 
 	@PostMapping("/signup/personal")
-	public String signupPersonal(UserDTO userDTO, RedirectAttributes rttr) {
+	public String signupPersonal(UserDTO userDTO, 
+								 RedirectAttributes rttr,
+								 @RequestParam("g-recaptcha-response")String recaptchaToken) {
+		
+		// reCAPTCHA 확인
+	    boolean verified = recaptchaService.verify(recaptchaToken);
+	    if (!verified) {
+	        rttr.addFlashAttribute("msg", "로봇 검증에 실패했습니다. 다시 시도해주세요.");
+	        return "redirect:/signup/personal";
+	    }
+		
+		// 회원가입 진행
 		UserDTO user = userService.signup(userDTO);
 		
 		if(user == null) {
@@ -99,13 +116,24 @@ public class UserController {
 		return "redirect:/";
 	}
 	
+	// 기업
 	@PostMapping("/signup/corporate")
-	public String signupCorporate(UserDTO userDTO, RedirectAttributes rttr) {
+	public String signupCorporate(UserDTO userDTO, 
+								  RedirectAttributes rttr,
+								  @RequestParam("g-recaptcha-response")String recaptchaToken) {
+		
+		// reCAPTCHA 확인
+	    boolean verified = recaptchaService.verify(recaptchaToken);
+	    if (!verified) {
+	        rttr.addFlashAttribute("msg", "로봇 검증에 실패했습니다. 다시 시도해주세요.");
+	        return "redirect:/signup/corporate";
+	    }
+		
 		CorporateUserDTO corpUser = userService.corpSignup(userDTO);
 		
 		if(corpUser == null) {
 			rttr.addFlashAttribute("msg", "회원가입 중 문제가 발생했습니다.");
-			return "redirect:/signup/personal";
+			return "redirect:/signup/corporate";
 		}
 		
 		return "redirect:/";

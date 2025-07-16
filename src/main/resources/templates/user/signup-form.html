@@ -5,6 +5,8 @@
 <title>회원가입</title>
 <link rel="stylesheet" href="/css/common.css"></link>
 <link rel="stylesheet" href="/css/user.css"></link>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 </head>
 <body>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
@@ -33,12 +35,17 @@
 				<input type="email" name="email" placeholder="이메일을 입력하세요." />
 				<p id="email-error" class="error"></p>
 				
+				<!--recaptcha-->
+				<div class="g-recaptcha" data-sitekey="6LdSKIIrAAAAABtlxvz5c2umoClI4p58xZozuRbR"></div>
+				
 				<input type="submit" value="회원가입" />
+				
 			</form>
 			<p th:if="${msg != null}" th:text="${msg}"></p>
 		</section>
 	</div>
 	<script>
+	
 		const $form = document.querySelector("form");
 		const $errors = document.querySelectorAll('.error');
 		
