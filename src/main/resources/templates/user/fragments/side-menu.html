@@ -122,8 +122,19 @@
 			await btn2();
 		}
 		
-		function btn3() {	// 챗봇 문의
-			window.open("/chatbot", "ChatbotWindow", "width=500,height=650,resizable=yes");
-		}
+		function btn3() {
+			  const width = 500;   // ✅ 약간 넓게 (기본 챗봇 내용에 충분한 너비)
+			  const height = 700;  // ✅ 세로는 약간 줄여서 덜 답답하게
+
+			  const left = (screen.width - width) / 2;
+			  const top = (screen.height - height) / 2;
+
+			  window.open(
+			    "/chatbot",
+			    "ChatbotWindow",
+			    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+			  );
+			}
+
 	</script>
 </div>

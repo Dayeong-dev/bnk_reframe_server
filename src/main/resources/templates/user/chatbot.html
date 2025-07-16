@@ -1,61 +1,106 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>감자챗봇</title>
+  <meta charset="UTF-8" />
+  <title>BNK 챗봇</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
       padding: 20px;
-      background: #f5f5f5;
+    }
+
+    h2 {
+      text-align: center;
+      color: #d7191f;
     }
 
     #chat-box {
       width: 100%;
-      height: 420px;
-      max-width: 100%;
-      overflow-y: scroll;
-      background-color: white;
-      padding: 10px;
-      display: none;
-    }
-
-    .user, .ai {
-      margin: 5px 0;
-      padding: 10px;
+      max-width: 600px;
+      height: 460px;
+      margin: 20px auto;
+      background: white;
       border-radius: 10px;
-      max-width: 80%;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .user {
-      background: #dcf8c6;
-      align-self: flex-end;
-      margin-left: auto;
+    .message-container {
+      display: flex;
+      flex-direction: column;
+      margin: 10px 0;
+    }
+
+    .message-container.ai {
+      align-items: flex-start;
+    }
+
+    .message-container.user {
+      align-items: flex-end;
+    }
+
+    .profile-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-bottom: 6px;
+    }
+
+    .ai, .user {
+      padding: 10px 14px;
+      border-radius: 18px;
+      max-width: 75%;
+      line-height: 1.4;
+      word-break: break-word;
+      position: relative;
     }
 
     .ai {
       background: #e2e2e2;
+      color: #333;
       align-self: flex-start;
-      margin-right: auto;
+    }
+
+    .user {
+      background: #d7191f;
+      color: white;
+      align-self: flex-end;
     }
 
     #input-box {
+      max-width: 600px;
+      margin: 10px auto;
       display: flex;
       gap: 10px;
-      margin-top: 10px;
-      display: none;
     }
 
     #message {
       flex: 1;
       padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
     }
 
     button {
-      padding: 10px 15px;
+      background-color: #d7191f;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
-    /* 모달 스타일 */
+    button:hover {
+      background-color: #b4161a;
+    }
+
+    /* 모달 */
     #consent-modal {
       position: fixed;
       top: 0; left: 0;
@@ -64,19 +109,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 100;
     }
 
     #consent-box {
       background: white;
       padding: 30px;
-      border-radius: 8px;
+      border-radius: 10px;
       text-align: center;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
 
-  <h2>💬 감자챗봇</h2>
+  <h2>💬 BNK 챗봇</h2>
 
   <!-- 개인정보 동의 모달 -->
   <div id="consent-modal">
@@ -96,126 +145,85 @@
     <button onclick="sendMessage()">전송</button>
   </div>
 
-<script>
-  const chatBox = document.getElementById("chat-box");
-  const inputBox = document.getElementById("input-box");
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const inputBox = document.getElementById("input-box");
 
-  function agree() {
-    document.getElementById("consent-modal").style.display = "none";
-    chatBox.style.display = "block";
-    inputBox.style.display = "flex";
-    showAgree();
-    showIntro();
-  }
-  
-  function showAgree() {
-	    const container = document.createElement("div");
-	    container.style.display = "flex";
-	    container.style.flexDirection = "column";
-	    container.style.alignItems = "flex-start";
-
-	    const img = document.createElement("img");
-	    img.src = "/images/potato.jpg";
-	    img.alt = "AI 캐릭터";
-	    img.style.width = "50px";
-	    img.style.height = "50px";
-	    img.style.borderRadius = "50%";
-	    img.style.marginBottom = "4px";
-	    container.appendChild(img);
-
-	    const msg = document.createElement("div");
-	    msg.className = "ai";
-	    msg.innerText = "개인정보 수집에 동의하셨습니다";
-	    container.appendChild(msg);
-
-	    chatBox.appendChild(container);
-	    chatBox.scrollTop = chatBox.scrollHeight;
-	  }
-
-  function showIntro() {
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.flexDirection = "column";
-    container.style.alignItems = "flex-start";
-
-    const img = document.createElement("img");
-    img.src = "/images/potato.jpg";
-    img.alt = "AI 캐릭터";
-    img.style.width = "50px";
-    img.style.height = "50px";
-    img.style.borderRadius = "50%";
-    img.style.marginBottom = "4px";
-    container.appendChild(img);
-
-    const msg = document.createElement("div");
-    msg.className = "ai";
-    msg.innerText = "안녕하세요! 감자챗봇입니다. 무엇을 도와드릴까요?";
-    container.appendChild(msg);
-
-    chatBox.appendChild(container);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function appendMessage(sender, text) {
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.flexDirection = "column";
-    container.style.alignItems = sender === "ai" ? "flex-start" : "flex-end";
-
-    if (sender === "ai") {
-      const img = document.createElement("img");
-      img.src = "/images/potato.jpg";
-      img.alt = "AI 캐릭터";
-      img.style.width = "50px";
-      img.style.height = "50px";
-      img.style.borderRadius = "50%";
-      img.style.marginBottom = "4px";
-      container.appendChild(img);
+    function agree() {
+      document.getElementById("consent-modal").style.display = "none";
+      chatBox.style.display = "flex";
+      inputBox.style.display = "flex";
+      showAgree();
+      showIntro();
     }
 
-    const msg = document.createElement("div");
-    msg.className = sender;
-    msg.innerText = text;
-    container.appendChild(msg);
-
-    chatBox.appendChild(container);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  function sendMessage() {
-	  const input = document.getElementById("message");
-	  const userText = input.value.trim();
-	  if (userText === "") return;
-
-	  appendMessage("user", userText);
-	  input.value = "";
-
-	  // 앞에 "bnk에서"를 붙여서 보냄
-	  const promptText = "bnk에서 " + userText;
-
-	  fetch("/api/chat", {
-	    method: "POST",
-	    headers: {
-	      "Content-Type": "application/json"
-	    },
-	    body: JSON.stringify(promptText)  // 수정된 부분
-	  })
-	    .then(response => response.text())
-	    .then(data => {
-	      appendMessage("ai", data);
-	    })
-	    .catch(err => {
-	      appendMessage("ai", "⚠️ 오류 발생: " + err);
-	    });
-	}
-
-  // 엔터로 전송
-  document.getElementById("message").addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-      sendMessage();
+    function showAgree() {
+      appendMessage("ai", "개인정보 수집에 동의하셨습니다");
     }
-  });
-</script>
+
+    function showIntro() {
+      appendMessage("ai", "안녕하세요! BNK 챗봇입니다. 무엇을 도와드릴까요?");
+    }
+
+    function appendMessage(sender, text, messageId = null) {
+      const container = document.createElement("div");
+      container.className = `message-container ${sender}`;
+
+      if (sender === "ai") {
+        const img = document.createElement("img");
+        img.src = "/images/mrb.PNG";
+        img.alt = "AI";
+        img.className = "profile-img";
+        container.appendChild(img);
+      }
+
+      const msg = document.createElement("div");
+      msg.className = sender;
+      msg.innerText = text;
+      if (messageId) msg.id = messageId;
+      container.appendChild(msg);
+
+      chatBox.appendChild(container);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("message");
+      const userText = input.value.trim();
+      if (userText === "") return;
+
+      appendMessage("user", userText);
+      input.value = "";
+
+      const promptText = "부산은행의 " + userText;
+
+      // 로딩 메시지 추가
+      const loadingId = "loading-" + Date.now();
+      appendMessage("ai", "답변을 생성 중입니다...", loadingId);
+
+      fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(promptText)
+      })
+      .then(res => res.text())
+      .then(data => {
+        const loadingMsg = document.getElementById(loadingId);
+        if (loadingMsg) loadingMsg.innerText = data;
+      })
+      .catch(err => {
+        const loadingMsg = document.getElementById(loadingId);
+        if (loadingMsg) loadingMsg.innerText = "⚠️ 오류 발생: " + err;
+      });
+    }
+
+    // 엔터로 전송
+    document.getElementById("message").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
 
 </body>
 </html>

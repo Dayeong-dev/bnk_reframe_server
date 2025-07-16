@@ -10,9 +10,21 @@
 	    <button onclick="openChatbot()">챗봇 상담하기</button>
 
 <script>
-    function openChatbot() {
-        window.open("/chatbot", "ChatbotWindow", "width=500,height=650,resizable=yes");
-    }
+function openChatbot() {
+	  const width = 500;
+	  const height = 650;
+
+	  // 화면 가운데 정렬
+	  const left = (screen.width - width) / 2;
+	  const top = (screen.height - height) / 2;
+
+	  window.open(
+	    "/chatbot",
+	    "ChatbotWindow",
+	    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+	  );
+	}
+
 </script>
 </body>
 </html>
