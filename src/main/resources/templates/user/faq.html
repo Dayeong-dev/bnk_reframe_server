@@ -4,61 +4,67 @@
 <meta charset="UTF-8">
 <title>자주 묻는 질문</title>
 <link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="/css/user.css" />
 <link rel="stylesheet" href="/css/faq.css" />
 </head>
 <body>
-
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
 
-	<div
-		style="max-width: 1000px; margin: 6rem auto 1rem; padding: 0 1rem;">
-		<h1
-			style="text-align: center; font-size: 2rem; margin-bottom: 1rem; font-family: 'BNKGothic', sans-serif;">
-			자주 묻는 질문</h1>
-		<hr>
-		<p style="text-align: center; color: #555; margin: 0.5rem 0;">자주
-			문의하시는 상담 내용을 모았습니다.</p>
-		<p style="text-align: center; color: #555; margin: 0.5rem 0;">
-			해결되지 않는 문의는 1:1 문의나 챗봇을 이용해 주세요.</p>
-	</div>
-
-	<div class="faq-container">
-
-
-		<!-- 검색 -->
-		<div class="faq-search">
-			<input type="text" id="search-input" placeholder="검색어를 입력하세요..."
-				list="autocomplete-list">
-			<datalist id="autocomplete-list"></datalist>
-		</div>
-
-		<!-- 카테고리 -->
-		<div id="category-buttons"></div>
-
-		<!-- 리스트 -->
-		<div id="faq-list" th:if="${faqlist != null}">
-			<table>
-				<thead>
-					<tr>
-						<th>글번호</th>
-						<th>구분</th>
-						<th>제목</th>
-					</tr>
-				</thead>
-				<tbody id="faq-tbody">
-					<tr th:each="faq, iterStat : ${faqlist}"
-						th:attr="data-index=${iterStat.index}">
-						<td><a th:href="@{'/faq/detail/' + ${faq.faqId}}"
-							th:text="${faq.faqId}"></a></td>
-						<td th:text="${faq.category}"></td>
-						<td th:text="${faq.question}"></td>
-					</tr>
-				</tbody>
-			</table>
-
-			<!-- 페이지네이션 -->
-			<div class="pagination" id="pagination"></div>
-		</div>
+	<div id="container">
+		<section>
+			<div
+				style="max-width: 1000px; margin: 0rem auto 1rem; padding: 0 1rem;">
+				<h1
+					style="text-align: center; font-size: 2rem; margin-bottom: 1rem; font-family: 'BNKGothic', sans-serif;">
+					자주 묻는 질문</h1>
+				<hr>
+				<p style="text-align: center; color: #555; margin: 0.5rem 0;">자주
+					문의하시는 상담 내용을 모았습니다.</p>
+				<p style="text-align: center; color: #555; margin: 0.5rem 0;">
+					해결되지 않는 문의는 1:1 문의나 챗봇을 이용해 주세요.</p>
+			</div>
+		
+			<div class="faq-container">
+		
+		
+				<!-- 검색 -->
+				<div class="faq-search">
+					<input type="text" id="search-input" placeholder="검색어를 입력하세요..."
+						list="autocomplete-list">
+					<datalist id="autocomplete-list"></datalist>
+				</div>
+		
+				<!-- 카테고리 -->
+				<div id="category-buttons"></div>
+		
+				<!-- 리스트 -->
+				<div id="faq-list" th:if="${faqlist != null}">
+					<table>
+						<thead>
+							<tr>
+								<th>글번호</th>
+								<th>구분</th>
+								<th>제목</th>
+							</tr>
+						</thead>
+						<tbody id="faq-tbody">
+							<tr th:each="faq, iterStat : ${faqlist}"
+								th:attr="data-index=${iterStat.index}">
+								<td><a th:href="@{'/faq/detail/' + ${faq.faqId}}"
+									th:text="${faq.faqId}"></a></td>
+								<td th:text="${faq.category}"></td>
+								<td th:text="${faq.question}"></td>
+							</tr>
+						</tbody>
+					</table>
+		
+					<!-- 페이지네이션 -->
+					<div class="pagination" id="pagination"></div>
+				</div>
+			</div>
+		</section>
 	</div>
 
 	<script>

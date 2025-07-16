@@ -346,77 +346,85 @@ h1 {
 </head>
 
 <body>
-  <div class="container">
-    <h1>카드 메인 페이지</h1>
-    <!-- 스와이퍼 -->
-	<div class="swiper mySwiper" style="width: 100%; max-width: 600px; margin: 0 auto;">
-	  <div class="swiper-wrapper">
-	    <div class="swiper-slide" th:each="card : ${allCards}" style="text-align:center;">
-	      <a th:href="@{'/card/detail/' + ${card.cardId}}">
-	        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" alt="" style="width:300px; height:auto; border-radius:8px;" />
-	        <p th:text="${card.name}"></p>
-	      </a>
-	    </div>
-	  </div>
+<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	<div id="container" >
+		<section>
+			<div class="container">
+			    <h1>카드 메인 페이지</h1>
+			    <!-- 스와이퍼 -->
+				<div class="swiper mySwiper" style="width: 100%; max-width: 600px; margin: 0 auto;">
+				  <div class="swiper-wrapper">
+				    <div class="swiper-slide" th:each="card : ${allCards}" style="text-align:center;">
+				      <a th:href="@{'/card/detail/' + ${card.cardId}}">
+				        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" alt="" style="width:300px; height:auto; border-radius:8px;" />
+				        <p th:text="${card.name}"></p>
+				      </a>
+				    </div>
+				  </div>
+				</div>
+			
+			    <!-- 슬릭 슬라이더 컨테이너 
+			    <div class="slider-container">
+			      <div class="slider">
+					<div class="slide-item" th:each="card : ${allCards}">
+			          <a th:href="@{'/card/detail/' + ${card.cardId}}">
+			            <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+			              th:alt="${card.name}" />
+			            <p th:text="${card.name}"></p>
+			          </a>
+			        </div>
+			      </div>
+			    </div>-->
+			
+			    <!-- 카드 이름 검색 폼 -->
+			    <div class="search-box">
+			      <form method="get" action="/card/list">
+			        <input type="text" name="keyword" placeholder="카드 이름 검색" />
+			        <button type="submit">검색</button>
+			      </form>
+			    </div>
+			
+				<!-- 카드 목록 헤더 -->
+				<div class="content-wrapper">
+				  <div class="section-header">
+				    <h2>인기/추천 카드</h2>
+				  </div>
+				
+				  <!-- 카드 목록 그리드 -->
+				  <div class="card-grid">
+				    <a class="card-item" th:href="@{'/card/detail/' + ${card.cardId}}" th:each="card : ${topCards}">
+				      <div class="img-container">
+				        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
+				      </div>
+				      <div class="card-desc">
+				        <div class="card-tags" th:if="${card.tags != null}">
+				          <span class="tag" th:each="tag : ${#strings.arraySplit(card.tags, ' ')}" th:text="${tag}"></span>
+				        </div>
+				        <h4 th:text="${card.name}"></h4>
+				        <p th:text="${card.description}"></p>
+				      </div>
+				    </a>
+				  </div>
+				
+				  <!-- 더보기 버튼을 그리드 아래에 -->
+				  <div class="more-link-wrapper">
+				    <a href="/card/list" class="more-link">전체 상품 &gt;</a>
+				  </div>
+				</div>
+			
+			
+			    <!-- 소비성향 테스트 배너 -->
+			    <div class="banner">
+			      <a href="/card/card_test">
+			        <img src="/images/cardTest/card_test_banner.png" alt="소비성향 테스트" />
+			      </a>
+			    </div>
+			  </div>
+		</section>	
 	</div>
-
-    <!-- 슬릭 슬라이더 컨테이너 
-    <div class="slider-container">
-      <div class="slider">
-		<div class="slide-item" th:each="card : ${allCards}">
-          <a th:href="@{'/card/detail/' + ${card.cardId}}">
-            <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
-              th:alt="${card.name}" />
-            <p th:text="${card.name}"></p>
-          </a>
-        </div>
-      </div>
-    </div>-->
-
-    <!-- 카드 이름 검색 폼 -->
-    <div class="search-box">
-      <form method="get" action="/card/list">
-        <input type="text" name="keyword" placeholder="카드 이름 검색" />
-        <button type="submit">검색</button>
-      </form>
-    </div>
-
-	<!-- 카드 목록 헤더 -->
-	<div class="content-wrapper">
-	  <div class="section-header">
-	    <h2>인기/추천 카드</h2>
-	  </div>
-	
-	  <!-- 카드 목록 그리드 -->
-	  <div class="card-grid">
-	    <a class="card-item" th:href="@{'/card/detail/' + ${card.cardId}}" th:each="card : ${topCards}">
-	      <div class="img-container">
-	        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
-	      </div>
-	      <div class="card-desc">
-	        <div class="card-tags" th:if="${card.tags != null}">
-	          <span class="tag" th:each="tag : ${#strings.arraySplit(card.tags, ' ')}" th:text="${tag}"></span>
-	        </div>
-	        <h4 th:text="${card.name}"></h4>
-	        <p th:text="${card.description}"></p>
-	      </div>
-	    </a>
-	  </div>
-	
-	  <!-- 더보기 버튼을 그리드 아래에 -->
-	  <div class="more-link-wrapper">
-	    <a href="/card/list" class="more-link">전체 상품 &gt;</a>
-	  </div>
-	</div>
-
-
-    <!-- 소비성향 테스트 배너 -->
-    <div class="banner">
-      <a href="/card/card_test">
-        <img src="/images/cardTest/card_test_banner.png" alt="소비성향 테스트" />
-      </a>
-    </div>
-  </div>
+  
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 

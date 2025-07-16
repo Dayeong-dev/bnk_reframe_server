@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
   <title>BNK 예적금 메인</title>
   <style>
     body {
@@ -81,7 +83,7 @@
     }
 
     /* 목적별 추천 */
-    .content-wrapper {
+    .purpose-content-wrapper {
       display: flex;
       width: 90%;
       max-width: 1200px;
@@ -160,7 +162,7 @@
 
     /* 검색 */
     .search-section {
-      width: 100%;
+      width: 100vw;
       background: #f1f3f5;
       padding: 30px 20px;
       display: flex;
@@ -285,93 +287,100 @@
   </style>
 </head>
 <body>
-
-<!-- ✅ 슬라이드 배너 -->
-<div class="slider-container">
-  <div class="slider" id="slider">
-    <img src="/img/image1.jpg" class="slide active">
-    <img src="/img/image2.jpg" class="slide">
-    <img src="/img/image3.jpg" class="slide">
-  </div>
-  <button class="slider-arrow left" onclick="prevSlide()">❮</button>
-  <button class="slider-arrow right" onclick="nextSlide()">❯</button>
-  <div class="dots">
-    <span class="dot active" onclick="setSlide(0)"></span>
-    <span class="dot" onclick="setSlide(1)"></span>
-    <span class="dot" onclick="setSlide(2)"></span>
-  </div>
-</div>
-
-<!-- ✅ 목적별 추천 상품 -->
-<div class="content-wrapper">
-  <div class="sidebar">
-	  <button class="purpose-btn active" data-category="적금">목돈 만들기</button>
-	  <button class="purpose-btn" data-category="예금">목돈 굴리기</button>
-	  <button class="purpose-btn" data-category="입출금자유">입출금 자유</button>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	
+	<div id="container">
+		<section>
+			<!-- ✅ 슬라이드 배너 -->
+			<div class="slider-container">
+			  <div class="slider" id="slider">
+			    <img src="/img/image1.jpg" class="slide active">
+			    <img src="/img/image2.jpg" class="slide">
+			    <img src="/img/image3.jpg" class="slide">
+			  </div>
+			  <button class="slider-arrow left" onclick="prevSlide()">❮</button>
+			  <button class="slider-arrow right" onclick="nextSlide()">❯</button>
+			  <div class="dots">
+			    <span class="dot active" onclick="setSlide(0)"></span>
+			    <span class="dot" onclick="setSlide(1)"></span>
+			    <span class="dot" onclick="setSlide(2)"></span>
+			  </div>
+			</div>
+			
+			<!-- ✅ 목적별 추천 상품 -->
+			<div class="purpose-content-wrapper">
+			  <div class="sidebar">
+				  <button class="purpose-btn active" data-category="적금">목돈 만들기</button>
+				  <button class="purpose-btn" data-category="예금">목돈 굴리기</button>
+				  <button class="purpose-btn" data-category="입출금자유">입출금 자유</button>
+				</div>
+			
+			  <div class="recommend-wrapper" id="recommendArea">
+			    <div th:if="${highlightProduct != null}" class="highlight-product" th:onclick="'location.href=\'/deposit/detail/' + ${highlightProduct.productId} + '\''">
+			      <h4 th:text="${highlightProduct.name}">강력추천</h4>
+			      <p th:text="${highlightProduct.summary}">요약</p>
+			      <p>최고 <b th:text="${highlightProduct.maxRate}"></b>% / 최저 <b th:text="${highlightProduct.minRate}"></b>%</p>
+			      <p><b th:text="${highlightProduct.period}"></b>개월</p>
+			    </div>
+			    <div class="grid-cards">
+			      <div class="card" th:each="product : ${otherProducts}" th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
+			        <h4 th:text="${product.name}">추천 상품명</h4>
+			        <p>최고 <b th:text="${product.maxRate}"></b>% / 최저 <b th:text="${product.minRate}"></b>%</p>
+			        <p><b th:text="${product.period}"></b>개월</p>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<!-- ✅ 검색창 -->
+			<div class="search-section">
+			  <form class="search-form" action="/deposit/list" method="get">
+			    <input type="text" name="keyword" class="search-input" placeholder="검색어를 입력하세요">
+			    <button type="submit" class="search-icon" aria-label="검색"></button>
+			  </form>
+			  <button class="hashtag-button" onclick="searchHashtag('적금')">#적금</button>
+			  <button class="hashtag-button" onclick="searchHashtag('예금')">#예금</button>
+			</div>
+			
+			<!-- ✅ 테마 추천 -->
+			<div class="theme-slider-container">
+			  <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px;">
+			    <button class="theme-btn" id="btn-주부" onclick="showTheme('주부')">주부</button>
+			    <button class="theme-btn active-theme" id="btn-직장인" onclick="showTheme('직장인')">직장인</button>
+			    <button class="theme-btn" id="btn-학생" onclick="showTheme('학생')">학생</button>
+			  </div>
+			
+			  <button class="theme-prev" onclick="prevTheme()">❮</button>
+			  <button class="theme-next" onclick="nextTheme()">❯</button>
+			
+			  <div id="themeSlider">
+			    <div id="theme-직장인" class="theme-slide-group" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+			      <div th:each="p : ${workerProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
+			        <h4 th:text="${p.name}">상품명</h4>
+			        <p th:text="${p.summary}">상품 요약</p>
+			        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
+			      </div>
+			    </div>
+			    <div id="theme-주부" class="theme-slide-group" style="display: none; flex-wrap: wrap; gap: 20px; justify-content: center;">
+			      <div th:each="p : ${housewifeProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
+			        <h4 th:text="${p.name}">상품명</h4>
+			        <p th:text="${p.summary}">상품 요약</p>
+			        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
+			      </div>
+			    </div>
+			    <div id="theme-학생" class="theme-slide-group" style="display: none; flex-wrap: wrap; gap: 20px; justify-content: center;">
+			      <div th:each="p : ${studentProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
+			        <h4 th:text="${p.name}">상품명</h4>
+			        <p th:text="${p.summary}">상품 요약</p>
+			        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+		</section>
 	</div>
-
-  <div class="recommend-wrapper" id="recommendArea">
-    <div th:if="${highlightProduct != null}" class="highlight-product" th:onclick="'location.href=\'/deposit/detail/' + ${highlightProduct.productId} + '\''">
-      <h4 th:text="${highlightProduct.name}">강력추천</h4>
-      <p th:text="${highlightProduct.summary}">요약</p>
-      <p>최고 <b th:text="${highlightProduct.maxRate}"></b>% / 최저 <b th:text="${highlightProduct.minRate}"></b>%</p>
-      <p><b th:text="${highlightProduct.period}"></b>개월</p>
-    </div>
-    <div class="grid-cards">
-      <div class="card" th:each="product : ${otherProducts}" th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
-        <h4 th:text="${product.name}">추천 상품명</h4>
-        <p>최고 <b th:text="${product.maxRate}"></b>% / 최저 <b th:text="${product.minRate}"></b>%</p>
-        <p><b th:text="${product.period}"></b>개월</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ✅ 검색창 -->
-<div class="search-section">
-  <form class="search-form" action="/deposit/list" method="get">
-    <input type="text" name="keyword" class="search-input" placeholder="검색어를 입력하세요">
-    <button type="submit" class="search-icon" aria-label="검색"></button>
-  </form>
-  <button class="hashtag-button" onclick="searchHashtag('적금')">#적금</button>
-  <button class="hashtag-button" onclick="searchHashtag('예금')">#예금</button>
-</div>
-
-<!-- ✅ 테마 추천 -->
-<div class="theme-slider-container">
-  <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px;">
-    <button class="theme-btn" id="btn-주부" onclick="showTheme('주부')">주부</button>
-    <button class="theme-btn active-theme" id="btn-직장인" onclick="showTheme('직장인')">직장인</button>
-    <button class="theme-btn" id="btn-학생" onclick="showTheme('학생')">학생</button>
-  </div>
-
-  <button class="theme-prev" onclick="prevTheme()">❮</button>
-  <button class="theme-next" onclick="nextTheme()">❯</button>
-
-  <div id="themeSlider">
-    <div id="theme-직장인" class="theme-slide-group" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
-      <div th:each="p : ${workerProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
-        <h4 th:text="${p.name}">상품명</h4>
-        <p th:text="${p.summary}">상품 요약</p>
-        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
-      </div>
-    </div>
-    <div id="theme-주부" class="theme-slide-group" style="display: none; flex-wrap: wrap; gap: 20px; justify-content: center;">
-      <div th:each="p : ${housewifeProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
-        <h4 th:text="${p.name}">상품명</h4>
-        <p th:text="${p.summary}">상품 요약</p>
-        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
-      </div>
-    </div>
-    <div id="theme-학생" class="theme-slide-group" style="display: none; flex-wrap: wrap; gap: 20px; justify-content: center;">
-      <div th:each="p : ${studentProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
-        <h4 th:text="${p.name}">상품명</h4>
-        <p th:text="${p.summary}">상품 요약</p>
-        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
   let currentSlide = 0;

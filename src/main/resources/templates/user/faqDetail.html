@@ -7,38 +7,41 @@
   <link rel="stylesheet" href="/css/user.css" />
 </head>
 <body>
-
-<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-
-<section class="qna-section">
-  <h2 class="page-title">FAQ 상세 보기</h2>
-
-  <div class="qna-detail-container">
-
-    <table class="qna-detail-table">
-      <tr>
-        <th>글번호</th>
-        <td th:text="${faq.faqId}">글번호</td>
-      </tr>
-      <tr>
-        <th>제목</th>
-        <td th:text="${faq.question}">질문 제목</td>
-      </tr>
-      <tr>
-        <th>카테고리</th>
-        <td th:text="${faq.category}">카테고리</td>
-      </tr>
-      <tr>
-        <th>답변</th>
-        <td>
-          <div class="answer" th:text="${faq.answer}">답변 내용입니다.</div>
-        </td>
-      </tr>
-    </table>
-
-    <a class="back-link" href="/faq/faq">← 목록으로</a>
-  </div>
-</section>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	
+	<div id="container">
+		<section class="qna-section">
+		  <h2>FAQ 상세 보기</h2>
+		
+		  <div class="qna-detail-container">
+		
+		    <table class="qna-detail-table">
+		      <tr>
+		        <th>글번호</th>
+		        <td th:text="${faq.faqId}">글번호</td>
+		      </tr>
+		      <tr>
+		        <th>제목</th>
+		        <td th:text="${faq.question}">질문 제목</td>
+		      </tr>
+		      <tr>
+		        <th>카테고리</th>
+		        <td th:text="${faq.category}">카테고리</td>
+		      </tr>
+		      <tr>
+		        <th>답변</th>
+		        <td>
+		          <div class="answer" th:text="${faq.answer}">답변 내용입니다.</div>
+		        </td>
+		      </tr>
+		    </table>
+		
+		    <a class="back-link" href="/faq/faq">← 목록으로</a>
+		  </div>
+		</section>
+	</div>
 
 </body>
 </html>
