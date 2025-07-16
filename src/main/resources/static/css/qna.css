@@ -137,13 +137,14 @@ section.qna-section {
 .qna-list-box table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 1rem;
 }
 
-.qna-list-box th, .qna-list-box td {
-  border: 1px solid #ccc;
-  padding: 0.75rem;
+.qna-list-box th,
+.qna-list-box td {
+  padding: 0.75rem 1rem;
   text-align: left;
-  word-break: keep-all;
+  border-bottom: 1px solid #eee;
 }
 
 #category-buttons {
@@ -188,6 +189,51 @@ section.qna-section {
   display: none !important;
 }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #f9f9f9;
+      font-weight: bold;
+      color: #333;
+    }
+
+    td a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+    }
+    
+    
+.qna-list-box th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+  color: #333;
+}
+
+.qna-list-box td a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.qna-list-box td a:hover {
+  text-decoration: underline;
+}
+
 /* =============== 반응형 =============== */
 @media (max-width: 1024px) {
   .qna-form-box,
@@ -228,4 +274,6 @@ section.qna-section {
   .qna-list-box td {
     font-size: 0.9rem;
   }
+  
+  
 }
