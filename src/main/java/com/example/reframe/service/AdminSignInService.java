@@ -55,7 +55,7 @@ public class AdminSignInService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("BNK 관리자 로그인 인증번호");
-        message.setText("BNK 관리자 로그인 인증번호:   " + authCode);
+        message.setText("BNK 관리자 로그인 인증번호:  < "+ authCode + " >");
         message.setFrom("codesender0001@gmail.com");
 
         javaMailSender.send(message);

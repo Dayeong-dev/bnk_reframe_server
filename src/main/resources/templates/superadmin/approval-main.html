@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1>상위관리자 결재 페이지</h1>
+            
+            <!-- 결재 요청 목록 -->
+            <div id="approval-list"></div>
+
+            <!-- 결재 상세 보기 -->
+            <div id="approval-detail" style="margin-top: 30px;"></div>
+        </div>
+    </div>
+
+
+<script>
+        // 결재 요청 목록 불러오기
+        function loadApprovalList() {
+            $.ajax({
+                url: '/admin/approvals',
+                method: 'GET',
+                success: function(data) {
+                    let html = '<table border="1" width="100%">';
+                    html += '<thead><tr><th>ID</th><th>상품ID</th><th>요청자</th><th>요청일시</th><th>보기</th></tr></thead><tbody>';
+                    data.forEach(item => {
+                        html += `<tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.productId}</td>
+                                    <td>${item.requestedBy}</td>
+                                    <td>${item.requestedAt}</td>
+                                    <td><button onclick="loadApprovalDetail(${item.id})">상세</button></td>
+                                </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    $('#approval-list').html(html);
+                }
+            });
+        }
+
+        // 결재 요청 상세 보기
+        function loadApprovalDetail(id) {
+            $.ajax({
+                url: `/admin/approvals/${id}`,
+                method: 'GET',
+                success: function(data) {
+                    let html = `<h3>결재 요청 상세 (요청ID: ${data.id})</h3>`;
+                    html += '<table border="1" width="100%">';
+                    html += '<thead><tr><th>필드</th><th>기존 값</th><th>변경 값</th></tr></thead><tbody>';
+                    data.details.forEach(detail => {
+                        html += `<tr>
+                                    <td>${detail.fieldName}</td>
+                                    <td>${detail.oldValue}</td>
+                                    <td>${detail.newValue}</td>
+                                </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    html += `<button onclick="approve(${data.id})">승인</button>
+                             <button onclick="reject(${data.id})">반려</button>`;
+                    $('#approval-detail').html(html);
+                }
+            });
+        }
+
+        // 승인 처리
+        function approve(id) {
+            $.post(`/admin/approvals/${id}/approve`, function() {
+                alert('승인 완료');
+                loadApprovalList();
+                $('#approval-detail').empty();
+            });
+        }
+
+        // 반려 처리
+        function reject(id) {
+            const reason = prompt("반려 사유를 입력하세요:");
+            if (!reason) return;
+            $.ajax({
+                url: `/admin/approvals/${id}/reject`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ reason: reason }),
+                success: function() {
+                    alert('반려 처리 완료');
+                    loadApprovalList();
+                    $('#approval-detail').empty();
+                }
+            });
+        }
+
+        // 최초 로딩
+        $(document).ready(function() {
+            loadApprovalList();
+        });
+    </script>
+</body>
+</html>
