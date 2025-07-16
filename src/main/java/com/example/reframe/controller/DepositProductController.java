@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.DepositProductDTO;
+import com.example.reframe.dto.InterestRateDTO;
 import com.example.reframe.service.DepositProductService;
 import com.example.reframe.service.DepositProductServiceImpl;
+import com.example.reframe.service.InterestRateService;
 import com.example.reframe.session.RecentViewManager;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class DepositProductController {
     private final DepositProductService depositProductService;
     private final DepositProductServiceImpl depositProductServiceImpl;
     private final RecentViewManager recentViewManager;
+    private final InterestRateService interestRateService;
+
 
     /**
      * 예적금 메인 (추천상품, 테마별 추천 상품)
@@ -129,22 +133,24 @@ public class DepositProductController {
         // 상품 상세 조회 (+ 조회수 증가)
         DepositProductDTO product = depositProductService.getProductDetail(productId);
 
-        // DETAIL (본문용) 그대로 사용
-        String detailForPage = product.getDetail();
-
-        // MODAL_DETAIL (모달용) 그대로 사용
-        String modalDetailForModal = product.getModalDetail();
-
-        // DETAIL 컬럼에서 7섹션을 꺼내 그대로 뷰에 전달
+        // DETAIL/모달 정보
         model.addAttribute("product", product);
-        model.addAttribute("detailForPage", detailForPage);
-        model.addAttribute("modalDetailForModal", modalDetailForModal);
-        
-        // 최근 본 상품에 리스트 기입
+        model.addAttribute("detailForPage", product.getDetail());
+        model.addAttribute("modalDetailForModal", product.getModalDetail());
+
+        // 금리 정보 추가
+      
+        String rateHtml = interestRateService.getRateHtmlByProductId(productId);
+
+    
+        model.addAttribute("modalRateTable", rateHtml);
+
+        // 최근 본 상품 기록
         recentViewManager.setProduct("deposit", product.getProductId(), product.getName());
-       
-        return "user/deposit_detail";  // user/deposit_detail.jsp or deposit_detail.html
+
+        return "user/deposit_detail";
     }
+
 
     // 조회수 기준으로 Top 5 예적금 추천 : 메인 페이지
     @GetMapping("/recommend/list")

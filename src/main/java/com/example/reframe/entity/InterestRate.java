@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "INTEREST_RATE")
+@Table(name = "DEPOSIT_PRODUCT_RATE")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,15 +12,15 @@ import lombok.*;
 @Builder
 public class InterestRate {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "RATE_ID") 
     private Long id;
 
+    @Column(name = "PRODUCT_ID")
     private Long productId;
 
-    private String category;     // ex: "만기지급", "중도해지", "만기후"
-    private String type;         // ex: "12개월", "6개월미만" 등
-    private Double rate;         // 연이율
-    private Double annualReturn; // 연수익률 (nullable)
-    private String note;         // 비고 (nullable)
+    @Column(name = "HTML_TABLE")
+    @Lob
+    private String htmlTable;
 }
