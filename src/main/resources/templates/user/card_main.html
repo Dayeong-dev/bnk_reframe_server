@@ -423,11 +423,16 @@ h1 {
   <script>
   
   var swiper = new Swiper(".mySwiper", {
-      effect: "cards",
-      grabCursor: true,
-    });
+	  effect: "cards",
+	  grabCursor: true,
+	  autoplay: {
+	    delay: 1300, // 자동 슬라이드(1.3초)
+	    disableOnInteraction: false // 사용자가 손대도 자동 재생 계속
+	  },
+	  loop: true // cards 효과는 loop랑 같이 쓰는 걸 권장!
+	});
   
-  
+  /*
     $(document).ready(function () {
       $('.slider').slick({
         centerMode: true,          // 가운데 슬라이드 강조 모드 활성화
@@ -468,6 +473,7 @@ h1 {
         ]
       });
     });
+  */
   </script>
 
 </body>

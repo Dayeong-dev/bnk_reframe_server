@@ -121,7 +121,22 @@ form button:hover {
   user-select: none;
   padding: 5px;
   box-sizing: border-box;
+  position: relative; /* X 버튼 위치 고정하려고 */
 }
+
+.compare-slot .remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  color: #555; /* 연회색 X */
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
 
 .compare-slot img {
   width: 100%;
@@ -130,7 +145,7 @@ form button:hover {
   border-radius: 4px;
 }
 
-#compareBox button {
+.compare-actions button {
   padding: 10px 20px;
   background: #007bff;
   color: white;
@@ -142,6 +157,9 @@ form button:hover {
   transition: background-color 0.3s ease;
 }
 
+.compare-actions button:hover {
+  background: #0056b3;
+}
 #compareBox button:hover {
   background: #0056b3;
 }
@@ -300,7 +318,9 @@ form button:hover {
     <div class="compare-slot" data-index="1">+</div>
     <div class="compare-slot" data-index="2">+</div>
   </div>
-  <button type="button" onclick="openCompareModal()">비교하기</button>
+  <div class="compare-actions">
+    <button type="button" onclick="openCompareModal()">비교하기</button>
+  </div>
 </div>
 
 <!-- 카드 리스트 -->
@@ -312,9 +332,9 @@ form button:hover {
     <h3>
       <a th:href="@{'/card/detail/' + ${card.cardId}}" th:text="${card.name}">카드 이름</a>
     </h3>
-    <p th:text="${card.description}">카드 설명</p>
-    <p>대분류: <span th:text="${card.categoryMajorDisplay}"></span></p>
-    <p>상태: <span th:text="${card.statusDisplay}"></span></p>
+    <p th:utext="${card.description}">카드 설명</p>
+    <p><span th:text="${card.categoryMajorDisplay}"></span></p>
+    <p><span th:text="${card.statusDisplay}"></span></p>
     <button type="button"
       th:attr="onclick=|addToCompare(${card.cardId}, &quot;${card.name}&quot;, '/images/cards/' + ${card.cardId} + '_front.PNG')|">
       비교함 담기
@@ -322,14 +342,6 @@ form button:hover {
   </div>
 </div>
 
-<!-- 페이지네이션 -->
-<div class="pagination" style="text-align: center; margin-top: 20px;">
-  <a th:if="${cards.hasPrevious()}" 
-     th:href="@{'/card/list?(page=' + ${cards.number - 1} + '&categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${subcategory} + '&keyword=' + ${keyword})'}">이전</a>
-  <span th:text="${cards.number + 1} + ' / ' + ${cards.totalPages}">페이지</span>
-  <a th:if="${cards.hasNext()}" 
-     th:href="@{'/card/list?(page=' + ${cards.number + 1} + '&categoryMajor=' + ${categoryMajor} + '&subcategory=' + ${subcategory} + '&keyword=' + ${keyword})'}">다음</a>
-</div>
 
 <!-- 카드 비교 모달 -->
 <div id="compareModal" class="modal">
@@ -399,13 +411,14 @@ function updateCompareBox() {
   slots.forEach((slotDiv, idx) => {
     const data = compareSlots[idx];
     if (data) {
-      slotDiv.innerHTML = `<img src="${data.cardImg}" alt="비교 카드 이미지" />`;
+      slotDiv.innerHTML = `
+        <img src="${data.cardImg}" alt="비교 카드 이미지" />
+        <button class="remove-btn" onclick="removeFromCompare(${idx})">×</button>
+      `;
       slotDiv.style.border = "2px dashed #ccc";
-      slotDiv.style.color = "initial";
     } else {
       slotDiv.innerHTML = "+";
       slotDiv.style.border = "2px dashed #ccc";
-      slotDiv.style.color = "#ccc";
     }
   });
 }
@@ -459,6 +472,16 @@ async function openCompareModal() {
 function closeCompareModal() {
   document.getElementById("compareModal").style.display = "none";
 }
+
+//모달 외부 클릭 시 닫기
+window.addEventListener("click", function(event) {
+  const modal = document.getElementById("compareModal");
+  const content = modal.querySelector(".modal-content");
+  if (event.target === modal) {
+    closeCompareModal();
+  }
+});
+
 
 // 페이지 로드시 세션 데이터로 초기화
 window.addEventListener("DOMContentLoaded", async () => {
