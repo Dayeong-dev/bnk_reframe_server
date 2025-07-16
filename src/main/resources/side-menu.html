@@ -1,15 +1,15 @@
-<div id="side-menu" xmlns:th="http://www.thymeleaf.org" th:fragment="sideMenuFragment">
+<div id="side-menu" xmlns:th="http://www.thymeleaf.org"
+	th:fragment="sideMenuFragment">
 	<div class="item" onclick="btn1()">
-		<img class="icon" src="/icons/search.svg" alt="아이콘" />
-		<span>고객센터</span>
+		<img class="icon" src="/icons/search.svg" alt="아이콘" /> <span>고객센터</span>
 	</div>
 	<div class="item" onclick="btn2()">
-		<img class="icon" src="/icons/card.svg" alt="아이콘" />
-		<span>카드 비교함</span>
+		<img class="icon" src="/icons/card.svg" alt="아이콘" /> <span>카드
+			비교함</span>
 	</div>
 	<div class="item" onclick="btn3()">
-		<img class="icon" src="/icons/chatbot.svg" alt="아이콘" />
-		<span>챗봇 문의</span>
+		<img class="icon" src="/icons/chatbot.svg" alt="아이콘" /> <span>챗봇
+			문의</span>
 	</div>
 	<script>
 
@@ -123,8 +123,8 @@
 		}
 		
 		function btn3() {
-			  const width = 500;   // ✅ 약간 넓게 (기본 챗봇 내용에 충분한 너비)
-			  const height = 700;  // ✅ 세로는 약간 줄여서 덜 답답하게
+			  const width = 520;  // 내부 padding 고려하여 조금 여유있게
+			  const height = 740; // 세로도 padding 포함해서 맞춤
 
 			  const left = (screen.width - width) / 2;
 			  const top = (screen.height - height) / 2;
@@ -132,9 +132,10 @@
 			  window.open(
 			    "/chatbot",
 			    "ChatbotWindow",
-			    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+			    `width=${width},height=${height},left=${left},top=${top},resizable=no,scrollbars=no`
 			  );
 			}
+
 
 	</script>
 </div>

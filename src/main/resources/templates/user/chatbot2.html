@@ -207,34 +207,36 @@
     }
 
     function sendMessage() {
-      const input = document.getElementById("message");
-      const userText = input.value.trim();
-      if (userText === "") return;
+    	  const input = document.getElementById("message");
+    	  const userText = input.value.trim();
+    	  if (userText === "") return;
 
-      appendMessage("user", userText);
-      input.value = "";
+    	  appendMessage("user", userText);
+    	  input.value = "";
 
-      const promptText = "부산은행의 " + userText;
-      const loadingId = "loading-" + Date.now();
-      appendMessage("ai", "답변을 생성 중입니다...", loadingId);
+    	  const loadingId = "loading-" + Date.now();
+    	  appendMessage("ai", "답변을 생성 중입니다...", loadingId);
 
-      fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(promptText)
-      })
-      .then(res => res.text())
-      .then(data => {
-        const loadingMsg = document.getElementById(loadingId);
-        if (loadingMsg) loadingMsg.innerText = data;
-        scrollToBottom();
-      })
-      .catch(err => {
-        const loadingMsg = document.getElementById(loadingId);
-        if (loadingMsg) loadingMsg.innerText = "⚠️ 오류 발생: " + err;
-        scrollToBottom();
-      });
-    }
+    	  fetch("/api/chat2", {
+    	    method: "POST",
+    	    headers: {
+    	      "Content-Type": "application/json"
+    	    },
+    	    body: JSON.stringify(userText) // 단일 문자열 그대로 보내기
+    	  })
+    	  .then(res => res.text())
+    	  .then(data => {
+    	    const loadingMsg = document.getElementById(loadingId);
+    	    if (loadingMsg) loadingMsg.innerText = data;
+    	    scrollToBottom();
+    	  })
+    	  .catch(err => {
+    	    const loadingMsg = document.getElementById(loadingId);
+    	    if (loadingMsg) loadingMsg.innerText = "⚠️ 오류 발생: " + err;
+    	    scrollToBottom();
+    	  });
+    	}
+
 
     document.getElementById("message").addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
