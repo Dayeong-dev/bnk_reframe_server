@@ -332,9 +332,9 @@ form button:hover {
     <h3>
       <a th:href="@{'/card/detail/' + ${card.cardId}}" th:text="${card.name}">카드 이름</a>
     </h3>
-    <p th:text="${card.description}">카드 설명</p>
-    <p>대분류: <span th:text="${card.categoryMajorDisplay}"></span></p>
-    <p>상태: <span th:text="${card.statusDisplay}"></span></p>
+    <p th:utext="${card.description}">카드 설명</p>
+    <p><span th:text="${card.categoryMajorDisplay}"></span></p>
+    <p><span th:text="${card.statusDisplay}"></span></p>
     <button type="button"
       th:attr="onclick=|addToCompare(${card.cardId}, &quot;${card.name}&quot;, '/images/cards/' + ${card.cardId} + '_front.PNG')|">
       비교함 담기

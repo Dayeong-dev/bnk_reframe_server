@@ -10,6 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 import com.example.reframe.dto.CardDto;
 import com.example.reframe.entity.Card;
 import com.example.reframe.entity.CardCategoryRel;
@@ -73,7 +76,7 @@ public class CardService {
         return CardDto.builder()
                 .cardId(card.getCardId())
                 .name(card.getName())
-                .description(card.getDescription())
+                .description(card.getDescription().replace("\\n", "<br>"))
                 .tags(card.getTags())
                 .categoryMajor(card.getCategoryMajor())
                 .status(card.getStatus())
@@ -100,15 +103,26 @@ public class CardService {
     // 목록 -  대분류/소분류/키워드로 카드 검색 + 페이징
     public Page<CardDto> getCards(String categoryMajor, String subcategory, String keyword, Pageable pageable) {
         Page<Card> cards = cardRepository.findByDynamicCondition(categoryMajor, subcategory, keyword, pageable);
-        return cards.map(this::convertToDto);
+        return cardRepository.findByDynamicCondition(categoryMajor, subcategory, keyword, pageable)
+                .map(card -> convertToDto(card));
     }
 
     // 비교함 -  선택한 카드 리스트 반환
     public List<CardDto> getCardsForCompare(List<Long> ids) {
-        return cardRepository.findAllById(ids)
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        List<Card> cards = cardRepository.findAllById(ids);
+
+        // 카드 ID별 DTO 맵 생성
+        Map<Long, CardDto> cardMap = cards.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toMap(CardDto::getCardId, Function.identity()));
+
+        // 원래 ID 리스트 순서대로 DTO 리스트 생성
+        List<CardDto> sortedCards = ids.stream()
+            .map(cardMap::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        return sortedCards;
     }
 
     // 목록 -  전체 소분류명 리스트 가져오기

@@ -7,7 +7,9 @@ import java.util.Map;
 import com.example.reframe.session.RecentViewManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -56,6 +58,7 @@ public class CardController {
 	public String cardDetail(@PathVariable("cardId") Long cardId, Model model) {
 		cardService.incrementViewCount(cardId); // 카드 상세페이지 클릭할 때마다 조회수 +1
 		CardDto cardDto = cardService.getCardDetail(cardId);
+	
 		model.addAttribute("card", cardDto);
 
 		// 최근 본 상품 등록
@@ -71,6 +74,10 @@ public class CardController {
 			@RequestParam(name = "keyword", required = false) String keyword, // 검색 키워드
 			Pageable pageable, Model model) {
 
+	    if (pageable.getSort().isUnsorted()) {
+	        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("cardId").ascending());
+	    }
+	    
 		Page<CardDto> cards = cardService.getCards(categoryMajor, subcategory, keyword, pageable);
 		List<String> allSubcategories = cardService.getAllSubcategories();
 

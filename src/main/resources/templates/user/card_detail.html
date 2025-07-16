@@ -123,8 +123,8 @@
 				</div>
 				<h1 th:text="${card.name}">카드 이름</h1>
 				<p>
-					<strong>대분류:</strong> <span th:text="${card.categoryMajorDisplay}"></span>
-					| <strong>신청 상태:</strong> <span th:text="${card.statusDisplay}"></span>
+					<strong>카드: </strong> <span th:text="${card.categoryMajorDisplay}"></span>
+					| <strong>상태: </strong> <span th:text="${card.statusDisplay}"></span>
 				</p>
 				<p class="card-description" th:text="${card.description}">카드 요약
 					설명</p>
@@ -136,13 +136,18 @@
 			현재 이 카드를 <span th:text="${card.viewCount}" style="color: #007bff; font-weight: bold;"></span>명이 조회했습니다.
 		</div>
 
-		<!-- 비교함 담기 버튼 -->
+		<!-- 비교함 담기 + 목록으로 버튼 -->
 		<div style="text-align: center; margin-top: 20px;">
 		  <button type="button"
-		  th:attr="onclick=|addToCompare(${card.cardId})|"
-		  style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">
-		  비교함 담기
-		</button>
+		    th:attr="onclick=|addToCompare(${card.cardId})|"
+		    style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; margin-right: 10px;">
+		    비교함 담기
+		  </button>
+		
+		  <a href="/card/list"
+		    style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; text-decoration: none;">
+		    목록으로 &gt;
+		  </a>
 		</div>
 
 		<!-- 서비스 / 적립 정보 -->
