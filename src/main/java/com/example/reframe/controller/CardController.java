@@ -142,9 +142,8 @@ public class CardController {
 	// 결과 저장 + 추천카드 반환
 	@PostMapping("/card_test_result")
 	@ResponseBody
-	public List<CardDto> processTestResult(@RequestParam String resultType) {
+	public void  processTestResult(@RequestParam("resultId") String resultType) {
 		cardService.saveOrUpdateTestResult(resultType);
-		return cardService.getRecommendedCardsByResult(resultType);
 	}
 	
 	

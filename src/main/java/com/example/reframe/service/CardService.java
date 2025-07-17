@@ -140,24 +140,6 @@ public class CardService {
 		cardTestResultRepository.save(cardTestResult);
 	}
 
-	public List<CardDto> getRecommendedCardsByResult(String resultType) {
-		// 예시: 결과유형에 따라 카드 아이디 고정
-		List<Long> cardIds;
-
-		switch (resultType) {
-		case "ONLINE-SAVE-PLAN":
-			cardIds = List.of(1L, 2L, 3L); // 결과유형에 맞는 카드 ID
-			break;
-		case "OFFLINE-SPEND-IMPULSE":
-			cardIds = List.of(4L, 5L, 6L);
-			break;
-		default:
-			cardIds = List.of(); // fallback
-		}
-
-		return cardRepository.findAllById(cardIds).stream().map(this::convertToDto).collect(Collectors.toList());
-	}
-
 	public List<CardDto> getTopFiveByViewCount() {
 		List<Card> cardList = cardRepository.findTopFiveByViewCount();
 

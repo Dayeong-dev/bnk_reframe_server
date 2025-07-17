@@ -2,16 +2,62 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
-<title>소비성향 테스트</title>
+<title>텅장진단기</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@400;700&display=swap"
+	rel="stylesheet">
 <style>
 body {
-	font-family: Arial, sans-serif;
+	font-family: 'Gmarket Sans', sans-serif;
+	background: #f8f9fa;
+	color: #333;
 	text-align: center;
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	font-size: 36px;
+	margin: 50px 0 20px;
+	color: #222;
+}
+
+h2 {
+	font-size: 30px;
+	margin: 20px 0;
+}
+
+h3 {
+	font-size: 24px;
+	margin: 120px 0 0 0;
+}
+
+h4 {
+	font-size: 20px;
+	margin: 15px 0;
+}
+
+p {
+	line-height: 1.5;
+	font-size: 16px;
+	color: #555;
+	margin: 10px 0;
+}
+
+button {
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.3s ease;
 }
 
 .section {
 	display: none;
-	padding: 40px;
+	max-width: 1000px;
+	margin: 0 auto;
+	background: #fff;
+	border-radius: 12px;
+	padding: 40px 30px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
 }
 
 .section.active {
@@ -22,81 +68,95 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 20px;
+	margin-bottom: 10px;
 }
 
 #prev-btn {
 	background: none;
 	border: none;
-	color: #555;
 	font-size: 16px;
-	cursor: pointer;
+	color: #888;
 }
 
 #prev-btn:hover {
-	color: #000;
+	color: #111;
 	text-decoration: underline;
 }
 
 #progress-bar {
-	width: 80%;
-	background: #eee;
-	height: 10px;
-	margin: 20px auto;
-	border-radius: 5px;
+	position: relative;
+	width: 100%;
+	height: 12px;
+	background: #e0e0e0;
+	border-radius: 6px;
 	overflow: hidden;
+	margin: 20px 0;
 }
 
 #progress-fill {
-	width: 0%;
 	height: 100%;
-	background: #4CAF50;
-	transition: width 0.3s;
+	width: 0%;
+	background: linear-gradient(90deg, #fad684, #f5b21d);
+	transition: width 0.3s ease;
 }
 
 .progress-text {
-	margin-top: 5px;
 	font-size: 14px;
+	color: #666;
 }
 
 .question-img {
-	width: 600px;
-	border-radius: 8px;
-	margin: 20px 0;
+	width: 100%;
+	max-width: 600px;
+	border-radius: 12px;
+	margin: 30px 0;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
 .question {
-	margin: 20px 0;
-	font-size: 20px;
-	font-weight: bold;
+	font-size: 22px;
+	font-weight: 600;
+	color: #222;
 }
 
 #options {
 	display: flex;
-	justify-content: center;
-	gap: 40px; /* 버튼 간격 */
-	margin-top: 30px;
 	flex-wrap: wrap;
+	justify-content: center;
+	gap: 30px;
+	margin-top: 30px;
 }
 
 .option-btn {
-	display: inline-block;
-	width: 500px;
-	height: 80px;
-	padding: 20px;
-	margin: 10px;
+	flex: 1 1 40%;
+	min-width: 260px;
+	max-width: 450px;
+	padding: 20px 30px;
 	font-size: 18px;
-	border: 2px solid #ccc;
+	border: 2px solid #ddd;
 	border-radius: 50px;
-	background-color: #f9f9f9;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	background: #fdfdfd;
 	transition: all 0.3s ease;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .option-btn:hover {
-	background-color: #e6f7ff;
-	border-color: #0099ff;
-	transform: translateY(-3px);
+	transform: translateY(-4px);
+}
+
+#start-section button {
+	background: #f5b21d;
+	color: #fff;
+	padding: 14px 40px;
+	border: none;
+	border-radius: 30px;
+	font-size: 18px;
+	transition: background 0.3s;
+	margin-top: 30px;
+}
+
+#start-section button:hover {
+	background: #388e3c;
 }
 
 .card-list {
@@ -104,31 +164,119 @@ body {
 	flex-wrap: wrap;
 	justify-content: center;
 	margin-top: 30px;
+	gap: 20px;
 }
 
 .card-item {
-	width: 200px;
-	margin: 10px;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-	padding: 10px;
+	width: 220px;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	overflow: hidden;
+	background: #fff;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+	padding: 15px;
+	text-align: center;
+	margin-bottom: 20px;
 }
 
 .card-item img {
 	width: 100%;
-	border-radius: 5px;
+	max-width: 200px;
+	border-radius: 8px;
+}
+
+.card-item h4 {
+	font-size: 18px;
+	margin: 5px 0;
+	color: #222;
+}
+
+.recommend-reason {
+  font-size: 15px;
+  color: #333;
+  margin: 15px auto 10px;
+  white-space: pre-line;
+  max-width: 600px;
+  line-height: 1.6;
+}
+/* 결과 텍스트 - 상단 메시지 */
+.result-text.top {
+  font-size: 30px;
+  font-weight: 400;
+  color: #888;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* 결과 이름 - 중앙 타이틀 */
+.result-name {
+  font-size: 42px;
+  font-weight: 750;
+  color: #f5b21d;
+  margin-bottom: 40px;
+}
+
+/* 결과 퍼센트 */
+.result-percentage {
+  font-size: 25px;
+  font-weight: 700;
+  color: #111;
+  margin: 20px 0 10px;
+}
+
+/* 하단 설명 */
+.result-text.bottom {
+  font-size: 16px;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 30px;
+  white-space: pre-line;
+}
+
+/* 결과 이미지 정렬 */
+#result-img {
+  margin: 10px auto 10px;
+  width: 400px;
+  display: block;
+}
+
+#scroll-gif {
+  display: block;
+  margin: 30px auto -10px;
+  width: 80px;
+  animation: bounce 1.5s infinite;
+}
+
+/* 추천 카드 */
+.card-item.recommend-card {
+  margin: 5px auto 0;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 174, 239, 0.1);
+  width: 350px;
+}
+
+.card-item.recommend-card img {
+  max-width: 300px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.card-item.recommend-card h4 {
+  font-size: 15px;
+  color: #7f7f7f;
+  margin: 5px 0 0;
 }
 </style>
 </head>
 
 <body>
-	<h1>💳 내 통장이 텅장이 된 이유는?</h1>
+	<h1>💳 텅장진단기 💳</h1>
 
 	<!-- 시작 화면 -->
 	<div id="start-section" class="section active">
 		<img src="/images/cardTest/card_test_main.png" alt="텅장 분석기"
 			width="400" />
-		<h2>텅장분석기 테스트</h2>
+		<h2>텅장진단기</h2>
 		<p>내 통장이 텅장이 된 이유를 분석해드립니다!</p>
 		<p>나의 소비성향을 확인해보세요!</p>
 		<button onclick="startTest()">테스트 시작</button>
@@ -161,11 +309,15 @@ body {
 	</div>
 
 	<!-- 결과 화면 -->
-	<div id="result-section" class="section">
+	<div id="document" class="section">
 		<h2 id="result-title"></h2>
-		<img id="result-img" src="" alt="결과 이미지" width="400" />
 		<p id="result-desc"></p>
+		
+		 <!-- 스크롤 화살표 -->
+  		<img id="scroll-gif" src="/images/cardTest/scroll.gif" alt="화살표"/>
+  	
 		<h3>추천 카드</h3>
+		<p id="recommend-reason" class="recommend-reason"></p>
 		<div id="recommended-cards" class="card-list"></div>
 	</div>
 
@@ -174,7 +326,7 @@ body {
   const questions = [
     {
       img: '/images/cardTest/q1.png',
-      text: '1️⃣ 쇼핑할 때 더 설레는 순간은?',
+      text: '1️. 쇼핑할 때 더 설레는 순간은?',
       A: '택배 도착 알림 똑딱📦',
       B: '매장 가서 실물 딱 보는 순간✨',
       typeA: '온라인',
@@ -182,7 +334,7 @@ body {
     },
     {
       img: '/images/cardTest/q2.png',
-      text: '2️⃣ 결제할 땐?',
+      text: '2️. 결제할 땐?',
       A: '‘폰만 있으면 끝! 간편결제 최고’',
       B: '‘카드 꺼내서 긁는 맛 있어야지~’',
       typeA: '온라인',
@@ -190,7 +342,7 @@ body {
     },
     {
       img: '/images/cardTest/q3.png',
-      text: '3️⃣ 급하게 필요한 물건이 생겼을 땐?',
+      text: '3️. 급하게 필요한 물건이 생겼을 땐?',
       A: '‘이럴 땐 로켓 배송!! 바로 주문 ㄱ ㄱ’',
       B: '‘지금 나가서 사와야지!!’',
       typeA: '온라인',
@@ -198,7 +350,7 @@ body {
     },
     {
       img: '/images/cardTest/q4.png',
-      text: '4️⃣ 월급 들어오면 제일 먼저 하는 생각?',
+      text: '4️. 월급 들어오면 제일 먼저 하는 생각?',
       A: '‘일단 저축부터 하고.. 남은 돈으로 버텨보자!’',
       B: '‘휴 한달동안 넘 고생했다~~ 오늘은 엽떡에 허니콤보~~’',
       typeA: '저축',
@@ -206,7 +358,7 @@ body {
     },
     {
       img: '/images/cardTest/q5.png',
-      text: '5️⃣ 할인 쿠폰이 생겼을 때 나는?',
+      text: '5️. 할인 쿠폰이 생겼을 때 나는?',
       A: '‘아깝지만.. 필요한 건 아니니깐 안 살래🙅‍♀️’',
       B: '‘싸면 일단 득템이지~🛍️’',
       typeA: '저축',
@@ -214,7 +366,7 @@ body {
     },
     {
       img: '/images/cardTest/q6.png',
-      text: '6️⃣ 통장 잔고가 넉넉할 때 나는?',
+      text: '6️. 통장 잔고가 넉넉할 때 나는?',
       A: '‘이번 달은 더 모아야지!’ 하고 통장 보며 뿌듯하다.',
       B: '‘이 정도면 뭐 하나 사도 되겠는데?’ 하고 장바구니부터 찾는다.',
       typeA: '저축',
@@ -222,7 +374,7 @@ body {
     },
     {
       img: '/images/cardTest/q7.png',
-      text: '7️⃣ 큰 돈 쓸 땐?',
+      text: '7️. 큰 돈 쓸 땐?',
       A: '비교하고 적립하고 신중🗂️',
       B: '고민하다 귀찮으면 그냥 삼',
       typeA: '계획',
@@ -230,7 +382,7 @@ body {
     },
     {
       img: '/images/cardTest/q8.png',
-      text: '8️⃣ 쇼핑몰 들어가면?',
+      text: '8️. 쇼핑몰 들어가면?',
       A: '살 거만 딱 보고 나옴',
       B: '돌아다니다가 광고에 홀려서 이것저것 담음',
       typeA: '계획',
@@ -238,7 +390,7 @@ body {
     },
     {
       img: '/images/cardTest/q9.png',
-      text: '9️⃣ 결제 직전 내 루틴은?',
+      text: '9️. 결제 직전 내 루틴은?',
       A: '‘쿠폰, 포인트 싹 모아서 받을 수 있는 할인은 다 받아야지!’',
       B: '‘아웅 귀찮아..’ 그냥 결제 누르고 끝👆',
       typeA: '계획',
@@ -251,12 +403,13 @@ body {
 	  'ONLINE-SAVE-PLAN': {
 	    id: 1,
 	    name: '통장 철옹성',
-	    front: '새는 돈도 다시 보자!\n지름신이 와도 철벽수비하는',
+	    front: '지름신이 와도 철벽수비하는',
 	    percentage: '텅장력 10%',
 	    back: '꼼꼼하게 비교하여 소비하는 당신!\n잔고가 쌓이는 통장을 보면 밥 안 먹어도 배부르다~~',
 	    card: {
-	      name: 'My플러스카드',
-	      reason: '온라인 결제·자동이체 할인 집중, 계획적 저축에 적합한'
+	      id: 4,
+	      name: 'BNK 부자되세요 홈쇼핑카드',
+	      reason: '온라인 쇼핑몰, 홈쇼핑 집중형으로 \n온라인 결제·자동이체 할인에 계획적 저축에 적합한'
 	    }
 	  },
 	  'OFFLINE-SAVE-PLAN': {
@@ -266,8 +419,9 @@ body {
 	    percentage: '텅장력 20%',
 	    back: '지름신이 찾아오는 그 순간에도\n이성의 끈을 놓지 않는 명예 통장지킴이!',
 	    card: {
-	      name: 'Green 카드',
-	      reason: '교통, 주유, 편의점 등 오프라인 생활밀착 할인으로 절약에 유리한'
+	      id: 3,
+	      name: 'BNK 프렌즈 신용카드',
+	      reason: '대중교통 10%, 휴대폰 자동이체 5%, \n주중/주말 할인 등 오프라인 생활비 절약에 초점을 맞춘'
 	    }
 	  },
 	  'ONLINE-SAVE-IMPULSE': {
@@ -277,8 +431,9 @@ body {
 	    percentage: '텅장력 40%',
 	    back: '처음 계획과는 다르게 점점 늘어나는 소비..\n분명히 통장 잔고가 있었는데요? 없어졌습니다?',
 	    card: {
-	      name: '오늘은e 신용카드',
-	      reason: '온라인 생활서비스 및 충동성 소비 할인과 일부 저축성 혜택 포함된'
+	      id: 12,
+	      name: '팟(pod) 카드',
+	      reason: '온라인 쇼핑과 배달 앱에서 10~15% 할인, 간편결제 10% 할인 등 \n충동적 온라인 소비에 혜택이 많은'
 	    }
 	  },
 	  'OFFLINE-SAVE-IMPULSE': {
@@ -288,8 +443,9 @@ body {
 	    percentage: '텅장력 50%',
 	    back: '저축도 열심이지만 소비도 열심히 하는 당신!\n내 통장은 울지만 잠깐이나마 행복했으니 그걸로 된 거 아닐까..? ㅜ',
 	    card: {
-	      name: 'SK OIL&LPG카드',
-	      reason: '주유 특화 할인으로 오프라인 소액 충동과 저축 방어 가능한'
+	      id: 5,
+	      name: '딩딩 신용카드',
+	      reason: '음식점 10%, 커피&베이커리 10%, 영화관 할인 등 \n오프라인 충동성 소비에 혜택이 많은'
 	    }
 	  },
 	  'ONLINE-SPEND-PLAN': {
@@ -297,10 +453,11 @@ body {
 	    name: '계획소비러',
 	    front: '저 결심했어요. 돈 쓸 결심..',
 	    percentage: '텅장력 60%',
-	    back: '내 소비엔 다 계획이 있다구~\n이 정도는 써줘야 인생 살 맛 나지!! 오늘도 온라인 쇼핑 한번 해볼까~',
+	    back: '내 소비엔 다 계획이 있다구~\n이 정도는 써줘야 인생 살 맛 나지!! \n오늘도 온라인 쇼핑 한번 해볼까~',
 	    card: {
-	      name: 'BNK 부자되세요 홈쇼핑카드',
-	      reason: '홈쇼핑과 온라인 쇼핑 계획적 소비에 특화된'
+	      id: 16,
+	      name: '오늘은e 신용카드',
+	      reason: '간편결제 5%, 학원 5%, 통신 5%, 커피 5%, 대중교통 5%, 영화 5% 청구 할인 등 \n생활 필수 소비 계획에 딱 맞는'
 	    }
 	  },
 	  'OFFLINE-SPEND-PLAN': {
@@ -308,10 +465,11 @@ body {
 	    name: '소비요정',
 	    front: '요정 등장! 내가 나간다!',
 	    percentage: '텅장력 70%',
-	    back: '노는 게 제일 좋아!\n밖에 나가면 일단 지갑부터 여는 소비요정!! 그런데 어디서 우는 소리 안 들리나요? 통장 우는 소리..',
+	    back: '노는 게 제일 좋아!\n밖에 나가면 일단 지갑부터 여는 소비요정!! \n그런데 어디서 우는 소리 안 들리나요? 통장 우는 소리..',
 	    card: {
-	      name: '부산체육사랑카드',
-	      reason: '스포츠, 의료, 문화 등 오프라인 계획적 지출에 맞춤 할인이 가능한'
+	      id: 8,
+	      name: 'ZipL 신용카드',
+	      reason: '아파트관리비, 도시가스, 보험, 학원 등 \n오프라인 생활 필수 지출에 10% 청구 할인되는'
 	    }
 	  },
 	  'ONLINE-SPEND-IMPULSE': {
@@ -319,10 +477,11 @@ body {
 	    name: '이 구역 지름신',
 	    front: '핸드폰만 키면 왜 잔고가 줄줄 새니..',
 	    percentage: '텅장력 90%',
-	    back: '일단 담고보자!\n장바구니가 항상 풀로 차있는.. 오늘 밤 지름신은 나야 나!',
+	    back: '일단 담고보자!\n장바구니가 항상 풀로 차있는.. \n오늘 밤 지름신은 나야 나!',
 	    card: {
-	      name: 'Dynamic 카드',
-	      reason: 'OTT, 배달, 간편결제 등 충동성 온라인 소비 적립에 최적화 된'
+	      id: 14,
+	      name: '2030 언택트 체크카드',
+	      reason: '쿠팡, 마켓컬리, 배달의민족 등 온라인 쇼핑과 \n딜리버리 3% 할인에 구독 서비스 20% 할인까지 \n충동 소비용으로 적합한'
 	    }
 	  },
 	  'OFFLINE-SPEND-IMPULSE': {
@@ -330,13 +489,15 @@ body {
 	    name: '프로탕진러',
 	    front: '사고싶은 건 못 참아 다 사고말테야!!',
 	    percentage: '텅장력 100%',
-	    back: '이것도 내 거, 저것도 내 거..\n맘에 드는 건 다 내 거야! 일단 맘에 드는 건 사고보는 프로탕진러',
+	    back: '이것도 내 거, 저것도 내 거..\n맘에 드는 건 다 내 거야! \n일단 맘에 드는 건 사고보는 프로탕진러',
 	    card: {
+	      id: 18,
 	      name: '딩딩 체크카드',
-	      reason: '외식, 카페, 영화 등 오프라인 충동성 소비에 특화된'
+	      reason: '편의점, 베이커리, 외식, 커피, 영화 등 \n오프라인 충동성 소비에 할인폭 크고 활용도가 높은'
 	    }
 	  }
 	};
+
 
 
 
@@ -388,7 +549,7 @@ body {
 
   function finishTest() {
 	  document.getElementById('question-section').classList.remove('active');
-	  document.getElementById('result-section').classList.add('active');
+	  document.getElementById('document').classList.add('active');
 
 	  const type1 = counts.온라인 >= counts.오프라인 ? 'ONLINE' : 'OFFLINE';
 	  const type2 = counts.저축 >= counts.소비 ? 'SAVE' : 'SPEND';
@@ -397,45 +558,29 @@ body {
 
 	  const result = resultMap[resultType] || { id: 0, name: '알 수 없음' };
 
-	  // 순서: front -> name -> result img -> percentage -> back
-	  const resultHTML = `
-	    <p style="font-size: 20px; white-space: pre-line; margin-bottom: 10px;">${result.front}</p>
-	    <h2 style="font-size: 28px; margin: 10px 0;">${result.name}</h2>
-	    <img src="/images/cardTest/r${result.id}.png" alt="결과 이미지"
-	        style="display:block; margin: 15px auto; max-width: 400px; border-radius: 8px;" />
-
-	    <p style="font-size: 16px; margin: 10px 0;">${result.percentage}</p>
-	    <p style="font-size: 12px; color: #555; white-space: pre-line; margin: 10px 0;">${result.back}</p>
-	  `;
-
-	  document.getElementById('result-title').innerHTML = resultHTML;
+	// 순서: front -> name -> result img -> percentage -> back
+		const resultHTML = `
+		  <p class="result-text top">${result.front}</p>
+		  <h2 class="result-name">${result.name}</h2>
+		  <img id="result-img" src="/images/cardTest/r${result.id}.jpg" alt="결과 이미지" />
+		  <p class="result-percentage">${result.percentage}</p>
+		  <p class="result-text bottom">${result.back}</p>
+		`;
+		
+		document.getElementById('result-title').innerHTML = resultHTML;
 
 	  // 추천카드 이유 + 카드 이미지 + 카드 이름
 		const container = document.getElementById('recommended-cards');
+		document.getElementById('recommend-reason').innerText = result.card.reason;
+
 		container.innerHTML = `
-		  <p style="font-size: 14px; color: #333; margin: 10px 0; white-space: pre-line;">
-		    ${result.card.reason}
-		  </p>
+			<a href="/card/detail/${result.card.id}" class="card-item recommend-card">
+			  <img src="/images/cards/${result.card.id}_front.PNG" alt="${result.card.name}" />
+			  <h4>${result.card.name}</h4>
+			</a>
+			  
 		`;
-
-	  fetch('/card/card_test_result', {
-	    method: 'POST',
-	    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	    body: 'resultId=' + result.id
-	  })
-	  .then(res => res.json())
-	  .then(cards => {
-	    cards.forEach(card => {
-	      container.innerHTML += `
-	    	  <div class="card-item" style="text-align: center;">
-	          <img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name}" style="max-width:200px; border-radius:8px;" />
-	          <h4 style="font-size: 18px; margin: 5px 0;">${card.name}</h4>
-	        </div>
-	      `;
-	    });
-	  });
-	}
-
+  }
 
 </script>
 
