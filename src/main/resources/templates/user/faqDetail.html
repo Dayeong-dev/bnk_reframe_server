@@ -1,34 +1,47 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="/css/common.css"></link>
-<title>faq 상세 보기</title>
+  <meta charset="UTF-8">
+  <title>FAQ 상세 보기</title>
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
 </head>
 <body>
-<br><br><br>
-<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-
-	<h1>faq 상세 보기</h1>
-
-	<span class="label">글번호:</span>
-	<span th:text="${faq.faqId}">글번호</span>
-
-	<span class="label">제목:</span>
-	<span th:text="${faq.question}">제목</span>
-
-	<span class="label">카테고리:</span>
-	<span th:text="${faq.category}">카테고리</span>
-
-	<!--  
-	<span class="label">작성일:</span>
-	<span th:text="${#temporals.format(faq.regdate, 'yyyy-MM-dd HH:mm')}">작성일</span>
-	-->
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
 	
-	<hr>
-	<span class="label">답변:</span>
-	<div class="content-box" th:text="${faq.answer}">게시글 내용이 들어갑니다.</div>
+	<div id="container">
+		<section class="qna-section">
+		  <h2>FAQ 상세 보기</h2>
+		
+		  <div class="qna-detail-container">
+		
+		    <table class="qna-detail-table">
+		      <tr>
+		        <th>글번호</th>
+		        <td th:text="${faq.faqId}">글번호</td>
+		      </tr>
+		      <tr>
+		        <th>제목</th>
+		        <td th:text="${faq.question}">질문 제목</td>
+		      </tr>
+		      <tr>
+		        <th>카테고리</th>
+		        <td th:text="${faq.category}">카테고리</td>
+		      </tr>
+		      <tr>
+		        <th>답변</th>
+		        <td>
+		          <div class="answer" th:text="${faq.answer}">답변 내용입니다.</div>
+		        </td>
+		      </tr>
+		    </table>
+		
+		    <a class="back-link" href="/faq/faq">← 목록으로</a>
+		  </div>
+		</section>
+	</div>
 
-	<a href="/faq/faq">← 목록으로</a>
 </body>
 </html>

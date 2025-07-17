@@ -49,6 +49,14 @@
 				<li><a href="/qna/qna">1:1 문의</a></li>
 				<li><a href="/faq/faq">자주 묻는 질문</a></li>
 			</ul>
+			<div class="recent-views">
+				<h4>최근 본 상품</h4>
+				<ul th:if="${recentViewList != null and not #lists.isEmpty(recentViewList)}">
+					<li th:each="recentView : ${recentViewList}">
+						<a th:href="${'/' + recentView.type + '/detail/' + recentView.id}" th:text="${recentView.name}"></a>
+					</li>
+				</ul>
+			</div>
 	    </div>
 	</div>
     <script>

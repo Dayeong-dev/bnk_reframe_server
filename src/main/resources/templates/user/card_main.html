@@ -1,14 +1,21 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
 <title>카드 메인 페이지</title>
 
+<link rel="stylesheet" href="/css/common.css"></link>
+<link rel="stylesheet" href="/css/user.css"></link>
 <!-- slick CSS -->
 <link rel="stylesheet" type="text/css"
   href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
 <link rel="stylesheet" type="text/css"
   href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script
@@ -40,12 +47,16 @@ h1 {
   margin: 20px 0 40px;
 }
 
+/* 반응형으로 너비 조절 */
 .search-box input {
-  width: 300px;
+  width: 80%;
+  max-width: 400px;
+  min-width: 180px;
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px 0 0 4px;
   font-size: 16px;
+  box-sizing: border-box;
 }
 
 .search-box button {
@@ -63,6 +74,21 @@ h1 {
   background-color: #0056b3;
 }
 
+/* 스와이퍼 아이템 */
+
+.swiper-3d .swiper-slide-shadow {
+    background: transparent;
+}
+.swiper-slide p {
+  display: none;
+}
+
+.swiper-slide-active p {
+  display: block;
+  color: #222;
+  font-weight: bold; /* 필요하면 진하게 */
+}
+
 .slider-container {
   margin: 0 auto 40px;
   position: relative;
@@ -70,17 +96,15 @@ h1 {
 
 /* 슬릭 슬라이드 아이템 스타일 */
 .slide-item {
-  text-align: center;
+  transition: transform 0.3s ease;
   padding: 0 10px;
   box-sizing: border-box;
-  transition: transform 0.3s ease;
   cursor: pointer;
 }
 
 .slide-item img {
-  width: 100%;
-  max-width: 280px;
-  height: 180px;
+  width: 100%;  /* 원하는 이미지 너비 */
+  height: auto;
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
@@ -92,16 +116,7 @@ h1 {
   transform: scale(1.05);
 }
 
-/* 가운데 슬라이드가 커지면서 강조되는 효과 */
-.slick-center .slide-item {
-  transform: scale(1.3);
-  z-index: 2;
-}
-
-.slick-center .slide-item img {
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  transform: scale(1.1);
-}
+  
 
 .slide-item p {
   margin-top: 10px;
@@ -111,47 +126,111 @@ h1 {
 }
 
 /* 카드 목록 그리드 스타일 */
+/* 반응형 그리드 1~3열 */
 .section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.more-link-wrapper {
+  text-align: center;
+  margin-top: 30px; /* 카드 그리드와 간격 */
+}
+
+.more-link {
+  display: inline-block;
+  font-weight: 600;
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.more-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
 }
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr); /* 2열 고정 grid-template-rows: repeat(3, auto);   3행 고정*/ 
+
   grid-gap: 20px;
+  margin-bottom: 40px;
 }
 
-.card-item {
-  display: flex;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fafafa;
-  transition: box-shadow 0.3s ease;
-}
 
 .card-item:hover {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
+.card-item {
+  display: flex;
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease;
+  min-height: 250px;
+  align-items: flex-start; /* 상단 정렬 유지 */
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  gap: 12px; /* 적당한 간격 */
+  padding: 20px;
+  box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
 
-.card-item img {
-  width: 150px;
-  height: auto;
+.card-tags {
+  margin-bottom: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px; /* 태그 사이 간격 */
+}
+
+.card-tags span {
+  background: #eee;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  color: #555;
+  user-select: none;
+  display: inline-block;
+}
+
+.img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 250px;
+  width: 150px; /* 이미지 눕는 가로 길이 맞춤 */
+  margin-top: 0;
+  overflow: hidden; /* 튀어나옴 방지 */
+  box-sizing: border-box;
+  position: relative; /* transform-origin 조절 위해 */
+}
+
+.img-container img {
+  width: auto;
+  height: 150px;
   object-fit: contain;
+  transform: rotate(90deg);
+  transform-origin: center center; /* 기준점 조절 */
+  flex-shrink: 0;
+  display: block;
+  margin: 0;
 }
 
 .card-desc {
-  padding: 10px 15px;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-top: 10px; /* 위쪽 정렬 */
 }
 
+
+/* 카드 이름도 클릭 영역에 포함되도록 a 태그로 감싸기 */
 .card-desc h4 {
-  margin: 0 0 5px;
+  margin: 0 0 10px;
   font-size: 18px;
   color: #222;
+  cursor: pointer;
 }
 
 .card-desc p {
@@ -177,19 +256,6 @@ h1 {
 
 .banner img:hover {
   transform: scale(1.03);
-}
-
-.more-link {
-  display: inline-block;
-  margin: 5px 0 20px;
-  font-size: 14px;
-  text-decoration: none;
-  color: #007bff;
-  font-weight: 600;
-}
-
-.more-link:hover {
-  text-decoration: underline;
 }
 
 /* 슬릭 커스텀 좌우 화살표 스타일 */
@@ -240,9 +306,6 @@ h1 {
 
 /* 반응형 */
 @media (max-width: 768px) {
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
   .slick-prev {
     left: -35px;
   }
@@ -264,71 +327,126 @@ h1 {
     right: -30px;
   }
 }
+
+@media (max-width: 400px) {
+  .search-box input {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+  }
+  .search-box button {
+    width: 100%;
+    border-radius: 0 0 4px 4px;
+    margin-top: 8px;
+  }
+  .search-box {
+    margin-bottom: 20px;
+  }
+}
 </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>카드 메인 페이지</h1>
+<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	<div id="container" >
+		<section>
+			<div class="container">
+			    <h1>카드 메인 페이지</h1>
+			    <!-- 스와이퍼 -->
+				<div class="swiper mySwiper" style="width: 100%; max-width: 600px; margin: 0 auto;">
+				  <div class="swiper-wrapper">
+				    <div class="swiper-slide" th:each="card : ${allCards}" style="text-align:center;">
+				      <a th:href="@{'/card/detail/' + ${card.cardId}}">
+				        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" alt="" style="width:300px; height:auto; border-radius:8px;" />
+				        <p th:text="${card.name}"></p>
+				      </a>
+				    </div>
+				  </div>
+				</div>
+			
+			    <!-- 슬릭 슬라이더 컨테이너 
+			    <div class="slider-container">
+			      <div class="slider">
+					<div class="slide-item" th:each="card : ${allCards}">
+			          <a th:href="@{'/card/detail/' + ${card.cardId}}">
+			            <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+			              th:alt="${card.name}" />
+			            <p th:text="${card.name}"></p>
+			          </a>
+			        </div>
+			      </div>
+			    </div>-->
+			
+			    <!-- 카드 이름 검색 폼 -->
+			    <div class="search-box">
+			      <form method="get" action="/card/list">
+			        <input type="text" name="keyword" placeholder="카드 이름 검색" />
+			        <button type="submit">검색</button>
+			      </form>
+			    </div>
+			
+				<!-- 카드 목록 헤더 -->
+				<div class="content-wrapper">
+				  <div class="section-header">
+				    <h2>인기/추천 카드</h2>
+				  </div>
+				
+				  <!-- 카드 목록 그리드 -->
+				  <div class="card-grid">
+				    <a class="card-item" th:href="@{'/card/detail/' + ${card.cardId}}" th:each="card : ${topCards}">
+				      <div class="img-container">
+				        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
+				      </div>
+				      <div class="card-desc">
+				        <div class="card-tags" th:if="${card.tags != null}">
+				          <span class="tag" th:each="tag : ${#strings.arraySplit(card.tags, ' ')}" th:text="${tag}"></span>
+				        </div>
+				        <h4 th:text="${card.name}"></h4>
+				        <p th:text="${card.description}"></p>
+				      </div>
+				    </a>
+				  </div>
+				
+				  <!-- 더보기 버튼을 그리드 아래에 -->
+				  <div class="more-link-wrapper">
+				    <a href="/card/list" class="more-link">전체 상품 &gt;</a>
+				  </div>
+				</div>
+			
+			
+			    <!-- 소비성향 테스트 배너 -->
+			    <div class="banner">
+			      <a href="/card/card_test">
+			        <img src="/images/cardTest/card_test_banner.png" alt="소비성향 테스트" />
+			      </a>
+			    </div>
+			  </div>
+		</section>	
+	</div>
+  
 
-    <!-- 슬릭 슬라이더 컨테이너 -->
-    <div class="slider-container">
-      <div class="slider">
-        <div class="slide-item" th:each="card : ${topCards}">
-          <a th:href="@{'/card/detail/' + ${card.cardId}}">
-            <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
-              th:alt="${card.name}" />
-            <p th:text="${card.name}"></p>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- 카드 이름 검색 폼 -->
-    <div class="search-box">
-      <form method="get" action="/card/list">
-        <input type="text" name="keyword" placeholder="카드 이름 검색" />
-        <button type="submit">검색</button>
-      </form>
-    </div>
-
-    <!-- 카드 목록 헤더 및 더보기 링크 -->
-    <div class="section-header">
-      <h2>카드 상품</h2>
-    </div>
-    <a href="/card/list" class="more-link">더보기 &gt;</a>
-
-    <!-- 카드 목록 그리드 -->
-    <div class="card-grid">
-      <div class="card-item" th:each="card : ${topCards}">
-        <a th:href="@{'/card/detail/' + ${card.cardId}}">
-          <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
-            th:alt="${card.name}" />
-        </a>
-        <div class="card-desc">
-          <a th:href="@{'/card/detail/' + ${card.cardId}}">
-            <h4 th:text="${card.name}"></h4>
-          </a>
-          <p th:text="${card.description}"></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 소비성향 테스트 배너 -->
-    <div class="banner">
-      <a href="/card/card_test">
-        <img src="/images/cards/card_test_banner.png" alt="소비성향 테스트" />
-      </a>
-    </div>
-  </div>
-
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <script>
+  
+  var swiper = new Swiper(".mySwiper", {
+	  effect: "cards",
+	  grabCursor: true,
+	  autoplay: {
+	    delay: 1300, // 자동 슬라이드(1.3초)
+	    disableOnInteraction: false // 사용자가 손대도 자동 재생 계속
+	  },
+	  loop: true // cards 효과는 loop랑 같이 쓰는 걸 권장!
+	});
+  
+  /*
     $(document).ready(function () {
       $('.slider').slick({
         centerMode: true,          // 가운데 슬라이드 강조 모드 활성화
-        centerPadding: '60px',     // 좌우 패딩 (슬라이드 주변 여백)
         slidesToShow: 3,           // 한번에 보이는 슬라이드 개수
+        centerPadding: '60px',     // 좌우 패딩 (슬라이드 주변 여백)
+        variableWidth: false,  // 각 슬라이드 너비 내부 콘텐츠 기준 자동 조절
         slidesToScroll: 1,         // 한번에 넘어가는 슬라이드 개수
         autoplay: true,            // 자동 슬라이드 활성화
         autoplaySpeed: 1500,       // 자동 슬라이드 속도 (1.5초)
@@ -347,7 +465,6 @@ h1 {
               slidesToShow: 2,
               arrows: true,
               dots: true,
-              centerMode: true,
               centerPadding: '40px',
             }
           },
@@ -364,7 +481,8 @@ h1 {
         ]
       });
     });
+  */
   </script>
 
 </body>
-</html>
+</html> 

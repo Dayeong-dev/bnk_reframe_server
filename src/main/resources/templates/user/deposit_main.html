@@ -1,180 +1,238 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>BNK 예적금 메인</title>
-<style>
-    body {
-        background: #f8f9fa;
-        font-family: 'Noto Sans KR', sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
+  <title>BNK 예적금 메인</title>
+  <style>
+  body {
+  background: #f8f9fa;
+  font-family: 'BNKGothic', sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #212529;
+}
 
-    /* 슬라이드 배너 */
-    .slider-container {
-        position: relative;
-        width: 90%;
-        max-width: 800px;
-        height: 200px;
-        overflow: hidden;
-        border-radius: 10px;
-        margin: 20px 0;
-    }
-    .slider {
-        display: flex;
-        width: 300%;
-        transition: transform 0.5s ease;
-        height: 100%;
-    }
-    .slide {
-        width: 100%;
-        object-fit: cover;
-        display: none;
-    }
-    .slide.active {
-        display: block;
-    }
-    .prev, .next {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0,0,0,0.5);
-        color: white;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
-        font-size: 18px;
-        border-radius: 50%;
-    }
-    .prev { left: 10px; }
-    .next { right: 10px; }
-    .prev:hover, .next:hover { background: rgba(0,0,0,0.7); }
+/* 슬라이드 배너 */
+.slider-container {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: 2rem 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
 
-    /* 메인 영역 */
-    .content-wrapper {
-        display: flex;
-        width: 90%;
-        max-width: 1200px;
-        align-items: stretch;
-        gap: 20px;
-        height: 330px;
-    }
-    .sidebar {
-        width: 200px;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-    .purpose-btn {
-        height: 105px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f1f3f5;
-        color: #212529;
-        font-weight: 500;
-        font-size: 17px;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-        position: relative;
-    }
-    .purpose-btn.active {
-        background: #1565c0;
-        color: white;
-    }
-    .purpose-btn.active::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        right: -10px;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
-        border-left: 10px solid #1565c0;
-    }
+.slider {
+  display: flex;
+  width: 300%;
+  transition: transform 0.5s ease;
+}
 
-    .recommend-wrapper {
-        flex: 1;
-        display: flex;
-        gap: 10px;
-        height: 100%;
-    }
-    .highlight-product {
-        flex: 0 0 30%;
-        background: #fff3f3;
-        border: 1px solid #f8d7da;
-        border-radius: 8px;
-        padding: 10px;
-        text-align: center;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        font-size: 13px;
-    }
-    .grid-cards {
-        flex: 1;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 8px;
-    }
-    .card {
-        background: #fff3f3;
-        border: 1px solid #f8d7da;
-        border-radius: 8px;
-        padding: 8px;
-        text-align: center;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        font-size: 12px;
-    }
-    .highlight-product:hover, .card:hover {
-        background: #ffeaea;
-    }
-/* 검색 */
+.slide {
+  width: 100%;
+  object-fit: cover;
+  display: none;
+  border-radius: 12px;
+}
+
+.slide.active {
+  display: block;
+}
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;  /* 배경 제거 */
+  color: #333;
+  font-size: 32px;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.slider-arrow:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.2);  /* 호버 시 확대 효과 */
+}
+
+.slider-arrow.left {
+  left: 10px;
+}
+
+.slider-arrow.right {
+  right: 10px;
+}
+
+
+.dots {
+  position: absolute;
+  bottom: 12px;
+  width: 100%;
+  text-align: center;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  margin: 0 4px;
+  background-color: #ced4da;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: var(--primary-color);
+}
+
+/* 목적별 추천 */
+.purpose-content-wrapper {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  gap: 24px;
+  height: 330px;
+  margin-top: 2rem;
+}
+
+.sidebar {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.purpose-btn {
+  height: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f3f5;
+  color: #212529;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+  position: relative;
+  border: 1px solid #ccc;
+}
+
+.purpose-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.purpose-btn.active::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid var(--primary-color);
+}
+
+.recommend-wrapper {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  height: 100%;
+}
+
+.highlight-product,
+.card {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1.2rem 1rem; /* ✅ 여백 살짝 증가 */
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.highlight-product:hover,
+.card:hover {
+  background: #f8f9fa;
+  transform: translateY(-4px);
+}
+
+/* ✅ 제목 스타일 개선 */
+.highlight-product h4,
+.card h4 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  color: #212529;
+}
+
+/* ✅ 설명 스타일 개선 */
+.highlight-product p,
+.card p {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0.2rem 0;
+  color: #555;
+}
+
+/* ✅ 기간(12개월 등) 강조 (선택) */
+.card p:last-of-type,
+.highlight-product p:last-of-type {
+  font-weight: bold;
+  color: #212529;
+  margin-top: 0.5rem;
+}
+
+/* 카드 배치 */
+.grid-cards {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+
+/* 검색창 */
 .search-section {
-    width: 100%;
-    background: #f1f3f5; /* 연한 회색 배경 */
-    padding: 30px 20px;   /* 상하 충분히 여백 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    border-radius: 8px;
-    box-sizing: border-box;
+  width: 100%;
+  background: none;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .search-form {
-    display: flex;
-    width: 100%;
-    max-width: 500px;
-    position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
 }
 
 .search-input {
-    flex: 1;
-    padding: 14px 50px 14px 20px;
-    border: 1px solid #ccc;
-    border-radius: 30px;
-    font-size: 15px;
-    outline: none;
-    transition: border 0.3s, box-shadow 0.3s;
-}
-
-.search-input:focus {
-    border-color: #1565c0;
-    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
+  flex: 1;
+  padding: 14px 50px 14px 20px;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  font-size: 15px;
 }
 
 .search-icon {
@@ -195,290 +253,307 @@
 }
 
 .hashtag-button {
-    background: #e0e3e7;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s;
-    white-space: nowrap;
+  background: #dee2e6;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .hashtag-button:hover {
-    background: #cfd2d6;
+  background: #ced4da;
 }
 
-/* 테마추천영역 */
-/* 테마 버튼 */
-.theme-btn {
-    padding: 12px 22px;
-    border: none;
-    border-radius: 20px;
-    background: #f1f3f5;
-    color: #212529;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-}
-.theme-btn:hover {
-    background: #e0e0e0;
-}
-.active-theme {
-    background: #1565c0;
-    color: white;
-    font-weight: 600;
-}
-
-/* 테마 슬라이드 컨테이너 */
+/* 테마 추천 */
 .theme-slider-container {
-    width: 95%;
-    max-width: 1200px;
-    margin: 40px auto;
-    position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 3rem auto;
+  position: relative;
 }
 
-/* 테마 카드 */
+.theme-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background: #f1f3f5;
+  color: #212529;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.theme-btn.active-theme {
+  background: var(--primary-color);
+  color: white;
+}
+
 .theme-card {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
-    padding: 25px;
-    width: 320px;
-    height: 260px;
-    cursor: pointer;
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 20px;
+  width: 320px;
+  height: 240px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.2s;
 }
+
 .theme-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-    background: #fdfdfd;
+  transform: translateY(-6px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-.theme-card h4 {
-    margin: 12px 0 8px;
-    font-size: 22px;
-    font-weight: 700;
-    color: #212529;
-}
-.theme-card p {
-    margin: 6px 0;
-    font-size: 16px;
-    color: #555;
-    word-break: keep-all;
-}
+
 .theme-card .rate {
-    color: #1565c0;
-    font-weight: 700;
-    font-size: 18px;
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 17px;
 }
 
-/* 좌우 버튼 */
-.theme-prev, .theme-next {
-    background: rgba(0,0,0,0.5);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 22px;
-    cursor: pointer;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: background 0.2s;
+.theme-prev,
+.theme-next {
+  background: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-.theme-prev { left: -40px; }
-.theme-next { right: -40px; }
-.theme-prev:hover, .theme-next:hover { background: rgba(0,0,0,0.7); }
 
-    
-</style>
+.theme-prev:hover,
+.theme-next:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.theme-prev { left: -30px; }
+.theme-next { right: -30px; }
+
+
+  </style>
 </head>
 <body>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	
+	<div id="container">
+		<section>
+			<!-- ✅ 슬라이드 배너 -->
+			<div class="slider-container">
+			  <div class="slider" id="slider">
+			    <img src="/img/image1.jpg" class="slide active">
+			    <img src="/img/image2.jpg" class="slide">
+			    <img src="/img/image3.jpg" class="slide">
+			  </div>
+			  <button class="slider-arrow left" onclick="prevSlide()">❮</button>
+			  <button class="slider-arrow right" onclick="nextSlide()">❯</button>
+			  <div class="dots">
+			    <span class="dot active" onclick="setSlide(0)"></span>
+			    <span class="dot" onclick="setSlide(1)"></span>
+			    <span class="dot" onclick="setSlide(2)"></span>
+			  </div>
+			</div>
+			
+			<!-- ✅ 목적별 추천 상품 -->
+			<div class="purpose-content-wrapper">
+			  <div class="sidebar">
+				  <button class="purpose-btn active" data-category="적금">목돈 만들기</button>
+				  <button class="purpose-btn" data-category="예금">목돈 굴리기</button>
+				  <button class="purpose-btn" data-category="입출금자유">입출금 자유</button>
+				</div>
+			
+			  <div class="recommend-wrapper" id="recommendArea">
+			    <div th:if="${highlightProduct != null}" class="highlight-product" th:onclick="'location.href=\'/deposit/detail/' + ${highlightProduct.productId} + '\''">
+			      <h4 th:text="${highlightProduct.name}">강력추천</h4>
+			      <p th:text="${highlightProduct.summary}">요약</p>
+			      <p>최고 <b th:text="${highlightProduct.maxRate}"></b>% / 최저 <b th:text="${highlightProduct.minRate}"></b>%</p>
+			      <p><b th:text="${highlightProduct.period}"></b>개월</p>
+			    </div>
+			    <div class="grid-cards">
+			      <div class="card" th:each="product : ${otherProducts}" th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
+			        <h4 th:text="${product.name}">추천 상품명</h4>
+			        <p>최고 <b th:text="${product.maxRate}"></b>% / 최저 <b th:text="${product.minRate}"></b>%</p>
+			        <p><b th:text="${product.period}"></b>개월</p>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+			<!-- ✅ 검색창 -->
+			<div class="search-section">
+			  <form class="search-form" action="/deposit/list" method="get">
+			    <input type="text" name="keyword" class="search-input" placeholder="검색어를 입력하세요">
+			    <button type="submit" class="search-icon" aria-label="검색"></button>
+			  </form>
+			  <button class="hashtag-button" onclick="searchHashtag('적금')">#적금</button>
+			  <button class="hashtag-button" onclick="searchHashtag('예금')">#예금</button>
+			</div>
+			
+			<!-- ✅ 테마 추천 -->
+			<div class="theme-slider-container">
+			  <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px;">
+			    <button class="theme-btn" id="btn-주부" onclick="showTheme('주부')">주부</button>
+			    <button class="theme-btn active-theme" id="btn-직장인" onclick="showTheme('직장인')">직장인</button>
+			    <button class="theme-btn" id="btn-학생" onclick="showTheme('학생')">학생</button>
+			  </div>
+			
+			  <button class="theme-prev" onclick="prevTheme()">❮</button>
+			  <button class="theme-next" onclick="nextTheme()">❯</button>
+			
+			  <div id="themeSlider">
+			    <div id="theme-직장인" class="theme-slide-group" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+			      <div th:each="p : ${workerProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
+			        <h4 th:text="${p.name}">상품명</h4>
+			        <p th:text="${p.summary}">상품 요약</p>
+			        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
+			      </div>
+			    </div>
+			    <div id="theme-주부" class="theme-slide-group" style="display: none; flex-wrap: wrap; gap: 20px; justify-content: center;">
+			      <div th:each="p : ${housewifeProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
+			        <h4 th:text="${p.name}">상품명</h4>
+			        <p th:text="${p.summary}">상품 요약</p>
+			        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
+			      </div>
+			    </div>
+			    <div id="theme-학생" class="theme-slide-group" style="display: none; flex-wrap: wrap; gap: 20px; justify-content: center;">
+			      <div th:each="p : ${studentProducts}" class="theme-card" th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
+			        <h4 th:text="${p.name}">상품명</h4>
+			        <p th:text="${p.summary}">상품 요약</p>
+			        <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+		</section>
+	</div>
 
-<!-- ✅ 상단 이미지 슬라이드 배너 -->
-<div class="slider-container">
-    <div class="slider">
-        <img src="/images/potato.jpg" class="slide active">
-        <img src="/images/potato.jpg" class="slide">
-        <img src="/images/potato.jpg" class="slide">
-    </div>
-    <button class="prev" onclick="prevSlide()">❮</button>
-    <button class="next" onclick="nextSlide()">❯</button>
-</div>
-
-<!-- ✅ 메인 콘텐츠 -->
-<div class="content-wrapper">
-
-    <!-- 목적 사이드바 -->
-    <div class="sidebar">
-        <a th:href="@{/deposit/main(purpose='목돈 만들기')}"
-           th:classappend="${selectedPurpose} == '목돈 만들기' ? 'active' : ''"
-           class="purpose-btn">목돈 만들기</a>
-        <a th:href="@{/deposit/main(purpose='목돈 굴리기')}"
-           th:classappend="${selectedPurpose} == '목돈 굴리기' ? 'active' : ''"
-           class="purpose-btn">목돈 굴리기</a>
-        <a th:href="@{/deposit/main(purpose='입출금 자유')}"
-           th:classappend="${selectedPurpose} == '입출금 자유' ? 'active' : ''"
-           class="purpose-btn">입출금 자유</a>
-    </div>
-
-    <!-- 추천상품 영역 -->
-    <div class="recommend-wrapper">
-
-        <!-- 강력추천 -->
-        <div th:if="${highlightProduct != null}"
-             class="highlight-product"
-             th:onclick="'window.location.href=\'/deposit/detail/' + ${highlightProduct.productId} + '\''">
-            <h4 th:text="${highlightProduct.name}">강력추천 상품명</h4>
-            <p th:text="${highlightProduct.summary}">상품 설명</p>
-            <p>최고 <b th:text="${highlightProduct.maxRate}">0.00</b>% / 최저 <b th:text="${highlightProduct.minRate}">0.00</b>%</p>
-            <p><b th:text="${highlightProduct.period}">0</b>개월</p>
-        </div>
-
-        <!-- 추천상품 4개 2x2 -->
-        <div class="grid-cards">
-            <div class="card"
-                 th:each="product : ${otherProducts}"
-                 th:onclick="'window.location.href=\'/deposit/detail/' + ${product.productId} + '\''">
-                <h4 th:text="${product.name}">추천 상품명</h4>
-                <p>최고 <b th:text="${product.maxRate}">0.00</b>% / 최저 <b th:text="${product.minRate}">0.00</b>%</p>
-                <p><b th:text="${product.period}">0</b>개월</p>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-<!-- 검색바 섹션 -->
-<div class="search-section">
-    <form id="searchForm" action="/deposit/list" method="get" class="search-form">
-        <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="search-input">
-        <button type="submit" class="search-icon" aria-label="검색"></button>
-    </form>
-    <button class="hashtag-button" onclick="searchHashtag('적금')">#적금</button>
-    <button class="hashtag-button" onclick="searchHashtag('예금')">#예금</button>
-</div>
-
-
-<!-- ✅ Theme 맞춤 추천 영역 -->
-<div class="theme-slider-container">
-    <!-- 테마 선택 버튼 -->
-    <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px;">
-        <button class="theme-btn" onclick="showTheme('주부')" id="btn-주부">주부</button>
-        <button class="theme-btn active-theme" onclick="showTheme('직장인')" id="btn-직장인">직장인</button>
-        <button class="theme-btn" onclick="showTheme('학생')" id="btn-학생">학생</button>
-    </div>
-
-    <!-- 좌우 넘김 버튼 -->
-    <button class="theme-prev" onclick="prevTheme()">❮</button>
-
-    <!-- 슬라이드 그룹 -->
-    <div class="theme-slider" id="themeSlider">
-        <!-- 직장인 -->
-        <div class="theme-slide-group" id="theme-직장인" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-            <div th:each="p : ${workerProducts}" class="theme-card"
-                 th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
-                <h4 th:text="${p.name}">상품명</h4>
-                <p th:text="${p.summary}">상품 요약</p>
-                <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
-            </div>
-        </div>
-        <!-- 주부 -->
-        <div class="theme-slide-group" id="theme-주부" style="display: none; gap: 20px; justify-content: center; flex-wrap: wrap;">
-            <div th:each="p : ${housewifeProducts}" class="theme-card"
-                 th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
-                <h4 th:text="${p.name}">상품명</h4>
-                <p th:text="${p.summary}">상품 요약</p>
-                <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
-            </div>
-        </div>
-        <!-- 학생 -->
-        <div class="theme-slide-group" id="theme-학생" style="display: none; gap: 20px; justify-content: center; flex-wrap: wrap;">
-            <div th:each="p : ${studentProducts}" class="theme-card"
-                 th:onclick="'location.href=\'/deposit/detail/' + ${p.productId} + '\''">
-                <h4 th:text="${p.name}">상품명</h4>
-                <p th:text="${p.summary}">상품 요약</p>
-                <p class="rate" th:text="'최고 ' + ${p.maxRate} + '%'">최고 금리</p>
-            </div>
-        </div>
-    </div>
-
-    <button class="theme-next" onclick="nextTheme()">❯</button>
-</div>
-
-
-
-
-
-
-
-<!-- ✅ 슬라이드 동작 스크립트 -->
 <script>
-let currentSlide = 0;
-const slides = document.querySelectorAll('.slide');
+  let currentSlide = 0;
+  const slides = document.querySelectorAll(".slide");
+  const dots = document.querySelectorAll(".dot");
 
-function showSlide(index) {
-    slides.forEach((slide, i) => {
-        slide.classList.toggle('active', i === index);
-    });
-}
+  function showSlide(index) {
+    slides.forEach((s, i) => s.classList.toggle("active", i === index));
+    dots.forEach((d, i) => d.classList.toggle("active", i === index));
+    currentSlide = index;
+  }
 
-function nextSlide() {
-    currentSlide = (currentSlide + 1) % slides.length;
-    showSlide(currentSlide);
-}
-
-function prevSlide() {
+  function prevSlide() {
     currentSlide = (currentSlide - 1 + slides.length) % slides.length;
     showSlide(currentSlide);
-}
+  }
 
-setInterval(nextSlide, 4000); // 4초 간격 자동 슬라이드
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+  }
 
-//해시태그 클릭 처리
-function searchHashtag(tag) {
+  function setSlide(index) {
+    showSlide(index);
+  }
+
+  setInterval(nextSlide, 3000);
+  showSlide(0);
+
+  document.addEventListener("DOMContentLoaded", function () {
+	  const buttons = document.querySelectorAll(".purpose-btn");
+	  const recommendArea = document.getElementById("recommendArea");
+
+	  buttons.forEach(btn => {
+	    btn.addEventListener("click", () => {
+	      const category = btn.dataset.category;
+
+	      // 버튼 스타일 토글
+	      buttons.forEach(b => b.classList.remove("active"));
+	      btn.classList.add("active");
+
+	      // 비동기 요청
+	      fetch(`/deposit/category?category=${encodeURIComponent(category)}`)
+	        .then(res => res.json())
+	        .then(data => updateRecommendation(data))
+	        .catch(err => console.error("추천 상품 불러오기 실패", err));
+	    });
+	  });
+
+	  function updateRecommendation(data) {
+	    let html = "";
+
+	    // ✅ highlightProduct
+	    if (data.highlightProduct) {
+	      const p = data.highlightProduct;
+	      html += `
+	        <div class="highlight-product" onclick="location.href='/deposit/detail/${p.productId}'">
+	          <h4>${p.name}</h4>
+	          <p>${p.summary}</p>
+	          <p>최고 <b>${p.maxRate}</b>% / 최저 <b>${p.minRate}</b>%</p>
+	          <p><b>${p.period}</b>개월</p>
+	        </div>
+	      `;
+	    }
+
+	    // ✅ otherProducts
+	    html += `<div class="grid-cards">`;
+	    data.otherProducts.forEach(p => {
+	      html += `
+	        <div class="card" onclick="location.href='/deposit/detail/${p.productId}'">
+	          <h4>${p.name}</h4>
+	          <p>최고 <b>${p.maxRate}</b>% / 최저 <b>${p.minRate}</b>%</p>
+	          <p><b>${p.period}</b>개월</p>
+	        </div>
+	      `;
+	    });
+	    html += `</div>`;
+
+	    recommendArea.innerHTML = html;
+	  }
+
+	  // ✅ 초기 로딩 시 기본 카테고리 호출
+	  const initialCategory = document.querySelector(".purpose-btn.active")?.dataset.category || "적금";
+	  fetch(`/deposit/category?category=${encodeURIComponent(initialCategory)}`)
+	    .then(res => res.json())
+	    .then(data => updateRecommendation(data));
+	});
+  
+  function searchHashtag(tag) {
     window.location.href = "/deposit/list?keyword=" + encodeURIComponent(tag);
-}
+  }
 
+  const themes = ["주부", "직장인", "학생"];
+  let currentThemeIndex = 1;
 
-// 테마 슬라이드 전환
-const themes = ['주부', '직장인', '학생'];
-let currentThemeIndex = themes.indexOf('직장인'); // 처음은 직장인으로
-
-function showTheme(theme) {
+  function showTheme(theme) {
     themes.forEach(t => {
-        const elem = document.getElementById('theme-' + t);
-        if (t === theme) {
-            elem.style.display = 'flex';
-            currentThemeIndex = themes.indexOf(t);
-        } else {
-            elem.style.display = 'none';
-        }
+      document.getElementById("theme-" + t).style.display = t === theme ? "flex" : "none";
+      document.getElementById("btn-" + t).classList.toggle("active-theme", t === theme);
     });
-}
+    currentThemeIndex = themes.indexOf(theme);
+  }
 
-// 좌 화살표
-function prevTheme() {
+  function prevTheme() {
     currentThemeIndex = (currentThemeIndex - 1 + themes.length) % themes.length;
     showTheme(themes[currentThemeIndex]);
-}
+  }
 
-// 우 화살표
-function nextTheme() {
+  function nextTheme() {
     currentThemeIndex = (currentThemeIndex + 1) % themes.length;
     showTheme(themes[currentThemeIndex]);
-}
+  }
 
-// 초기 로드시 직장인 표시
-document.addEventListener("DOMContentLoaded", function() {
-    showTheme('직장인');
-});
+  document.addEventListener("DOMContentLoaded", () => showTheme("직장인"));
 </script>
-
 </body>
 </html>

@@ -1,8 +1,9 @@
 @charset "UTF-8";
 
 :root {
-    --primary-color: #D7191F;
-    --secondary-color: #B4161B;
+	--primary-color: #D7191F;
+	--secondary-color: #B4161B;
+	--border-color: #ddd;
 }
 
 /* ============================== */
@@ -41,13 +42,11 @@
 	width: 5rem;
 	border: 2px solid #262626;
 	border-radius: 2rem;
-	
 	padding: 0.4rem;
 	color: #262626;
 	font-weight: bold;
 	background-color: transparent;
 	cursor: pointer;
-	
 	transition: all 0.2s ease;
 }
 
@@ -67,7 +66,7 @@
 	gap: 1rem;
 	flex-wrap: wrap;
 	margin: 0 auto;
-} 
+}
 
 #main .recommend-area li a {
 	transition: transform 0.2s ease;
@@ -87,12 +86,10 @@
 	cursor: pointer;
 	text-align: left;
 	word-break: keep-all;
-	
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 }
-
 
 #main .recommend-area li.deposit-item .name {
 	font-weight: bold;
@@ -122,13 +119,100 @@
 	border-radius: 5%;
 	box-shadow: 0px 2px 4px #777;
 	margin-bottom: 0.5rem;
-	
 	min-width: 90%;
 	min-height: 91px;
 }
 
 #main .recommend-area li.card-item p {
 	font-weight: bold;
+}
+
+/* ============================== */
+/* 메인페이지 리뷰 부분                 */
+/* ============================== */
+#review-popup {
+	display: none;
+	position: fixed;
+	bottom: 30px;
+	right: 30px;
+	width: 300px;
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 12px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+	padding: 1.5rem;
+	z-index: 1000;
+	font-family: 'Noto Sans KR', sans-serif;
+	animation: fadeInUp 0.3s ease;
+}
+
+#review-popup p {
+	margin: 0 0 0.75rem;
+	font-size: 1rem;
+	color: #333;
+	font-weight: bold;
+}
+
+#review-content {
+	width: 100%;
+	height: 80px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	padding: 0.5rem;
+	font-size: 0.9rem;
+	resize: none;
+	box-sizing: border-box;
+}
+
+#review-popup button {
+	margin-top: 0.8rem;
+	padding: 0.2rem 0.5rem;
+	background-color: #D7191F;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+#review-popup button:hover {
+	background-color: #b4161b;
+}
+
+#review-close {
+	position: absolute;
+	top: 10px;
+	right: 12px;
+	font-size: 1.2rem;
+	background: none;
+	border: none;
+	color: #888;
+	cursor: pointer;
+}
+
+#review-close:hover {
+	color: #000;
+}
+
+
+@keyframes fadeInUp {from { opacity:0;
+	transform: translateY(30px);
+}
+
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+}
+@media ( max-width : 480px) {
+	#review-popup {
+		right: 10px;
+		left: 10px;
+		width: auto;
+		bottom: 20px;
+	}
 }
 
 /* ============================== */
@@ -145,7 +229,6 @@
 	height: 8rem;
 	border-radius: 0.5rem;
 	background-color: #ddd;
-	
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -156,81 +239,280 @@
 /* ============================== */
 #signup-form .username-wrap {
 	width: 20rem;
-    display: flex;
-    justify-content: space-betweens;
-    align-items: center;
-    margin: 0.5rem auto;
+	display: flex;
+	justify-content: space-betweens;
+	align-items: center;
+	margin: 0.5rem auto;
 }
+
 #signup-form .username-wrap input[type="text"] {
-    flex: 1;
-    margin: 0;
-    margin-right: 0.5rem;
+	flex: 1;
+	margin: 0;
+	margin-right: 0.5rem;
 }
+
 #signup-form .username-wrap input[type="button"] {
-    padding: 0.5rem 1rem;
-    height: 2.5rem;
+	padding: 0.5rem 1rem;
+	height: 2.5rem;
 }
 
 /* ============================== */
 /* 회원가입, 로그인 페이지 공통 요소      */
 /* ============================== */
-.user-form input[type="text"], 
-.user-form input[type="password"], 
-.user-form input[type="date"], 
-.user-form input[type="tel"], 
-.user-form input[type="email"], 
-.user-form textarea{
-    width: 20rem;
-    padding: 0.75rem 1rem;
-    margin: 0.5rem;
-    font-size: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    color: #444;
-    outline: none;
-    resize: none;
+.user-form input[type="text"], .user-form input[type="password"],
+	.user-form input[type="date"], .user-form input[type="tel"], .user-form input[type="email"],
+	.user-form textarea {
+	width: 20rem;
+	padding: 0.75rem 1rem;
+	margin: 0.5rem;
+	font-size: 0.75rem;
+	border: 1px solid #ccc;
+	border-radius: 0.5rem;
+	color: #444;
+	outline: none;
+	resize: none;
 }
 
-.user-form input:focus, 
-.user-form textarea:focus {
-    border-color: var(--primary-color);
+.user-form input:focus, .user-form textarea:focus {
+	border-color: var(--primary-color);
 }
 
-.user-form button,
-.user-form input[type="submit"], 
-.user-form input[type="button"] {
-    padding: 0.5rem 2rem;
-    font-size: 0.75rem;
-    font-weight: 400;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
+.user-form button, .user-form input[type="submit"], .user-form input[type="button"]
+	{
+	padding: 0.5rem 2rem;
+	font-size: 0.75rem;
+	font-weight: 400;
+	color: white;
+	border: none;
+	border-radius: 0.5rem;
+	cursor: pointer;
 }
 
 .user-form input[type="submit"] {
-    width: 20rem;
-    height: 2.5rem;
-    margin: 1rem 0;
-
-    font-size: 1rem;
-    font-weight: 700;
+	width: 20rem;
+	height: 2.5rem;
+	margin: 1rem 0;
+	font-size: 1rem;
+	font-weight: 700;
 }
 
-.user-form button, 
-.user-form input[type="button"] {
-    background-color: #262626;
+.user-form button, .user-form input[type="button"] {
+	background-color: #262626;
 }
 
-.user-form button:hover, 
-.user-form input[type="button"]:hover {
-    background-color: #000;
+.user-form button:hover, .user-form input[type="button"]:hover {
+	background-color: #000;
 }
 
 .user-form input[type="submit"] {
-    background-color: var(--primary-color);
+	background-color: var(--primary-color);
 }
 
 .user-form input[type="submit"]:hover {
     background-color: var(--secondary-color);
+}
+
+/* ============================== */
+/* 모달 - 카드 비교함                 */
+/* ============================== */
+table.compare-list, 
+table.compare-list th, 
+table.compare-list td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+table.compare-list {
+	margin: 0 auto;
+}
+
+table.compare-list th {
+	width: 5rem;
+}
+
+table.compare-list td {
+	width: 15rem;
+	padding: 0.5rem;
+}
+
+table.compare-list .image {
+	position: relative;
+	text-align: center;
+	padding: 1rem;
+}
+
+table.compare-list .image .remove-btn {
+	position: absolute;
+	top: 0;
+	right: 0;
+	
+	color: #fff;
+	border-bottom-left-radius: 0.25rem;
+	background-color: #262626;
+	
+	width: 1rem;
+	height: 1rem;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	cursor: pointer;
+}
+
+table.compare-list img {
+	width: 80%;
+	display: inline-block;
+	box-shadow: 0px 0px 4px #aaa;
+	border-radius: 5%;
+}
+
+/* ============================== */
+/* qna 디테일 페이지                  */
+/* ============================== */
+.qna-detail-container {
+	width: 90%;
+	max-width: 1000px;
+	background-color: #fff;
+	border: 1px solid var(--border-color);
+	padding: 2rem 3rem;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.qna-detail-container h2 {
+	font-size: 2rem;
+	text-align: center;
+	margin-bottom: 2rem;
+}
+
+.qna-detail-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.qna-detail-table th, .qna-detail-table td {
+	text-align: left;
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid #eee;
+	vertical-align: top;
+}
+
+.qna-detail-table th {
+	width: 120px;
+	font-weight: bold;
+	color: #555;
+	white-space: nowrap;
+}
+
+.qna-detail-table td {
+	color: #333;
+}
+
+.qna-detail-table .content, .qna-detail-table .answer {
+	white-space: pre-wrap;
+	background-color: #f9f9f9;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 1rem;
+	margin-top: 0.5rem;
+}
+
+.page-title {
+	font-size: 2rem;
+	font-weight: bold;
+	margin-bottom: 2rem;
+	text-align: center;
+}
+
+section.qna-section {
+	padding: 6rem 1rem 4rem;
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.back-link {
+	display: inline-block;
+	margin-top: 2rem;
+	font-weight: bold;
+	color: var(--primary-color);
+	text-decoration: underline;
+}
+
+.back-link:hover {
+	color: var(--secondary-color);
+}
+
+@media ( max-width : 768px) {
+	.qna-detail-table th {
+		width: auto;
+		display: block;
+	}
+	.qna-detail-table td {
+		display: block;
+		margin-bottom: 1rem;
+	}
+	.faq-detail-table th {
+		width: auto;
+		display: block;
+	}
+	.faq-detail-table td {
+		display: block;
+		margin-bottom: 1rem;
+	}
+}
+
+/* ============================== */
+/* faq 디테일 페이지                  */
+/* ============================== */
+.faq-detail-container {
+	max-width: 1000px;
+	margin: 6rem auto 4rem;
+	padding: 2rem 3rem;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	background-color: #fff;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+	font-family: 'BNKGothic', sans-serif;
+}
+
+.faq-detail-container h2 {
+	font-size: 2rem;
+	text-align: center;
+	margin-bottom: 2rem;
+}
+
+.faq-detail-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.faq-detail-table th, .faq-detail-table td {
+	text-align: left;
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid #eee;
+	vertical-align: top;
+}
+
+.faq-detail-table th {
+	width: 120px;
+	font-weight: bold;
+	color: #555;
+	white-space: nowrap;
+}
+
+.faq-detail-table td {
+	color: #333;
+}
+
+.faq-detail-table .answer {
+	white-space: pre-wrap;
+	background-color: #f9f9f9;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 1rem;
+	margin-top: 0.5rem;
 }

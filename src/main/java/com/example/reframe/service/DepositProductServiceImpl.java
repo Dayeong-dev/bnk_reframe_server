@@ -1,11 +1,12 @@
 package com.example.reframe.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page; // ✅ 정확한 Page 임포트
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,6 +29,7 @@ public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
     private final DepositProductImageRepository depositProductImageRepository;
+    
     private final EntityManager em;
 
     private String formatDate(Date date) {
@@ -79,6 +81,7 @@ public class DepositProductServiceImpl implements DepositProductService {
         product.setPurpose(dto.getPurpose());
         product.setSummary(dto.getSummary());
         product.setDetail(dto.getDetail());
+        product.setModalDetail(dto.getModalDetail()); // ✅ modalDetail 업데이트
         product.setMaxRate(dto.getMaxRate());
         product.setMinRate(dto.getMinRate());
         product.setPeriod(dto.getPeriod());
@@ -112,6 +115,7 @@ public class DepositProductServiceImpl implements DepositProductService {
 
         if ("rate".equals(sort)) {
             pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "maxRate"));
+      
         } else { // 기본 추천순
             pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "viewCount"));
         }
@@ -144,6 +148,7 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .purpose(p.getPurpose())
                 .summary(p.getSummary())
                 .detail(p.getDetail())
+                .modalDetail(p.getModalDetail()) // ✅ modalDetail DTO에 포함
                 .maxRate(p.getMaxRate())
                 .minRate(p.getMinRate())
                 .period(p.getPeriod())
@@ -161,6 +166,7 @@ public class DepositProductServiceImpl implements DepositProductService {
         p.setPurpose(dto.getPurpose());
         p.setSummary(dto.getSummary());
         p.setDetail(dto.getDetail());
+        p.setModalDetail(dto.getModalDetail()); // ✅ modalDetail 엔티티에 설정
         p.setMaxRate(dto.getMaxRate());
         p.setMinRate(dto.getMinRate());
         p.setPeriod(dto.getPeriod());
@@ -169,8 +175,10 @@ public class DepositProductServiceImpl implements DepositProductService {
         p.setViewCount(0L);
         return p;
     }
+
     
     @Override
+    @Transactional
     public DepositProductDTO getProductDetail(Long productId) {
         DepositProduct product = depositProductRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
@@ -184,6 +192,8 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .productId(product.getProductId())
                 .name(product.getName())
                 .summary(product.getSummary())
+                .detail(product.getDetail())
+                .modalDetail(product.getModalDetail()) // ✅ modalDetail 포함
                 .detail(product.getDetail()) // ✅ 여기서 DETAIL 꺼냄
                 .maxRate(product.getMaxRate())
                 .minRate(product.getMinRate())
@@ -192,7 +202,29 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .imageUrl(product.getImageUrl())
                 .build();
     }
+    @Override
+    public List<DepositProductDTO> getProductsByCategory(String category) {
+        List<DepositProduct> products = depositProductRepository.findByCategoryAndStatus(category, "S");
+        return products.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
     
+    @Override
+    public List<DepositProductDTO> getThemeRecommended(String theme) {
+        List<String> purposes = new ArrayList<>();
+
+        switch (theme) {
+            case "직장인" -> purposes = List.of("청년자립자금", "사업자전용", "단기자금운용", "월급통장", "기업자금운용");
+            case "주부" -> purposes = List.of("육아자금", "출산자금", "자녀교육자금", "가계우대");
+            case "학생" -> purposes = List.of("청소년자금관리", "학생우대", "공동상품/학생우대");
+        }
+
+        List<DepositProduct> result = depositProductRepository
+            .findByPurposeInAndStatus(purposes, "S");
+
+        return result.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
     public List<DepositProductDTO> getTopFiveByViewCount() {
     	List<DepositProduct> depositList = depositProductRepository.findTopFiveByViewCount();
     	
@@ -219,5 +251,8 @@ public class DepositProductServiceImpl implements DepositProductService {
 		List<DepositProduct> result = query.getResultList();
 
         return result.stream().map(this::convertToDTO).collect(Collectors.toList());
+        
     }
+	
+	
 }

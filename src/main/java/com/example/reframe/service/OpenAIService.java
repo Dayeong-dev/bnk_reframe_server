@@ -47,4 +47,49 @@ public class OpenAIService {
                        .getMessage()
                        .getContent();
     }
+    
+    public String askChatGPT2(String userMessage) {
+        RestTemplate restTemplate = new RestTemplate();
+        String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:bnk123:Bt6Iw477";
+
+        ChatRequest.Message systemMessage = new ChatRequest.Message(
+            "system", 
+            "너는 BNK 부산은행의 정보를 안내하는 챗봇이야. 'bnk에서'로 시작하는 질문은 항상 학습된 데이터로 답하고 학습된 데이터가 없으면 모르겠다고 해"
+        );
+
+        ChatRequest.Message userMessageObj = new ChatRequest.Message(
+            "user", 
+            userMessage.startsWith("bnk에서") ? userMessage : "bnk에서 " + userMessage
+        );
+        
+        
+
+        ChatRequest request = new ChatRequest(
+            fineTunedModel, 
+            List.of(systemMessage, userMessageObj)
+        );
+
+        System.out.println("전송되는 전체 메시지: ");
+        System.out.println(request);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+        HttpEntity<ChatRequest> entity = new HttpEntity<>(request, headers);
+        
+        ResponseEntity<ChatResponse> response = restTemplate.exchange(
+            API_URL,
+            HttpMethod.POST,
+            entity,
+            ChatResponse.class
+        );
+
+        return response.getBody()
+                       .getChoices()
+                       .get(0)
+                       .getMessage()
+                       .getContent();
+    }
+    
+    
 }
