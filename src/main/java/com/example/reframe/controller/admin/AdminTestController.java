@@ -136,30 +136,6 @@ public class AdminTestController {
 	    return dtoList;
 	}
 	
-	// 상세보기에서 수정 데이터 받기 
-	@PutMapping("/products/update")
-	public ResponseEntity<Void> updateProduct(@RequestBody DepositProductDTO dto,
-										      HttpSession session) {
-		/*
-		 * 결재 프로세스로 삭제
-	    DepositProduct product = productRepository.findById(dto.getProductId())
-	        .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않음"));
-		
-	    product.setName(dto.getName());	
-	    product.setCategory(dto.getCategory());
-	    product.setPurpose(dto.getPurpose());
-	    product.setSummary(dto.getSummary());
-	    product.setDetail(dto.getDetail());
-	    product.setMinRate(dto.getMinRate());
-	    product.setMaxRate(dto.getMaxRate());
-	    product.setPeriod(dto.getPeriod());
-	    product.setStatus(dto.getStatus());
-		*/
-		
-	    approvalService.requestApproval(dto, SessionUtil.getLoginUser(session).getUsername());
-	    
-	    return ResponseEntity.ok().build();
-	}
 	
 	// 상태 일괄 변경 요청 처리
 	@PostMapping("/products/status-update")
@@ -188,6 +164,30 @@ public class AdminTestController {
 	    productRepository.save(product);
 	    return ResponseEntity.ok().build();
 	}
+	// 상세보기에서 수정 데이터 받기 
+	@PutMapping("/products/update")
+	public ResponseEntity<Void> updateProduct(@RequestBody DepositProductDTO dto,
+			HttpSession session) {
+		/*
+		 * 결재 프로세스로 삭제
+	    DepositProduct product = productRepository.findById(dto.getProductId())
+	        .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않음"));
+		
+	    product.setName(dto.getName());	
+	    product.setCategory(dto.getCategory());
+	    product.setPurpose(dto.getPurpose());
+	    product.setSummary(dto.getSummary());
+	    product.setDetail(dto.getDetail());
+	    product.setMinRate(dto.getMinRate());
+	    product.setMaxRate(dto.getMaxRate());
+	    product.setPeriod(dto.getPeriod());
+	    product.setStatus(dto.getStatus());
+		 */
+		
+		approvalService.requestApproval(dto, SessionUtil.getLoginUser(session).getUsername());
+		
+		return ResponseEntity.ok().build();
+	}
 	
 	// 결재 승인
 	@PostMapping("/approvals/{id}/approve")
@@ -211,7 +211,6 @@ public class AdminTestController {
 	@GetMapping("/approvals")
 	public List<ApprovalRequest> getAllPendingRequests() {
 		List<ApprovalRequest> list = approvalRequestRepository.findByStatus("PENDING");
-	    System.out.println(list);
 		return list ;
 	}
 	

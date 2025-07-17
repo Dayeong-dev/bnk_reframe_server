@@ -13,4 +13,14 @@ public class SuperAdminController {
 		return "/superadmin/approval-main";
 	}
 	
+	@GetMapping("/admin-manage")
+	public String management() {
+		return "/superadmin/admin-manage";
+	}
+	
+	@GetMapping("/card-approval-main")
+	public String cardApprovalMain() {
+		return "/superadmin/card-approval-main";
+	}
+	
 }

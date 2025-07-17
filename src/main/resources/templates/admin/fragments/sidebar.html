@@ -66,12 +66,12 @@
 			<!-- 상위관리자 전용 메뉴 -->
 			<li th:if="${session.role == 'ROLE_SUPERADMIN'}" class="sidebar-list">
 				<a href="/superadmin/approval-main" class="sidebar-a">결재</a>
-				<!-- <ul class="dropdown">
-					<li><a href=""> 통계1 </a></li>
-					<li><a href="/admin/chart/2"> 통계2 </a></li>
+				<ul class="dropdown">
+					<li><a href="/superadmin/approval-main"> 예/적금</a></li>
+					<li><a href="/superadmin/card-approval-main"> 카드</a></li>
 					<li><a href=""> 통계3 </a></li>
 					<li><a href=""> 통계4 </a></li>
-				</ul> -->
+				</ul>
 			</li>
 			
 			
