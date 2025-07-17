@@ -9,7 +9,6 @@
 body {
 	font-family: 'Noto Sans KR', sans-serif;
 	margin: 0;
-	
 }
 
 .container {
@@ -28,14 +27,35 @@ body {
 
 .info-box {
 	display: flex;
-	justify-content: space-around;
-	margin: 20px 0;
+	justify-content: center;
+	gap: 80px; /* 항목 간 간격 */
+	margin: 30px 0;
 	text-align: center;
+	flex-wrap: wrap;
 }
 
-.info-box div {
-	font-weight: bold;
-	font-size: 1.1rem;
+.info-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 100px;
+}
+
+.info-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #000; /* 기본값 검정 */
+}
+
+.info-value.red {
+  color: #d9230f; /* 최고금리만 빨간색 */
+}
+
+.info-label {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #000;
+	margin-top: 5px;
 }
 
 .calc-container {
@@ -84,96 +104,89 @@ body {
 /* 추가 스타일 (필요 시 head 영역에 포함) */
 #detailContent section {
   display: flex;
+  min-height: auto;
   align-items: center;
-  justify-content: center; /* ✅ 전체를 페이지 가운데 정렬 */
-  margin: 50px 0;
+  justify-content: space-between; /* ✅ 내부 요소 사이 간격 확보 */
   flex-direction: row;
-  max-width: 900px; /* ✅ 넓이 제한 */
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 900px;
+  margin: 100px auto;              /* ✅ 상하 여백 확보 */
+  padding: 0 20px;                /* ✅ 양쪽 여백 확보 */
+  box-sizing: border-box;
 }
 
+
 #detailContent section.reverse {
-  flex-direction: row-reverse;
+	flex-direction: row-reverse;
 }
 
 #detailContent section .text-wrap {
-  flex: 1;
-  padding: 0 20px;
-  text-align: left;
+	flex: 1;
+	padding: 0 20px;
+	text-align: left;
 }
 
 #detailContent section.reverse .text-wrap {
-  text-align: right;
+	text-align: right;
 }
 
 #detailContent section h2 {
-  font-size: 1.6rem;       /* 기존 1.4 → 더 큼 */
-  font-weight: bold;       /* ✅ 볼드 적용 */
-  margin-bottom: 10px;
+	font-size: 1.6rem; /* 기존 1.4 → 더 큼 */
+	font-weight: bold; /* ✅ 볼드 적용 */
+	margin-bottom: 10px;
 }
 
 #detailContent section p {
-  font-size: 1.2rem;       /* 기존 1.1 → 조금 키움 */
-  font-weight: 500;        /* ✅ 중간 볼드 (너무 두껍지 않게) */
-  line-height: 1.7;
-  margin: 0;
+	font-size: 1.2rem; /* 기존 1.1 → 조금 키움 */
+	font-weight: 500; /* ✅ 중간 볼드 (너무 두껍지 않게) */
+	line-height: 1.7;
+	margin: 0;
 }
 
 #detailContent section img {
-  width: 240px;
-  height: auto;
- 
-  object-fit: cover;
-  
+	width: 240px;
+	height: auto;
+	object-fit: cover;
 }
-
-
-
-
 </style>
 </head>
 <body>
 	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
 	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
 	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
-	
+
 	<div id="container">
 		<section>
 			<!-- 🟢 상단 정보 -->
 			<div class="header" style="text-align: center;">
 				<h1 th:text="${product.name}" style="margin-bottom: 8px;">상품명</h1>
-				<p th:text="${product.summary}" style="font-size: 1rem; color: #666;">상품요약</p>
+				<p th:utext="${product.summary}"
+					style="font-size: 1rem; color: #666;">상품요약</p>
 			</div>
-		
-			<!-- 🟢 금리/기간 정보 박스 -->
+
 			<div class="info-box">
-				<div>
-					<span style="color: #d9230f; font-size: 1.4rem;"
-						th:text="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')} + '%'">4.50%</span><br>
-					<small>최고금리</small>
+				<div class="info-item">
+					<span class="info-value red"
+						th:text="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')} + '%'">2.10%</span>
+					<span class="info-label">최고금리</span>
 				</div>
-				<div>
-					<span style="font-size: 1.2rem;"
-						th:text="${#numbers.formatDecimal(product.minRate,1,'POINT',2,'POINT')} + '%'">2.50%</span><br>
-					<small>최저금리</small>
+				<div class="info-item">
+					<span class="info-value"
+						th:text="${#numbers.formatDecimal(product.minRate,1,'POINT',2,'POINT')} + '%'">1.80%</span>
+					<span class="info-label">최저금리</span>
 				</div>
-				<div>
-					<span style="font-size: 1.2rem;" th:text="${product.period}">12</span>
-					개월<br> <small>가입기간</small>
+				<div class="info-item">
+					<span class="info-value" th:text="${product.period} + '개월'">12개월</span>
+					<span class="info-label">가입기간</span>
 				</div>
 			</div>
-		
-		
-		
-			<hr>
-		
+
 			<!-- 상세 설명 영역 (7개 섹션 포함) -->
 			<div id="detailContent" th:utext="${product.detail}">상세 설명</div>
-		
+
 			<div class="calc-container" style="text-align: center;">
-				<h3 style="font-size: 1.5rem; margin-bottom: 20px;">💰 간편 이자 계산기</h3>
-		
+				<h3 style="font-size: 1.5rem; margin-bottom: 20px;">💰 간편 이자
+					계산기</h3>
+
 				<div
 					style="display: inline-flex; flex-wrap: wrap; align-items: center; gap: 15px; font-size: 1.2rem; justify-content: center;">
 					<label> 이 상품을 <input id="monthsInput" type="text"
@@ -190,17 +203,17 @@ body {
 						<span>%를 적용하면?</span>
 					</label>
 				</div>
-		
+
 				<br>
-				<button class="btn" style="margin-top: 20px;" onclick="calcInterest()">✔
-					결과보기</button>
-		
+				<button class="btn" style="margin-top: 20px;"
+					onclick="calcInterest()">✔ 결과보기</button>
+
 				<div style="margin-top: 25px; font-size: 1.3rem;">
 					세전 이자: <b id="interestResult"
 						style="font-size: 1.5rem; color: #1565c0;">0</b> 원
 				</div>
 			</div>
-		
+
 			<div style="text-align: center;">
 				<a href="/deposit/list" class="btn">목록으로</a>
 				<button class="btn" onclick="openModal()">상품 이용 가이드</button>
@@ -224,21 +237,21 @@ body {
 			</div>
 		</div>
 	</div>
-	
+
 	<!-- 금리표 모달 -->
-<div id="rateModal" class="modal">
-  <div class="modal-content" style="position: relative;">
-    <span class="close" onclick="closeRateModal()">&times;</span>
-    <h2 style="text-align: center; margin-top: 0;">금리표</h2>
-    <div th:utext="${modalRateTable}" style="margin-bottom: 20px;">
-      <!-- 금리표 HTML 출력 -->
-    </div>
-    <div style="text-align: center;">
-      <button class="btn" onclick="closeRateModal()">닫기</button>
-    </div>
-  </div>
-</div>
-	
+	<div id="rateModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeRateModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">금리표</h2>
+			<div th:utext="${modalRateTable}" style="margin-bottom: 20px;">
+				<!-- 금리표 HTML 출력 -->
+			</div>
+			<div style="text-align: center;">
+				<button class="btn" onclick="closeRateModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+
 
 	<script>
   function openModal() {
