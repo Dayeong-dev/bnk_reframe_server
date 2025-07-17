@@ -42,13 +42,13 @@ body {
 }
 
 .info-value {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #000; /* 기본값 검정 */
+	font-size: 1.4rem;
+	font-weight: bold;
+	color: #000; /* 기본값 검정 */
 }
 
 .info-value.red {
-  color: #d9230f; /* 최고금리만 빨간색 */
+	color: #d9230f; /* 최고금리만 빨간색 */
 }
 
 .info-label {
@@ -67,17 +67,18 @@ body {
 }
 
 .btn {
-	background: #007bff;
+	background: #D7191F;
 	color: white;
 	border: none;
 	padding: 10px 20px;
 	margin: 10px;
 	border-radius: 5px;
 	cursor: pointer;
+	transition: background 0.2s ease;
 }
 
 .btn:hover {
-	background: #0056b3;
+	background: #b71510;
 }
 
 .modal {
@@ -102,40 +103,40 @@ body {
 	overflow-y: auto;
 	line-height: 1.6; /* ✅ 줄간격 추가 */
 }
+
 .modal-content p {
-  margin-bottom: 1rem;  /* ✅ 단락 사이 여백 */
-  line-height: 1.6;     /* ✅ 줄 간격도 유지 */
+	margin-bottom: 1rem; /* ✅ 단락 사이 여백 */
+	line-height: 1.6; /* ✅ 줄 간격도 유지 */
 }
 
 .close {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  font-size: 28px;
-  font-weight: bold;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  z-index: 10;
+	position: absolute;
+	top: 16px;
+	right: 20px;
+	font-size: 28px;
+	font-weight: bold;
+	color: #aaa;
+	cursor: pointer;
+	transition: color 0.2s ease;
+	z-index: 10;
 }
 
 .close:hover {
-  color: #000;
+	color: #000;
 }
 
 /* 추가 스타일 (필요 시 head 영역에 포함) */
 #detailContent section {
-  display: flex;
-  min-height: auto;
-  align-items: center;
-  justify-content: space-between; /* ✅ 내부 요소 사이 간격 확보 */
-  flex-direction: row;
-  max-width: 900px;
-  margin: 100px auto;              /* ✅ 상하 여백 확보 */
-  padding: 0 20px;                /* ✅ 양쪽 여백 확보 */
-  box-sizing: border-box;
+	display: flex;
+	min-height: auto; align-items : center;
+	justify-content: space-between; /* ✅ 내부 요소 사이 간격 확보 */
+	flex-direction: row;
+	max-width: 900px;
+	margin: 100px auto; /* ✅ 상하 여백 확보 */
+	padding: 0 20px; /* ✅ 양쪽 여백 확보 */
+	box-sizing: border-box;
+	align-items: center;
 }
-
 
 #detailContent section.reverse {
 	flex-direction: row-reverse;
@@ -180,7 +181,8 @@ body {
 		<section>
 			<!-- 🟢 상단 정보 -->
 			<div class="header" style="text-align: center;">
-				<h1 th:text="${product.name}" style="margin-bottom: 8px; font-size: 2.8rem;">상품명</h1>
+				<h1 th:text="${product.name}"
+					style="margin-bottom: 8px; font-size: 2.8rem;">상품명</h1>
 				<p th:utext="${product.summary}"
 					style="font-size: 1rem; color: #666;">상품요약</p>
 			</div>
@@ -205,6 +207,13 @@ body {
 			<!-- 상세 설명 영역 (7개 섹션 포함) -->
 			<div id="detailContent" th:utext="${product.detail}">상세 설명</div>
 
+			<!-- 🟡 세부 기능 버튼 (계산기 위로 이동) -->
+			<div
+				style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
+				<button class="btn" onclick="openModal()">상품 이용 가이드</button>
+				<button class="btn" onclick="openRateModal()">금리표 보기</button>
+			</div>
+
 			<div class="calc-container" style="text-align: center;">
 				<h3 style="font-size: 1.5rem; margin-bottom: 20px;">💰 간편 이자
 					계산기</h3>
@@ -227,8 +236,9 @@ body {
 				</div>
 
 				<br>
-				<button class="btn" style="margin-top: 20px;"
+				<button class="btn" style="margin-top: 20px; background: #F0AD4E;"
 					onclick="calcInterest()">✔ 결과보기</button>
+
 
 				<div style="margin-top: 25px; font-size: 1.3rem;">
 					세전 이자: <b id="interestResult"
@@ -236,10 +246,8 @@ body {
 				</div>
 			</div>
 
-			<div style="text-align: center;">
+			<div style="text-align: center; margin-top: 10px;">
 				<a href="/deposit/list" class="btn">목록으로</a>
-				<button class="btn" onclick="openModal()">상품 이용 가이드</button>
-				<button class="btn" onclick="openRateModal()">금리표 보기</button>
 			</div>
 		</section>
 	</div>
