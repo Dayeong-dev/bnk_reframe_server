@@ -94,13 +94,35 @@ body {
 .modal-content {
 	background: white;
 	margin: 5% auto;
-	padding: 20px;
+	padding: 40px;
 	border-radius: 10px;
-	width: 90%;
-	max-width: 600px;
+	width: 80%;
+	max-width: 700px;
 	max-height: 80vh;
 	overflow-y: auto;
+	line-height: 1.6; /* ✅ 줄간격 추가 */
 }
+.modal-content p {
+  margin-bottom: 1rem;  /* ✅ 단락 사이 여백 */
+  line-height: 1.6;     /* ✅ 줄 간격도 유지 */
+}
+
+.close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.close:hover {
+  color: #000;
+}
+
 /* 추가 스타일 (필요 시 head 영역에 포함) */
 #detailContent section {
   display: flex;
