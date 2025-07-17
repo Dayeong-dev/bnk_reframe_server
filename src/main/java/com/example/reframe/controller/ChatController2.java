@@ -17,8 +17,8 @@ public class ChatController2 {
         this.openAIService2 = openAIService2;
     }
 
-    @PostMapping
-    public String chat(@RequestBody String message) {
-        return openAIService2.askChatGPT(message);
-    }
+//    @PostMapping
+//    public String chat(@RequestBody String message) {
+//        return openAIService2.askChatGPT(message);
+//    }
 }
