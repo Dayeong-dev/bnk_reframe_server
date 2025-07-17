@@ -272,7 +272,7 @@ header #sub-header .recent-views li a {
 /* ============================== */
 /* 공통 요소                        */
 /* ============================== */
-section {
+#container > section {
     width: 100%;
     min-height: calc(100vh - 5rem);
     padding-top: 2rem;
@@ -282,7 +282,7 @@ section {
     align-items: center;
 }
 
-section h2 {
+#container > section h2 {
     margin: 1.5rem 0;
 }
 
