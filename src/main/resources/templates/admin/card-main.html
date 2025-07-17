@@ -198,7 +198,7 @@
 				tags: formData.get("tags"),
 				categoryMajor: formData.get("categoryMajor"),
 				status: formData.get("status"),
-				annualFee: Number(formData.get("annualFee")),
+				annualFee: formData.get("annualFee"),
 				service: formData.get("service"),
 				pointInfo: formData.get("pointInfo"),
 				onlinePaymentGuide: formData.get("onlinePaymentGuide"),
@@ -208,17 +208,13 @@
 			console.log(data);
 			
 			$.ajax({
-				url: "/admin/card/update",
-				type: "PUT",
+				url: "/admin/card/approval/request",
+				type: "POST",
 				contentType: "application/json",
 				data: JSON.stringify(data),
 				success: function() {
-					alert("수정 완료");
+					alert("수정 요청이 등록되었습니다. 승인 대기 중입니다.");
 					selectMenu("all");
-				},
-				error: function(err) {
-					alert("수정 실패");
-					console.error(err);
 				}
 			});
 		}
@@ -243,7 +239,7 @@
 		    html += '<option value="K">체크</option>';
 		    html += '</select></td></tr>';
 		
-		    html += '<tr><td>연회비</td><td><input type="number" name="annualFee" /></td></tr>';
+		    html += '<tr><td>연회비</td><td><input type="text" name="annualFee" /></td></tr>';
 		    html += '<tr><td>카드 서비스</td><td><textarea name="service"></textarea></td></tr>';
 		    html += '<tr><td>적립/할인</td><td><textarea name="pointInfo"></textarea></td></tr>';
 		    html += '<tr><td>상품 안내</td><td><textarea name="guideInfo"></textarea></td></tr>';

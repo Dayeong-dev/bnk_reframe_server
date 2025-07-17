@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1>관리자 관리 페이지</h1>
+			<!-- 관리자 리스트  -->            
+            <div id="content-list"></div>
+            
+        </div>
+    </div>
+
+	<script>
+	
+		function getAdminList(){
+			$.ajax({
+				url: "/superadmin/admin-manage/show-admin-list",
+				type: "POST",
+				success: function(response){
+					console.log(response);
+					showAdminList(response);
+				},
+				error: function(error){
+					console.error("필터 요청 실패: ",error)
+				} 
+			});
+			
+		}
+		
+		function showAdminList(adminData){
+			let html = '<table border="1" style="margin-top: 10px; width:100%;">';
+			html += '<thead>';
+			html += '<tr>';
+			html += '<th><input type="checkbox" id="checkAll"></th>';
+			html += '<th>행번</th>';
+			html += '<th>이름</th>';
+			html += '<th>이메일</th>';
+			html += '<th>전화번호</th>';
+			html += '<th>부서</th>';
+			html += '<th>등급</th>';
+			html += '</tr>';
+			html += '</thead><tbody>';
+		
+			for (let data of adminData) {
+				html += `<tr>`;
+				html += `<td><input type="checkbox" class="product-check" ></td>`;
+				html += `<td>${data.username}</td>`;
+				html += `<td><a href="#none" onclick="loadProductDetail('${data.name}')">${data.name}</a></td>`; 
+				html += `<td>${data.email}</td>`;
+				html += `<td>${data.phone}</td>`;
+				html += `<td>디지털금융IT개발부</td>`;
+				html += `<td>${data.role}</td>`;
+				html += '</tr>';
+			}
+		
+			html += '</tbody></table>';
+			document.getElementById('content-list').innerHTML = html;
+		}
+		
+		
+	
+	
+		$(document).ready(function() {
+			getAdminList();
+	    });
+	</script>
+</body>
+</html>

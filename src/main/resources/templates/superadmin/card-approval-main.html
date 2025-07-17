@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1> 상위관리자 카드 결재 페이지</h1>
+            <div id="approval-list"></div>
+        	<div id="approval-detail" style="margin-top: 30px;"></div>
+        </div>
+    </div>
+    
+    
+<script>
+    // 결재 요청 목록 불러오기
+    function loadCardApprovalList() {
+        $.ajax({
+            url: '/admin/card/approval/pending',
+            method: 'GET',
+            success: function(data) {
+                let html = '<table border="1" width="100%">';
+                html += '<thead><tr><th>ID</th><th>카드ID</th><th>요청자</th><th>요청일시</th><th>보기</th></tr></thead><tbody>';
+                data.forEach(item => {
+                    html += `<tr>
+                                <td>${item.id}</td>
+                                <td>${item.cardId}</td>
+                                <td>${item.requestedBy}</td>
+                                <td>${item.requestedAt}</td>
+                                <td><button onclick="loadCardApprovalDetail(${item.id})">상세</button></td>
+                            </tr>`;
+                });
+                html += '</tbody></table>';
+                $('#approval-list').html(html);
+            }
+        });
+    }
+
+    // 상세보기
+    function loadCardApprovalDetail(id) {
+        $.ajax({
+            url: `/admin/card/approval/detail/${id}`,
+            method: 'GET',
+            success: function(data) {
+                let html = `<h3>결재 상세 (ID: ${data.id})</h3>`;
+                html += '<table border="1" width="100%">';
+                html += '<thead><tr><th>필드</th><th>기존값</th><th>변경값</th></tr></thead><tbody>';
+                data.details.forEach(detail => {
+                    html += `<tr>
+                                <td>${detail.fieldName}</td>
+                                <td>${detail.oldValue}</td>
+                                <td>${detail.newValue}</td>
+                             </tr>`;
+                });
+                html += '</tbody></table>';
+
+                html += `<br>
+                         <button onclick="approve(${data.id})">승인</button>
+                         <button onclick="reject(${data.id})">반려</button>`;
+                $('#approval-detail').html(html);
+            }
+        });
+    }
+
+    // 승인 처리
+    function approve(id) {
+        $.post(`/admin/card/approval/approve/${id}`, function() {
+            alert("승인 완료");
+            loadCardApprovalList();
+            $('#approval-detail').empty();
+        });
+    }
+
+    // 반려 처리
+    function reject(id) {
+        const reason = prompt("반려 사유를 입력하세요");
+        if (!reason) return;
+
+        $.ajax({
+            url: `/admin/card/approval/reject/${id}`,
+            method: 'POST',
+            data: { reason: reason },
+            success: function() {
+                alert("반려 완료");
+                loadCardApprovalList();
+                $('#approval-detail').empty();
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        loadCardApprovalList();
+    });
+</script>
+</body>
+</html>

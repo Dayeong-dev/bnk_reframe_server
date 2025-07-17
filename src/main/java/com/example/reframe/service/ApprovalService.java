@@ -33,8 +33,12 @@ public class ApprovalService {
 		DepositProduct product = productRepo.findById(dto.getProductId())
 				.orElseThrow(() -> new RuntimeException("상품 없음"));
 		
-		ApprovalRequest request = ApprovalRequest.builder().productId(product.getProductId()).requestedBy(requestedBy)
-				.requestedAt(LocalDateTime.now()).status("PENDING").build();
+		ApprovalRequest request = ApprovalRequest.builder()
+				.productId(product.getProductId())
+				.requestedBy(requestedBy)
+				.requestedAt(LocalDateTime.now())
+				.status("PENDING")
+				.build();
 
 		List<ApprovalRequestDetail> details = new ArrayList<>();
 		
