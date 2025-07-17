@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>약관 목록</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+</head>
+<body>
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+		<!-- 본문 -->
+		<div class="content">
+			<h2>약관 목록</h2>
+			<div>
+				<table border="1">
+					<thead>
+						<tr>
+							<th>약관 번호</th>
+							<th>상품 타입</th>
+							<th>제목</th>
+							<th>다운로드</th>
+						</tr>
+					</thead>
+					<tbody th:if="${termList == null or #lists.isEmpty(termList)}">
+						<tr>
+							<td colspan="4">현재 데이터가 없습니다. </td>
+						</tr>
+					</tbody>
+					<tbody th:if="${termList != null and not #lists.isEmpty(termList)}">
+						<tr th:each="term : ${termList}">
+							<td th:text="${term.documentId}"></td>
+							<td th:text="${term.productType}"></td>
+							<td th:text="${term.title}"></td>
+							<td>
+								<a th:href="@{/admin/document/download/{id}(id=${term.documentId})}">
+									<img class="icon" src="/icons/download.svg" alt="다운로드"/>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pagenation">
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

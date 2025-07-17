@@ -171,6 +171,7 @@ header #sub-header .recent-views li a {
 #side-menu .icon {
 	width: 2rem;
 	height: 2rem;
+	cursor: pointer;
 }
 
 #side-menu .item span {
