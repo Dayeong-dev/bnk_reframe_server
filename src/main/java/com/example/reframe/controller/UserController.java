@@ -113,7 +113,7 @@ public class UserController {
 			return "redirect:/signup/personal";
 		}
 		
-		return "redirect:/";
+		return "redirect:/signin/form";
 	}
 	
 	// 기업
@@ -136,6 +136,6 @@ public class UserController {
 			return "redirect:/signup/corporate";
 		}
 		
-		return "redirect:/";
+		return "redirect:/signin/form";
 	}
 }
