@@ -6,6 +6,446 @@
 <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<style>
+	/* 리팩토링된 버튼 스타일 */
+	.top-menu {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		margin-bottom: 20px;
+	}
+
+	.menu-btn {
+		height: 40px;
+		padding: 0 20px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-right: none;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.menu-btn:first-child {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+	}
+
+	.menu-btn:nth-child(4) {
+		border-right: 1px solid #dee2e6;
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+	}
+
+	.menu-btn:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
+
+	.menu-btn.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	.menu-btn.active:hover {
+		background-color: #0056b3;
+	}
+
+	/* 상품 등록 버튼 분리 */
+	.register-btn {
+		height: 40px;
+		padding: 0 20px;
+		margin-left: auto;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.register-btn:hover {
+		background-color: #0056b3;
+	}
+
+	/* 중간 메뉴 스타일 개선 */
+	.middle-menu {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		margin-bottom: 20px;
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: 6px;
+		border: 1px solid #dee2e6;
+	}
+
+	.middle-menu select,
+	.middle-menu input[type="text"] {
+		height: 36px;
+		padding: 0 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+	}
+
+	.middle-menu select {
+		min-width: 120px;
+	}
+
+	.middle-menu input[type="text"] {
+		min-width: 200px;
+		flex: 1;
+	}
+
+	.search-btn {
+		height: 36px;
+		padding: 0 16px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		
+		
+	}
+
+	.search-btn:hover {
+		background-color: #0056b3;
+	}
+
+	/* 상태 변경 버튼 스타일 개선 */
+	.status-actions {
+		display: flex;
+		gap: 10px;
+		margin-top: 15px;
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: 6px;
+		border: 1px solid #dee2e6;
+	}
+
+	.status-btn {
+		height: 36px;
+		padding: 0 16px;
+		background-color: white;
+		color: #495057;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.status-btn:hover {
+		background-color: #e9ecef;
+		border-color: #adb5bd;
+	}
+
+	.status-btn.sale {
+		background-color: #d4edda;
+		border-color: #c3e6cb;
+		color: #155724;
+	}
+
+	.status-btn.pause {
+		background-color: #fff3cd;
+		border-color: #ffeaa7;
+		color: #856404;
+	}
+
+	.status-btn.end {
+		background-color: #f8d7da;
+		border-color: #f5c6cb;
+		color: #721c24;
+	}
+
+	/* 테이블 스타일 */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 14px;
+		background-color: white;
+		border-radius: 6px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	table th,
+	table td {
+		border: 1px solid #dee2e6;
+		padding: 12px 16px;
+		text-align: left;
+	}
+
+	table th {
+		background-color: #f8f9fa;
+		font-weight: 600;
+		color: #495057;
+	}
+
+	table td a {
+		color: #007bff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	table td a:hover {
+		text-decoration: underline;
+		color: #0056b3;
+	}
+
+	/* 폼 섹션 스타일 */
+	.form-section {
+		margin-top: 20px;
+		background-color: #ffffff;
+		padding: 24px;
+		border: 1px solid #dee2e6;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.form-section input,
+	.form-section select,
+	.form-section textarea {
+		width: 100%;
+		padding: 12px;
+		margin: 8px 0;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+	}
+
+	.form-section button {
+		padding: 12px 24px;
+		margin-top: 15px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.form-section button:hover {
+		background-color: #0056b3;
+	}
+
+	/* 상세 보기 스타일 */
+	.detail-table {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+		background-color: #fff;
+		padding: 24px;
+		border: 1px solid #dee2e6;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.detail-item {
+		display: flex;
+		flex-direction: column;
+		width: calc(50% - 10px);
+	}
+
+	.detail-item label {
+		font-weight: 600;
+		margin-bottom: 8px;
+		color: #495057;
+	}
+
+	.detail-item input,
+	.detail-item textarea {
+		padding: 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: #f8f9fa;
+	}
+
+	.detail-item img {
+		max-width: 120px;
+		border: 1px solid #dee2e6;
+		border-radius: 4px;
+	}
+
+	/* 폼 테이블 스타일 */
+	.form-table {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+		margin-top: 16px;
+	}
+
+	.form-table .form-item {
+		display: flex;
+		flex-direction: column;
+		width: calc(50% - 10px);
+	}
+
+	.form-table .form-item label {
+		font-weight: 600;
+		margin-bottom: 8px;
+		color: #495057;
+	}
+
+	.form-table .form-item input,
+	.form-table .form-item select,
+	.form-table .form-item textarea {
+		padding: 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: #ffffff;
+	}
+
+	/* 카드 테이블 래퍼 */
+	.card-table-wrapper {
+		border: 1px solid #dee2e6;
+		
+		border-radius: 8px;
+		margin-top: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.card-table {
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+		table-layout: fixed;
+		height: 100%;
+	}
+
+	.card-table thead {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background-color: #f8f9fa;
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	.card-table thead th {
+		padding: 16px 12px;
+		font-weight: 600;
+		text-align: left;
+		border-bottom: 2px solid #dee2e6;
+		color: #495057;
+	}
+
+	.card-table tbody {
+		display: inline-block;
+		width: calc(100% + 17px);
+		box-sizing: content-box;
+		max-height: 400px;
+		overflow-y: auto;
+		scrollbar-gutter: stable;
+	}
+
+	.card-table tbody tr {
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+		transition: background-color 0.2s ease;
+	}
+
+	.card-table tbody tr:hover {
+		background-color: #f8f9fa;
+	}
+
+	.card-table tbody td {
+		padding: 12px;
+		border-bottom: 1px solid #dee2e6;
+	}
+
+	/* 컬럼 너비 설정 */
+	.card-table thead th:nth-child(1),
+	.card-table tbody td:nth-child(1) {
+		width: 50px;
+	}
+
+	.card-table thead th:nth-child(2),
+	.card-table tbody td:nth-child(2) {
+		width: 80px;
+	}
+
+	.card-table thead th:nth-child(3),
+	.card-table tbody td:nth-child(3) {
+		width: 300px;
+	}
+
+	.card-table thead th:nth-child(4),
+	.card-table tbody td:nth-child(4) {
+		width: 100px;
+	}
+
+	.card-table thead th:nth-child(5),
+	.card-table tbody td:nth-child(5) {
+		width: 120px;
+	}
+
+	.card-table thead th:nth-child(6),
+	.card-table tbody td:nth-child(6) {
+		width: 80px;
+	}
+
+	/* 반응형 디자인 */
+	@media (max-width: 768px) {
+		.detail-item,
+		.form-table .form-item {
+			width: 100%;
+		}
+		
+		.top-menu {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+		
+		.menu-btn {
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+		}
+		
+		.register-btn {
+			margin-left: 0;
+			width: 100%;
+		}
+		
+		.middle-menu {
+			flex-direction: column;
+			align-items: stretch;
+		}
+		
+		.middle-menu input[type="text"] {
+			min-width: auto;
+		}
+	}
+
+	/* 페이지 제목 스타일 */
+	h1 {
+		color: #212529;
+		font-size: 24px;
+		font-weight: 600;
+		margin-bottom: 24px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #dee2e6;
+	}
+</style>
 </head>
 <body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -19,18 +459,18 @@
 
 		<!-- 본문 -->
 		<div class="content">
+		
 			<h1>카드 관리</h1>
+			
 			<div class="top-menu">
-				<button class="menu-btn" onclick="selectMenu('all')">전체보기</button>
-				<button class="menu-btn" onclick="selectMenu('개인')">개인카드</button>
-				<button class="menu-btn" onclick="selectMenu('기업')">기업카드</button>
-				<button class="menu-btn" onclick="selectMenu('체크')">체크카드</button>
-				<button class="menu-btn" onclick="showCardForm()">상품 등록
-				</button>
+				<button class="menu-btn active" onclick="selectMenu('all')">전체보기</button>
+				<button class="menu-btn" onclick="selectMenu('P')">개인카드</button>
+				<button class="menu-btn" onclick="selectMenu('C')">기업카드</button>
+				<button class="menu-btn" onclick="selectMenu('K')">체크카드</button>
+				<button class="register-btn" onclick="showCardForm()">상품 등록</button>
 			</div>
 
 			<div class="middle-menu">
-
 				<!-- 필터  -->
 				<select id="statusFilter" onchange="filterByStatus(this.value)">
 					<option value="all">전체</option>
@@ -42,24 +482,22 @@
 				<!-- 검색창 -->
 				<input type="text" id="searchInput" placeholder="상품명을 입력하세요">
 				<button class="search-btn" onclick="">검색</button>
-
 			</div>
 
 			<!-- 데이터 출력 부분 -->
 			<div id="content"></div>
 
 			<!-- 상품 상태 변경 버튼 -->
-			<div style="margin-top: 10px;">
-				<button onclick="changeStatus('S')">판매중</button>
-				<button onclick="changeStatus('P')">판매중단</button>
-				<button onclick="changeStatus('E')">판매종료</button>
+			<div class="status-actions">
+				<button class="status-btn sale" onclick="changeStatus('S')">판매중</button>
+				<button class="status-btn pause" onclick="changeStatus('P')">판매중단</button>
+				<button class="status-btn end" onclick="changeStatus('E')">판매종료</button>
 			</div>
 
 			<!-- 상품 디테일 출력 부분 -->
 			<div id="content-detail"></div>
 		</div>
 	</div>
-
 
 	<script>
 		let currentCategory = "all";
@@ -69,9 +507,18 @@
 		
 		// 메뉴 선택 ( 전체, 개인, 기업, 체크 )
 		function selectMenu(value){
+			// 모든 메뉴 버튼에서 active 클래스 제거
+			document.querySelectorAll('.menu-btn').forEach(btn => {
+				btn.classList.remove('active');
+			});
+			
+			// 클릭된 버튼에 active 클래스 추가
+			event.target.classList.add('active');
+			
 			currentCategory = value;
 		    fetchFilteredProducts();
 		}
+		
 		// 상태 선택 ( 전체, 판매중, 판매중단, 판매종료 )
 		function filterByStatus(statusCode) {
 			currentStatus = statusCode;
@@ -98,14 +545,16 @@
 		
 		// 요청한 데이터 view에 출력하기 
 		function showProductList(cards) {
-		    let html = '<table border="1" style="margin-top: 10px; width:100%;">';
+		    let html = '<div class="card-table-wrapper">';
+		    html += '<table class="card-table">';
+
 		    html += '<thead>';
 		    html += '<tr>';
 		    html += '<th><input type="checkbox" id="checkAll"></th>';
 		    html += '<th>카드 ID</th>';
 		    html += '<th>카드명</th>';
 		    html += '<th>카드 유형</th>';  
-		    html += '<th>상태</th>';
+		    html += '<th>신청 가능 여부</th>';
 		    html += '<th>조회수</th>';
 		    html += '</tr>';
 		    html += '</thead><tbody>';
@@ -122,6 +571,8 @@
 		    }
 		
 		    html += '</tbody></table>';
+		    html += '</div>';
+		
 		    document.getElementById('content').innerHTML = html;
 		}
 		
@@ -144,34 +595,30 @@
 		
 		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
 		function showCardDetail(card) {
-		    let html = '<form id="cardDetailForm">';
-		    html += '<table border="1" style="margin-top: 10px; width: 100%;">';
-		    html += '<thead><tr><th colspan="2">카드 상세 정보</th></tr></thead>';
-		    html += '<tbody>';
+		    let html = '<form id="cardDetailForm" class="detail-table">';
 
-		    html += `<tr><td>카드 ID</td><td><input type="text" name="cardId" value="${card.cardId}" readonly></td></tr>`;
-		    html += `<tr><td>카드명</td><td><input type="text" name="name" value="${card.name}" readonly></td></tr>`;
-		    html += `<tr><td>설명</td><td><input type="text" name="description" value="${card.description}" readonly></td></tr>`;
-		    html += `<tr><td>해시태그</td><td><input type="text" name="tags" value="${card.tags}" readonly></td></tr>`;
-		    html += `<tr><td>대분류</td><td><input type="text" name="categoryMajor" value="${card.categoryMajor}" readonly></td></tr>`;
-		    html += `<tr><td>상태</td><td><input type="text" name="status" value="${card.status}" readonly></td></tr>`;
-		    html += `<tr><td>연회비</td><td><input type="text" name="annualFee" value="${card.annualFee}" readonly></td></tr>`;
-		    html += `<tr><td>카드 서비스</td><td><textarea name="service" readonly>${card.service}</textarea></td></tr>`;
-		    html += `<tr><td>적립/할인</td><td><textarea name="pointInfo" readonly>${card.pointInfo}</textarea></td></tr>`;
-		    html += `<tr><td>조회수</td><td><input type="text" name="viewCount" value="${card.viewCount}" readonly></td></tr>`;
-		    html += `<tr><td>상품 안내</td><td><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></td></tr>`;
-		    html += `<tr><td>온라인 결제 안내</td><td><textarea name="onlinePaymentGuide" readonly>${card.onlinePaymentGuide}</textarea></td></tr>`;
-		    html += `<tr><td>기타 안내</td><td><textarea name="etcGuide" readonly>${card.etcGuide}</textarea></td></tr>`;
-		    html += `<tr><td>이용 약관</td><td><textarea name="termsGuide" readonly>${card.termsGuide}</textarea></td></tr>`;
+		    html += `<div class="detail-item"><label>카드 ID</label><input type="text" name="cardId" value="${card.cardId}" readonly></div>`;
+		    html += `<div class="detail-item"><label>카드명</label><input type="text" name="name" value="${card.name}" readonly></div>`;
+		    html += `<div class="detail-item"><label>설명</label><input type="text" name="description" value="${card.description}" readonly></div>`;
+		    html += `<div class="detail-item"><label>해시태그</label><input type="text" name="tags" value="${card.tags}" readonly></div>`;
+		    html += `<div class="detail-item"><label>대분류</label><input type="text" name="categoryMajor" value="${card.categoryMajor}" readonly></div>`;
+		    html += `<div class="detail-item"><label>상태</label><input type="text" name="status" value="${card.status}" readonly></div>`;
+		    html += `<div class="detail-item"><label>연회비</label><input type="text" name="annualFee" value="${card.annualFee}" readonly></div>`;
+		    html += `<div class="detail-item"><label>카드 서비스</label><textarea name="service" readonly>${card.service}</textarea></div>`;
+		    html += `<div class="detail-item"><label>적립/할인</label><textarea name="pointInfo" readonly>${card.pointInfo}</textarea></div>`;
+		    html += `<div class="detail-item"><label>조회수</label><input type="text" name="viewCount" value="${card.viewCount}" readonly></div>`;
+		    html += `<div class="detail-item"><label>상품 안내</label><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></div>`;
+		    html += `<div class="detail-item"><label>온라인 결제 안내</label><textarea name="onlinePaymentGuide" readonly>${card.onlinePaymentGuide}</textarea></div>`;
+		    html += `<div class="detail-item"><label>기타 안내</label><textarea name="etcGuide" readonly>${card.etcGuide}</textarea></div>`;
+		    html += `<div class="detail-item"><label>이용 약관</label><textarea name="termsGuide" readonly>${card.termsGuide}</textarea></div>`;
 
 		    // 소분류 리스트 출력
 		    if (card.subcategories && card.subcategories.length > 0) {
-		        html += `<tr><td>소분류</td><td>${card.subcategories.join(', ')}</td></tr>`;
+		        html += `<div class="detail-item"><label>소분류</label><input type="text" value="${card.subcategories.join(', ')}" readonly></div>`;
 		    }
 
-		    html += '</tbody></table>';
-		    html += `<button type="button" onclick="enableEditMode()">수정</button>`;
-			html += `<button type="button" id="saveBtn" onclick="saveProductChanges()" style="display:none;">저장</button>`;
+		    html += `<button type="button" class="search-btn" onclick="enableEditMode()">수정</button>`;
+			html += `<button type="button" id="saveBtn" class="search-btn" onclick="saveProductChanges()" style="display:none;">저장</button>`;
 		    html += '</form>';
 
 		    document.getElementById('content-detail').innerHTML = html;
@@ -181,7 +628,7 @@
 			
 		// 수정모드 전환
 		function enableEditMode() {
-			const inputs = document.querySelectorAll("#cardDetailForm input[type='text'] , #cardDetailForm textarea");
+			const inputs = document.querySelectorAll("#cardDetailForm input[type='text'], #cardDetailForm textarea");
 			inputs.forEach(input => input.removeAttribute("readonly"));
 			document.getElementById("saveBtn").style.display = "inline";
 		}
@@ -222,34 +669,31 @@
 		//============================================================
 		
 		// 상품 등록 폼 열기
-		
 		function showCardForm() {
-			
-		    let html = '<form id="cardCreateFo	rm">';
-		    html += '<table border="1" style="margin-top: 10px; width: 100%;">';
-		    html += '<thead><tr><th colspan="2">카드 등록</th></tr></thead><tbody>';
+		    let html = '<form id="cardCreateForm">';
+		    html += '<div class="form-table">';
 		
-		    html += '<tr><td>카드명</td><td><input type="text" name="name" required /></td></tr>';
-		    html += '<tr><td>설명</td><td><input type="text" name="description" /></td></tr>';
-		    html += '<tr><td>해시태그</td><td><input type="text" name="tags" /></td></tr>';
+		    html += '<div class="form-item"><label>카드명</label><input type="text" name="name" required /></div>';
+		    html += '<div class="form-item"><label>설명</label><input type="text" name="description" /></div>';
+		    html += '<div class="form-item"><label>해시태그</label><input type="text" name="tags" /></div>';
 		
-		    html += '<tr><td>대분류</td><td><select name="categoryMajor">';
+		    html += '<div class="form-item"><label>대분류</label><select name="categoryMajor">';
 		    html += '<option value="P">개인</option>';
 		    html += '<option value="C">기업</option>';
 		    html += '<option value="K">체크</option>';
-		    html += '</select></td></tr>';
+		    html += '</select></div>';
 		
-		    html += '<tr><td>연회비</td><td><input type="text" name="annualFee" /></td></tr>';
-		    html += '<tr><td>카드 서비스</td><td><textarea name="service"></textarea></td></tr>';
-		    html += '<tr><td>적립/할인</td><td><textarea name="pointInfo"></textarea></td></tr>';
-		    html += '<tr><td>상품 안내</td><td><textarea name="guideInfo"></textarea></td></tr>';
-		    html += '<tr><td>온라인 결제 안내</td><td><textarea name="onlinePaymentGuide"></textarea></td></tr>';
-		    html += '<tr><td>기타 안내</td><td><textarea name="etcGuide"></textarea></td></tr>';
-		    html += '<tr><td>이용 약관</td><td><textarea name="termsGuide"></textarea></td></tr>';
-		    html += '<tr><td>소분류</td><td><input type="text" name="subcategories" placeholder="쉼표(,)로 구분" /></td></tr>';
+		    html += '<div class="form-item"><label>연회비</label><input type="text" name="annualFee" /></div>';
+		    html += '<div class="form-item"><label>카드 서비스</label><textarea name="service"></textarea></div>';
+		    html += '<div class="form-item"><label>적립/할인</label><textarea name="pointInfo"></textarea></div>';
+		    html += '<div class="form-item"><label>상품 안내</label><textarea name="guideInfo"></textarea></div>';
+		    html += '<div class="form-item"><label>온라인 결제 안내</label><textarea name="onlinePaymentGuide"></textarea></div>';
+		    html += '<div class="form-item"><label>기타 안내</label><textarea name="etcGuide"></textarea></div>';
+		    html += '<div class="form-item"><label>이용 약관</label><textarea name="termsGuide"></textarea></div>';
+		    html += '<div class="form-item"><label>소분류</label><input type="text" name="subcategories" placeholder="쉼표(,)로 구분" /></div>';
 		
-		    html += '<tr><td colspan="2"><button type="button" onclick="submitCardForm()">등록</button></td></tr>';
-		    html += '</tbody></table>';
+		    html += '<div class="form-item"><button type="button" onclick="submitCardForm()">등록</button></div>';
+		    html += '</div>';
 		    html += '</form>';
 		
 		    document.getElementById("content-detail").innerHTML = html;
@@ -339,6 +783,11 @@
 		    const allChecked = $(".card-check").length === $(".card-check:checked").length;
 		    $("#checkAll").prop("checked", allChecked);
 		});
+		
+		// 최초 로딩
+        $(document).ready(function() {
+        	fetchFilteredProducts();
+        });
 		
 	</script>	
 	

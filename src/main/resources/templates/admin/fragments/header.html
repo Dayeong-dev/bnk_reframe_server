@@ -1,9 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+</head>
 <body>
 	<div th:fragment="header" id="header">
+		<!-- 로고 -->
 		<a href="#">
-	        <img th:src="@{/admin/img/header/header-logo.png}" alt="로고" id="header-logo"/>
+			<img th:src="@{/admin/img/header/header-logo.png}" alt="로고" id="header-logo" />
 		</a>
+
+		<!-- 로그인한 사용자 정보 영역 -->
+		<div th:if="${loginInfo != null}" id="header-userArea">
+
+			<!-- 사용자 아바타 -->
+			<img th:src="@{/admin/img/header/myImg2.jpg}" alt="아바타" id="header-avatar" />
+
+			<!-- 사용자 이름/이메일 -->
+			<div id="header-userInfo">
+				<span th:text="${loginInfo.username}" >유저명</span>
+				<span th:text="${loginInfo.email}">이메일</span>
+			</div>
+
+			<!-- 관리자 권한 -->
+			<div id="header-role">
+				<span th:if="${role == 'ROLE_ADMIN'}">[일반 관리자]</span>
+				<span th:if="${role == 'ROLE_SUPERADMIN'}">[상위 관리자]</span>
+			</div>
+
+			<!-- 로그아웃 버튼 -->
+			<form th:action="@{/signout}" method="post" style="margin-right: 10px;">
+				<button type="submit" id="logout-btn">로그아웃</button>
+			</form>
+		</div>
 	</div>
 </body>
+</html>
