@@ -6,6 +6,31 @@
 <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<style>
+	h2 {
+		margin-bottom: 12px;
+	}
+	
+	table {
+		width: 100%;
+		text-align: center;	
+	}
+	
+	table th, 
+	table td {
+		padding: 4px 8px;
+	}
+	
+	table td {
+		text-align: left;
+	}
+	
+	.tap-btn {
+		display: flex;
+		justify-content: space-between;
+		margin: 12px 0;
+	}
+</style>
 </head>
 <body>
 	<!-- 공통 헤더 -->
@@ -31,10 +56,10 @@
 						<tr>
 							<th>상품 유형</th>
 							<td>
-								<select name="productType">
-									<option value="예적금">예적금</option>
-									<option value="카드">카드</option>
-								</select>
+								<input id="deposit" type="radio" name="productType" value="예적금" checked/>
+								<label for="deposit">예적금</label>
+								<input id="card" type="radio" name="productType" value="카드" />
+								<label for="card">카드</label>
 							</td>
 						</tr>
 						<tr>

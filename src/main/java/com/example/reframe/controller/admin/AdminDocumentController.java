@@ -58,6 +58,25 @@ public class AdminDocumentController {
 		return "admin/manual-list";
 	}
 	
+	@GetMapping("/document/list")
+	public String getDocumentList() {
+		return "admin/document-list";
+	}
+	
+	@GetMapping("/terms")
+	public @ResponseBody ResponseEntity<List<DocumentDTO>> getTerms() {
+		List<DocumentDTO> termList = documentService.getTermList();
+		
+		return ResponseEntity.ok(termList);
+	}
+	
+	@GetMapping("/manuals")
+	public @ResponseBody ResponseEntity<List<DocumentDTO>> getManuals() {
+		List<DocumentDTO> manualList = documentService.getManualList();
+		
+		return ResponseEntity.ok(manualList);
+	}
+	
 	@GetMapping("/document/download/{documentId}")
 	public @ResponseBody ResponseEntity<Resource> downloadFile(@PathVariable("documentId") Integer documentId) {
 	    DocumentDTO document = documentService.getById(documentId);

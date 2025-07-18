@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>약관/설명서 목록</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<style>
+	h2 {
+		margin-bottom: 12px;
+	}
+	
+	table {
+		width: 100%;
+		text-align: center;	
+	}
+	
+	table th, 
+	table td {
+		padding: 4px 8px;
+	}
+	
+	.tap-btn {
+		display: flex;
+		justify-content: space-between;
+		margin: 12px 0;
+	}
+</style>
+</head>
+<body>
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+		<!-- 본문 -->
+		<div class="content">
+			<h2>약관/설명서 목록</h2>
+			<div class=tap-btn>
+				<div>
+					<button onclick="getTerms()">약관</button>
+					<button onclick="getManuals()">상품설명서</button>
+				</div>
+				<a href="/admin/document/form"><button>파일 등록</button></a>
+			</div>
+			<div>
+				<table border="1">
+					<thead>
+						<tr></tr>
+					</thead>
+					<tbody>
+					</tbody>
+					<tbody th:if="${1 != 1}">
+						<tr th:each="term : ${termList}">
+							<td th:text="${term.documentId}"></td>
+							<td th:text="${term.productType}"></td>
+							<td th:text="${term.title}"></td>
+							<td>
+								<a th:href="@{/admin/document/download/{id}(id=${term.documentId})}">
+									<img class="icon" src="/icons/download.svg" alt="다운로드"/>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="pagenation"></div>
+			</div>
+		</div>
+	</div>
+	<script>
+		const $header = document.querySelector("thead tr");
+		const $content = document.querySelector("tbody");
+		
+		getTerms();
+		
+		function getTerms() {
+			fetch("/admin/terms")
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>생성일자</th>`;
+				$header.innerHTML += `<th>다운로드</th>`;
+				$header.innerHTML += `<th>삭제</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					const date = new Date(element.regdate);  // ← 원하는 날짜 입력
+
+					const yyyy = date.getFullYear();
+					const mm = String(date.getMonth() + 1).padStart(2, '0');  // 월: 0부터 시작
+					const dd = String(date.getDate()).padStart(2, '0');
+					
+					const regdate = `${yyyy}-${mm}-${dd}`;
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td>${regdate}</td>`;
+					tr.innerHTML += `<td><a href='/admin/document/download/${element.documentId}'><img class='icon' src='/icons/download.svg' alt='다운로드'/></a></td>`;
+					tr.innerHTML += `<td><button onclick='deleteDocs(${element.documentId})'>삭제</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function getManuals() {
+			fetch("/admin/manuals")
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>생성일자</th>`;
+				$header.innerHTML += `<th>다운로드</th>`;
+				$header.innerHTML += `<th>삭제</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					const date = new Date(element.regdate);  // ← 원하는 날짜 입력
+
+					const yyyy = date.getFullYear();
+					const mm = String(date.getMonth() + 1).padStart(2, '0');  // 월: 0부터 시작
+					const dd = String(date.getDate()).padStart(2, '0');
+					
+					const regdate = `${yyyy}-${mm}-${dd}`;
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td>${regdate}</td>`;
+					tr.innerHTML += `<td><a href='/admin/document/download/${element.documentId}'><img class='icon' src='/icons/download.svg' alt='다운로드'/></a></td>`;
+					tr.innerHTML += `<td><button onclick='deleteDocs(${element.documentId})'>삭제</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function deleteDocs(documentId) {
+			console.log(documentId);
+		}
+	</script>
+</body>
+</html>
