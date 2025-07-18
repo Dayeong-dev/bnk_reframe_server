@@ -1,6 +1,7 @@
 package com.example.reframe.controller.admin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.reframe.dto.DepositProductContentDTO;
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.ProductStatusUpdateRequestDTO;
 import com.example.reframe.entity.DepositProduct;
@@ -25,8 +27,13 @@ import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.service.ApprovalService;
 import com.example.reframe.service.ProductService;
 import com.example.reframe.util.SessionUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/admin")
@@ -43,7 +50,7 @@ public class AdminTestController {
 
 	@Autowired
 	private ApprovalRequestRepository approvalRequestRepository;
-	
+
 	
 	/*
 	 * 이중 필터 사용 -> filterProducts() 메서드로 통합 
@@ -119,8 +126,32 @@ public class AdminTestController {
 	public DepositProductDTO getProductDetail(@PathVariable("productId") Long productId) {
 		DepositProduct product = productRepository.findById(productId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. ID: " + productId));
+		
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			
+			List<DepositProductContentDTO> productContentList;
+			
+			if (product.getDetail() != null && !product.getDetail().isBlank()) {
+				productContentList = objectMapper.readValue(
+					product.getDetail(),
+				    new TypeReference<List<DepositProductContentDTO>>(){}
+				);
+			} else {
+				productContentList = Collections.emptyList(); // 또는 null 처리
+			}
 
-		return convertToDTO(product);
+			DepositProductDTO result = convertToDTO(product);
+			result.setProductContentList(productContentList);
+
+			return result;
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 
@@ -146,24 +177,42 @@ public class AdminTestController {
 	
 	// 상품 등록 
 	@PostMapping("/products/create")
-	public ResponseEntity<Void> createProduct(@RequestBody DepositProductDTO dto) {
-	    DepositProduct product = DepositProduct.builder()
-	        .name(dto.getName())
-	        .category(dto.getCategory())
-	        .purpose(dto.getPurpose())
-	        .summary(dto.getSummary())
-	        .detail(dto.getDetail())
-	        .minRate(dto.getMinRate())
-	        .maxRate(dto.getMaxRate())
-	        .period(dto.getPeriod())
-	        .status("S") // 기본값
-	        .imageUrl(dto.getImageUrl())
-	        .viewCount(0L)
-	        .build();
+	@Transactional
+	public ResponseEntity<Void> createProduct(@RequestBody DepositProductDTO dto) {      
+		try {
+			// 수정된 예적금 상세 설명 저장
+		    List<DepositProductContentDTO> insertContents = dto.getProductContentList();
+		    
+		    ObjectMapper objectMapper = new ObjectMapper();	  
+		    
+			String json = objectMapper.writeValueAsString(insertContents);	// JSON 형태로 저장
+			dto.setDetail(json);
+			
+			DepositProduct product = DepositProduct.builder()
+			        .name(dto.getName())
+			        .category(dto.getCategory())
+			        .purpose(dto.getPurpose())
+			        .summary(dto.getSummary())
+			        .detail(dto.getDetail())
+			        .minRate(dto.getMinRate())
+			        .maxRate(dto.getMaxRate())
+			        .period(dto.getPeriod())
+			        .status("S") // 기본값
+			        .imageUrl(dto.getImageUrl())
+			        .viewCount(0L)
+			        .build();
 
-	    productRepository.save(product);
-	    return ResponseEntity.ok().build();
+		    productRepository.save(product);
+		    
+		    return ResponseEntity.ok().build();
+		    
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
+		return ResponseEntity.badRequest().build();
 	}
+	
 	// 상세보기에서 수정 데이터 받기 
 	@PutMapping("/products/update")
 	public ResponseEntity<Void> updateProduct(@RequestBody DepositProductDTO dto,
@@ -184,9 +233,26 @@ public class AdminTestController {
 	    product.setStatus(dto.getStatus());
 		 */
 		
-		approvalService.requestApproval(dto, SessionUtil.getLoginUser(session).getUsername());
+		/* 상세 설명 수정 */
+	    // 수정된 예적금 상세 설명 저장
+	    List<DepositProductContentDTO> updateContents = dto.getProductContentList();
+	    System.out.println("hello");
+	    System.out.println(updateContents);
+	    ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			String json = objectMapper.writeValueAsString(updateContents);		// JSON 형태로 저장
+			dto.setDetail(json);
+			
+			approvalService.requestApproval(dto, SessionUtil.getLoginUser(session).getUsername());
+			
+			return ResponseEntity.ok().build();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 		
-		return ResponseEntity.ok().build();
+		return ResponseEntity.badRequest().build();
+	    
 	}
 	
 	// 결재 승인

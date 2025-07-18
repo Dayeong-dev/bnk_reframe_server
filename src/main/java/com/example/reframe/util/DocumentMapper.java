@@ -13,6 +13,8 @@ public class DocumentMapper {
 		document.setFilename(documentDTO.getFilename());
 		document.setProductType(documentDTO.getProductType());
 		document.setDocumentType(documentDTO.getDocumentType());
+		document.setRegdate(documentDTO.getRegdate());
+		document.setModDate(documentDTO.getModDate());
 		
 		return document;
 	}
@@ -25,8 +27,9 @@ public class DocumentMapper {
 		documentDTO.setFilename(document.getFilename());
 		documentDTO.setProductType(document.getProductType());
 		documentDTO.setDocumentType(document.getDocumentType());
+		documentDTO.setRegdate(document.getRegdate());
+		documentDTO.setModDate(document.getModDate());
 		
 		return documentDTO;
 	}
-
 }

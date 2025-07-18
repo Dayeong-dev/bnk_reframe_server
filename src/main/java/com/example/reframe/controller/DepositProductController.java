@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.DepositProductDTO;
-import com.example.reframe.dto.InterestRateDTO;
+
 import com.example.reframe.service.DepositProductService;
 import com.example.reframe.service.DepositProductServiceImpl;
 import com.example.reframe.service.InterestRateService;
 import com.example.reframe.session.RecentViewManager;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -96,13 +98,9 @@ public class DepositProductController {
     }
 
 
-
-
     /**
      * 예적금 상품 목록 (페이징, 정렬, 검색)
      */
-    
-   
     @GetMapping("/list")
     public String depositList(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -129,26 +127,31 @@ public class DepositProductController {
      */
 
     @GetMapping("/detail/{id}")
-    public String depositDetail(@PathVariable("id") Long productId, Model model) {
-        // 상품 상세 조회 (+ 조회수 증가)
-        DepositProductDTO product = depositProductService.getProductDetail(productId);
+    public String depositDetail(@PathVariable("id") Long productId, Model model) { 
+		try {
+			// 상품 상세 조회 (+ 조회수 증가)
+			DepositProductDTO product = depositProductService.getProductDetail(productId);
+			
+			// DETAIL/모달 정보
+	        model.addAttribute("product", product);
+	        model.addAttribute("detailForPage", product.getDetail());
+	        model.addAttribute("modalDetailForModal", product.getModalDetail());
 
-        // DETAIL/모달 정보
-        model.addAttribute("product", product);
-        model.addAttribute("detailForPage", product.getDetail());
-        model.addAttribute("modalDetailForModal", product.getModalDetail());
+	        // 금리 정보 추가
+	        String rateHtml = interestRateService.getRateHtmlByProductId(productId);
+	        model.addAttribute("modalRateTable", rateHtml);
 
-        // 금리 정보 추가
-      
-        String rateHtml = interestRateService.getRateHtmlByProductId(productId);
+	        // 최근 본 상품 기록
+	        recentViewManager.setProduct("deposit", product.getProductId(), product.getName());
 
-    
-        model.addAttribute("modalRateTable", rateHtml);
-
-        // 최근 본 상품 기록
-        recentViewManager.setProduct("deposit", product.getProductId(), product.getName());
-
-        return "user/deposit_detail";
+	        return "user/deposit_detail";
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
+		return "redirect:/";
     }
 
 

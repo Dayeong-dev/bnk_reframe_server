@@ -17,6 +17,9 @@ import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.DepositProductImage;
 import com.example.reframe.repository.DepositProductImageRepository;
 import com.example.reframe.repository.DepositProductRepository;
+import com.example.reframe.util.SetProductContent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -29,8 +32,9 @@ public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
     private final DepositProductImageRepository depositProductImageRepository;
-    
     private final EntityManager em;
+    
+    private SetProductContent setProductContent = new SetProductContent();
 
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -179,10 +183,12 @@ public class DepositProductServiceImpl implements DepositProductService {
     
     @Override
     @Transactional
-    public DepositProductDTO getProductDetail(Long productId) {
+    public DepositProductDTO getProductDetail(Long productId) throws JsonMappingException, JsonProcessingException {
         DepositProduct product = depositProductRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
 
+        String detail = setProductContent.setDepositDetail(product.getDetail());
+        
         // 조회수 증가
         product.setViewCount(product.getViewCount() + 1);
         depositProductRepository.save(product);
@@ -194,7 +200,7 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .summary(product.getSummary())
                 .detail(product.getDetail())
                 .modalDetail(product.getModalDetail()) // ✅ modalDetail 포함
-                .detail(product.getDetail()) // ✅ 여기서 DETAIL 꺼냄
+                .detail(detail) // ✅ 여기서 DETAIL 꺼냄
                 .maxRate(product.getMaxRate())
                 .minRate(product.getMinRate())
                 .period(product.getPeriod())

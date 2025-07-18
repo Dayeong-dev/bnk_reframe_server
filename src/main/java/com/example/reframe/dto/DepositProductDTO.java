@@ -1,6 +1,7 @@
 package com.example.reframe.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,4 +28,6 @@ public class DepositProductDTO {
     private String createdAt;     // 등록일 (문자열 변환된 날짜)
     private Long viewCount;       // 조회수
     private String imageUrl;      // 썸네일 이미지 URL
+    
+    private List<DepositProductContentDTO> productContentList;	// 상세 설명 내용 리스트
 }

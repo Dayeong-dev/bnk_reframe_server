@@ -1,6 +1,9 @@
 package com.example.reframe.service;
 
 import com.example.reframe.dto.DepositProductDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -14,7 +17,7 @@ public interface DepositProductService {
     List<DepositProductDTO> searchProducts(String keyword);
 
     // ✅ 상품 상세 조회 (+ 조회수 증가)
-    DepositProductDTO getProductDetail(Long productId);
+    DepositProductDTO getProductDetail(Long productId) throws JsonMappingException, JsonProcessingException;
 
     // ✅ 관리자 상품 등록/수정/삭제
     Long saveProduct(DepositProductDTO dto);

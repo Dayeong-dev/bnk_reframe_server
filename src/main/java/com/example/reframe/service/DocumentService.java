@@ -24,7 +24,6 @@ public class DocumentService {
 		List<Document> result = documentRepository.findAllByDocumentType("T");
 		List<DocumentDTO> termList = new ArrayList<>();
 		
-		
 		for(Document doc : result) {
 			termList.add(documentMapper.toDTO(doc));
 		}
@@ -35,7 +34,6 @@ public class DocumentService {
 	public List<DocumentDTO> getManualList() {
 		List<Document> result = documentRepository.findAllByDocumentType("M");
 		List<DocumentDTO> manualList = new ArrayList<>();
-		
 		
 		for(Document doc : result) {
 			manualList.add(documentMapper.toDTO(doc));
