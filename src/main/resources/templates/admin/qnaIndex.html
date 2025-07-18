@@ -7,41 +7,230 @@
 <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
 <style>
-table {
-	width: 100%;
-	border-collapse: collapse;
-}
+	/* 리팩토링된 버튼 스타일 */
+	.top-menu {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		margin-bottom: 20px;
+	}
 
-table, th, td {
-	border: 1px solid #ccc;
-}
+	.menu-btn {
+		height: 40px;
+		padding: 0 20px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-right: none;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
 
-th, td {
-	padding: 10px;
-	text-align: left;
-}
+	.menu-btn:first-child {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+	}
+	
+	.menu-btn:last-child {
+		border-right: 1px solid #dee2e6;
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+	}
 
-.pagination {
-	margin-top: 15px;
-	text-align: center;
-}
+	.menu-btn:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
 
-.pagination button {
-	margin: 0 5px;
-	padding: 5px 10px;
-}
+	.menu-btn.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
 
-.hidden {
-	display: none;
-}
+	.menu-btn.active:hover {
+		background-color: #0056b3;
+	}
 
-#qna-form {
-	display: none;
-}
+	/* 알림 배너 스타일 */
+	#alert-banner {
+		background-color: #fff3cd;
+		border: 1px solid #ffeaa7;
+		border-radius: 6px;
+		padding: 12px 16px;
+		margin-bottom: 20px;
+		color: #856404;
+		font-size: 14px;
+		font-weight: 500;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
 
-#qna-detail {
-	display: none;
-}
+	/* 테이블 스타일 */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 14px;
+		background-color: white;
+		border-radius: 6px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	table th,
+	table td {
+		border: 1px solid #dee2e6;
+		padding: 12px 16px;
+		text-align: left;
+	}
+
+	table th {
+		background-color: #f8f9fa;
+		font-weight: 600;
+		color: #495057;
+	}
+
+	table td a {
+		color: #007bff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	table td a:hover {
+		text-decoration: underline;
+		color: #0056b3;
+	}
+
+	/* 페이지네이션 스타일 */
+	.pagination {
+		margin-top: 20px;
+		text-align: center;
+	}
+
+	.pagination button {
+		height: 36px;
+		padding: 0 12px;
+		margin: 0 2px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.pagination button:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
+
+	.pagination button.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	/* 상세 보기 스타일 */
+	.detail-section {
+		margin-top: 20px;
+		background-color: #fff;
+		padding: 24px;
+		border: 1px solid #dee2e6;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.detail-section p {
+		margin: 12px 0;
+		font-size: 14px;
+		color: #495057;
+	}
+
+	.detail-section strong {
+		font-weight: 600;
+		color: #212529;
+	}
+
+	.detail-section .content-box {
+		background-color: #f8f9fa;
+		padding: 16px;
+		border: 1px solid #dee2e6;
+		border-radius: 4px;
+		margin-top: 8px;
+		white-space: pre-wrap;
+		line-height: 1.5;
+		display: block;
+		margin-left: 8px;
+	}
+
+	.detail-section textarea {
+		width: 100%;
+		padding: 12px;
+		margin: 8px 0;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+		resize: vertical;
+	}
+
+	.detail-section button {
+		padding: 12px 24px;
+		margin-top: 15px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.detail-section button:hover {
+		background-color: #0056b3;
+	}
+
+	/* 페이지 제목 스타일 */
+	h1 {
+		color: #212529;
+		font-size: 24px;
+		font-weight: 600;
+		margin-bottom: 24px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	/* 숨김 처리 */
+	.hidden {
+		display: none;
+	}
+
+	#qna-form, #qna-detail {
+		display: none;
+	}
+
+	/* 구분선 스타일 */
+	hr {
+		margin: 24px 0;
+		border: none;
+		border-top: 1px solid #dee2e6;
+	}
+
+	/* 반응형 디자인 */
+	@media (max-width: 768px) {
+		.top-menu {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+		
+		.menu-btn {
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+		}
+	}
 </style>
 </head>
 <body>
@@ -54,9 +243,6 @@ th, td {
 		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
 
 		<!-- 본문 -->
-
-
-
 		<div class="content" id="main-content">
 			<h1>1:1 문의 관리</h1>
 
@@ -64,9 +250,13 @@ th, td {
 				🚨 부정 리뷰가 <span id="alert-count"></span>건 있습니다!
 			</div>
 
+			<!-- 카테고리 버튼 영역 -->
+			<div class="top-menu" id="category-buttons">
+				<!-- 버튼은 JS로 생성 -->
+			</div>
 
 			<div id="qna-list" th:if="${qnalist != null}">
-				<table>
+				<table id="qna-table">
 					<thead>
 						<tr>
 							<th>글번호</th>
@@ -93,19 +283,15 @@ th, td {
 							<td th:text="${qna.status}"></td>
 						</tr>
 					</tbody>
-
 				</table>
 
 				<!-- 페이지네이션 -->
 				<div class="pagination" id="pagination"></div>
 			</div>
 
-
-
 			<hr>
 
-			<div id="qna-detail">
-
+			<div id="qna-detail" class="detail-section">
 				<p>
 					<strong>글번호:</strong> <span id="detail-id"></span>
 				</p>
@@ -118,192 +304,200 @@ th, td {
 				<p>
 					<strong>작성일:</strong> <span id="detail-regdate"></span>
 				</p>
-
-
-
 				<p>
 					<strong>카테고리:</strong> <span id="detail-category"></span>
 				</p>
 				<p>
 					<strong>상태:</strong> <span id="detail-status"></span>
 				</p>
+				
 				<hr>
 				<p>
-					<strong>내용:</strong><span class="content-box" id="detail-content"></span>
+					<strong>내용:</strong>
 				</p>
-
+				<div class="content-box" id="detail-content"></div>
+				
 				<hr>
 				<p>
 					<strong>답변:</strong>
 				</p>
-				<textarea id="detail-answer" rows="5" style="width: 100%;"></textarea>
-				<br />
+				<textarea id="detail-answer" rows="5"></textarea>
 				<button onclick="submitAnswer()">답변 등록</button>
 			</div>
 		</div>
 	</div>
 
 	<script>
-  const rowsPerPage = 5;
-  let currentCategory = "전체";
-  let currentPage = 0;
-  let allRows = [];
-  let filteredRows = [];
+		const rowsPerPage = 5;
+		let currentCategory = "전체";
+		let currentPage = 0;
+		let allRows = [];
+		let filteredRows = [];
 
-  document.addEventListener("DOMContentLoaded", () => {
-    allRows = Array.from(document.querySelectorAll("#qna-tbody tr"));
-    initCategoryFilter();
-    showPage(0);
+		document.addEventListener("DOMContentLoaded", () => {
+			allRows = Array.from(document.querySelectorAll("#qna-tbody tr"));
+			initCategoryFilter();
+			renderPagination();
+			showPage(0);
 
-    // 상세보기 및 답변 등록 함수 외부에서도 접근 가능
-    window.loadQnaDetail = loadQnaDetail;
-    window.submitAnswer = submitAnswer;
-  });
+			// 상세보기 및 답변 등록 함수 외부에서도 접근 가능
+			window.loadQnaDetail = loadQnaDetail;
+			window.submitAnswer = submitAnswer;
+		});
 
-  function initCategoryFilter() {
-    const container = document.createElement("div");
-    container.id = "category-buttons";
-    container.style.margin = "10px 0";
+		function initCategoryFilter() {
+			const container = document.getElementById("category-buttons");
 
-    const uniqueCategories = [...new Set(allRows.map(row =>
-      row.querySelector("td:nth-child(6)").textContent.trim()
-    ))];
+			const uniqueCategories = [...new Set(allRows.map(row =>
+				row.querySelector("td:nth-child(6)").textContent.trim()
+			))];
 
-    ["전체", ...uniqueCategories].forEach(category => {
-      const btn = document.createElement("button");
-      btn.textContent = category;
-      btn.className = "category-btn";
-      if (category === currentCategory) btn.classList.add("active");
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentCategory = category;
-        filterRows();
-        showPage(0);
-        renderPagination();
-      });
-      container.appendChild(btn);
-    });
+			["전체", ...uniqueCategories].forEach(category => {
+				const btn = document.createElement("button");
+				btn.textContent = category;
+				btn.className = "menu-btn";
+				btn.dataset.category = category;
+				
+				if (category === currentCategory) btn.classList.add("active");
+				
+				btn.addEventListener("click", () => {
+					document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"));
+					btn.classList.add("active");
+					currentCategory = category;
+					filterRows();
+					showPage(0);
+					renderPagination();
+				});
+				
+				container.appendChild(btn);
+			});
 
-    const listSection = document.getElementById("qna-list");
-    listSection.insertBefore(container, listSection.firstChild);
+			filterRows();
+		}
 
-    filterRows();
-    renderPagination();
-  }
+		function filterRows() {
+			filteredRows = allRows.filter(row => {
+				const cat = row.querySelector("td:nth-child(6)").textContent.trim();
+				return currentCategory === "전체" || cat === currentCategory;
+			});
+		}
 
-  function filterRows() {
-    filteredRows = allRows.filter(row => {
-      const cat = row.querySelector("td:nth-child(6)").textContent.trim();
-      return currentCategory === "전체" || cat === currentCategory;
-    });
-  }
+		function showPage(page) {
+			allRows.forEach(row => row.classList.add("hidden"));
+			filteredRows.forEach((row, index) => {
+				row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+			});
+			currentPage = page;
+		}
 
-  function showPage(page) {
-    allRows.forEach(row => row.classList.add("hidden"));
-    filteredRows.forEach((row, index) => {
-      row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
-    });
-    currentPage = page;
-  }
+		function renderPagination() {
+			const pagination = document.getElementById("pagination");
+			pagination.innerHTML = "";
 
-  function renderPagination() {
-    const pagination = document.getElementById("pagination");
-    pagination.innerHTML = "";
+			const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
 
-    const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
+			for (let i = 0; i < pageCount; i++) {
+				const btn = document.createElement("button");
+				btn.textContent = i + 1;
+				btn.addEventListener("click", () => {
+					// 기존 활성 버튼 제거
+					document.querySelectorAll('.pagination button').forEach(b => b.classList.remove('active'));
+					// 클릭된 버튼 활성화
+					btn.classList.add('active');
+					showPage(i);
+				});
+				pagination.appendChild(btn);
+			}
 
-    for (let i = 0; i < pageCount; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i + 1;
-      btn.addEventListener("click", () => showPage(i));
-      pagination.appendChild(btn);
-    }
-  }
+			// 첫 번째 페이지 버튼 활성화
+			if (pagination.firstChild) {
+				pagination.firstChild.classList.add('active');
+			}
+		}
 
-  function loadQnaDetail(element) {
-	  const qnaId = element.getAttribute('data-id');
+		function loadQnaDetail(element) {
+			const qnaId = element.getAttribute('data-id');
 
-	  fetch('/admin/qnaDetail/' + qnaId)
-	    .then(response => response.json())
-	    .then(qna => {
-	      document.getElementById("detail-id").textContent = qna.qnaId;
-	      document.getElementById("detail-title").textContent = qna.title;
-	      document.getElementById("detail-username").textContent = qna.username;
-	      document.getElementById("detail-regdate").textContent = qna.regdate;
-	      document.getElementById("detail-category").textContent = qna.category;
-	      document.getElementById("detail-status").textContent = qna.status;
-	      document.getElementById("detail-content").textContent = qna.content;
-	      document.getElementById("detail-answer").value = qna.answer;
+			fetch('/admin/qnaDetail/' + qnaId)
+				.then(response => response.json())
+				.then(qna => {
+					document.getElementById("detail-id").textContent = qna.qnaId;
+					document.getElementById("detail-title").textContent = qna.title;
+					document.getElementById("detail-username").textContent = qna.username;
+					document.getElementById("detail-regdate").textContent = qna.regdate;
+					document.getElementById("detail-category").textContent = qna.category;
+					document.getElementById("detail-status").textContent = qna.status;
+					document.getElementById("detail-content").textContent = qna.content;
+					document.getElementById("detail-answer").value = qna.answer;
 
-	      //상세보기 폼 보이기
-	      document.getElementById("qna-detail").style.display = "block";
+					//상세보기 폼 보이기
+					document.getElementById("qna-detail").style.display = "block";
 
-	      //스크롤 이동 (선택)
-	      document.getElementById("qna-detail").scrollIntoView({ behavior: "smooth" });
-	    })
-	    .catch(error => {
-	      console.error("QNA 상세보기 실패:", error);
-	      alert("상세보기를 불러오지 못했습니다.");
-	    });
-	}
+					//스크롤 이동 (선택)
+					document.getElementById("qna-detail").scrollIntoView({ behavior: "smooth" });
+				})
+				.catch(error => {
+					console.error("QNA 상세보기 실패:", error);
+					alert("상세보기를 불러오지 못했습니다.");
+				});
+		}
 
+		function submitAnswer() {
+			const qnaId = document.getElementById("detail-id").textContent;
+			const answer = document.getElementById("detail-answer").value;
 
-  function submitAnswer() {
-    const qnaId = document.getElementById("detail-id").textContent;
-    const answer = document.getElementById("detail-answer").value;
+			if (!answer.trim()) {
+				alert("답변 내용을 입력하세요.");
+				return;
+			}
 
-    if (!answer.trim()) {
-      alert("답변 내용을 입력하세요.");
-      return;
-    }
+			fetch('/admin/submitAnswer', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ qnaId, answer })
+			})
+				.then(response => {
+					if (!response.ok) throw new Error('서버 오류');
+					return response.json();
+				})
+				.then(updatedQna => {
+					alert("답변이 등록되었습니다.");
+					document.getElementById("detail-answer").value = updatedQna.answer;
+					document.getElementById("detail-status").textContent = updatedQna.status;
 
-    fetch('/admin/submitAnswer', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ qnaId, answer })
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('서버 오류');
-        return response.json();
-      })
-      .then(updatedQna => {
-        alert("답변이 등록되었습니다.");
-        document.getElementById("detail-answer").value = updatedQna.answer;
-        document.getElementById("detail-status").textContent = updatedQna.status;
+					// 테이블 반영
+					const row = document.querySelector(`a[data-id="${qnaId}"]`).closest("tr");
+					row.querySelector("td:nth-child(7)").textContent = updatedQna.status;
+					row.querySelector("td:nth-child(6)").textContent = updatedQna.category;
+				})
+				.catch(error => {
+					console.error("답변 등록 실패:", error);
+					alert("답변 등록 중 오류가 발생했습니다.");
+				});
+		}
 
-        // 테이블 반영
-        const row = document.querySelector(`a[data-id="${qnaId}"]`).closest("tr");
-        row.querySelector("td:nth-child(7)").textContent = updatedQna.status;
-        row.querySelector("td:nth-child(6)").textContent = updatedQna.category;
-      })
-      .catch(error => {
-        console.error("답변 등록 실패:", error);
-        alert("답변 등록 중 오류가 발생했습니다.");
-      });
-  }
-  
-  fetch('/admin/alertCount')
-  .then(res => res.json())
-  .then(count => {
-    if (count > 0) {
-      const banner = document.getElementById("alert-banner");
-      const countSpan = document.getElementById("alert-count");
-      countSpan.textContent = count;
-      banner.style.display = "block";
+		// 알림 배너 로드
+		fetch('/admin/alertCount')
+			.then(res => res.json())
+			.then(count => {
+				if (count > 0) {
+					const banner = document.getElementById("alert-banner");
+					const countSpan = document.getElementById("alert-count");
+					countSpan.textContent = count;
+					banner.style.display = "block";
 
-      // 자동 사라짐
-      setTimeout(() => {
-        banner.style.display = "none";
-      }, 10000);
-
-      
-    }
-  });
-</script>
-
+					// 자동 사라짐
+					setTimeout(() => {
+						banner.style.display = "none";
+					}, 10000);
+				}
+			})
+			.catch(error => {
+				console.error("알림 카운트 로드 실패:", error);
+			});
+	</script>
 
 </body>
 </html>
