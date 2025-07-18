@@ -1,6 +1,8 @@
 package com.example.reframe.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -11,12 +13,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.example.reframe.dto.BenefitItem;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @Entity
 @Table(name = "card")
@@ -81,4 +90,21 @@ public class Card {
     }
     
 
+    @Transient
+    private List<BenefitItem> serviceList;
+
+    @PostLoad
+    public void parseServiceJson() {
+        if (this.service != null) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                this.serviceList = mapper.readValue(this.service, new TypeReference<List<BenefitItem>>() {});
+                System.out.println("✅ serviceList 파싱 성공: " + serviceList.size() + "개");
+            } catch (Exception e) {
+                System.err.println("❌ 서비스 파싱 실패: " + cardId + " / " + e.getMessage());
+                this.serviceList = new ArrayList<>();
+            }
+        }
+    }
 }
+
