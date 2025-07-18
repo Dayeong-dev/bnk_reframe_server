@@ -74,7 +74,7 @@ public class CardService {
 				.service(card.getService().replace("\\n", "<br>")).pointInfo(card.getPointInfo().replace("\\n", "<br>"))
 				.viewCount(card.getViewCount()).guideInfo(card.getGuideInfo())
 				.onlinePaymentGuide(card.getOnlinePaymentGuide()).etcGuide(card.getEtcGuide())
-				.termsGuide(card.getTermsGuide()).build();
+				.termsGuide(card.getTermsGuide()).serviceList(card.getServiceList()).build();
 	}
 
 	@Transactional

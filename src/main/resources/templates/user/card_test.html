@@ -16,11 +16,6 @@ body {
 	padding: 0;
 }
 
-h1 {
-	font-size: 36px;
-	margin: 50px 0 20px;
-	color: #222;
-}
 
 h2 {
 	font-size: 30px;
@@ -127,6 +122,10 @@ button {
 	margin-top: 30px;
 }
 
+#start-section .option-btn {
+  margin-top: 40px;
+}
+
 .option-btn {
 	flex: 1 1 40%;
 	min-width: 260px;
@@ -142,21 +141,6 @@ button {
 
 .option-btn:hover {
 	transform: translateY(-4px);
-}
-
-#start-section button {
-	background: #f5b21d;
-	color: #fff;
-	padding: 14px 40px;
-	border: none;
-	border-radius: 30px;
-	font-size: 18px;
-	transition: background 0.3s;
-	margin-top: 30px;
-}
-
-#start-section button:hover {
-	background: #388e3c;
 }
 
 .card-list {
@@ -240,14 +224,21 @@ button {
   display: block;
 }
 
-#scroll-gif {
-  display: block;
-  margin: 30px auto -10px;
-  width: 80px;
-  animation: bounce 1.5s infinite;
-}
 
 /* 추천 카드 */
+#recommend-reason,
+#recommended-cards {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.6s ease;
+}
+
+#recommend-reason.show,
+#recommended-cards.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .card-item.recommend-card {
   margin: 5px auto 0;
   padding: 20px;
@@ -266,20 +257,62 @@ button {
   color: #7f7f7f;
   margin: 5px 0 0;
 }
+
+#document .s1_arrow {
+  display: inline-block;
+  position: relative;
+  top: 28px;
+  margin-left: -10px;
+  text-align: center;
+  animation: arrow_down 1.5s infinite;
+}
+
+#document .s1_arrow .scroll-arrow {
+  width: 12px;
+  height: 12px;
+  border-right: 3px solid gray;
+  border-bottom: 3px solid gray;
+  transform: rotate(45deg);
+  animation: arrow-wave 1s infinite alternate;
+}
+
+#document .s1_arrow .scroll-arrow:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+#document .s1_arrow .scroll-arrow:nth-child(2) {
+  margin-top: 6px;
+  animation-delay: 0.2s;
+}
+
+#document .s1_arrow .scroll-arrow:nth-child(3) {
+  margin-top: 6px;
+  animation-delay: 0.3s;
+}
+
+@keyframes arrow-wave {
+  0% { opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes arrow_down {
+  0% { top: 28px; }
+  50% { top: 40px; }
+  100% { top: 28px; }
+}
 </style>
 </head>
 
 <body>
-	<h1>💳 텅장진단기 💳</h1>
-
 	<!-- 시작 화면 -->
 	<div id="start-section" class="section active">
-		<img src="/images/cardTest/card_test_main.png" alt="텅장 분석기"
+		<img src="/images/cardTest/card_test_main.gif" alt="텅장 분석기"
 			width="400" />
 		<h2>텅장진단기</h2>
 		<p>내 통장이 텅장이 된 이유를 분석해드립니다!</p>
 		<p>나의 소비성향을 확인해보세요!</p>
-		<button onclick="startTest()">테스트 시작</button>
+		<button class="option-btn" onclick="startTest()">테스트 시작</button>
 	</div>
 
 	<!-- 질문 화면 -->
@@ -303,18 +336,22 @@ button {
 
 		<!-- 선택 버튼 -->
 		<div id="options">
-			<button class="option-btn" onclick="selectOption('A')"></button>
-			<button class="option-btn" onclick="selectOption('B')"></button>
+			<button id="optionA" class="option-btn" onclick="selectOption('A')"></button>
+			<button id="optionB" class="option-btn" onclick="selectOption('B')"></button>
 		</div>
 	</div>
 
 	<!-- 결과 화면 -->
 	<div id="document" class="section">
-		<h2 id="result-title"></h2>
+		<div id="result-title"></div>
 		<p id="result-desc"></p>
 		
 		 <!-- 스크롤 화살표 -->
-  		<img id="scroll-gif" src="/images/cardTest/scroll.gif" alt="화살표"/>
+  		<div class="s1_arrow">
+		  <div class="scroll-arrow"></div>
+		  <div class="scroll-arrow"></div>
+		  <div class="scroll-arrow"></div>
+		</div>
   	
 		<h3>추천 카드</h3>
 		<p id="recommend-reason" class="recommend-reason"></p>
@@ -323,80 +360,80 @@ button {
 
 	<script>
   // 질문 데이터
-  const questions = [
-    {
-      img: '/images/cardTest/q1.png',
-      text: '1️. 쇼핑할 때 더 설레는 순간은?',
-      A: '택배 도착 알림 똑딱📦',
-      B: '매장 가서 실물 딱 보는 순간✨',
-      typeA: '온라인',
-      typeB: '오프라인'
-    },
-    {
-      img: '/images/cardTest/q2.png',
-      text: '2️. 결제할 땐?',
-      A: '‘폰만 있으면 끝! 간편결제 최고’',
-      B: '‘카드 꺼내서 긁는 맛 있어야지~’',
-      typeA: '온라인',
-      typeB: '오프라인'
-    },
-    {
-      img: '/images/cardTest/q3.png',
-      text: '3️. 급하게 필요한 물건이 생겼을 땐?',
-      A: '‘이럴 땐 로켓 배송!! 바로 주문 ㄱ ㄱ’',
-      B: '‘지금 나가서 사와야지!!’',
-      typeA: '온라인',
-      typeB: '오프라인'
-    },
-    {
-      img: '/images/cardTest/q4.png',
-      text: '4️. 월급 들어오면 제일 먼저 하는 생각?',
-      A: '‘일단 저축부터 하고.. 남은 돈으로 버텨보자!’',
-      B: '‘휴 한달동안 넘 고생했다~~ 오늘은 엽떡에 허니콤보~~’',
-      typeA: '저축',
-      typeB: '소비'
-    },
-    {
-      img: '/images/cardTest/q5.png',
-      text: '5️. 할인 쿠폰이 생겼을 때 나는?',
-      A: '‘아깝지만.. 필요한 건 아니니깐 안 살래🙅‍♀️’',
-      B: '‘싸면 일단 득템이지~🛍️’',
-      typeA: '저축',
-      typeB: '소비'
-    },
-    {
-      img: '/images/cardTest/q6.png',
-      text: '6️. 통장 잔고가 넉넉할 때 나는?',
-      A: '‘이번 달은 더 모아야지!’ 하고 통장 보며 뿌듯하다.',
-      B: '‘이 정도면 뭐 하나 사도 되겠는데?’ 하고 장바구니부터 찾는다.',
-      typeA: '저축',
-      typeB: '소비'
-    },
-    {
-      img: '/images/cardTest/q7.png',
-      text: '7️. 큰 돈 쓸 땐?',
-      A: '비교하고 적립하고 신중🗂️',
-      B: '고민하다 귀찮으면 그냥 삼',
-      typeA: '계획',
-      typeB: '충동'
-    },
-    {
-      img: '/images/cardTest/q8.png',
-      text: '8️. 쇼핑몰 들어가면?',
-      A: '살 거만 딱 보고 나옴',
-      B: '돌아다니다가 광고에 홀려서 이것저것 담음',
-      typeA: '계획',
-      typeB: '충동'
-    },
-    {
-      img: '/images/cardTest/q9.png',
-      text: '9️. 결제 직전 내 루틴은?',
-      A: '‘쿠폰, 포인트 싹 모아서 받을 수 있는 할인은 다 받아야지!’',
-      B: '‘아웅 귀찮아..’ 그냥 결제 누르고 끝👆',
-      typeA: '계획',
-      typeB: '충동'
-    }
-  ];
+	const questions = [
+	  {
+	    img: '/images/cardTest/q1.png',
+	    text: '1. 쇼핑할 때 더 설레는 순간은?',
+	    A: '택배 도착 알림 똑딱📦',
+	    B: '매장 가서 실물 딱 보는 순간✨',
+	    typeA: '온라인',
+	    typeB: '오프라인'
+	  },
+	  {
+	    img: '/images/cardTest/q2.png',
+	    text: '2. 결제할 땐?',
+	    A: '‘폰만 있으면 끝! 간편결제 최고’',
+	    B: '‘카드 꺼내서 긁는 맛 있어야지~’',
+	    typeA: '온라인',
+	    typeB: '오프라인'
+	  },
+	  {
+	    img: '/images/cardTest/q3.png',
+	    text: '3. 급하게 필요한 물건이 생겼을 땐?',
+	    A: '‘이럴 땐 로켓 배송!! 바로 주문 ㄱ ㄱ’',
+	    B: '‘지금 나가서 사와야지!!’',
+	    typeA: '온라인',
+	    typeB: '오프라인'
+	  },
+	  {
+	    img: '/images/cardTest/q4.png',
+	    text: '4. 월급 들어오면 제일 먼저 하는 생각?',
+	    A: '‘일단 저축부터 하고.. 남은 돈으로 버텨보자!’',
+	    B: '‘휴 한달동안 넘 고생했다~ 오늘은 치킨이닭!!’',
+	    typeA: '저축',
+	    typeB: '소비'
+	  },
+	  {
+	    img: '/images/cardTest/q5.png',
+	    text: '5. 할인 쿠폰이 생겼을 때 나는?',
+	    A: '‘아깝지만.. 필요한 건 아니니깐 안 살래🙅‍♀️’',
+	    B: '‘싸면 일단 득템이지~🛍️’',
+	    typeA: '저축',
+	    typeB: '소비'
+	  },
+	  {
+	    img: '/images/cardTest/q6.png',
+	    text: '6. 우왓 로또 3등 당첨!! 150만원으로 뭘 하지?',
+	    A: '‘나이스~ 일단 비상금으로 둬야겠다’',
+	    B: '‘꽁돈 생겼다~~ flex 가보자고~~💸🤑💰💰’',
+	    typeA: '저축',
+	    typeB: '소비'
+	  },
+	  {
+	    img: '/images/cardTest/q7.png',
+	    text: '7. 해외여행을 떠나기 3달 전, 나는?',
+	    A: '‘비행기는 미리미리 예매해서 최저가격에 창가자리까지 겟~!’',
+	    B: '‘자리는 있겠지 뭐~~ 예약은 한달 전에 하면 되겠지??’',
+	    typeA: '계획',
+	    typeB: '충동'
+	  },
+	  {
+	    img: '/images/cardTest/q8.png',
+	    text: '8. 눈을 사로잡는 SNS 속 핫템! 이거 탐난다..',
+	    A: '‘혹하긴 하지만 당장 필요한 물건은 아니니깐.. 필요하면 사야지’',
+	    B: '‘이게 진짜 효과가 있다고? 당장 구매 ㄱ ㄱ’',
+	    typeA: '계획',
+	    typeB: '충동'
+	  },
+	  {
+	    img: '/images/cardTest/q9.png',
+	    text: '9. 로션이 다 떨어져서 하나 사야겠어!',
+	    A: '‘후기 하나하나 찾아보며 나에게 맞는지 꼼꼼히 비교’',
+	    B: '친구가 좋다고 추천해준 거 들고 바로 계산대 직행~!',
+	    typeA: '계획',
+	    typeB: '충동'
+	  }
+	];
 
   // 결과 유형 이름, 설명
 	const resultMap = {
@@ -515,8 +552,8 @@ button {
     const q = questions[current];
     document.getElementById('question-img').src = q.img;
     document.getElementById('question-text').innerText = q.text;
-    document.querySelectorAll('.option-btn')[0].innerText = `${q.A}`;
-    document.querySelectorAll('.option-btn')[1].innerText = `${q.B}`;
+    document.getElementById('optionA').innerText = q.A;
+    document.getElementById('optionB').innerText = q.B;
 
     const progressPercent = ((current + 1) / questions.length) * 100;
     document.getElementById('progress-fill').style.width = `${progressPercent}%`;
@@ -558,29 +595,42 @@ button {
 
 	  const result = resultMap[resultType] || { id: 0, name: '알 수 없음' };
 
-	// 순서: front -> name -> result img -> percentage -> back
-		const resultHTML = `
-		  <p class="result-text top">${result.front}</p>
-		  <h2 class="result-name">${result.name}</h2>
-		  <img id="result-img" src="/images/cardTest/r${result.id}.jpg" alt="결과 이미지" />
-		  <p class="result-percentage">${result.percentage}</p>
-		  <p class="result-text bottom">${result.back}</p>
-		`;
-		
-		document.getElementById('result-title').innerHTML = resultHTML;
+	  const resultHTML = `
+	    <p class="result-text top">${result.front}</p>
+	    <h2 class="result-name">${result.name}</h2>
+	    <img id="result-img" src="/images/cardTest/r${result.id}.png" alt="결과 이미지" />
+	    <p class="result-percentage">${result.percentage}</p>
+	    <p class="result-text bottom">${result.back}</p>
+	  `;
+	  document.getElementById('result-title').innerHTML = resultHTML;
 
-	  // 추천카드 이유 + 카드 이미지 + 카드 이름
-		const container = document.getElementById('recommended-cards');
-		document.getElementById('recommend-reason').innerText = result.card.reason;
+	  const container = document.getElementById('recommended-cards');
+	  document.getElementById('recommend-reason').innerText = result.card.reason;
 
-		container.innerHTML = `
-			<a href="/card/detail/${result.card.id}" class="card-item recommend-card">
-			  <img src="/images/cards/${result.card.id}_front.PNG" alt="${result.card.name}" />
-			  <h4>${result.card.name}</h4>
-			</a>
-			  
-		`;
-  }
+	  container.innerHTML = `
+	    <a href="/card/detail/${result.card.id}" class="card-item recommend-card">
+	      <img src="/images/cards/${result.card.id}_front.PNG" alt="${result.card.name}" />
+	      <h4>${result.card.name}</h4>
+	    </a>
+	  `;
+
+	  const recommendReason = document.getElementById('recommend-reason');
+	  const recommendedCards = document.getElementById('recommended-cards');
+	  observer.observe(recommendReason);
+	  observer.observe(recommendedCards);
+	}
+  
+	  const observer = new IntersectionObserver((entries) => {
+		    entries.forEach((entry) => {
+		      if (entry.isIntersecting) {
+		        entry.target.classList.add('show');
+		        observer.unobserve(entry.target); // 한 번만 애니메이션 적용
+		      }
+		    });
+		  }, {
+		    threshold: 0.3
+		  });
+
 
 </script>
 

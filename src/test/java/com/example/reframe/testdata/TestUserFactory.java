@@ -50,7 +50,7 @@ public class TestUserFactory {
 				.password(bCryptPasswordEncoder.encode("1234"))
 				.name("김법진1")
 				.phone("01011112222")
-				.email("beobjin-_-@naver.com")
+				.email("qkrwjddnjs0715@naver.com")
 				.usertype("P")
 				.role("ROLE_ADMIN")
 				.build();
@@ -66,7 +66,7 @@ public class TestUserFactory {
 				.password(bCryptPasswordEncoder.encode("1234"))
 				.name("김법진2")
 				.phone("01011113333")
-				.email("beobjin-_-@naver.com")
+				.email("qkrwjddnjs0715@naver.com")
 				.usertype("P")
 				.role("ROLE_SUPERADMIN")
 				.build();

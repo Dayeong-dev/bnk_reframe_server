@@ -30,7 +30,9 @@ public class CardDto {
 	private String termsGuide;        // 상품 설명서 및 이용약관
 
     private List<String> subcategories; // 소분류명 리스트
-    
+
+    private List<BenefitItem> serviceList;
+
  // categoryMajor 변환 메서드
     public String getCategoryMajorDisplay() {
         if (categoryMajor == null) return "알 수 없음";
