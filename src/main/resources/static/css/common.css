@@ -5,6 +5,20 @@
     --secondary-color: #B4161B;
 }
 
+@font-face {
+    font-family: 'BNKGothic';
+    src: url('/fonts/BNKGothic-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BNKGothic';
+    src: url('/fonts/BNKGothic-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
 /* ============================== */
 /* 기본 스타일 제거                   */
 /* ============================== */
