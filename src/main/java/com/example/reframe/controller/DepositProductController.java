@@ -96,13 +96,9 @@ public class DepositProductController {
     }
 
 
-
-
     /**
      * 예적금 상품 목록 (페이징, 정렬, 검색)
      */
-    
-   
     @GetMapping("/list")
     public String depositList(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -139,10 +135,7 @@ public class DepositProductController {
         model.addAttribute("modalDetailForModal", product.getModalDetail());
 
         // 금리 정보 추가
-      
         String rateHtml = interestRateService.getRateHtmlByProductId(productId);
-
-    
         model.addAttribute("modalRateTable", rateHtml);
 
         // 최근 본 상품 기록

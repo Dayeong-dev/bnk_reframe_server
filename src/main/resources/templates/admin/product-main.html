@@ -237,21 +237,52 @@
 			html += `<tr><td>유형</td><td><input type="text" name="category" value="${product.category}" readonly /></td></tr>`;
 			html += `<tr><td>추천 대상</td><td><input type="text" name="purpose" value="${product.purpose}" readonly /></td></tr>`;
 			html += `<tr><td>요약</td><td><input type="text" name="summary" value="${product.summary}" readonly /></td></tr>`;
-			html += `<tr><td>상세 설명</td><td><input type="text" name="detail" value="${product.detail}" readonly /></td></tr>`;
+			/* html += `<tr><td>상세 설명</td><td><input type="text" name="detail" value="${product.detail}" readonly /></td></tr>`; */
 			html += `<tr><td>금리</td><td><input type="text" name="rate" value="${product.minRate}% ~ ${product.maxRate}%" readonly /></td></tr>`;
 			html += `<tr><td>가입 기간</td><td><input type="text" name="period" value="${product.period}" readonly />개월</td></tr>`;
 			html += `<tr><td>판매 상태</td><td><input type="text" name="status" value="${product.status}" readonly /></td></tr>`;
 			html += `<tr><td>등록일</td><td><input type="text" name="createdAt" value="${product.createdAt}" readonly /></td></tr>`;
 			html += `<tr><td>조회수</td><td><input type="text" name="viewCount" value="${product.viewCount}" readonly /></td></tr>`;
 			html += `<tr><td>이미지</td><td><img src="${product.imageUrl}" width="100"/></td></tr>`;
+			html += `<tr><td>상세 설명</td>`;
+			html += `<td class="detail">`;
+			html += `<button type="button" onclick="createBlock()">추가</button><br/>`;
+			for(let productContent of product.productContentList) {
+				html += `<div>
+						<input type="hidden" name="contentId" value="${productContent.contentId}" />
+						<label>제목: <input type="text" name="title" value="${productContent.title}" class="title-input" /></label><br/>
+						<label>내용: <textarea name="content" class="content-textarea" rows="4" cols="50">${productContent.content}</textarea></label><br/>
+						<label>이미지 URL: <input type="text" name="imageURL" value="${productContent.imageURL}" class="image-input" /></label>
+						<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
+					</div>`;
+			}
 		
-			html += '</tbody></table>';
+			html += '</td></tbody></table>';
 		
 			html += `<button type="button" onclick="enableEditMode()">수정</button>`;
 			html += `<button type="button" id="saveBtn" onclick="saveProductChanges()" style="display:none;">저장</button>`;
 			html += '</form>';
 		
 			document.getElementById('content-detail').innerHTML = html;
+		}
+		
+		/* 상세 설명 입력창 삭제 함수 */
+		function deleteBlock(button) {
+			const div = button.closest("div");
+			if(div) div.remove();
+		}
+		
+		/* 상세 설명 입력창 생성 함수 */
+		function createBlock() {
+			const $detail = document.querySelector(".detail");
+			const div = document.createElement("div");
+			
+			div.innerHTML = `<label>제목: <input type="text" name="title" class="title-input" /></label><br/>
+					<label>내용: <textarea name="content" class="content-textarea" rows="4" cols="50"></textarea></label><br/>
+					<label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
+					<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>`;
+					
+			$detail.appendChild(div);
 		}
 		
 		//============================================================
@@ -271,6 +302,24 @@
 			const form = document.getElementById("productForm");
 			const formData = new FormData(form);
 			const rawRate = formData.get("rate").replace("%", "").split("~");
+			
+			// 상세 정보 리스트
+			const details = document.querySelectorAll(".detail div");
+		    const contentIds = formData.getAll("contentId");
+		    const titles = formData.getAll("title");
+		    const contents = formData.getAll("content");
+		    const imageURLs = formData.getAll("imageURL");
+		    
+			const productContentList = [];
+		   	for(let i = 0; i < details.length; i++) {
+		   		let obj = {
+		   				contentId: contentIds[i], 
+		   				title: titles[i],
+		   				content: contents[i],
+		   				imageURL: imageURLs[i],
+		   		};
+		   		productContentList.push(obj);
+		   	}
 
 			const data = {
 				productId: Number(formData.get("productId")),
@@ -278,7 +327,8 @@
 				category: formData.get("category"),
 				purpose: formData.get("purpose"),
 				summary: formData.get("summary"),
-				detail: formData.get("detail"),
+				/* detail: formData.get("detail"), */
+				productContentList: productContentList, 
 				minRate: parseFloat(rawRate[0]),
 				maxRate: parseFloat(rawRate[1]),
 				period: Number(formData.get("period")),
@@ -347,13 +397,25 @@
 		    html += '<tr><td>유형</td><td><select name="category"><option value="예금">예금</option><option value="적금">적금</option></select></td></tr>';
 		    html += '<tr><td>추천 대상</td><td><input type="text" name="purpose" /></td></tr>';
 		    html += '<tr><td>요약</td><td><input type="text" name="summary" /></td></tr>';
-		    html += '<tr><td>상세 설명</td><td><input type="text" name="detail" /></td></tr>';
+/* 		    html += '<tr><td>상세 설명</td><td><input type="text" name="detail" /></td></tr>'; */
 		    html += '<tr><td>최소 금리</td><td><input type="number" step="0.01" name="minRate" required /></td></tr>';
 		    html += '<tr><td>최대 금리</td><td><input type="number" step="0.01" name="maxRate" required /></td></tr>';
 		    html += '<tr><td>가입 기간(개월)</td><td><input type="number" name="period" required /></td></tr>';
 		    html += '<tr><td>이미지 URL</td><td><input type="text" name="imageUrl" /></td></tr>';
-		    html += '<tr><td colspan="2"><button type="button" onclick="submitProductForm()">등록</button></td></tr>';
-
+		    html += `<tr>
+		    			<td>상세 설명</td>
+		    			<td class="detail">
+			    			<button type="button" onclick="createBlock()">추가</button><br/>
+			    			<div>
+				    			<label>제목: <input type="text" name="title" class="title-input" /></label><br/>
+				    			<label>내용: <textarea name="content" class="content-textarea" rows="4" cols="50"></textarea></label><br/>
+				    			<label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
+				    			<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
+			    			</div>
+			    		</td>
+			    	</tr>`;
+		    
+			html += '<tr><td colspan="2"><button type="button" onclick="submitProductForm()">등록</button></td></tr>';
 		    html += '</tbody></table>';
 		    html += '</form>';
 
@@ -364,13 +426,30 @@
 		function submitProductForm() {
 		    const form = document.getElementById("productCreateForm");
 		    const formData = new FormData(form);
+		    
+		    // 상세 정보 리스트
+		    const details = document.querySelectorAll(".detail div");
+		    const titles = formData.getAll("title");
+		    const contents = formData.getAll("content");
+		    const imageURLs = formData.getAll("imageURL");
+		    
+		    const productContentList = [];
+		   	for(let i = 0; i < details.length; i++) {
+		   		let obj = {
+		   				title: titles[i],
+		   				content: contents[i],
+		   				imageURL: imageURLs[i],
+		   		};
+		   		productContentList.push(obj);
+		   	}
 
 		    const data = {
 		        name: formData.get("name"),
 		        category: formData.get("category"),
 		        purpose: formData.get("purpose"),
 		        summary: formData.get("summary"),
-		        detail: formData.get("detail"),
+		        /* detail: formData.get("detail"), */
+		        productContentList: productContentList, 
 		        minRate: parseFloat(formData.get("minRate")),
 		        maxRate: parseFloat(formData.get("maxRate")),
 		        period: parseInt(formData.get("period")),

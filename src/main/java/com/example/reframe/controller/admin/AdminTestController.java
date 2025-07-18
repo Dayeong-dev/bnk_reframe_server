@@ -16,17 +16,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.reframe.dto.DepositProductContentDTO;
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.ProductStatusUpdateRequestDTO;
 import com.example.reframe.entity.DepositProduct;
+import com.example.reframe.entity.DepositProductContent;
 import com.example.reframe.entity.admin.ApprovalRequest;
 import com.example.reframe.repository.ApprovalRequestRepository;
+import com.example.reframe.repository.DepositProductContentRepository;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.service.ApprovalService;
 import com.example.reframe.service.ProductService;
+import com.example.reframe.util.DepositProductContentMapper;
 import com.example.reframe.util.SessionUtil;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/admin")
@@ -36,6 +41,9 @@ public class AdminTestController {
 	private DepositProductRepository productRepository;
 	
 	@Autowired
+	private DepositProductContentRepository productContentRepository;
+	
+	@Autowired
 	private ProductService productService;
 	
 	@Autowired
@@ -43,7 +51,8 @@ public class AdminTestController {
 
 	@Autowired
 	private ApprovalRequestRepository approvalRequestRepository;
-	
+
+	private DepositProductContentMapper productContentMapper = new DepositProductContentMapper();
 	
 	/*
 	 * 이중 필터 사용 -> filterProducts() 메서드로 통합 
@@ -119,8 +128,18 @@ public class AdminTestController {
 	public DepositProductDTO getProductDetail(@PathVariable("productId") Long productId) {
 		DepositProduct product = productRepository.findById(productId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. ID: " + productId));
+		
+		List<DepositProductContent> productContent = productContentRepository.findByDepositProduct_ProductIdOrderByContentOrderAsc(productId);
+		List<DepositProductContentDTO> productContentList = new ArrayList<>();
+		
+		for(DepositProductContent d : productContent) {
+			productContentList.add(productContentMapper.toDTO(d));
+		}
+		
+		DepositProductDTO result = convertToDTO(product);
+		result.setProductContentList(productContentList);
 
-		return convertToDTO(product);
+		return result;
 	}
 	
 
@@ -146,13 +165,14 @@ public class AdminTestController {
 	
 	// 상품 등록 
 	@PostMapping("/products/create")
+	@Transactional
 	public ResponseEntity<Void> createProduct(@RequestBody DepositProductDTO dto) {
 	    DepositProduct product = DepositProduct.builder()
 	        .name(dto.getName())
 	        .category(dto.getCategory())
 	        .purpose(dto.getPurpose())
 	        .summary(dto.getSummary())
-	        .detail(dto.getDetail())
+//	        .detail(dto.getDetail())
 	        .minRate(dto.getMinRate())
 	        .maxRate(dto.getMaxRate())
 	        .period(dto.getPeriod())
@@ -160,8 +180,24 @@ public class AdminTestController {
 	        .imageUrl(dto.getImageUrl())
 	        .viewCount(0L)
 	        .build();
+	    
+	    // 수정된 예적금 상세 설명 저장
+	    List<DepositProductContentDTO> insertContents = dto.getProductContentList();
 
-	    productRepository.save(product);
+	    DepositProduct productEntity = productRepository.save(product);
+	    
+	    // 수정된 설명 내용 업데이트
+	    for(int i = 0; i < insertContents.size(); i++) {
+	    	DepositProductContentDTO updateContent = insertContents.get(i);
+	    	DepositProduct depositProduct = new DepositProduct();
+	    	depositProduct.setProductId(productEntity.getProductId());
+	    	
+	    	updateContent.setContentOrder(i + 1);
+	    	updateContent.setDepositProduct(depositProduct);
+	    	
+	    	productContentRepository.save(productContentMapper.toEntity(updateContent));
+	    }
+	    
 	    return ResponseEntity.ok().build();
 	}
 	// 상세보기에서 수정 데이터 받기 
@@ -183,6 +219,39 @@ public class AdminTestController {
 	    product.setPeriod(dto.getPeriod());
 	    product.setStatus(dto.getStatus());
 		 */
+		
+		/* 상세 설명 수정 */
+	    // 수정된 예적금 상세 설명 저장
+	    List<DepositProductContentDTO> updateContents = dto.getProductContentList();
+	    
+	    System.out.println("hello world: ");
+	    System.out.println(updateContents);
+	    
+	    // 기존 예적금 상세 설명 조회
+	    List<DepositProductContent> existingContents =  productContentRepository.findByDepositProduct_ProductIdOrderByContentOrderAsc(dto.getProductId());
+	    
+	    // 삭제할 컨텐츠 추출
+	    // 수정된 설명 contentId만 추출
+	    List<Integer> contentIds = updateContents.stream().map(v -> v.getContentId()).toList();
+	    
+	    // 수정된 설명에 포함되지 않은 content 삭제
+	    existingContents.forEach(v -> {
+	    	if(!contentIds.contains(v.getContentId())) {
+	    		productContentRepository.deleteById(v.getContentId());
+	    	}
+	    });
+	    
+	    // 수정된 설명 내용 업데이트
+	    for(int i = 0; i < updateContents.size(); i++) {
+	    	DepositProductContentDTO updateContent = updateContents.get(i);
+	    	DepositProduct depositProduct = new DepositProduct();
+	    	depositProduct.setProductId(dto.getProductId());
+	    	
+	    	updateContent.setContentOrder(i + 1);
+	    	updateContent.setDepositProduct(depositProduct);
+	    	
+	    	productContentRepository.save(productContentMapper.toEntity(updateContent));
+	    }
 		
 		approvalService.requestApproval(dto, SessionUtil.getLoginUser(session).getUsername());
 		

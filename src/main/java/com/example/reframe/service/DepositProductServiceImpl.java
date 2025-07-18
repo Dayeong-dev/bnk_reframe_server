@@ -14,9 +14,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.entity.DepositProduct;
+import com.example.reframe.entity.DepositProductContent;
 import com.example.reframe.entity.DepositProductImage;
+import com.example.reframe.repository.DepositProductContentRepository;
 import com.example.reframe.repository.DepositProductImageRepository;
 import com.example.reframe.repository.DepositProductRepository;
+import com.example.reframe.util.DepositProductContentMapper;
+import com.example.reframe.util.SetProductContent;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -29,8 +33,11 @@ public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
     private final DepositProductImageRepository depositProductImageRepository;
-    
+    private final DepositProductContentRepository depositProductContentRepository; 
     private final EntityManager em;
+    
+    private SetProductContent setProductContent = new SetProductContent();
+    private DepositProductContentMapper depositProductContentMapper = new DepositProductContentMapper();
 
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -182,7 +189,11 @@ public class DepositProductServiceImpl implements DepositProductService {
     public DepositProductDTO getProductDetail(Long productId) {
         DepositProduct product = depositProductRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
+        
+        List<DepositProductContent> productContentList = depositProductContentRepository.findByDepositProduct_ProductIdOrderByContentOrderAsc(productId);
 
+        String detail = setProductContent.setDepositDetail(productContentList.stream().map(v -> depositProductContentMapper.toDTO(v)).toList());
+        
         // 조회수 증가
         product.setViewCount(product.getViewCount() + 1);
         depositProductRepository.save(product);
@@ -194,7 +205,7 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .summary(product.getSummary())
                 .detail(product.getDetail())
                 .modalDetail(product.getModalDetail()) // ✅ modalDetail 포함
-                .detail(product.getDetail()) // ✅ 여기서 DETAIL 꺼냄
+                .detail(detail) // ✅ 여기서 DETAIL 꺼냄
                 .maxRate(product.getMaxRate())
                 .minRate(product.getMinRate())
                 .period(product.getPeriod())
