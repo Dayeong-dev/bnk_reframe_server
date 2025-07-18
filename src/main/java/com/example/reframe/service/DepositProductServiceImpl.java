@@ -14,13 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.entity.DepositProductContent;
 import com.example.reframe.entity.DepositProductImage;
-import com.example.reframe.repository.DepositProductContentRepository;
 import com.example.reframe.repository.DepositProductImageRepository;
 import com.example.reframe.repository.DepositProductRepository;
-import com.example.reframe.util.DepositProductContentMapper;
 import com.example.reframe.util.SetProductContent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -33,11 +32,9 @@ public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
     private final DepositProductImageRepository depositProductImageRepository;
-    private final DepositProductContentRepository depositProductContentRepository; 
     private final EntityManager em;
     
     private SetProductContent setProductContent = new SetProductContent();
-    private DepositProductContentMapper depositProductContentMapper = new DepositProductContentMapper();
 
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -186,13 +183,11 @@ public class DepositProductServiceImpl implements DepositProductService {
     
     @Override
     @Transactional
-    public DepositProductDTO getProductDetail(Long productId) {
+    public DepositProductDTO getProductDetail(Long productId) throws JsonMappingException, JsonProcessingException {
         DepositProduct product = depositProductRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
-        
-        List<DepositProductContent> productContentList = depositProductContentRepository.findByDepositProduct_ProductIdOrderByContentOrderAsc(productId);
 
-        String detail = setProductContent.setDepositDetail(productContentList.stream().map(v -> depositProductContentMapper.toDTO(v)).toList());
+        String detail = setProductContent.setDepositDetail(product.getDetail());
         
         // 조회수 증가
         product.setViewCount(product.getViewCount() + 1);
