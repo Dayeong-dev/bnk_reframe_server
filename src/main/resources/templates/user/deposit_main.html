@@ -22,25 +22,24 @@
   position: relative;
   width: 100%;
   max-width: 1000px;
-  height: 220px;
+  height: 270px; /* ✅ 여기가 중요! */
   overflow: hidden;
   border-radius: 12px;
   margin: 2rem 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.slider {
-  display: flex;
-  width: 300%;
-  transition: transform 0.5s ease;
-}
 
 .slide {
   width: 100%;
-  object-fit: cover;
+  height: 100%;
+  object-fit: cover;          /* ✅ 배너 영역을 채움, 잘리는 건 양옆 */
+  object-position: center;    /* ✅ 중앙 기준으로 자름 */
   display: none;
   border-radius: 12px;
 }
+
+
 
 .slide.active {
   display: block;
@@ -77,14 +76,14 @@
 
 .dots {
   position: absolute;
-  bottom: 12px;
+  bottom: 5px;
   width: 100%;
   text-align: center;
 }
 
 .dot {
-  height: 10px;
-  width: 10px;
+  height: 8px;
+  width: 8px;
   margin: 0 4px;
   background-color: #ced4da;
   border-radius: 50%;
@@ -355,9 +354,9 @@
 			<!-- ✅ 슬라이드 배너 -->
 			<div class="slider-container">
 			  <div class="slider" id="slider">
-			    <img src="/img/image1.jpg" class="slide active">
-			    <img src="/img/image2.jpg" class="slide">
-			    <img src="/img/image3.jpg" class="slide">
+			    <img src="/im/001.jpg" class="slide active">
+			    <img src="/im/002.jpg" class="slide">
+			    <img src="/im/003.jpg" class="slide">
 			  </div>
 			  <button class="slider-arrow left" onclick="prevSlide()">❮</button>
 			  <button class="slider-arrow right" onclick="nextSlide()">❯</button>
@@ -466,7 +465,7 @@
     showSlide(index);
   }
 
-  setInterval(nextSlide, 3000);
+  setInterval(nextSlide, 4000);
   showSlide(0);
 
   document.addEventListener("DOMContentLoaded", function () {
