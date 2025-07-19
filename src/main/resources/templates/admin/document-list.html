@@ -45,6 +45,12 @@
 				<a href="/admin/document/form"><button>파일 등록</button></a>
 			</div>
 			<div>
+				<form id="search-form">
+					<input type="text" name="search" placeholder="검색 내용을 입력하세요. " />
+					<input type="submit" value="검색" />
+				</form>
+			</div>
+			<div>
 				<table border="1">
 					<thead>
 						<tr></tr>
@@ -71,11 +77,36 @@
 	<script>
 		const $header = document.querySelector("thead tr");
 		const $content = document.querySelector("tbody");
+		const $searchForm = document.getElementById("search-form");
+		
+		let curr_type = "T";
 		
 		getTerms();
 		
-		function getTerms() {
-			fetch("/admin/terms")
+		$searchForm.addEventListener("submit", e => {
+			e.preventDefault();
+			
+			const search = $searchForm.search.value.trim();
+			
+			if(search === "") {
+				alert("검색어를 입력하세요. ");
+				$searchForm.search.fucus();
+				return;
+			}
+			
+			if(curr_type === "T") {
+				getTerms(search);	
+			}
+			else if(curr_type === "M") {
+				getManuals(search);
+			}
+		});
+		
+		function getTerms(search = null) {
+			// 현재 목록 = 약관(Term)
+			curr_type = "T";
+			
+			fetch(`/admin/terms${search != null ? ("?search=" + search) : ""}`)
 			.then(response => response.json())
 			.then(data => {
 				$header.innerHTML = `<th>번호</th>`;
@@ -119,8 +150,11 @@
 			.catch(error => console.log(error));
 		}
 		
-		function getManuals() {
-			fetch("/admin/manuals")
+		function getManuals(search = null) {
+			// 현재 목록 = 상품설명서(Manual)
+			curr_type = "M";
+			
+			fetch(`/admin/manuals${search != null ? ("?search=" + search) : ""}`)
 			.then(response => response.json())
 			.then(data => {
 				$header.innerHTML = `<th>번호</th>`;

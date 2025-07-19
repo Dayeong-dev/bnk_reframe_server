@@ -20,8 +20,16 @@ public class DocumentService {
 		this.documentRepository = documentRepository;
 	}
 
-	public List<DocumentDTO> getTermList() {
-		List<Document> result = documentRepository.findAllByDocumentType("T");
+	public List<DocumentDTO> getTermList(String search) {
+		List<Document> result;
+		
+		if(search != null) {
+			result = documentRepository.findByTitleContainingAndDocumentType(search, "T");
+		}	
+		else {
+			result = documentRepository.findAllByDocumentType("T");
+		}
+		
 		List<DocumentDTO> termList = new ArrayList<>();
 		
 		for(Document doc : result) {
@@ -31,8 +39,16 @@ public class DocumentService {
 		return termList;
 	}
 	
-	public List<DocumentDTO> getManualList() {
-		List<Document> result = documentRepository.findAllByDocumentType("M");
+	public List<DocumentDTO> getManualList(String search) {
+		List<Document> result; 
+		
+		if(search != null) {
+			result = documentRepository.findByTitleContainingAndDocumentType(search, "M");
+		}	
+		else {
+			result = documentRepository.findAllByDocumentType("M");
+		}
+		
 		List<DocumentDTO> manualList = new ArrayList<>();
 		
 		for(Document doc : result) {
