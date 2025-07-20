@@ -21,6 +21,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Document extends BaseEntity {
+	public Document(Integer documentId) {
+		this.documentId = documentId;
+	}
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Integer documentId;		// 문서 아이디(자동증가)

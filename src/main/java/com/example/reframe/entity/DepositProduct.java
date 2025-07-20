@@ -39,8 +39,20 @@ public class DepositProduct {
     private String detail;
 
     @Lob
-    @Column(name = "MODAL_DETAIL") // 추가됨
+    @Column(name = "MODAL_DETAIL")		// 추가됨
     private String modalDetail;
+    
+    @Lob
+    @Column(name = "MODAL_RATE")		// 추가됨
+    private String modalRate;
+    
+	@ManyToOne(fetch = FetchType.LAZY)	// 추가됨
+	@JoinColumn(name = "TERM_ID")
+	private Document term;
+	
+	@ManyToOne(fetch = FetchType.LAZY)	// 추가됨
+	@JoinColumn(name = "MANUAL_ID")
+	private Document manual;
 
     @Column(name = "MAX_RATE", precision = 5, scale = 2)
     private BigDecimal maxRate;

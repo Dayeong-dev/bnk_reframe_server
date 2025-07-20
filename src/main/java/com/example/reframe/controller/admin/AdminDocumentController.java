@@ -39,40 +39,21 @@ public class AdminDocumentController {
 		this.documentService = documentService;
 	}
 	
-	
-	@GetMapping("/term/list")
-	public String getTermList(Model model) {
-		List<DocumentDTO> termList = documentService.getTermList();
-		
-		model.addAttribute("termList", termList);
-		
-		return "admin/term-list";
-	}
-	
-	@GetMapping("/manual/list")
-	public String getManualList(Model model) {
-		List<DocumentDTO> manualList = documentService.getManualList();
-		
-		model.addAttribute("manualList", manualList);
-		
-		return "admin/manual-list";
-	}
-	
 	@GetMapping("/document/list")
 	public String getDocumentList() {
 		return "admin/document-list";
 	}
 	
 	@GetMapping("/terms")
-	public @ResponseBody ResponseEntity<List<DocumentDTO>> getTerms() {
-		List<DocumentDTO> termList = documentService.getTermList();
+	public @ResponseBody ResponseEntity<List<DocumentDTO>> getTerms(@RequestParam(required = false, name = "search") String search) {
+		List<DocumentDTO> termList = documentService.getTermList(search);
 		
 		return ResponseEntity.ok(termList);
 	}
 	
 	@GetMapping("/manuals")
-	public @ResponseBody ResponseEntity<List<DocumentDTO>> getManuals() {
-		List<DocumentDTO> manualList = documentService.getManualList();
+	public @ResponseBody ResponseEntity<List<DocumentDTO>> getManuals(@RequestParam(required = false, name = "search") String search) {
+		List<DocumentDTO> manualList = documentService.getManualList(search);
 		
 		return ResponseEntity.ok(manualList);
 	}
@@ -88,12 +69,12 @@ public class AdminDocumentController {
 	    String filename = document.getFilename();
 	    Path path;
 	    
-	    if(document.getDocumentType().equals("T")) {
-	    	path = Paths.get(TERM_PATH + filename);
-	    } else if(document.getDocumentType().equals("M")) {
-	    	path = Paths.get(MANUAL_PATH + filename);
-	    } else {
-	    	return ResponseEntity.badRequest().build();
+	    switch (document.getDocumentType()) {
+	        case "T" -> path = Paths.get(TERM_PATH + filename);
+	        case "M" -> path = Paths.get(MANUAL_PATH + filename);
+	        default -> {
+	            return ResponseEntity.badRequest().build();
+	        }
 	    }
 	    
 	    Resource resource = new FileSystemResource(path);

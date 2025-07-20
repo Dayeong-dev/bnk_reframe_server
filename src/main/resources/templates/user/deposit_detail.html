@@ -104,9 +104,50 @@ body {
 	line-height: 1.6; /* ✅ 줄간격 추가 */
 }
 
+.modal-content h2 {
+	font-size: 24px;
+	font-weight: bold;
+	margin: 24px 0 12px;
+	padding-bottom: 6px;
+}
+
 .modal-content p {
-	margin-bottom: 1rem; /* ✅ 단락 사이 여백 */
-	line-height: 1.6; /* ✅ 줄 간격도 유지 */
+	margin: 0.5rem 0;
+	color: #444;
+}
+
+.modal-content ul,
+.modal-content ol {
+	margin: 10px 0 10px;
+	padding-left: 20px;
+}
+
+.modal-content ul {
+	list-style-type: disc;
+}
+
+.modal-content li {
+	margin-bottom: 6px;
+	line-height: 1.6;
+}
+
+.modal-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 20px 0;
+}
+
+.modal-content th,
+.modal-content td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.modal-content th {
+	background-color: #f5f7fa;
+	color: #2c3e50;
+	font-weight: bold;
 }
 
 .close {
@@ -276,6 +317,7 @@ body {
 			<div th:utext="${modalRateTable}" style="margin-bottom: 20px;">
 				<!-- 금리표 HTML 출력 -->
 			</div>
+			<p class="rate-note">※ 본 금리는 <span th:text="${#dates.format(#dates.createNow(), 'yyyy년 MM월 dd일')}"></span> 기준입니다.</p>
 			<div style="text-align: center;">
 				<button class="btn" onclick="closeRateModal()">닫기</button>
 			</div>

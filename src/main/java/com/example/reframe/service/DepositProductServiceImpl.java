@@ -17,6 +17,7 @@ import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.DepositProductImage;
 import com.example.reframe.repository.DepositProductImageRepository;
 import com.example.reframe.repository.DepositProductRepository;
+import com.example.reframe.util.MarkdownUtil;
 import com.example.reframe.util.SetProductContent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -187,7 +188,9 @@ public class DepositProductServiceImpl implements DepositProductService {
         DepositProduct product = depositProductRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
 
-        String detail = setProductContent.setDepositDetail(product.getDetail());
+        String detail = setProductContent.setDepositDetail(product.getDetail());	// Json → HTML
+        String modalDetail = MarkdownUtil.toHtml(product.getModalDetail());		// MarkDown → HTML
+        String modalRate = MarkdownUtil.toHtml(product.getModalRate());			// MarkDown → HTML
         
         // 조회수 증가
         product.setViewCount(product.getViewCount() + 1);
@@ -199,8 +202,9 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .name(product.getName())
                 .summary(product.getSummary())
                 .detail(product.getDetail())
-                .modalDetail(product.getModalDetail()) // ✅ modalDetail 포함
-                .detail(detail) // ✅ 여기서 DETAIL 꺼냄
+                .modalDetail(modalDetail)
+                .modalRate(modalRate)
+                .detail(detail)
                 .maxRate(product.getMaxRate())
                 .minRate(product.getMinRate())
                 .period(product.getPeriod())

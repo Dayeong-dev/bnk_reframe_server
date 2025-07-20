@@ -12,6 +12,40 @@
     		width: 100px;
     		margin-right: 10px;
     	}
+    	
+    	#modal {
+    		display: none;
+    		position: fixed;
+    		top: 0;
+    		left: 0;
+    		width: 100%;
+    		height: 100vh;
+    		background-color: rgba(0, 0, 0, 0.4);
+    	}
+    	
+    	#modal .modal-wrapper {
+    		max-width: 80%;
+    		max-height: 80%;
+    		border-radius: 1rem;
+    		background-color: #fff;
+    		padding: 2rem;
+    		
+    		position: absolute;
+    		top: 50%;
+    		left: 50%;
+    		transform: translate(-50%, -50%);
+    	}
+    	
+    	#modal .modal-wrapper .modal-close {
+    		position: absolute;
+    		top: 0.75rem;
+    		right: 0.75rem;
+    		cursor: pointer;
+    	}
+    	
+    	#modal .search-form {
+    		margin-bottom: 1rem;
+    	}
     </style>
 </head>
 <body>
@@ -65,6 +99,24 @@
             <div id="content-detail"></div>
             
         </div>
+    </div>
+    <!-- 문서(약관/설명서) 선택 모달 -->
+    <div id="modal">
+    	<div class="modal-wrapper" >
+			<span class="modal-close" onclick="closeModal()">&times;</span>
+			<div class="modal-content">
+				<form class="search-form">
+					<input type="text" name="search" placeholder="검색 내용을 입력하세요. " />
+					<input type="submit" value="검색" />
+				</form>
+				<table border="1">
+					<thead>
+						<tr></tr>
+					</thead>
+					<tbody class=""></tbody>
+				</table>
+			</div>
+		</div>
     </div>
 
 	<script>
@@ -241,16 +293,32 @@
 			html += `<tr><td>금리</td><td><input type="text" name="rate" value="${product.minRate}% ~ ${product.maxRate}%" readonly /></td></tr>`;
 			html += `<tr><td>가입 기간</td><td><input type="text" name="period" value="${product.period}" readonly />개월</td></tr>`;
 			html += `<tr><td>판매 상태</td><td><input type="text" name="status" value="${product.status}" readonly /></td></tr>`;
-			html += `<tr><td>등록일</td><td><input type="text" name="createdAt" value="${product.createdAt}" readonly /></td></tr>`;
+/* 			html += `<tr><td>등록일</td><td><input type="text" name="createdAt" value="${product.createdAt}" readonly /></td></tr>`;
 			html += `<tr><td>조회수</td><td><input type="text" name="viewCount" value="${product.viewCount}" readonly /></td></tr>`;
-			html += `<tr><td>이미지</td><td><img src="${product.imageUrl}" width="100"/></td></tr>`;
+			html += `<tr><td>이미지</td><td><img src="${product.imageUrl}" width="100"/></td></tr>`; */
+			html += `<tr><td>상품 안내</td><td><textarea name="modalDetail">${product.modalDetail}</textarea></td></tr>`;
+		    html += `<tr><td>금리 안내</td><td><textarea name="modalRate">${product.modalRate}</textarea></td></tr>`;
+		    html += `<tr>
+		    	<td>약관</td>
+		    	<td>
+		    		<input type="text" name="termId" value="${product.termId ?? ''}" />
+		    		<input type="button" value="검색" onclick="openModal('T')" />
+		    	</td>
+		    </tr>`;
+		    html += `<tr>
+		    	<td>상품설명서</td>
+		    	<td>
+		    		<input type="text" name="manualId" value="${product.manualId ?? ''}" />
+		    		<input type="button" value="검색" onclick="openModal('M')" />
+		    	</td>
+		    </tr>`;
 			html += `<tr><td>상세 설명</td>`;
 			html += `<td class="detail">`;
 			html += `<button type="button" onclick="createBlock()">추가</button><br/>`;
 			for(let productContent of product.productContentList) {
 				html += `<div>
 						<label>제목: <input type="text" name="title" value="${productContent.title}" class="title-input" /></label><br/>
-						<label>내용: <textarea name="content" class="content-textarea" rows="4" cols="50">${productContent.content}</textarea></label><br/>
+						<label>내용: <textarea name="content" class="content-textarea">${productContent.content}</textarea></label><br/>
 						<label>이미지 URL: <input type="text" name="imageURL" value="${productContent.imageURL}" class="image-input" /></label>
 						<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
 					</div>`;
@@ -265,6 +333,8 @@
 			document.getElementById('content-detail').innerHTML = html;
 		}
 		
+		//============================================================
+			
 		/* 상세 설명 입력창 삭제 함수 */
 		function deleteBlock(button) {
 			const div = button.closest("div");
@@ -274,18 +344,160 @@
 		/* 상세 설명 입력창 생성 함수 */
 		function createBlock() {
 			const $detail = document.querySelector(".detail");
+			const count = $detail.querySelectorAll("div");
+			
+			if(count.length >= 7) {	// 7개 제한
+				alert("상세 설명은 최대 7개까지만 등록 가능합니다. ");
+				return;
+			}
+			
 			const div = document.createElement("div");
 			
 			div.innerHTML = `<label>제목: <input type="text" name="title" class="title-input" /></label><br/>
-					<label>내용: <textarea name="content" class="content-textarea" rows="4" cols="50"></textarea></label><br/>
+					<label>내용: <textarea name="content" class="content-textarea"></textarea></label><br/>
 					<label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
 					<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>`;
 					
 			$detail.appendChild(div);
 		}
 		
-		//============================================================
 		
+		//============================================================
+			
+		const $modal = document.getElementById("modal");
+		const $header = $modal.querySelector("thead tr");
+		const $content = $modal.querySelector("tbody");
+		const $searchForm = $modal.querySelector(".search-form");
+		
+		/* 약관/설명서 검색 모달 열기 */
+		function openModal(curr_type) {
+			$modal.style.display = "block";
+			document.body.style.overflow = "hidden";
+			
+			if(curr_type === "T") {
+				getTerms();
+			}
+			if(curr_type === "M") {
+				getManuals();
+			}
+		}
+		
+		/* 모달 닫기 */
+		function closeModal() {
+			$modal.style.display = "none";
+			document.body.style.overflow = "auto";
+			
+			$header.innerHTML = "";
+			$content.innerHTML = "";
+		}
+		
+		let curr_type = "T";
+		
+		function getTerms(search = null) {
+			
+			// 현재 목록 = 약관(Term)
+			curr_type = "T";
+			
+			fetch(`/admin/terms${search != null ? ("?search=" + search) : ""}`)
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>선택</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td><button onclick="selectTerm(${element.documentId})">선택</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function getManuals(search = null) {
+			// 현재 목록 = 상품설명서(Manual)
+			curr_type = "M";
+			
+			fetch(`/admin/manuals${search != null ? ("?search=" + search) : ""}`)
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>선택</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td><button onclick="selectManual(${element.documentId})">선택</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function selectTerm(documentId) {
+		    const termInput = document.querySelector("input[name='termId']");
+		    if (termInput) {
+		        termInput.value = documentId;
+		    }
+		    closeModal();
+		}
+
+		function selectManual(documentId) {
+		    const manualInput = document.querySelector("input[name='manualId']");
+		    if (manualInput) {
+		        manualInput.value = documentId;
+		    }
+		    closeModal();
+		}
+		
+		$searchForm.addEventListener("submit", function(e) {
+			e.preventDefault();
+
+			const search = this.search.value.trim();
+
+			if (!search) {
+				alert("검색어를 입력해주세요.");
+				return;
+			}
+
+			if (curr_type === "T") {
+				getTerms(search);
+			} else if (curr_type === "M") {
+				getManuals(search);
+			}
+		});
 		
 		//============================================================
 			
@@ -325,6 +537,10 @@
 				purpose: formData.get("purpose"),
 				summary: formData.get("summary"),
 				/* detail: formData.get("detail"), */
+				modalDetail: formData.get("modalDetail"), 
+				modalRate: formData.get("modalRate"),
+				termId: formData.get("termId"), 
+				manualId: formData.get("manualId"), 
 				productContentList: productContentList, 
 				minRate: parseFloat(rawRate[0]),
 				maxRate: parseFloat(rawRate[1]),
@@ -398,14 +614,18 @@
 		    html += '<tr><td>최소 금리</td><td><input type="number" step="0.01" name="minRate" required /></td></tr>';
 		    html += '<tr><td>최대 금리</td><td><input type="number" step="0.01" name="maxRate" required /></td></tr>';
 		    html += '<tr><td>가입 기간(개월)</td><td><input type="number" name="period" required /></td></tr>';
-		    html += '<tr><td>이미지 URL</td><td><input type="text" name="imageUrl" /></td></tr>';
+/* 		    html += '<tr><td>이미지 URL</td><td><input type="text" name="imageUrl" /></td></tr>'; */
+		    html += '<tr><td>상품 안내</td><td><textarea name="modalDetail"></textarea></td></tr>';
+		    html += '<tr><td>금리 안내</td><td><textarea name="modalRate"></textarea></td></tr>';
+		    html += '<tr><td>약관</td><td><input type="text" name="termId" /><input type="button" value="검색" onclick="openModal(\'T\')" /></td></tr>';
+		    html += '<tr><td>상품설명서</td><td><input type="text" name="manualId" /><input type="button" value="검색" onclick="openModal(\'M\')" /></td></tr>';
 		    html += `<tr>
 		    			<td>상세 설명</td>
 		    			<td class="detail">
 			    			<button type="button" onclick="createBlock()">추가</button><br/>
 			    			<div>
 				    			<label>제목: <input type="text" name="title" class="title-input" /></label><br/>
-				    			<label>내용: <textarea name="content" class="content-textarea" rows="4" cols="50"></textarea></label><br/>
+				    			<label>내용: <textarea name="content" class="content-textarea"></textarea></label><br/>
 				    			<label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
 				    			<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
 			    			</div>
@@ -446,6 +666,10 @@
 		        purpose: formData.get("purpose"),
 		        summary: formData.get("summary"),
 		        /* detail: formData.get("detail"), */
+		        modalDetail: formData.get("modalDetail"), 
+				modalRate: formData.get("modalRate"),
+				termId: formData.get("termId"), 
+				manualId: formData.get("manualId"), 
 		        productContentList: productContentList, 
 		        minRate: parseFloat(formData.get("minRate")),
 		        maxRate: parseFloat(formData.get("maxRate")),
