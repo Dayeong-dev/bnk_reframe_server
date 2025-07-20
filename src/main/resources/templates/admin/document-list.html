@@ -55,20 +55,7 @@
 					<thead>
 						<tr></tr>
 					</thead>
-					<tbody>
-					</tbody>
-					<tbody th:if="${1 != 1}">
-						<tr th:each="term : ${termList}">
-							<td th:text="${term.documentId}"></td>
-							<td th:text="${term.productType}"></td>
-							<td th:text="${term.title}"></td>
-							<td>
-								<a th:href="@{/admin/document/download/{id}(id=${term.documentId})}">
-									<img class="icon" src="/icons/download.svg" alt="다운로드"/>
-								</a>
-							</td>
-						</tr>
-					</tbody>
+					<tbody></tbody>
 				</table>
 				<div class="pagenation"></div>
 			</div>

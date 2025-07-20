@@ -21,6 +21,7 @@ import com.example.reframe.dto.DepositProductContentDTO;
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.ProductStatusUpdateRequestDTO;
 import com.example.reframe.entity.DepositProduct;
+import com.example.reframe.entity.Document;
 import com.example.reframe.entity.admin.ApprovalRequest;
 import com.example.reframe.repository.ApprovalRequestRepository;
 import com.example.reframe.repository.DepositProductRepository;
@@ -128,6 +129,7 @@ public class AdminTestController {
 				.orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. ID: " + productId));
 		
 		try {
+			// JSON 데이터를 객체로 매핑
 			ObjectMapper objectMapper = new ObjectMapper();
 			
 			List<DepositProductContentDTO> productContentList;
@@ -194,6 +196,10 @@ public class AdminTestController {
 			        .purpose(dto.getPurpose())
 			        .summary(dto.getSummary())
 			        .detail(dto.getDetail())
+			        .modalDetail(dto.getModalDetail())	// 추가
+			        .modalRate(dto.getModalRate())		// 추가
+			        .term(dto.getTermId() != null ? new Document(dto.getTermId()) : null)		// 추가
+			        .manual(dto.getManualId() != null ? new Document(dto.getManualId()) : null)	// 추가
 			        .minRate(dto.getMinRate())
 			        .maxRate(dto.getMaxRate())
 			        .period(dto.getPeriod())
@@ -236,8 +242,6 @@ public class AdminTestController {
 		/* 상세 설명 수정 */
 	    // 수정된 예적금 상세 설명 저장
 	    List<DepositProductContentDTO> updateContents = dto.getProductContentList();
-	    System.out.println("hello");
-	    System.out.println(updateContents);
 	    ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
@@ -297,6 +301,10 @@ public class AdminTestController {
 	            .purpose(product.getPurpose())
 	            .summary(product.getSummary())
 	            .detail(product.getDetail())
+	            .modalDetail(product.getModalDetail())	// 추가
+	            .modalRate(product.getModalRate())		// 추가
+	            .termId(product.getTerm() != null ? product.getTerm().getDocumentId() : null)		// 추가
+	            .manualId(product.getManual() != null ? product.getManual().getDocumentId() : null)	// 추가
 	            .maxRate(product.getMaxRate())
 	            .minRate(product.getMinRate())
 	            .period(product.getPeriod())

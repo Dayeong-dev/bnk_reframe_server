@@ -138,8 +138,9 @@ public class DepositProductController {
 	        model.addAttribute("modalDetailForModal", product.getModalDetail());
 
 	        // 금리 정보 추가
-	        String rateHtml = interestRateService.getRateHtmlByProductId(productId);
-	        model.addAttribute("modalRateTable", rateHtml);
+	        model.addAttribute("modalRateTable", product.getModalRate());
+//	        String rateHtml = interestRateService.getRateHtmlByProductId(productId);
+//	        model.addAttribute("modalRateTable", rateHtml);
 
 	        // 최근 본 상품 기록
 	        recentViewManager.setProduct("deposit", product.getProductId(), product.getName());

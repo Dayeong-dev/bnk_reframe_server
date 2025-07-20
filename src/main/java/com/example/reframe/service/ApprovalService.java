@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.entity.DepositProduct;
+import com.example.reframe.entity.Document;
 import com.example.reframe.entity.admin.ApprovalRequest;
 import com.example.reframe.entity.admin.ApprovalRequestDetail;
 import com.example.reframe.repository.ApprovalRequestDetailRepository;
@@ -58,6 +59,25 @@ public class ApprovalService {
 		if (!Objects.equals(product.getDetail(), dto.getDetail())) {
 			details.add(makeDetail(request, "detail", product.getDetail(), dto.getDetail()));
 		}
+		if (!Objects.equals(product.getModalDetail(), dto.getModalDetail())) {	// 상품 안내 모달 내용(MarkDown)
+			details.add(makeDetail(request, "modalDetail", product.getModalDetail(), dto.getModalDetail()));
+		}
+		if (!Objects.equals(product.getModalRate(), dto.getModalRate())) {	// 금리 안내 모달 내용(MarkDown)
+			details.add(makeDetail(request, "modalRate", product.getModalRate(), dto.getModalRate()));
+		}
+		
+		String oldTermId = product.getTerm() != null ? product.getTerm().getDocumentId().toString() : null;
+		String newTermId = dto.getTermId() != null ? dto.getTermId().toString() : null;
+		if (!Objects.equals(oldTermId, newTermId)) {	// 약관 ID
+			details.add(makeDetail(request, "term", oldTermId, newTermId));
+		}
+		
+		String oldManualId = product.getManual() != null ? product.getManual().getDocumentId().toString() : null;
+		String newManualId = dto.getManualId() != null ? dto.getManualId().toString() : null;
+		if (!Objects.equals(oldManualId, newManualId)) {	// 상품설명서 ID
+			details.add(makeDetail(request, "manual", oldManualId, newManualId));
+		}
+		
 		if (!Objects.equals(product.getMinRate(), dto.getMinRate())) {
 			details.add(makeDetail(request, "minRate", String.valueOf(product.getMinRate()),
 					String.valueOf(dto.getMinRate())));
@@ -108,6 +128,10 @@ public class ApprovalService {
                 case "purpose" -> product.setPurpose(detail.getNewValue());
                 case "summary" -> product.setSummary(detail.getNewValue());
                 case "detail" -> product.setDetail(detail.getNewValue());
+                case "modalDetail" -> product.setModalDetail(detail.getNewValue());		// 상품 안내 모달 내용
+                case "modalRate" -> product.setModalRate(detail.getNewValue());			// 금리 안내 모달 내용
+                case "term" -> product.setTerm(detail.getNewValue() != null ? new Document(Integer.parseInt(detail.getNewValue())) : null);
+                case "manual" -> product.setManual(detail.getNewValue() != null ? new Document(Integer.parseInt(detail.getNewValue())) : null);	
                 case "minRate" -> product.setMinRate(new java.math.BigDecimal(detail.getNewValue()));
                 case "maxRate" -> product.setMaxRate(new java.math.BigDecimal(detail.getNewValue()));
                 case "period" -> product.setPeriod(Integer.parseInt(detail.getNewValue()));
