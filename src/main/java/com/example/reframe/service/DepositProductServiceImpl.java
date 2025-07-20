@@ -264,5 +264,16 @@ public class DepositProductServiceImpl implements DepositProductService {
         
     }
 	
+	@Override
+    public List<String> findSuggestions(String keyword) {
+        List<String> allNames = depositProductRepository.findAllNames();
+        String lowerKeyword = keyword.toLowerCase();
+
+        return allNames.stream()
+                .filter(name -> name.toLowerCase().contains(lowerKeyword))
+                .limit(10)
+                .toList();
+    }
+	
 	
 }

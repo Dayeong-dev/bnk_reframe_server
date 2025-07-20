@@ -45,5 +45,7 @@ public interface DepositProductService {
     // ✅ 테마 기반 추천 (직장인, 주부, 학생)
     List<DepositProductDTO> getThemeRecommended(String theme);
     
+    List<String> findSuggestions(String keyword);
+    
     
 }

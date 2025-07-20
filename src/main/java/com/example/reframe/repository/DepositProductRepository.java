@@ -62,5 +62,8 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
 
     @Query(value = "SELECT * FROM (SELECT * FROM DEPOSIT_PRODUCT WHERE view_count IS NOT NULL AND status = 'S' ORDER BY view_count DESC) WHERE ROWNUM <= 5", nativeQuery = true)
 	List<DepositProduct> findTopFiveByViewCount();
+    
+    @Query("SELECT d.name FROM DepositProduct d")
+    List<String> findAllNames();
    
 }

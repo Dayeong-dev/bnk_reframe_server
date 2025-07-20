@@ -155,6 +155,13 @@ public class DepositProductController {
 		return "redirect:/";
     }
 
+    @GetMapping("/autocomplete")
+    @ResponseBody
+    public List<String> getAutocomplete(@RequestParam("keyword") String keyword) {
+        return depositProductService.findSuggestions(keyword); // 상품명 유사 매칭 리스트 반환
+    }
+
+    
 
     // 조회수 기준으로 Top 5 예적금 추천 : 메인 페이지
     @GetMapping("/recommend/list")
