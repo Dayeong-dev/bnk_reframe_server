@@ -16,10 +16,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-	    name = "card_category_rel",
-	    uniqueConstraints = {
-	        @UniqueConstraint(columnNames = {"card_id", "subcategory_id"})
-	    }
+	    name = "card_category_rel"
 	)
 @Data
 @NoArgsConstructor
