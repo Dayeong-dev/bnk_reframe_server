@@ -18,8 +18,8 @@ public class OpenAIService2 {
     private String apiKey;
 
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:bnk123:Bt6Iw477";
-    private static final int MAX_MESSAGE_HISTORY = 20;
+    private static final String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:green:BvgH8xnc";
+    private static final int MAX_MESSAGE_HISTORY = 3;
     // 세션ID별 대화 로그 저장
     private final Map<String, List<Message>> conversationHistoryMap = new HashMap<>();
 
@@ -32,11 +32,15 @@ public class OpenAIService2 {
 
         // 처음 대화 시 system 메시지를 추가
         if (messages.isEmpty()) {
-            messages.add(new Message("system", "너는 BNK 부산은행의 정보를 안내하는 챗봇이야. 'bnk에서'로 시작하는 질문은 항상 학습된 데이터로 답하고, 학습된 데이터가 없으면 모르겠다고 해."));
+            messages.add(new Message("system", "너는 BNK 부산은행 챗봇이다.  \r\n"
+            		+ "친절하고 정중하게 답하며, 고객이 쉽게 이해할 수 있도록 설명한다.  \r\n"
+            		+ "은행 상품, 서비스, 가입 방법, 혜택, 수수료, 이벤트 등 BNK 부산은행 관련 정보와 이 모델에 학습된 데이터로만 대답한다.  \r\n"
+            		+ "개인정보나 계좌 정보 등 민감한 내용은 답하지 않는다.  \r\n"
+            		+ "답변은 간결하고 명확하게 작성하며, 과장된 표현이나 추측성 답변을 하지 않는다."));
         }
 
         // 현재 user 메시지 추가
-        messages.add(new Message("user", userMessage.startsWith("bnk에서") ? userMessage : "bnk에서 " + userMessage));
+        messages.add(new Message("user", userMessage));
         System.out.println(messages);
         
      // 메시지 수 제한 초과 시 앞에서부터 제거 (시스템 메시지는 유지)
