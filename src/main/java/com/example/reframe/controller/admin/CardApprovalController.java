@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.reframe.dto.BenefitItem;
 import com.example.reframe.dto.CardApprovalRequestDTO;
 import com.example.reframe.dto.CardDto;
 import com.example.reframe.entity.Card;
 import com.example.reframe.service.CardApprovalService;
 import com.example.reframe.util.SessionUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -33,8 +36,24 @@ public class CardApprovalController {
 	    public ResponseEntity<Void> requestApproval(@RequestBody CardDto dto,
 	                                                HttpSession session) {
 	        String username = SessionUtil.getLoginUser(session).getUsername();
-	        cardApprovalService.requestApproval(dto, username);
-	        return ResponseEntity.ok().build();
+	        
+			try {
+			    List<BenefitItem> serviceList = dto.getServiceList();
+			    
+			    ObjectMapper objectMapper = new ObjectMapper();	
+				String json = objectMapper.writeValueAsString(serviceList);
+				
+				dto.setService(json);	// JSON 형태로 저장
+				
+				cardApprovalService.requestApproval(dto, username);
+				
+		        return ResponseEntity.ok().build();
+		        
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			
+			return ResponseEntity.badRequest().build();
 	    }
 
 	    // 전체 결재 요청 조회 (PENDING)

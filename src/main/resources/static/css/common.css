@@ -296,7 +296,7 @@ header #sub-header .recent-views li a {
     align-items: center;
 }
 
-#container > section h2 {
+#container > section > h2 {
     margin: 1.5rem 0;
 }
 

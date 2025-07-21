@@ -8,10 +8,13 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
@@ -59,26 +62,34 @@ public class Card {
 
     @Lob
     @Column(name = "point_info")
-    private String pointInfo; // 적립 정보 (JSON 등)
+    private String pointInfo; // 적립 정보 (JSON)
 
     @Column(name = "view_count")
     private Integer viewCount; // 조회수
 
     @Lob
     @Column(name = "guide_info")
-    private String guideInfo; // 상품 안내 (관리자 등록)
+    private String guideInfo; // 상품 안내 (MarkDown)
 
-    @Lob
-    @Column(name = "online_payment_guide")
-    private String onlinePaymentGuide; // 온라인 결제 안내 (관리자 등록)
+//    @Lob
+//    @Column(name = "online_payment_guide")
+//    private String onlinePaymentGuide; // 온라인 결제 안내 (관리자 등록)
 
-    @Lob
-    @Column(name = "etc_guide")
-    private String etcGuide; // 기타 안내 (관리자 등록)
+//    @Lob
+//    @Column(name = "etc_guide")
+//    private String etcGuide; // 기타 안내 (관리자 등록)
 
-    @Lob
-    @Column(name = "terms_guide")
-    private String termsGuide; // 상품 설명서 및 이용약관
+//    @Lob
+//    @Column(name = "terms_guide")
+//    private String termsGuide; // 상품 설명서 및 이용약관
+    
+	@ManyToOne(fetch = FetchType.LAZY)	// 추가됨
+	@JoinColumn(name = "TERM_ID")
+	private Document term;
+	
+	@ManyToOne(fetch = FetchType.LAZY)	// 추가됨
+	@JoinColumn(name = "MANUAL_ID")
+	private Document manual;
     
     
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
