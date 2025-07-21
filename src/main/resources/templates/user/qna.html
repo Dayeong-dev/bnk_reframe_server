@@ -66,8 +66,8 @@
 	          </tr>
 	        </thead>
 	        <tbody id="qna-tbody">
-	          <tr th:each="qna : ${qnalist}">
-	            <td><a th:href="@{'/qna/detail/' + ${qna.qnaId}}" th:text="${qna.qnaId}"></a></td>
+	          <tr th:each="qna : ${qnalist}" th:attr="data-qna-id=${qna.qnaId}">
+	            <td th:text="${qna.qnaId}"></td>
 	            <td th:text="${qna.title}"></td>
 	            <td th:text="${qna.user.username}"></td>
 	            <td th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
@@ -104,12 +104,21 @@
     	  // 모든 행 새로 수집
     	  allRows = Array.from(document.querySelectorAll("#qna-tbody tr"));
 
-    	  // 항상 필터 초기화
-    	  currentCategory = "전체";
+    	  // ✅ 각 행 클릭 이벤트 추가
+    	  allRows.forEach(row => {
+    	    const qnaId = row.getAttribute("data-qna-id");
+    	    row.style.cursor = "pointer";
+    	    row.addEventListener("click", () => {
+    	      window.location.href = `/qna/detail/${qnaId}`;
+    	    });
+    	  });
 
-    	  initCategoryButtons();   // 버튼 다시 그림
-    	  filterAndRender();       // 필터 적용
+    	  // 필터 초기화 및 실행
+    	  currentCategory = "전체";
+    	  initCategoryButtons();
+    	  filterAndRender();
     	}
+
 
 
     function initCategoryButtons() {

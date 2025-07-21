@@ -63,6 +63,11 @@ body {
   border-radius: 4px;
 }
 
+#faq-tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+
 /* 카테고리 버튼 */
 #category-buttons {
   text-align: center;

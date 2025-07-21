@@ -25,20 +25,20 @@
 				<p style="text-align: center; color: #555; margin: 0.5rem 0;">
 					해결되지 않는 문의는 1:1 문의나 챗봇을 이용해 주세요.</p>
 			</div>
-		
+
 			<div class="faq-container">
-		
-		
+
+
 				<!-- 검색 -->
 				<div class="faq-search">
 					<input type="text" id="search-input" placeholder="검색어를 입력하세요..."
 						list="autocomplete-list">
 					<datalist id="autocomplete-list"></datalist>
 				</div>
-		
+
 				<!-- 카테고리 -->
 				<div id="category-buttons"></div>
-		
+
 				<!-- 리스트 -->
 				<div id="faq-list" th:if="${faqlist != null}">
 					<table>
@@ -51,15 +51,15 @@
 						</thead>
 						<tbody id="faq-tbody">
 							<tr th:each="faq, iterStat : ${faqlist}"
-								th:attr="data-index=${iterStat.index}">
-								<td><a th:href="@{'/faq/detail/' + ${faq.faqId}}"
-									th:text="${faq.faqId}"></a></td>
+								th:attr="data-index=${iterStat.index}, data-faq-id=${faq.faqId}">
+
+								<td th:text="${faq.faqId}"></td>
 								<td th:text="${faq.category}"></td>
 								<td th:text="${faq.question}"></td>
 							</tr>
 						</tbody>
 					</table>
-		
+
 					<!-- 페이지네이션 -->
 					<div class="pagination" id="pagination"></div>
 				</div>
@@ -86,36 +86,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderPagination(list = filteredRows) {
-	  pagination.innerHTML = "";
-	  const pageCount = Math.ceil(list.length / rowsPerPage);
+    pagination.innerHTML = "";
+    const pageCount = Math.ceil(list.length / rowsPerPage);
 
-	  for (let i = 0; i < pageCount; i++) {
-	    const button = document.createElement("button");
-	    button.textContent = i + 1;
+    for (let i = 0; i < pageCount; i++) {
+      const button = document.createElement("button");
+      button.textContent = i + 1;
+      if (i === 0) button.classList.add("active");
 
-	    // ✅ 첫 번째 버튼은 기본으로 active
-	    if (i === 0) button.classList.add("active");
+      button.addEventListener("click", () => {
+        pagination.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        showPage(i, list);
+      });
 
-	    button.addEventListener("click", () => {
-	      // ✅ 모든 버튼에서 active 제거
-	      pagination.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+      pagination.appendChild(button);
+    }
 
-	      // ✅ 현재 클릭된 버튼에 active 추가
-	      button.classList.add("active");
-
-	      // ✅ 페이지 내용 표시
-	      showPage(i, list);
-	    });
-
-	    pagination.appendChild(button);
-	  }
-
-	  showPage(0, list);
-	}
-
+    showPage(0, list);
+  }
 
   function updateAutocompleteOptions() {
-    const questions = rows.map(row => row.querySelector("a").textContent.trim());
+    const questions = rows.map(row => row.querySelector("td:nth-child(3)").textContent.trim());
     datalist.innerHTML = "";
     [...new Set(questions)].forEach(text => {
       const option = document.createElement("option");
@@ -127,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function filterRows() {
     const keyword = searchInput.value.trim().toLowerCase();
     filteredRows = rows.filter(row => {
-      const question = row.querySelector("a").textContent.toLowerCase();
+      const question = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
       const category = row.querySelector("td:nth-child(2)").textContent.trim();
       const matchKeyword = question.includes(keyword);
       const matchCategory = currentCategory === "전체" || category === currentCategory;
@@ -138,11 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPagination(filteredRows);
   }
 
-  // 검색어 입력 시 필터링
+  // 검색어 자동완성 및 필터링
   searchInput.addEventListener("input", () => {
     const keyword = searchInput.value.trim().toLowerCase();
     const matchedQuestions = rows
-      .map(row => row.querySelector("a").textContent.trim())
+      .map(row => row.querySelector("td:nth-child(3)").textContent.trim())
       .filter(q => q.toLowerCase().includes(keyword));
 
     datalist.innerHTML = "";
@@ -172,9 +164,21 @@ document.addEventListener("DOMContentLoaded", () => {
     categoryContainer.appendChild(btn);
   });
 
+  // ✅ 행 클릭 시 상세 페이지로 이동
+  rows.forEach(row => {
+    const faqId = row.getAttribute("data-faq-id");
+    row.style.cursor = "pointer";
+    row.addEventListener("click", () => {
+      window.location.href = `/faq/detail/${faqId}`;
+    });
+  });
+
+  // 초기 렌더링
+  updateAutocompleteOptions();
   renderPagination();
 });
 </script>
+
 
 </body>
 </html>
