@@ -1,18 +1,16 @@
 package com.example.reframe.service;
-
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
+import com.example.reframe.dto.BenefitItem;
 import com.example.reframe.dto.CardDto;
 import com.example.reframe.entity.Card;
 import com.example.reframe.entity.CardCategoryRel;
@@ -21,6 +19,8 @@ import com.example.reframe.entity.CardTestResult;
 import com.example.reframe.repository.CardRepository;
 import com.example.reframe.repository.CardSubcategoryRepository;
 import com.example.reframe.repository.CardTestResultRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -28,6 +28,8 @@ import jakarta.persistence.Query;
 @Service
 public class CardService {
 
+	private final ObjectMapper objectMapper = new ObjectMapper();
+	
 	@Autowired
 	private CardRepository cardRepository;
 
@@ -68,6 +70,17 @@ public class CardService {
 
 	// 카드 목록 - Entity → DTO 변환 메서드
 	private CardDto convertToDto(Card card) {
+		List<BenefitItem> serviceList = null;
+		try {
+		    if (card.getService() != null && !card.getService().isBlank()) {
+		        serviceList = objectMapper.readValue(card.getService(), new TypeReference<List<BenefitItem>>() {});
+		    }
+		} catch (Exception e) {
+		    System.err.println("SERVICE 파싱 실패 - cardId: " + card.getCardId());
+		    System.err.println("JSON: " + card.getService());
+		    e.printStackTrace(); // 오류 로그 전체 출력
+		}
+		
 		return CardDto.builder().cardId(card.getCardId()).name(card.getName())
 				.description(card.getDescription().replace("\\n", "<br>")).tags(card.getTags())
 				.categoryMajor(card.getCategoryMajor()).status(card.getStatus()).annualFee(card.getAnnualFee())
