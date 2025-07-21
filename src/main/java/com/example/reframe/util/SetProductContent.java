@@ -29,8 +29,8 @@ public class SetProductContent {
 		}	 
 		
 		for(DepositProductContentDTO productContent : productContentList) {
-			String title = String.format("<h2>%s</h2>", productContent.getTitle().replace("\\n", "<br/>"));
-			String content = String.format("<p>%s</p>", productContent.getContent().replace("\\n", "<br/>"));
+			String title = String.format("<h2>%s</h2>", productContent.getTitle().replace("\n", "<br/>").replace("\\n", "<br/>"));
+			String content = String.format("<p>%s</p>", productContent.getContent().replace("\n", "<br/>").replace("\\n", "<br/>"));
 			String image = String.format("<img src='%s' alt='' />", productContent.getImageURL());
 
 			sb.append("<section>" + title + content + image + "</section>");	
