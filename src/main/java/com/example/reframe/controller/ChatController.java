@@ -33,7 +33,7 @@ public class ChatController {
         return openAIService.askChatGPT2(message);
     }
     
-    //미사용
+    //사용
     @PostMapping("/memory")
     public String chat3(HttpSession session,@RequestBody String message) {
     	String sessionId = session.getId(); // 세션 ID 가져오기

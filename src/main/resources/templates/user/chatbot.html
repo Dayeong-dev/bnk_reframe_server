@@ -219,7 +219,7 @@ button:hover {
   	  appendMessage("ai", "답변을 생성 중입니다...", loadingId);
 
   	  //수정부분
-  	  fetch("/api/chat/fineTuned", {
+  	  fetch("/api/chat/memory", {
   	    method: "POST",
   	    headers: {
   	      "Content-Type": "application/json"
