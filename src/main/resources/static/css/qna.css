@@ -37,6 +37,11 @@ section.qna-section {
   margin-bottom: 2rem;
 }
 
+#qna-tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+
 .qna-tabs button {
   background: none;
   border: none;
