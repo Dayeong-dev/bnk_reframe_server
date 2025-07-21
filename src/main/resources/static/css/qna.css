@@ -134,9 +134,17 @@ section.qna-section {
   color: #fff;
 }
 
+.btn-submit:hover {
+	background-color: var(--secondary-color);
+}
+
 .btn-cancel {
   background-color: #e0e0e0;
   color: #333;
+}
+
+.btn-cancel:hover {
+	background-color: #c0c0c0;
 }
 
 .qna-list-box table {

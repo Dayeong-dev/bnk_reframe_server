@@ -195,8 +195,7 @@
 	color: #000;
 }
 
-
-@keyframes fadeInUp {from { opacity:0;
+keyframes fadeInUp {from { opacity:0;
 	transform: translateY(30px);
 }
 
@@ -309,15 +308,14 @@ to {
 }
 
 .user-form input[type="submit"]:hover {
-    background-color: var(--secondary-color);
+	background-color: var(--secondary-color);
 }
 
 /* ============================== */
 /* 모달 - 카드 비교함                 */
 /* ============================== */
-#global-modal table.compare-list, 
-#global-modal table.compare-list th, 
-#global-modal table.compare-list td {
+#global-modal table.compare-list, #global-modal table.compare-list th,
+	#global-modal table.compare-list td {
 	border: 1px solid black;
 	border-collapse: collapse;
 }
@@ -345,18 +343,14 @@ to {
 	position: absolute;
 	top: 0;
 	right: 0;
-	
 	color: #fff;
 	border-bottom-left-radius: 0.25rem;
 	background-color: #262626;
-	
 	width: 1rem;
 	height: 1rem;
-	
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	
 	cursor: pointer;
 }
 
@@ -434,16 +428,26 @@ section.qna-section {
 	align-items: center;
 }
 
-.back-link {
-	display: inline-block;
+.back-button-wrapper {
+	text-align: center;
 	margin-top: 2rem;
-	font-weight: bold;
-	color: var(--primary-color);
-	text-decoration: underline;
 }
 
-.back-link:hover {
-	color: var(--secondary-color);
+.btn-back {
+	font-size: 1rem;
+	display: inline-block;
+	background-color: var(--primary-color);
+	color: #fff;
+	padding: 1.1rem 2rem;
+	border-radius: 4px;
+	border: none;
+	font-weight: bold;
+	text-decoration: none;
+	transition: background-color 0.2s ease;
+}
+
+.btn-back:hover {
+	background-color: var(--secondary-color);
 }
 
 @media ( max-width : 768px) {
