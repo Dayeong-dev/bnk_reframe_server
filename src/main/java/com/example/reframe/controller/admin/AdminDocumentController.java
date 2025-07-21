@@ -117,10 +117,8 @@ public class AdminDocumentController {
             
             documentDTO.setFilename(fileName);
             documentService.setDocument(documentDTO);
-
-            String url = documentDTO.getDocumentType().equals("T") ? "term/list" : "manual/list";
     		
-    		return "redirect:/admin/" + url;
+    		return "redirect:/admin/document/list";
 
         } catch (Exception e) {
             rttr.addFlashAttribute("msg", "업로드 실패: " + e.getMessage());
