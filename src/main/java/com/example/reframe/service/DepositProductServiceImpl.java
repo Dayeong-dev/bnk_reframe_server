@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.entity.DepositProductImage;
-import com.example.reframe.repository.DepositProductImageRepository;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.util.MarkdownUtil;
 import com.example.reframe.util.SetProductContent;
@@ -32,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
-    private final DepositProductImageRepository depositProductImageRepository;
     private final EntityManager em;
     
     private SetProductContent setProductContent = new SetProductContent();
@@ -143,8 +140,8 @@ public class DepositProductServiceImpl implements DepositProductService {
     // ===== DTO 변환 유틸 =====
 
     private DepositProductDTO convertToDTO(DepositProduct p) {
-        DepositProductImage image = depositProductImageRepository.findFirstByProductIdAndType(p.getProductId(), "썸네일");
-        String imageUrl = (image != null) ? image.getImageUrl() : "";
+      
+      
 
         return DepositProductDTO.builder()
                 .productId(p.getProductId())
@@ -160,7 +157,7 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .status(p.getStatus())
                 .createdAt(formatDate(p.getCreatedAt()))
                 .viewCount(p.getViewCount())
-                .imageUrl(imageUrl)
+               
                 .build();
     }
 
