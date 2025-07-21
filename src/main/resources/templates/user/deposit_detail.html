@@ -116,8 +116,7 @@ body {
 	color: #444;
 }
 
-.modal-content ul,
-.modal-content ol {
+.modal-content ul, .modal-content ol {
 	margin: 10px 0 10px;
 	padding-left: 20px;
 }
@@ -137,11 +136,10 @@ body {
 	margin: 20px 0;
 }
 
-.modal-content th,
-.modal-content td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: left;
+.modal-content th, .modal-content td {
+	border: 1px solid #ccc;
+	padding: 10px;
+	text-align: left;
 }
 
 .modal-content th {
@@ -169,7 +167,8 @@ body {
 /* 추가 스타일 (필요 시 head 영역에 포함) */
 #detailContent section {
 	display: flex;
-	min-height: auto; align-items : center;
+	min-height: auto;
+	align-items: center;
 	justify-content: space-between; /* ✅ 내부 요소 사이 간격 확보 */
 	flex-direction: row;
 	max-width: 900px;
@@ -253,6 +252,8 @@ body {
 				style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
 				<button class="btn" onclick="openModal()">상품 이용 가이드</button>
 				<button class="btn" onclick="openRateModal()">금리표 보기</button>
+				<button class="btn" onclick="openGuideImgModal()">상품설명서 보기</button>
+				<button class="btn" onclick="openTermsImgModal()">이용약관 보기</button>
 			</div>
 
 			<div class="calc-container" style="text-align: center;">
@@ -317,9 +318,43 @@ body {
 			<div th:utext="${modalRateTable}" style="margin-bottom: 20px;">
 				<!-- 금리표 HTML 출력 -->
 			</div>
-			<p class="rate-note">※ 본 금리는 <span th:text="${#dates.format(#dates.createNow(), 'yyyy년 MM월 dd일')}"></span> 기준입니다.</p>
+			<p class="rate-note">
+				※ 본 금리는 <span
+					th:text="${#dates.format(#dates.createNow(), 'yyyy년 MM월 dd일')}"></span>
+				기준입니다.
+			</p>
 			<div style="text-align: center;">
 				<button class="btn" onclick="closeRateModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 상품설명서 모달 -->
+	<div id="guideImgModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeGuideImgModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">상품설명서</h2>
+			<div style="text-align: center;">
+				<img th:src="@{/img/guide_sample.png}" alt="상품설명서"
+					style="max-width: 100%; height: auto;" />
+			</div>
+			<div style="text-align: center; margin-top: 20px;">
+				<button class="btn" onclick="closeGuideImgModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 이용약관 모달 -->
+	<div id="termsImgModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeTermsImgModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">이용약관</h2>
+			<div style="text-align: center;">
+				<img th:src="@{/img/terms_sample.png}" alt="이용약관"
+					style="max-width: 100%; height: auto;" />
+			</div>
+			<div style="text-align: center; margin-top: 20px;">
+				<button class="btn" onclick="closeTermsImgModal()">닫기</button>
 			</div>
 		</div>
 	</div>
@@ -332,22 +367,36 @@ body {
   function closeModal() {
     document.getElementById("productModal").style.display = "none";
   }
-  window.onclick = function(e) {
-    if (e.target == document.getElementById("productModal")) {
-      closeModal();
-    }
-  }
   
-  function openRateModal() {
+  
+ 	 function openRateModal() {
 	  document.getElementById("rateModal").style.display = "block";
 	}
 	function closeRateModal() {
 	  document.getElementById("rateModal").style.display = "none";
 	}
-	window.onclick = function(e) {
-	  if (e.target === document.getElementById("productModal")) closeModal();
-	  if (e.target === document.getElementById("rateModal")) closeRateModal();
-	};
+	
+		function openGuideImgModal() {
+		  document.getElementById("guideImgModal").style.display = "block";
+		}
+		function closeGuideImgModal() {
+		  document.getElementById("guideImgModal").style.display = "none";
+		}
+
+			function openTermsImgModal() {
+			  document.getElementById("termsImgModal").style.display = "block";
+			}
+			function closeTermsImgModal() {
+			  document.getElementById("termsImgModal").style.display = "none";
+			}
+
+		// 배경 클릭 시 닫기 처리도 추가
+		window.onclick = function (e) {
+		  if (e.target === document.getElementById("productModal")) closeModal();
+		  if (e.target === document.getElementById("rateModal")) closeRateModal();
+		  if (e.target === document.getElementById("guideImgModal")) closeGuideImgModal();
+		  if (e.target === document.getElementById("termsImgModal")) closeTermsImgModal();
+		};
 
   // 쉼표 자동 삽입
  document.getElementById("depositAmount").addEventListener("input", function() {
