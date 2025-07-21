@@ -13,6 +13,7 @@ import com.example.reframe.dto.CardApprovalRequestDTO;
 import com.example.reframe.dto.CardApprovalRequestDetailDTO;
 import com.example.reframe.dto.CardDto;
 import com.example.reframe.entity.Card;
+import com.example.reframe.entity.Document;
 import com.example.reframe.entity.admin.CardApprovalRequest;
 import com.example.reframe.entity.admin.CardApprovalRequestDetail;
 import com.example.reframe.repository.CardApprovalRequestRepository;
@@ -40,6 +41,8 @@ public class CardApprovalService {
                 .requestedAt(LocalDateTime.now())
                 .status("PENDING")
                 .build();
+        
+        System.out.println(card);
 
         List<CardApprovalRequestDetail> details = Stream.of(
                 compareField("name", card.getName(), dto.getName(), request),
@@ -51,9 +54,10 @@ public class CardApprovalService {
                 compareField("service", card.getService(), dto.getService(), request),
                 compareField("pointInfo", card.getPointInfo(), dto.getPointInfo(), request),
                 compareField("guideInfo", card.getGuideInfo(), dto.getGuideInfo(), request),
-                compareField("onlinePaymentGuide", card.getOnlinePaymentGuide(), dto.getOnlinePaymentGuide(), request),
-                compareField("etcGuide", card.getEtcGuide(), dto.getEtcGuide(), request),
-                compareField("termsGuide", card.getTermsGuide(), dto.getTermsGuide(), request)
+//                compareField("onlinePaymentGuide", card.getOnlinePaymentGuide(), dto.getOnlinePaymentGuide(), request),
+//                compareField("etcGuide", card.getEtcGuide(), dto.getEtcGuide(), request),
+                compareField("term", card.getTerm() != null ? card.getTerm().getDocumentId().toString() : null, dto.getTermId() != null ? dto.getTermId().toString() : null, request), 
+                compareField("manual", card.getManual() != null ? card.getManual().getDocumentId().toString() : null, dto.getManualId() != null ? dto.getManualId().toString() : null, request)
         ).filter(Objects::nonNull).collect(Collectors.toList());
 
         request.setDetails(details);
@@ -93,9 +97,10 @@ public class CardApprovalService {
                 case "service" -> card.setService(detail.getNewValue());
                 case "pointInfo" -> card.setPointInfo(detail.getNewValue());
                 case "guideInfo" -> card.setGuideInfo(detail.getNewValue());
-                case "onlinePaymentGuide" -> card.setOnlinePaymentGuide(detail.getNewValue());
-                case "etcGuide" -> card.setEtcGuide(detail.getNewValue());
-                case "termsGuide" -> card.setTermsGuide(detail.getNewValue());
+//                case "onlinePaymentGuide" -> card.setOnlinePaymentGuide(detail.getNewValue());
+//                case "etcGuide" -> card.setEtcGuide(detail.getNewValue());
+                case "term" -> card.setTerm(detail.getNewValue() != null ? new Document(Integer.parseInt(detail.getNewValue())) : null);
+                case "manual" -> card.setManual(detail.getNewValue() != null ? new Document(Integer.parseInt(detail.getNewValue())) : null);	
             }
         }
 

@@ -21,6 +21,7 @@ import com.example.reframe.entity.CardTestResult;
 import com.example.reframe.repository.CardRepository;
 import com.example.reframe.repository.CardSubcategoryRepository;
 import com.example.reframe.repository.CardTestResultRepository;
+import com.example.reframe.util.MarkdownUtil;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -55,7 +56,9 @@ public class CardService {
 	public CardDto getCardDetail(Long cardId) {
 		Card card = cardRepository.findByIdWithCategories(cardId)
 				.orElseThrow(() -> new RuntimeException("해당 카드 없음: " + cardId));
-		System.out.println(cardId);
+		
+		card.setGuideInfo(MarkdownUtil.toHtml(card.getGuideInfo()));	// MarkDown → HTML
+		
 		return convertToDto(card);
 	}
 
@@ -71,10 +74,12 @@ public class CardService {
 		return CardDto.builder().cardId(card.getCardId()).name(card.getName())
 				.description(card.getDescription().replace("\\n", "<br>")).tags(card.getTags())
 				.categoryMajor(card.getCategoryMajor()).status(card.getStatus()).annualFee(card.getAnnualFee())
-				.service(card.getService().replace("\\n", "<br>")).pointInfo(card.getPointInfo().replace("\\n", "<br>"))
+//				.service(card.getService().replace("\\n", "<br>")).pointInfo(card.getPointInfo().replace("\\n", "<br>"))
 				.viewCount(card.getViewCount()).guideInfo(card.getGuideInfo())
-				.onlinePaymentGuide(card.getOnlinePaymentGuide()).etcGuide(card.getEtcGuide())
-				.termsGuide(card.getTermsGuide()).serviceList(card.getServiceList()).build();
+//				.onlinePaymentGuide(card.getOnlinePaymentGuide()).etcGuide(card.getEtcGuide())
+	            .termId(card.getTerm() != null ? card.getTerm().getDocumentId() : null)		// 추가
+	            .manualId(card.getManual() != null ? card.getManual().getDocumentId() : null)	// 추가
+				.serviceList(card.getServiceList()).build();
 	}
 
 	@Transactional
