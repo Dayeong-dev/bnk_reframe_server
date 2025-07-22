@@ -1,8 +1,10 @@
 package com.example.reframe.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,7 +44,7 @@ public class CardApprovalService {
                 .status("PENDING")
                 .build();
         
-        System.out.println(card);
+//        System.out.println(card);
 
         List<CardApprovalRequestDetail> details = Stream.of(
                 compareField("name", card.getName(), dto.getName(), request),
@@ -65,14 +67,18 @@ public class CardApprovalService {
     }
 
     private CardApprovalRequestDetail compareField(String fieldName, String oldVal, String newVal, CardApprovalRequest request) {
-        if (!Objects.equals(oldVal, newVal)) {
+        String oldStr = oldVal == null ? "" : oldVal.trim();
+        String newStr = newVal == null ? "" : newVal.trim();
+
+        if (!oldStr.equals(newStr)) {
             return CardApprovalRequestDetail.builder()
                     .request(request)
                     .fieldName(fieldName)
-                    .oldValue(oldVal)
-                    .newValue(newVal)
+                    .oldValue(oldStr)
+                    .newValue(newStr)
                     .build();
         }
+
         return null;
     }
 
@@ -166,4 +172,13 @@ public class CardApprovalService {
                 )
                 .build();
     }
+
+    public List<CardApprovalRequest> getMyCardRequests(String username) {
+        return requestRepo.findByRequestedBy(username);
+    }
+
+    public List<CardApprovalRequest> getMyCardRequestsByStatus(String username, String status) {
+        return requestRepo.findByRequestedByAndStatus(username, status);
+    }
+
 }

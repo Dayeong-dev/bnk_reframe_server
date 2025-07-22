@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import com.example.reframe.dto.ProductStatusUpdateRequestDTO;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.Document;
 import com.example.reframe.entity.admin.ApprovalRequest;
+import com.example.reframe.entity.admin.ApprovalRequestDetail;
 import com.example.reframe.repository.ApprovalRequestRepository;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.service.ApprovalService;
@@ -291,6 +293,32 @@ public class AdminTestController {
 	            .orElseThrow(() -> new RuntimeException("요청 없음"));
 	}
 
+	 @GetMapping("/approval/my")
+	 public List<ApprovalRequest> getMyRequests(HttpSession session) {
+	     String username = SessionUtil.getLoginUser(session).getUsername();
+	     List<ApprovalRequest> requests = approvalService.getMyRequests(username);
+	     System.out.println("요청 확인 ..........."+requests );
+	     return requests;
+	 }
+
+	 @GetMapping("/approval/my/{status}")
+	 public List<ApprovalRequest> getMyRequestsByStatus(@PathVariable("status") String status,
+	                                                                     HttpSession session) {
+	     String username = SessionUtil.getLoginUser(session).getUsername();
+	     List<ApprovalRequest> requests = approvalService.getMyRequestsByStatus(username, status.toUpperCase());
+	     return requests;
+	 }	
+	 @GetMapping("/approval/details/{requestId}")
+	 public List<ApprovalRequestDetail> getRequestDetails(@PathVariable("requestId") Long requestId) {
+	     Optional<ApprovalRequest> requestOpt = approvalRequestRepository.findById(requestId);
+	     if (requestOpt.isPresent()) {
+	         List<ApprovalRequestDetail> details = requestOpt.get().getDetails();
+	         return details;
+	     } else {
+	         return null;
+	     }
+	 }
+	
 	
 	// DTO로 컨버전
 	private DepositProductDTO convertToDTO(DepositProduct product) {

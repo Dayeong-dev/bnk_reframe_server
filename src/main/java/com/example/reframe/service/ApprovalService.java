@@ -161,6 +161,14 @@ public class ApprovalService {
         request.setRejectionReason(reason);
         requestRepo.save(request);
     }
+
+    public List<ApprovalRequest> getMyRequests(String username) {
+        return requestRepo.findByRequestedBy(username);
+    }
+
+    public List<ApprovalRequest> getMyRequestsByStatus(String username, String status) {
+        return requestRepo.findByRequestedByAndStatus(username, status);
+    }
 	
 	
 	
