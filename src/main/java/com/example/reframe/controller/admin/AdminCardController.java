@@ -120,10 +120,10 @@ public class AdminCardController {
 			    card.setAnnualFee(dto.getAnnualFee());
 			    card.setService(dto.getService());
 //			    card.setIssuedInfo(dto.getIssuedInfo());
-			    card.setPointInfo(dto.getPointInfo());
+//			    card.setPointInfo(dto.getPointInfo());
 //			    card.setOnlinePaymentGuide(dto.getOnlinePaymentGuide());
 //			    card.setEtcGuide(dto.getEtcGuide());
-			    card.setGuideInfo(dto.getGuideInfo());
+//			    card.setGuideInfo(dto.getGuideInfo());
 		        card.setTerm(dto.getTermId() != null ? new Document(dto.getTermId()) : null);		// 추가
 		        card.setManual(dto.getManualId() != null ? new Document(dto.getManualId()) : null);	// 추가
 			    cardRepository.save(card);

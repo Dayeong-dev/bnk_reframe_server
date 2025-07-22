@@ -2,95 +2,201 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>관리자 메인</title>
+    <title>관리자 회원 관리</title>
     <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+    .top-menu {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .menu-btn {
+	  height: 36px;
+	  padding: 0 16px;
+	  background-color: #f8f9fa;   /* 기본 배경 회색톤 */
+	  color: #495057;
+	  border: 1px solid #dee2e6;
+	  font-size: 14px;
+	  font-weight: 500;
+	  cursor: pointer;
+	  transition: all 0.2s ease;
+	}
+	
+	.menu-btn.active {
+	  background-color: #007bff;   /* 활성 버튼: 파란색 */
+	  color: white;
+	  border-color: #007bff;
+	}
+	
+	.menu-btn:hover {
+	  background-color: #e2e6ea;
+	}
+
+    .middle-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+    }
+
+    .middle-menu input[type="text"] {
+      height: 36px;
+      padding: 0 12px;
+      font-size: 14px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      min-width: 240px;
+    }
+
+    .search-btn {
+      height: 36px;
+      padding: 0 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .search-btn:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f5f5f5;
+      font-weight: 600;
+    }
+
+    h1 {
+      color: #212529;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #dee2e6;
+    }
+  </style>
 </head>
 <body>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <div th:replace="admin/fragments/header :: header" class="header"></div>
 
-    <!-- 공통 헤더 -->
-    <div th:replace="admin/fragments/header :: header" class="header"></div>
+  <div id="body">
+    <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
 
-    <div id="body">
-        <!-- 사이드바 -->
-        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+    <div class="content">
+      <h1>관리자 회원 관리</h1>
 
-        <!-- 본문 -->
-        <div class="content">
-            <h1>관리자 회원 관리</h1>
-        	
-        	<div class="top-menu">
-	          	<button class="menu-btn" onclick="selectMenu('P')"> 개인 </button>  
-	          	<button class="menu-btn" onclick="selectMenu('C')"> 기업 </button>  
-            </div>
-            
-            <!-- 검색창 -->
-            <input type="text" id="searchInput" placeholder="상품명을 입력하세요" >
-            <button class="search-btn" onclick="">검색</button>
-            
-        	<!-- 데이터 출력 부분 -->
-            <div id="content"></div>
-        
-        
-        </div>
-        
+      <div class="top-menu">
+        <button class="menu-btn" onclick="selectMenu('P')">개인</button>
+        <button class="menu-btn" onclick="selectMenu('C')">기업</button>
+      </div>
+
+      <!-- 리팩토링된 검색창 -->
+      <div class="middle-menu">
+        <input type="text" id="searchInput" placeholder="회원명을 입력하세요">
+        <button class="search-btn" onclick="searchUser()">검색</button>
+      </div>
+
+      <!-- 데이터 출력 -->
+      <div id="content"></div>
     </div>
+  </div>
 
+    <script>
+	    function selectMenu(type) {
+	        console.log("선택된 메뉴: " + type);
+	
+	        // 버튼 활성화 클래스 조절
+	        document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+	        if (type === 'P') {
+	            document.querySelector('.menu-btn:nth-child(1)').classList.add('active');
+	        } else if (type === 'C') {
+	            document.querySelector('.menu-btn:nth-child(2)').classList.add('active');
+	        }
+	
+	        $.ajax({
+	            url: '/admin/user/' + type,
+	            type: 'GET',
+	            success: function(response) {
+	                console.log("응답 데이터:", response);
+	                showUserList(response, type);
+	            },
+	            error: function(error) {
+	                console.error("요청 실패:", error);
+	            }
+	        });
+	    }
 
-	<script>
-    function selectMenu(type){
-        console.log("선택된 메뉴: " + type);
-        $.ajax({
-            url: '/admin/user/' + type,
-            type: 'GET',
-            success: function(response){
-                console.log("응답 데이터:", response);
-                showUserList(response, type);
-            },
-            error: function(error){
-                console.error("요청 실패:", error);
-            }
-        });
-    }
-
-    // 회원 리스트 출력 (개인/기업 공통 처리)
-    function showUserList(users, type){
-        let html = '<table border="1" style="margin-top: 10px; width:100%;">';
-        html += '<thead><tr>';
-        html += '<th>아이디</th>';
-        html += '<th>이름</th>';
-        html += '<th>이메일</th>';
-        html += '<th>전화번호</th>';
-
-        if (type === 'C') {
-            html += '<th>사업자등록번호</th>';
-            html += '<th>개업일자</th>';
-            html += '<th>대표자명</th>';
-        }
-
-        html += '</tr></thead><tbody>';
-
-        for (let user of users) {
-            html += '<tr>';
-            html += `<td>${user.username}</td>`;
-            html += `<td>${user.name || user.user?.name}</td>`;
-            html += `<td>${user.email || user.user?.email}</td>`;
-            html += `<td>${user.phone || user.user?.phone}</td>`;
+        function showUserList(users, type) {
+            let html = '<table>';
+            html += '<thead><tr>';
+            html += '<th>아이디</th>';
+            html += '<th>이름</th>';
+            html += '<th>이메일</th>';
+            html += '<th>전화번호</th>';
 
             if (type === 'C') {
-                html += `<td>${user.businessNumber}</td>`;
-                html += `<td>${user.businessStartDate}</td>`;
-                html += `<td>${user.ceoName}</td>`;
+                html += '<th>사업자등록번호</th>';
+                html += '<th>개업일자</th>';
+                html += '<th>대표자명</th>';
             }
 
-            html += '</tr>';
-        }
+            html += '</tr></thead><tbody>';
 
-        html += '</tbody></table>';
-        document.getElementById('content').innerHTML = html;
-    }
-</script>
+            for (let user of users) {
+                html += '<tr>';
+                html += `<td>${user.username}</td>`;
+                html += `<td>${user.name || user.user?.name}</td>`;
+                html += `<td>${user.email || user.user?.email}</td>`;
+                html += `<td>${user.phone || user.user?.phone}</td>`;
+
+                if (type === 'C') {
+                    html += `<td>${user.businessNumber}</td>`;
+                    html += `<td>${user.businessStartDate}</td>`;
+                    html += `<td>${user.ceoName}</td>`;
+                }
+
+                html += '</tr>';
+            }
+
+            html += '</tbody></table>';
+            document.getElementById('content').innerHTML = html;
+        }
+        
+     // 최초 로딩
+       $(document).ready(function() {
+		    selectMenu('P');  // 기본: 개인
+		    document.querySelector('.menu-btn:nth-child(1)').classList.add('active'); // 개인 버튼 active
+		});
+    </script>
 </body>
 </html>
