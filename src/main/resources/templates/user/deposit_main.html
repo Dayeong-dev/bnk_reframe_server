@@ -21,8 +21,8 @@ body {
 .slider-container {
 	position: relative;
 	width: 100%;
-	max-width: 1000px;
-	height: 270px; /* ✅ 여기가 중요! */
+	max-width: 1200px;
+	height: 300px; /* ✅ 여기가 중요! */
 	overflow: hidden;
 	border-radius: 12px;
 	margin: 2rem 0;
@@ -106,7 +106,7 @@ body {
 	max-width: 1200px;
 	gap: 24px;
 	height: 330px;
-	margin-top: 2rem;
+	margin-top: 0.3rem;
 }
 
 .sidebar {
@@ -121,7 +121,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #D7191F;
+	background: #fff;
 	color: #212529;
 	font-weight: bold;
 	font-size: 16px;
@@ -133,7 +133,7 @@ body {
 }
 
 .purpose-btn.active {
-	background: var(--primary-color);
+	background: #fe504f;
 	color: white;
 }
 
@@ -145,7 +145,7 @@ body {
 	transform: translateY(-50%);
 	border-top: 10px solid transparent;
 	border-bottom: 10px solid transparent;
-	border-left: 10px solid var(--primary-color);
+	border-left: 10px solid #fe504f;
 }
 
 .recommend-wrapper {
@@ -178,11 +178,12 @@ body {
 
 /* ✅ 제목 스타일 개선 */
 .highlight-product h4, .card h4 {
-	font-size: 1.1rem;
+	font-size: 1.2rem;
 	font-weight: bold;
 	margin-bottom: 0.75rem;
 	color: #212529;
 }
+
 
 /* ✅ 설명 스타일 개선 */
 .highlight-product p, .card p {
@@ -192,7 +193,11 @@ body {
 	color: #555;
 }
 
+
 /* ✅ 기간(12개월 등) 강조 (선택) */
+.highlight-product p:nth-child(3) {
+	color: var(--primary-color);
+}
 .card p:last-of-type, .highlight-product p:last-of-type {
 	font-weight: bold;
 	color: #212529;
@@ -318,7 +323,7 @@ body {
 }
 
 .theme-btn.active-theme {
-	background: var(--primary-color);
+	background: #fe504f;
 	color: white;
 }
 
@@ -336,6 +341,14 @@ body {
 	justify-content: center;
 	transition: all 0.2s;
 }
+.theme-card h4{
+  	font-size: 1.2rem;
+  	margin-bottom: 0.75rem;
+}
+
+.theme-card p:nth-child(2) {
+	margin-bottom: 1rem;
+}
 
 .theme-card:hover {
 	transform: translateY(-6px);
@@ -350,8 +363,8 @@ body {
 
 .theme-prev, .theme-next {
 	background: white;
-	color: var(--primary-color);
-	border: 2px solid var(--primary-color);
+	color: #fe504f	;
+	border: 2px solid #fe504f;
 	width: 40px;
 	height: 40px;
 	font-size: 20px;
@@ -366,7 +379,7 @@ body {
 }
 
 .theme-prev:hover, .theme-next:hover {
-	background: var(--primary-color);
+	background: #fe504f;
 	color: white;
 }
 
