@@ -13,7 +13,7 @@
 		align-items: center;
 		gap: 0;
 		margin-bottom: 20px;
-	}
+	}	
 
 	.menu-btn {
 		height: 40px;
@@ -101,9 +101,48 @@
 		text-decoration: underline;
 		color: #0056b3;
 	}
-
+	
+	.middle-menu {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		margin-bottom: 20px;
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: 6px;
+		border: 1px solid #dee2e6;
+	}
+	
+	.middle-menu input[type="text"] {
+		height: 36px;
+		padding: 0 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+		min-width: 200px;
+		flex: 1;
+	}
+	
+	.search-btn {
+		height: 36px;
+		padding: 0 16px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	
+	.search-btn:hover {
+		background-color: #0056b3;
+	}
+	
 	/* 페이지네이션 스타일 */
-	.pagination {
+	.pagination{
 		margin-top: 20px;
 		text-align: center;
 	}
@@ -253,6 +292,11 @@
 			<!-- 카테고리 버튼 영역 -->
 			<div class="top-menu" id="category-buttons">
 				<!-- 버튼은 JS로 생성 -->
+			</div>
+
+			<div class="middle-menu">
+				<input type="text" id="searchInput" placeholder="제목 또는 작성자를 입력하세요">
+				<button class="search-btn" onclick="">검색</button>
 			</div>
 
 			<div id="qna-list" th:if="${qnalist != null}">

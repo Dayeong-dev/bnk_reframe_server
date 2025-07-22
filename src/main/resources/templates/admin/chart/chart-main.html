@@ -91,7 +91,12 @@
 	        },
 	        options: {
 	            scales: {
-	                y: { beginAtZero: true }
+	                y: { 
+	                	beginAtZero: true ,
+	                	ticks: {
+	                		stepSize:1
+	                	}	
+	                }
 	            }
 	        }
 	    });
@@ -209,7 +214,10 @@
 	                 title: {
 	                     display: true,
 	                     text: '응답 수'
-	                 }
+	                 },
+	     			 ticks:{
+	     				 stepSize:5
+	     			 }
 	             },
 	             x: {
 	                 title: {
