@@ -49,7 +49,6 @@ public class ReviewController {
 	            .build();
 	    reviewRepository.save(review); // 먼저 저장
 
-	    // 비동기로 AI 분석 처리 (새 스레드)
 	    new Thread(() -> {
 	        try {
 	            String prompt = "다음 리뷰가 부정적인 리뷰인지 감지해줘. 부정이면 true, 아니면 false로만 답해줘: " + dto.getContent();

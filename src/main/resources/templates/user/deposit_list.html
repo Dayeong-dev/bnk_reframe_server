@@ -98,9 +98,9 @@
 
     .sort-btn.active,
     .sort-btn:hover {
-      background: #D7191F;
+      background: #fe504f;
       color: white;
-      border-color: #D7191F;
+      border-color: #fe504f;
     }
 
     .card-list {
@@ -174,9 +174,9 @@
     }
 
     .pagination a.active {
-      background: #D7191F;
+      background: #fe504f;
       color: white;
-      border-color: #D7191F;
+      border-color: #fe504f;
     }
 
     .pagination a:hover {
@@ -220,7 +220,7 @@
           <p th:utext="${product.summary}">상품 요약</p>
           <div class="rate-container">
             <span class="high-rate"
-              th:text="${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
+              th:text="'최고 '+ ${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
             <span class="low-rate"
               th:text="${#numbers.formatDecimal(product.minRate, 1, 'POINT', 2, 'POINT')} + '%'">2.50%</span>
           </div>

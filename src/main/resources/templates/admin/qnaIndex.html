@@ -7,269 +7,267 @@
 <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
 <style>
-	/* 리팩토링된 버튼 스타일 */
+/* 리팩토링된 버튼 스타일 */
+.top-menu {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	margin-bottom: 20px;
+}
+
+.menu-btn {
+	height: 40px;
+	padding: 0 20px;
+	background-color: #f8f9fa;
+	color: #495057;
+	border: 1px solid #dee2e6;
+	border-right: none;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	white-space: nowrap;
+}
+
+.menu-btn:first-child {
+	border-top-left-radius: 6px;
+	border-bottom-left-radius: 6px;
+}
+
+.menu-btn:last-child {
+	border-right: 1px solid #dee2e6;
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+
+.menu-btn:hover {
+	background-color: #e9ecef;
+	color: #212529;
+}
+
+.menu-btn.active {
+	background-color: #007bff;
+	color: white;
+	border-color: #007bff;
+}
+
+.menu-btn.active:hover {
+	background-color: #0056b3;
+}
+
+/* 알림 배너 스타일 */
+#alert-banner {
+	background-color: #fff3cd;
+	border: 1px solid #ffeaa7;
+	border-radius: 6px;
+	padding: 12px 16px;
+	margin-bottom: 20px;
+	color: #856404;
+	font-size: 14px;
+	font-weight: 500;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 테이블 스타일 */
+table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 14px;
+	background-color: white;
+	border-radius: 6px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+table th, table td {
+	border: 1px solid #dee2e6;
+	padding: 12px 16px;
+	text-align: left;
+}
+
+table th {
+	background-color: #f8f9fa;
+	font-weight: 600;
+	color: #495057;
+}
+
+table td a {
+	color: #007bff;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+table td a:hover {
+	text-decoration: underline;
+	color: #0056b3;
+}
+
+.middle-menu {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	margin-bottom: 20px;
+	padding: 15px;
+	background-color: #f8f9fa;
+	border-radius: 6px;
+	border: 1px solid #dee2e6;
+}
+
+.middle-menu input[type="text"] {
+	height: 36px;
+	padding: 0 12px;
+	font-size: 14px;
+	border: 1px solid #ced4da;
+	border-radius: 4px;
+	background-color: white;
+	min-width: 200px;
+	flex: 1;
+}
+
+.search-btn {
+	height: 36px;
+	padding: 0 16px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+	background-color: #0056b3;
+}
+
+/* 페이지네이션 스타일 */
+.pagination {
+	margin-top: 20px;
+	text-align: center;
+}
+
+.pagination button {
+	height: 36px;
+	padding: 0 12px;
+	margin: 0 2px;
+	background-color: #f8f9fa;
+	color: #495057;
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+	background-color: #e9ecef;
+	color: #212529;
+}
+
+.pagination button.active {
+	background-color: #007bff;
+	color: white;
+	border-color: #007bff;
+}
+
+/* 상세 보기 스타일 */
+.detail-section {
+	margin-top: 20px;
+	background-color: #fff;
+	padding: 24px;
+	border: 1px solid #dee2e6;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detail-section p {
+	margin: 12px 0;
+	font-size: 14px;
+	color: #495057;
+}
+
+.detail-section strong {
+	font-weight: 600;
+	color: #212529;
+}
+
+.detail-section .content-box {
+	background-color: #f8f9fa;
+	padding: 16px;
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	margin-top: 8px;
+	white-space: pre-wrap;
+	line-height: 1.5;
+	display: block;
+	margin-left: 8px;
+}
+
+.detail-section textarea {
+	width: 100%;
+	padding: 12px;
+	margin: 8px 0;
+	font-size: 14px;
+	border: 1px solid #ced4da;
+	border-radius: 4px;
+	background-color: white;
+	resize: vertical;
+}
+
+.detail-section button {
+	padding: 12px 24px;
+	margin-top: 15px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.detail-section button:hover {
+	background-color: #0056b3;
+}
+
+/* 페이지 제목 스타일 */
+h1 {
+	color: #212529;
+	font-size: 24px;
+	font-weight: 600;
+	margin-bottom: 24px;
+	padding-bottom: 12px;
+	border-bottom: 2px solid #dee2e6;
+}
+
+/* 숨김 처리 */
+.hidden {
+	display: none;
+}
+
+#qna-form, #qna-detail {
+	display: none;
+}
+
+/* 구분선 스타일 */
+hr {
+	margin: 24px 0;
+	border: none;
+	border-top: 1px solid #dee2e6;
+}
+
+/* 반응형 디자인 */
+@media ( max-width : 768px) {
 	.top-menu {
-		display: flex;
-		align-items: center;
-		gap: 0;
-		margin-bottom: 20px;
-	}	
-
+		flex-wrap: wrap;
+		gap: 10px;
+	}
 	.menu-btn {
-		height: 40px;
-		padding: 0 20px;
-		background-color: #f8f9fa;
-		color: #495057;
-		border: 1px solid #dee2e6;
-		border-right: none;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		white-space: nowrap;
-	}
-
-	.menu-btn:first-child {
-		border-top-left-radius: 6px;
-		border-bottom-left-radius: 6px;
-	}
-	
-	.menu-btn:last-child {
-		border-right: 1px solid #dee2e6;
-		border-top-right-radius: 6px;
-		border-bottom-right-radius: 6px;
-	}
-
-	.menu-btn:hover {
-		background-color: #e9ecef;
-		color: #212529;
-	}
-
-	.menu-btn.active {
-		background-color: #007bff;
-		color: white;
-		border-color: #007bff;
-	}
-
-	.menu-btn.active:hover {
-		background-color: #0056b3;
-	}
-
-	/* 알림 배너 스타일 */
-	#alert-banner {
-		background-color: #fff3cd;
-		border: 1px solid #ffeaa7;
-		border-radius: 6px;
-		padding: 12px 16px;
-		margin-bottom: 20px;
-		color: #856404;
-		font-size: 14px;
-		font-weight: 500;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
-
-	/* 테이블 스타일 */
-	table {
-		border-collapse: collapse;
-		width: 100%;
-		font-size: 14px;
-		background-color: white;
-		border-radius: 6px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	}
-
-	table th,
-	table td {
-		border: 1px solid #dee2e6;
-		padding: 12px 16px;
-		text-align: left;
-	}
-
-	table th {
-		background-color: #f8f9fa;
-		font-weight: 600;
-		color: #495057;
-	}
-
-	table td a {
-		color: #007bff;
-		text-decoration: none;
-		font-weight: 500;
-	}
-
-	table td a:hover {
-		text-decoration: underline;
-		color: #0056b3;
-	}
-	
-	.middle-menu {
-		display: flex;
-		align-items: center;
-		gap: 15px;
-		margin-bottom: 20px;
-		padding: 15px;
-		background-color: #f8f9fa;
-		border-radius: 6px;
+		border-radius: 4px;
 		border: 1px solid #dee2e6;
 	}
-	
-	.middle-menu input[type="text"] {
-		height: 36px;
-		padding: 0 12px;
-		font-size: 14px;
-		border: 1px solid #ced4da;
-		border-radius: 4px;
-		background-color: white;
-		min-width: 200px;
-		flex: 1;
-	}
-	
-	.search-btn {
-		height: 36px;
-		padding: 0 16px;
-		background-color: #007bff;
-		color: white;
-		border: none;
-		border-radius: 4px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-	
-	.search-btn:hover {
-		background-color: #0056b3;
-	}
-	
-	/* 페이지네이션 스타일 */
-	.pagination{
-		margin-top: 20px;
-		text-align: center;
-	}
-
-	.pagination button {
-		height: 36px;
-		padding: 0 12px;
-		margin: 0 2px;
-		background-color: #f8f9fa;
-		color: #495057;
-		border: 1px solid #dee2e6;
-		border-radius: 4px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.pagination button:hover {
-		background-color: #e9ecef;
-		color: #212529;
-	}
-
-	.pagination button.active {
-		background-color: #007bff;
-		color: white;
-		border-color: #007bff;
-	}
-
-	/* 상세 보기 스타일 */
-	.detail-section {
-		margin-top: 20px;
-		background-color: #fff;
-		padding: 24px;
-		border: 1px solid #dee2e6;
-		border-radius: 8px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	}
-
-	.detail-section p {
-		margin: 12px 0;
-		font-size: 14px;
-		color: #495057;
-	}
-
-	.detail-section strong {
-		font-weight: 600;
-		color: #212529;
-	}
-
-	.detail-section .content-box {
-		background-color: #f8f9fa;
-		padding: 16px;
-		border: 1px solid #dee2e6;
-		border-radius: 4px;
-		margin-top: 8px;
-		white-space: pre-wrap;
-		line-height: 1.5;
-		display: block;
-		margin-left: 8px;
-	}
-
-	.detail-section textarea {
-		width: 100%;
-		padding: 12px;
-		margin: 8px 0;
-		font-size: 14px;
-		border: 1px solid #ced4da;
-		border-radius: 4px;
-		background-color: white;
-		resize: vertical;
-	}
-
-	.detail-section button {
-		padding: 12px 24px;
-		margin-top: 15px;
-		background-color: #007bff;
-		color: white;
-		border: none;
-		border-radius: 4px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.detail-section button:hover {
-		background-color: #0056b3;
-	}
-
-	/* 페이지 제목 스타일 */
-	h1 {
-		color: #212529;
-		font-size: 24px;
-		font-weight: 600;
-		margin-bottom: 24px;
-		padding-bottom: 12px;
-		border-bottom: 2px solid #dee2e6;
-	}
-
-	/* 숨김 처리 */
-	.hidden {
-		display: none;
-	}
-
-	#qna-form, #qna-detail {
-		display: none;
-	}
-
-	/* 구분선 스타일 */
-	hr {
-		margin: 24px 0;
-		border: none;
-		border-top: 1px solid #dee2e6;
-	}
-
-	/* 반응형 디자인 */
-	@media (max-width: 768px) {
-		.top-menu {
-			flex-wrap: wrap;
-			gap: 10px;
-		}
-		
-		.menu-btn {
-			border-radius: 4px;
-			border: 1px solid #dee2e6;
-		}
-	}
+}
 </style>
 </head>
 <body>
@@ -292,6 +290,10 @@
 			<!-- 카테고리 버튼 영역 -->
 			<div class="top-menu" id="category-buttons">
 				<!-- 버튼은 JS로 생성 -->
+			</div>
+
+			<!-- 상태 버튼 영역 -->
+			<div class="top-menu" id="status-buttons">
 			</div>
 
 			<div class="middle-menu">
@@ -354,13 +356,13 @@
 				<p>
 					<strong>상태:</strong> <span id="detail-status"></span>
 				</p>
-				
+
 				<hr>
 				<p>
 					<strong>내용:</strong>
 				</p>
 				<div class="content-box" id="detail-content"></div>
-				
+
 				<hr>
 				<p>
 					<strong>답변:</strong>
@@ -372,6 +374,39 @@
 	</div>
 
 	<script>
+	
+	let currentStatus = "전체"; // 추가 상태 필터
+
+	function initStatusFilter() {
+		const container = document.getElementById("status-buttons");
+
+		const uniqueStatuses = [...new Set(allRows.map(row =>
+			row.querySelector("td:nth-child(7)").textContent.trim()
+		))];
+
+		["전체", ...uniqueStatuses].forEach(status => {
+			const btn = document.createElement("button");
+			btn.textContent = status;
+			btn.className = "menu-btn";
+			btn.dataset.status = status;
+
+			if (status === currentStatus) btn.classList.add("active");
+
+			btn.addEventListener("click", () => {
+				document.querySelectorAll("#status-buttons .menu-btn").forEach(b => b.classList.remove("active"));
+				btn.classList.add("active");
+				currentStatus = status;
+				filterRows();
+				showPage(0);
+				renderPagination();
+			});
+
+			container.appendChild(btn);
+		});
+
+		filterRows();
+	}
+
 		const rowsPerPage = 5;
 		let currentCategory = "전체";
 		let currentPage = 0;
@@ -381,6 +416,7 @@
 		document.addEventListener("DOMContentLoaded", () => {
 			allRows = Array.from(document.querySelectorAll("#qna-tbody tr"));
 			initCategoryFilter();
+			initStatusFilter();
 			renderPagination();
 			showPage(0);
 
@@ -422,9 +458,15 @@
 		function filterRows() {
 			filteredRows = allRows.filter(row => {
 				const cat = row.querySelector("td:nth-child(6)").textContent.trim();
-				return currentCategory === "전체" || cat === currentCategory;
+				const status = row.querySelector("td:nth-child(7)").textContent.trim();
+
+				const categoryMatch = currentCategory === "전체" || cat === currentCategory;
+				const statusMatch = currentStatus === "전체" || status === currentStatus;
+
+				return categoryMatch && statusMatch;
 			});
 		}
+
 
 		function showPage(page) {
 			allRows.forEach(row => row.classList.add("hidden"));
