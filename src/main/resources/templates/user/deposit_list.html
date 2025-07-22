@@ -1,245 +1,291 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="/css/common.css" />
-<link rel="stylesheet" href="/css/user.css" />
-<title>BNK 예적금 상품 목록</title>
-<style>
-body {
-	font-family: 'Noto Sans KR', sans-serif;
-	background: #f8f9fa;
-	margin: 0;
-	color: #212529;
-}
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
+  <title>BNK 예적금 상품 목록</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      color: #212529;
+    }
 
-h2 {
-	text-align: center;
-	margin: 2rem 0 1rem;
-}
+    h2 {
+      text-align: center;
+      margin: 2rem 0 1rem;
+    }
 
-section {
-	align-items: initial;
-}
+    .search-section {
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
+    }
 
-.search-section {
-	width: 100%;
-	background: none;
-	padding: 20px 20px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 10px;
-	flex-wrap: wrap;
-	box-sizing: border-box;
-	margin-bottom: 20px;
-}
+    .search-form {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+    }
 
-.search-form {
-	display: flex;
-	width: 100%;
-	max-width: 500px;
-	position: relative;
-}
+    .search-input {
+      width: 100%;
+      padding: 10px 40px 10px 20px;
+      border-radius: 30px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
 
-.search-input {
-	flex: 1;
-	padding: 12px 50px 12px 20px;
-	border: 1px solid #ccc;
-	border-radius: 30px;
-	font-size: 15px;
-	background-color: white;
-	transition: border 0.3s, box-shadow 0.3s;
-}
+    .search-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: url('/img/search-icon.png') no-repeat center center;
+      background-size: 24px 24px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      cursor: pointer;
+    }
 
-.search-input:focus {
-	border-color: #1565c0;
-	box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
-}
+    .autocomplete-box {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
 
-.search-icon {
-	position: absolute;
-	top: 50%;
-	right: 18px;
-	transform: translateY(-50%);
-	background: none;
-	border: none;
-	cursor: pointer;
-	width: 22px;
-	height: 22px;
-	background-image:
-		url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-position: center;
-	padding: 0;
-}
+    .autocomplete-box div {
+      padding: 10px;
+      cursor: pointer;
+    }
 
-.sort-container {
-	display: flex;
-	justify-content: flex-end;
-	gap: 10px;
-	margin: 0 20px 15px;
-}
+    .autocomplete-box div:hover {
+      background: #f1f1f1;
+    }
 
-.sort-btn {
-	padding: 8px 16px;
-	border: 1px solid #dee2e6;
-	background: white;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 500;
-	color: #212529;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	text-decoration: none;
-}
+    .sort-container {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin: 0 20px 15px;
+    }
 
-.sort-btn.active, .sort-btn:hover {
-	background: #D7191F;
-	color: white;
-	border-color: #D7191F;
-}
+    .sort-btn {
+      padding: 8px 16px;
+      border: 1px solid #dee2e6;
+      background: white;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #212529;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
 
-/* ✅ 카드 리스트 및 카드 박스 수정 */
-.card-list {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 16px;
-	justify-content: center;
-	padding: 0 20px;
-}
+    .sort-btn.active,
+    .sort-btn:hover {
+      background: #D7191F;
+      color: white;
+      border-color: #D7191F;
+    }
 
-.card {
-	background: white;
-	border: 1px solid #dee2e6;
-	border-radius: 12px;
-	padding: 16px;
-	width: 250px;
-	min-height: 260px;
-	box-sizing: border-box;
-	cursor: pointer;
-	transition: transform 0.2s, box-shadow 0.2s;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-}
+    .card-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      padding: 0 20px;
+    }
 
-.card h3, .card p {
-	word-break: break-word;
-	white-space: normal;
-	overflow-wrap: break-word;
-}
+    .card {
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      padding: 16px;
+      width: 250px;
+      min-height: 260px;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-.card:hover {
-	transform: translateY(-6px);
-	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
+    .card h3,
+    .card p {
+      word-break: break-word;
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
 
-.rate-container {
-	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
-	margin-top: 10px;
-}
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
 
-.high-rate {
-	font-size: 20px;
-	font-weight: bold;
-	color: #D7191F;
-}
+    .rate-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 10px;
+    }
 
-.low-rate {
-	font-size: 14px;
-	color: #868e96;
-}
+    .high-rate {
+      font-size: 20px;
+      font-weight: bold;
+      color: #D7191F;
+    }
 
-.pagination {
-	display: flex;
-	justify-content: center;
-	gap: 8px;
-	margin: 30px 0;
-}
+    .low-rate {
+      font-size: 14px;
+      color: #868e96;
+    }
 
-.pagination a {
-	text-decoration: none;
-	border: 1px solid #ddd;
-	background: white;
-	padding: 6px 12px;
-	border-radius: 6px;
-	color: #333;
-	transition: background 0.2s ease;
-}
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 30px 0;
+    }
 
-.pagination a.active {
-	background: #D7191F;
-	color: white;
-	border-color: #D7191F;
-}
+    .pagination a {
+      text-decoration: none;
+      border: 1px solid #ddd;
+      background: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: #333;
+      transition: background 0.2s ease;
+    }
 
-.pagination a:hover {
-	background: #e9ecef;
-}
-</style>
+    .pagination a.active {
+      background: #D7191F;
+      color: white;
+      border-color: #D7191F;
+    }
 
+    .pagination a:hover {
+      background: #e9ecef;
+    }
+  </style>
 </head>
+
 <body>
-	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
-	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+  <div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+  <div th:replace="~{user/fragments/header :: headerFragment}"></div>
+  <div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
 
-	<div id="container">
-		<section class="content-wrapper">
-			<h2>원하시는 상품을 검색해보세요!</h2>
+  <div id="container">
+    <section class="content-wrapper">
+      <h2>원하시는 상품을 검색해보세요!</h2>
 
-			<!-- ✅ 검색창 -->
-			<div class="search-section">
-				<form th:action="@{/deposit/list}" method="get" class="search-form">
-					<input type="text" name="keyword" placeholder="검색어를 입력하세요"
-						class="search-input" th:value="${keyword}">
-					<button type="submit" class="search-icon" aria-label="검색"></button>
-				</form>
-			</div>
+      <!-- ✅ 검색창 -->
+      <div class="search-section">
+        <form class="search-form" action="/deposit/list" method="get">
+          <input type="text" name="keyword" id="searchInput"
+            th:value="${keyword}" class="search-input" placeholder="검색어를 입력하세요" autocomplete="off">
+          <button type="submit" class="search-icon" aria-label="검색"></button>
+          <div id="autocompleteList" class="autocomplete-box"></div>
+        </form>
+      </div>
 
-			<!-- ✅ 정렬 버튼 (우측 정렬) -->
-			<div class="sort-container">
-				<a th:href="@{/deposit/list(sort='recommend', keyword=${keyword})}"
-					class="sort-btn"
-					th:classappend="${sort} == 'recommend' ? 'active' : ''">추천순</a> <a
-					th:href="@{/deposit/list(sort='rate', keyword=${keyword})}"
-					class="sort-btn" th:classappend="${sort} == 'rate' ? 'active' : ''">금리순</a>
-			</div>
+      <!-- ✅ 정렬 -->
+      <div class="sort-container">
+        <a th:href="@{/deposit/list(sort='recommend', keyword=${keyword})}" class="sort-btn"
+          th:classappend="${sort} == 'recommend' ? 'active' : ''">추천순</a>
+        <a th:href="@{/deposit/list(sort='rate', keyword=${keyword})}" class="sort-btn"
+          th:classappend="${sort} == 'rate' ? 'active' : ''">금리순</a>
+      </div>
 
-			<!-- ✅ 카드 목록 -->
-			<div class="card-list">
-				<div class="card" th:each="product : ${products}"
-					th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
-					<h3 th:text="${product.name}">상품명</h3>
-					<p th:utext="${product.summary}">상품 요약</p>
-					<div class="rate-container">
-						<span class="high-rate"
-							th:text="${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
-						<span class="low-rate"
-							th:text="${#numbers.formatDecimal(product.minRate, 1, 'POINT', 2, 'POINT')} + '%'">2.50%</span>
-					</div>
-				</div>
-			</div>
+      <!-- ✅ 카드 리스트 -->
+      <div class="card-list">
+        <div class="card" th:each="product : ${products}"
+          th:onclick="'location.href=\'/deposit/detail/' + ${product.productId} + '\''">
+          <h3 th:text="${product.name}">상품명</h3>
+          <p th:utext="${product.summary}">상품 요약</p>
+          <div class="rate-container">
+            <span class="high-rate"
+              th:text="${#numbers.formatDecimal(product.maxRate, 1, 'POINT', 2, 'POINT')} + '%'">5.00%</span>
+            <span class="low-rate"
+              th:text="${#numbers.formatDecimal(product.minRate, 1, 'POINT', 2, 'POINT')} + '%'">2.50%</span>
+          </div>
+        </div>
+      </div>
 
-<!-- ✅ 검색 결과 없음 메시지 -->
-<div th:if="${products.empty}" style="text-align: center; margin: 40px 40px; color: #999; font-size: 1.1rem;">
-    검색 결과가 없습니다.
-</div>
+      <!-- ✅ 검색 결과 없음 -->
+      <div th:if="${products.empty}" style="text-align: center; margin: 40px 0; color: #999; font-size: 1.1rem;">
+        검색 결과가 없습니다.
+      </div>
 
-			<!-- ✅ 페이지네이션 (검색 결과가 있을 때만) -->
-			<div class="pagination" th:if="${page.totalPages > 0}">
-				<a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
-					th:href="@{/deposit/list(page=${i}, sort=${sort}, keyword=${keyword})}"
-					th:text="${i + 1}"
-					th:classappend="${i} == ${page.number} ? 'active' : ''">1</a>
-			</div>
+      <!-- ✅ 페이지네이션 -->
+      <div class="pagination" th:if="${page.totalPages > 0}">
+        <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+          th:href="@{/deposit/list(page=${i}, sort=${sort}, keyword=${keyword})}" th:text="${i + 1}"
+          th:classappend="${i} == ${page.number} ? 'active' : ''">1</a>
+      </div>
+    </section>
+  </div>
 
-		</section>
-	</div>
+  <script>
+    const input = document.getElementById("searchInput");
+    const box = document.getElementById("autocompleteList");
 
+    input.addEventListener("keyup", function () {
+      const keyword = this.value.trim();
+      if (keyword.length < 1) {
+        box.innerHTML = "";
+        box.style.display = "none";
+        return;
+      }
+
+      fetch(`/deposit/autocomplete?keyword=${encodeURIComponent(keyword)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length === 0) {
+            box.innerHTML = "";
+            box.style.display = "none";
+            return;
+          }
+          box.innerHTML = data.map(word =>
+            `<div onclick="selectAutocomplete('${word}')">${word}</div>`
+          ).join("");
+          box.style.display = "block";
+        })
+        .catch(() => {
+          box.innerHTML = "";
+          box.style.display = "none";
+        });
+    });
+
+    function selectAutocomplete(word) {
+      input.value = word;
+      box.innerHTML = "";
+      box.style.display = "none";
+      document.querySelector(".search-form").submit();
+    }
+
+    // 외부 클릭 시 자동완성 닫기
+    document.addEventListener("click", function (e) {
+      if (!document.querySelector(".search-form").contains(e.target)) {
+        box.innerHTML = "";
+        box.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
