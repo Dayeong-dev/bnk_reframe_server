@@ -6,10 +6,12 @@
 <title>메인</title>
 <link rel="stylesheet" href="/css/common.css"></link>
 <link rel="stylesheet" href="/css/user.css"></link>
+<link rel="stylesheet" href="/css/main.css"></link>
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script
 	src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.5/lottie.min.js"></script>
 </head>
 <body>
 	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
@@ -18,58 +20,87 @@
 	
 	<div id="container">
 		<section id="main">
-			<div class="swiper content-wrapper">
+			<div class="swiper mySwiper">
 				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<a href="#"> <img src="/img/image1.jpg" alt="slide1" />
-						</a>
+					<div class="swiper-slide content-wrapper">
+						<!-- <div th:replace="~{user/fragments/main-search :: mainSearchFragment}"></div> -->
+						<div class="search-area">
+							<div id="main-search">
+								<h4 class="typing-container">
+									<span class="typing-text"></span>
+									<span>검색해보세요!</span>
+								</h4>
+								<form class="search-form" action="/search" method="get">
+									<input type="text" name="keywords" placeholder="검색어를 입력하세요. " />
+									<button type="submit">
+										<img class="icon" src="/icons/search.svg" alt="search" />
+									</button>
+								</form>
+							</div>
+							<div id="lottie"></div>
+							<div class="scroll-down">
+								<div class="arrows">
+									<span></span>
+									<span></span>
+									<span></span>
+								</div>
+								<p>Scroll</p>
+							</div>
+						</div>
 					</div>
 					<div class="swiper-slide">
-						<a href="#"> <img src="/img/image2.jpg" alt="slide2" />
-						</a>
-					</div>
-					<div class="swiper-slide">
-						<a href="#"> <img src="/img/image3.jpg" alt="slide3" />
-						</a>
+						<div class="recommend-area">
+							<h4>인기상품 TOP 5</h4>
+							<div class="btn-list">
+								<input type="radio" id="deposit-btn" name="category" onclick="getDepositList()" checked>
+								<label for="deposit-btn">예적금</label>
+								
+								<input type="radio" id="card-btn" name="category" onclick="getCardList()">
+								<label for="card-btn">카드</label>
+							</div>
+							<ul class="product-list"></ul>
+						</div>
 					</div>
 				</div>
 			</div>
-			<div th:replace="~{user/fragments/main-search :: mainSearchFragment}"></div>
-			<div class="recommend-area">
-				<h4>추천하는 상품</h4>
-				<div class="btn-list content-wrapper">
-					<button id="deposit-btn" onclick="getDepositList()">예적금</button>
-					<button id="card-btn" onclick="getCardList()">카드</button>
-				</div>
-				<ul class="product-list"></ul>
+			<div class="trail">
+				<div class="circle big"></div>
+				<div class="circle medium"></div>
+				<div class="circle small"></div>
 			</div>
 		</section>
 	</div>
-
+	
 	<!-- 리뷰 팝업 -->
-<div id="review-popup" sec:authorize="isAuthenticated()">
-  <button id="review-close"  onclick="closePopup()">×</button>
-  <p>사이트 이용은 어떠신가요?</p>
-  <textarea id="review-content" placeholder="간단한 리뷰를 남겨주세요 :)"></textarea><br/>
-  <button onclick="submitReview()">제출</button>
-</div>
-
-
+	<div id="review-popup" sec:authorize="isAuthenticated()">
+		<button id="review-close"  onclick="closePopup()">×</button>
+		<p>사이트 이용은 어떠신가요?</p>
+		<textarea id="review-content" placeholder="간단한 리뷰를 남겨주세요 :)"></textarea><br/>
+		<button onclick="submitReview()">제출</button>
+	</div>
 
 	<script>
 		const $productList = document.querySelector(".product-list");
 		const $depositBtn = document.getElementById("deposit-btn");
 		const $cardBtn = document.getElementById("card-btn");
 		
+		lottie.loadAnimation({
+			container: document.getElementById('lottie'),
+			renderer: 'svg',
+			loop: true,
+			autoplay: true,
+			path: '/images/main/Business.json' // LottieFiles에서 받은 JSON 경로
+		});
+		
 		// 첫 화면 시 예적금 상품 조회
 		getDepositList();
 		
-		const swiper = new Swiper('.swiper', {
-			loop: true,
-			speed: 500,
-			autoplay: {
-				delay: 3000
-			}
+		const swiper = new Swiper('.mySwiper', {
+			direction: "vertical",
+			mousewheel: {
+			    releaseOnEdges: true,
+			}, 
+			autoHeight: true, 
 		});
 		
 		async function getDepositList() {
@@ -99,7 +130,7 @@
 				a.href = "/deposit/detail/" + deposit.productId;
 				
 				name.innerText = deposit.name
-				maxRate.innerText = deposit.maxRate.toFixed(2);
+				maxRate.innerText = deposit.maxRate.toFixed(2) + "%";
 				
 				a.appendChild(name);
 				a.appendChild(maxRate);
@@ -149,32 +180,97 @@
 			}
 		}
 		
-		  window.onload = () => {
-			    const cookie = document.cookie;
-			    if (!cookie.includes("reviewed=true")) {
-			      document.getElementById("review-popup").style.display = "block";
-			    }
-			  }
+		window.onload = () => {
+			const cookie = document.cookie;
+			if (!cookie.includes("reviewed=true")) {
+				document.getElementById("review-popup").style.display = "block";
+			}
+		}
 
-			  function submitReview() {
-			    const content = document.getElementById("review-content").value;
-			    if (!content.trim()) return alert("리뷰를 입력해주세요");
+		function submitReview() {
+			const content = document.getElementById("review-content").value;
+			if (!content.trim()) return alert("리뷰를 입력해주세요");
+			
+			fetch("/api/review/submit", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ content: content })
+			}).then(res => res.text()).then(msg => {
+				alert(msg);
+				document.getElementById("review-popup").style.display = "none";
+				document.cookie = "reviewed=true; path=/; max-age=" + (86400 * 7);
+			});
+		}
+		function closePopup() {
+			document.getElementById("review-popup").style.display = "none";
+		}
+		
+		// 타이핑 텍스트 이벤트
+		const $typingText = document.querySelector('.typing-text');
+		const messages = ["상품을", "야구를", "매일을", "오징어를"];
+		const colors = ["#000", "#fe504f", "#72D48F", "#4FA9FE"];
+		
+		let messageIndex = 0;
+		let charIndex = 0;
+		let typing = true;
+		
+		function type() {
+			const current = messages[messageIndex];
+		  
+			if (typing) {
+				$typingText.innerText = current.substring(0, charIndex++);
+				$typingText.style.color = colors[messageIndex];
+				
+				if (charIndex > current.length) {
+					typing = false;
+					setTimeout(type, 2500);
+				} else {
+					setTimeout(type, 100);
+				}
+			} else {
+				$typingText.innerText = current.substring(0, --charIndex);
+				if (charIndex === 0) {
+					messageIndex = (messageIndex + 1) % messages.length;
+					typing = true;
+					setTimeout(type, 500);
+				} else {
+					setTimeout(type, 100);
+				}
+			}
+		}
+		type();
+		
+		// 마우스 움직임 이벤트
+		const circles = document.querySelectorAll('.circle');
 
-			    fetch("/api/review/submit", {
-			      method: "POST",
-			      headers: { "Content-Type": "application/json" },
-			      body: JSON.stringify({ content: content })
-			    }).then(res => res.text()).then(msg => {
-			      alert(msg);
-			      document.getElementById("review-popup").style.display = "none";
-			      document.cookie = "reviewed=true; path=/; max-age=" + (86400 * 7);
-			    });
-			  }
-			  function closePopup() {
-				    document.getElementById("review-popup").style.display = "none";
-				  }
+		let mouseX = 0;
+		let mouseY = 0;
 		
+		const coords = Array.from({ length: circles.length }, () => ({ x: 0, y: 0 }));
 		
+		document.addEventListener('mousemove', (e) => {
+			mouseX = e.clientX;
+			mouseY = e.clientY;
+		});
+		
+		function animateTrail() {
+			coords[0].x += (mouseX - coords[0].x) * 0.15;
+			coords[0].y += (mouseY - coords[0].y) * 0.15;
+			
+			for (let i = 1; i < coords.length; i++) {
+				coords[i].x += (coords[i - 1].x - coords[i].x) * 0.15;
+				coords[i].y += (coords[i - 1].y - coords[i].y) * 0.15;
+			}
+			
+			circles.forEach((circle, i) => {
+				circle.style.left = coords[i].x + 'px';
+				circle.style.top = coords[i].y + 'px';
+			});
+			
+			requestAnimationFrame(animateTrail);
+		}
+		
+		animateTrail();
 		
 	</script>
 </body>
