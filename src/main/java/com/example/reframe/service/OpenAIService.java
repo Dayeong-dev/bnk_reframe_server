@@ -24,7 +24,7 @@ public class OpenAIService {
 
     public String askChatGPT(String userMessage) {
         RestTemplate restTemplate = new RestTemplate();
-        String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:bnk123:Bt6Iw477";
+        String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:bnk:BvvK7sqc";
         ChatRequest.Message message = new ChatRequest.Message("user", userMessage);
         System.out.println(message);
         ChatRequest request = new ChatRequest(fineTunedModel, List.of(message));
