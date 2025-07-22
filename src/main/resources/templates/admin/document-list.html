@@ -156,5 +156,133 @@
             </div>
         </div>
     </div>
+    <script>
+		const $header = document.querySelector("thead tr");
+		const $content = document.querySelector("tbody");
+		const $searchForm = document.getElementById("search-form");
+		
+		let curr_type = "T";
+		
+		getTerms();
+		
+		$searchForm.addEventListener("submit", e => {
+			e.preventDefault();
+			
+			const search = $searchForm.search.value.trim();
+			
+			if(search === "") {
+				alert("검색어를 입력하세요. ");
+				$searchForm.search.fucus();
+				return;
+			}
+			
+			if(curr_type === "T") {
+				getTerms(search);	
+			}
+			else if(curr_type === "M") {
+				getManuals(search);
+			}
+		});
+		
+		function getTerms(search = null) {
+			// 현재 목록 = 약관(Term)
+			curr_type = "T";
+			
+			fetch(`/admin/terms${search != null ? ("?search=" + search) : ""}`)
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>생성일자</th>`;
+				$header.innerHTML += `<th>다운로드</th>`;
+				$header.innerHTML += `<th>삭제</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					const date = new Date(element.regdate);  // ← 원하는 날짜 입력
+
+					const yyyy = date.getFullYear();
+					const mm = String(date.getMonth() + 1).padStart(2, '0');  // 월: 0부터 시작
+					const dd = String(date.getDate()).padStart(2, '0');
+					
+					const regdate = `${yyyy}-${mm}-${dd}`;
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td>${regdate}</td>`;
+					tr.innerHTML += `<td><a href='/admin/document/download/${element.documentId}'><img class='icon' src='/icons/download.svg' alt='다운로드'/></a></td>`;
+					tr.innerHTML += `<td><button onclick='deleteDocs(${element.documentId})'>삭제</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function getManuals(search = null) {
+			// 현재 목록 = 상품설명서(Manual)
+			curr_type = "M";
+			
+			fetch(`/admin/manuals${search != null ? ("?search=" + search) : ""}`)
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>생성일자</th>`;
+				$header.innerHTML += `<th>다운로드</th>`;
+				$header.innerHTML += `<th>삭제</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					const date = new Date(element.regdate);  // ← 원하는 날짜 입력
+
+					const yyyy = date.getFullYear();
+					const mm = String(date.getMonth() + 1).padStart(2, '0');  // 월: 0부터 시작
+					const dd = String(date.getDate()).padStart(2, '0');
+					
+					const regdate = `${yyyy}-${mm}-${dd}`;
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td>${regdate}</td>`;
+					tr.innerHTML += `<td><a href='/admin/document/download/${element.documentId}'><img class='icon' src='/icons/download.svg' alt='다운로드'/></a></td>`;
+					tr.innerHTML += `<td><button onclick='deleteDocs(${element.documentId})'>삭제</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function deleteDocs(documentId) {
+			console.log(documentId);
+		}
+	</script>
 </body>
 </html>
