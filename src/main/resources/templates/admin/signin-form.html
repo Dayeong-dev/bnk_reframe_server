@@ -3,44 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <title>로그인</title>
+<style>
+	html, body {
+		padding: 0;
+		margin: 0;
+		box-sizing: border-box;
+	}
+	
+	section {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		
+		width: 100%;
+		height: 100vh;
+		background-color: #eee;
+	}
+	
+	section h2 {
+		text-align: center;
+		margin-bottom: 1rem;
+	}
+	
+	section .content {
+		width: 20rem;
+		height: 20rem;
+		background-color: #fff;
+		box-shadow: 0px 2px 4px #aaa;
+		border-radius: 1rem;
+		padding: 2rem;
+	}
+	
+	form > div {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		margin-bottom: 0.5rem;
+		column-gap: 0.5rem;
+	}
+	
+	form > div label {
+		min-width: 60px;
+	}
+	
+	form > div button {
+		width: 100px;
+		padding: 0.5rem;
+	}
+	
+	input[type="text"], 
+	input[type="password"], 
+	input[type="email"] {
+		flex: 1;
+		padding: 0.75rem 1rem;
+		font-size: 0.75rem;
+		border: 1px solid #ccc;
+		border-radius: 0.5rem;
+		color: #444;
+		outline: none;
+	}
+
+	input:focus {
+		border-color: #000;
+	}
+
+	button, 
+	input[type="submit"],
+	input[type="button"] {
+		font-size: 0.75rem;
+		font-weight: 400;
+		background-color: #ddd;
+		border: none;
+		border-radius: 0.5rem;
+		cursor: pointer;
+	}
+	
+	button[type="submit"] {
+		color: #fff;
+		font-weight: bold;
+		width: 100%;
+		padding: 1rem;
+		background-color: #fe504f;	/* 메인 컬러 */
+		margin-top: 0.75rem;
+	}
+	
+</style>
 </head>
 <body>
 	<script src='https://www.google.com/recaptcha/api.js'></script>
 	<section>
-		<h2>관리자 로그인</h2>
+		<div class="content">
+			<h2>관리자 로그인</h2>
 		
-		<form id="adminLoginForm" method="post" th:action="@{/admin/login}">
-			<div>
-				<label for="username">행번</label> 
-				<input type="text" id="username" name="username" 
-				 	   th:value="${username}" th:readonly="${step2}" required />
-			</div>
-			<div>
-				<label for="password">비밀번호</label> 
-				<input type="password" id="password" name="password" 
-					   th:value="${password}"th:readonly="${step2}" required />
-			</div>
-
-			<!-- step2 username, password 입력 완료 시 -->
-			<div th:if="${step2}">
-				<label for="email">이메일</label> 
-				<input type="email" id="email" name="email" required />
-				<button type="button" id="sendCodeBtn">인증번호 보내기</button>
-			</div>
-			
-			<!-- step3 email 입력 완료 시 -->
-			<div id="authCodeField" style="display: none;">
-		        <label>인증번호</label>
-		        <input type="text" name="authCode" />
-		        <button type="submit">로그인</button>
-		    </div>
-
-			<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red;"></p>
-		</form>
-		<p th:if="${msg != null}" th:text="${msg}"></p>
+			<form id="adminLoginForm" method="post" th:action="@{/admin/login}">
+				<div>
+					<label for="username">행번</label> 
+					<input type="text" id="username" name="username" 
+					 	   th:value="${username}" th:readonly="${step2}" required />
+				</div>
+				<div>
+					<label for="password">비밀번호</label> 
+					<input type="password" id="password" name="password" 
+						   th:value="${password}"th:readonly="${step2}" required />
+				</div>
+	
+				<!-- step2 username, password 입력 완료 시 -->
+				<div th:if="${step2}">
+					<label for="email">이메일</label> 
+					<input type="email" id="email" name="email" required />
+					<button type="button" id="sendCodeBtn">인증번호<br/>보내기</button>
+				</div>
+				
+				<!-- step3 email 입력 완료 시 -->
+				<div id="authCodeField" style="display: none;">
+			        <label>인증번호</label>
+			        <input type="text" name="authCode" />
+			    </div>
+			    <button type="submit">로그인</button>
+	
+				<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red;"></p>
+			</form>
+			<p th:if="${msg != null}" th:text="${msg}"></p>
+		</div>
 		
 	</section>
-
+	
 	<script>
 		const $form = document.querySelector("form");
 		
@@ -86,7 +173,7 @@
 
 		    if (response.ok) {
 		        alert("인증번호를 전송했습니다.");
-		        document.getElementById("authCodeField").style.display = "block";
+		        document.getElementById("authCodeField").style.display = "flex";
 		    } else {
 		        alert("이메일 전송 실패: 다시 시도해주세요.");
 		    }
