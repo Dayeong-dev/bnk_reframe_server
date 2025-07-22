@@ -18,8 +18,8 @@ public class OpenAIService2 {
     private String apiKey;
 
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:green:BvgH8xnc";
-    private static final int MAX_MESSAGE_HISTORY = 3;
+    private static final String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:bnk:BvvK7sqc";
+    private static final int MAX_MESSAGE_HISTORY = 10;
     // 세션ID별 대화 로그 저장
     private final Map<String, List<Message>> conversationHistoryMap = new HashMap<>();
 
@@ -41,7 +41,7 @@ public class OpenAIService2 {
 
         // 현재 user 메시지 추가
         messages.add(new Message("user", userMessage));
-        System.out.println(messages);
+        System.out.println(userMessage);
         
      // 메시지 수 제한 초과 시 앞에서부터 제거 (시스템 메시지는 유지)
         while (messages.size() > MAX_MESSAGE_HISTORY + 1) { // +1은 system
