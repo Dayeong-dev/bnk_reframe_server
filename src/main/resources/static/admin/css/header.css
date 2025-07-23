@@ -4,12 +4,13 @@
 			align-items: center;
 			justify-content: space-between;
 			padding: 10px 20px;
-			background-color: #f9f9f9;
-			border-bottom: 1px solid #ddd;
+			background-color: white;
+			border-bottom: 2px solid #ddd;
 		}
 
 		#header-logo {
 			height: 50px;
+			margin-left: 20px;
 		}
 
 		#header-userArea {

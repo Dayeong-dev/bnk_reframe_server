@@ -93,7 +93,7 @@ public class AdminSignInController {
 				User user = userRepository.findByUsername(username);
 			    session.setAttribute("role", user.getRole());
 			    session.setAttribute("loginInfo", user);
-				return "redirect:/admin/card-main"; // 로그인 완료
+				return "redirect:/admin/product-main"; // 로그인 완료
 				
 			} else {
 				model.addAttribute("step3", true);
