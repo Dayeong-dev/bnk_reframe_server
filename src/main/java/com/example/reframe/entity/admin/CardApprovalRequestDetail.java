@@ -1,5 +1,7 @@
 package com.example.reframe.entity.admin;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +30,7 @@ public class CardApprovalRequestDetail {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
+    @JsonBackReference
     private CardApprovalRequest request;
 
     private String fieldName;

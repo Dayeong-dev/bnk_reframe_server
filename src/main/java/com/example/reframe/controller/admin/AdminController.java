@@ -46,6 +46,16 @@ public class AdminController {
 	public String getSignin() {
 		return "admin/signin-form";
 	}
+	
+	@GetMapping("/approval-box")
+	public String approvalBox() {
+		return "admin/approval-box";
+	}
+	@GetMapping("/card-approval-box")
+	public String cardApprovalBox() {
+		return "admin/card-approval-box";
+	}
+	
 //	@PostMapping("/login")
 //	public String postSignin() {
 //		return "admin/signin-form";

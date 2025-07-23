@@ -419,6 +419,7 @@
 		.menu-btn {
 			border-radius: 4px;
 			border: 1px solid #dee2e6;
+			height: 40px;
 		}
 		
 		.register-btn {
@@ -446,12 +447,6 @@
 		border-bottom: 2px solid #dee2e6;
 	}
 	
-	/* 모달 */
-	.menu-btn{
-    		height: 50px;
-    		width: 100px;
-    		margin-right: 10px;
-    	}
     	
     	#modal {
     		display: none;
@@ -504,7 +499,7 @@
 			<h1>카드 관리</h1>
 			
 			<div class="top-menu">
-				<button class="menu-btn active" onclick="selectMenu('all')">전체보기</button>
+				<button class="menu-btn active" onclick="selectMenu('all')">전체</button>
 				<button class="menu-btn" onclick="selectMenu('P')">개인카드</button>
 				<button class="menu-btn" onclick="selectMenu('C')">기업카드</button>
 				<button class="menu-btn" onclick="selectMenu('K')">체크카드</button>
@@ -670,7 +665,7 @@
 		    html += `<div class="detail-item"><label>상태</label><input type="text" name="status" value="${card.status}" readonly></div>`;
 		    html += `<div class="detail-item"><label>연회비</label><input type="text" name="annualFee" value="${card.annualFee}" readonly></div>`;
 		    /* html += `<div class="detail-item"><label>카드 서비스</label><textarea name="service" readonly>${card.service}</textarea></div>`; */
-		    /* html += `<div class="detail-item"><label>적립/할인</label><textarea name="pointInfo" readonly>${card.pointInfo}</textarea></div>`; */
+		    html += `<div class="detail-item"><label>적립/할인</label><input type="text" name="pointInfo" value="${card.pointInfo}" readonly></div>`;
 		    html += `<div class="detail-item"><label>조회수</label><input type="text" name="viewCount" value="${card.viewCount}" readonly></div>`;
 		    html += `<div class="detail-item"><label>상품 안내</label><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></div>`;
 		    /* html += `<div class="detail-item"><label>온라인 결제 안내</label><textarea name="onlinePaymentGuide" readonly>${card.onlinePaymentGuide}</textarea></div>`;
@@ -766,7 +761,7 @@
 				status: formData.get("status"),
 				annualFee: formData.get("annualFee"),
 				/* service: formData.get("service"), */
-				/* pointInfo: formData.get("pointInfo"), */
+				pointInfo: formData.get("pointInfo"),
 				/* onlinePaymentGuide: formData.get("onlinePaymentGuide"),
 				etcGuide: formData.get("etcGuide"), */
 				serviceList: serviceList, 
@@ -807,7 +802,7 @@
 		
 		    html += '<div class="form-item"><label>연회비</label><input type="text" name="annualFee" /></div>';
 		    /* html += '<div class="form-item"><label>카드 서비스</label><textarea name="service"></textarea></div>'; */
-		    /* html += '<div class="form-item"><label>적립/할인</label><textarea name="pointInfo"></textarea></div>'; */
+		    html += '<div class="form-item"><label>적립/할인</label><textarea name="pointInfo"></textarea></div>';
 		    html += '<div class="form-item"><label>상품 안내</label><textarea name="guideInfo"></textarea></div>';
 		    /* html += '<div class="form-item"><label>온라인 결제 안내</label><textarea name="onlinePaymentGuide"></textarea></div>';
 		    html += '<div class="form-item"><label>기타 안내</label><textarea name="etcGuide"></textarea></div>'; */
