@@ -6,8 +6,8 @@
 <link rel="stylesheet" href="/css/user.css" />
 <title>카드 상세 페이지</title>
 <style>
-body {
-	background-color: #f5f5f5; /* 아주 연한 회색 */
+#container>section {
+	padding-top: 0;
 }
 
 .card-container {
@@ -16,10 +16,10 @@ body {
 	font-family: Arial, sans-serif;
 }
 
-card-header-wrapper{
-background-color: #f5f5f5;
+.card-header-wrapper {
+	background-color: #fff;
+	width: 100%;
 }
-
 
 .card-header {
 	display: flex;
@@ -28,7 +28,7 @@ background-color: #f5f5f5;
 }
 
 .card-header img {
-	width: 300px;
+	width: 350px;
 	border-radius: 10px;
 }
 
@@ -68,10 +68,11 @@ background-color: #f5f5f5;
 .card-details {
 	background: none;
 	padding: 0;
+	padding: 0 20px;
 }
 
 .card-details h3 {
-	margin-top: 60px;
+	margin-top: 30px;
 }
 
 /* fade-in 애니메이션 */
@@ -104,10 +105,8 @@ background-color: #f5f5f5;
 	max-width: 600px;
 	max-height: 80%;
 	padding: 1rem;
-	
 	display: flex;
 	flex-direction: column;
-	
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -138,8 +137,7 @@ background-color: #f5f5f5;
 	color: #444;
 }
 
-#guideModal .modal-content ul,
-#guideModal .modal-content ol {
+#guideModal .modal-content ul, #guideModal .modal-content ol {
 	margin: 10px 0 10px;
 	padding-left: 20px;
 }
@@ -159,11 +157,10 @@ background-color: #f5f5f5;
 	margin: 20px 0;
 }
 
-#guideModal .modal-content th,
-#guideModal .modal-content td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: left;
+#guideModal .modal-content th, #guideModal .modal-content td {
+	border: 1px solid #ccc;
+	padding: 10px;
+	text-align: left;
 }
 
 #guideModal .modal-content th {
@@ -186,12 +183,12 @@ background-color: #f5f5f5;
 .service-grid {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	gap: 16px;
+	gap: 18px;
 	margin: 30px 0 100px 0;
 }
 
 .card-name {
-	color: #f5b21d;
+	color: #fe504f;
 }
 
 .service-item {
@@ -208,7 +205,7 @@ background-color: #f5f5f5;
 }
 
 .highlight {
-	color: #D7191F;
+	color: #fe504f;
 }
 
 .service-desc {
@@ -223,14 +220,14 @@ background-color: #f5f5f5;
 }
 
 .compare-button {
-	padding: 10px 20px;
+	padding: 8px 16px;
 	background-color: #fff;
 	color: #555;
-	border: 2px solid #ddd;
+	border: 1px solid #ddd;
 	border-radius: 50px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 	cursor: pointer;
-	font-size: 1em;
+	font-size: 14px;
 	text-decoration: none;
 	display: inline-block;
 	margin-right: 10px;
@@ -249,16 +246,18 @@ background-color: #f5f5f5;
 }
 
 .grid-buttons button {
-	padding: 20px;
-	background: #D7191F;
-	color: #fff;
-	border: none;
+	width: 100%;
+	padding: 17px;
+	background: #fff;
+	color: #000;
+	border: 1px solid #555;
 	border-radius: 12px;
 	cursor: pointer;
 	font-size: 1em;
 	transition: all 0.3s ease;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
+
 
 .grid-buttons button:hover {
 	transform: translateY(-4px);
@@ -272,8 +271,7 @@ background-color: #f5f5f5;
 
 .list-button {
 	color: #555;
-	font-size: 1.05em;
-	font-weight: bold;
+	font-size: 17px;
 }
 
 .list-button:hover {
@@ -304,8 +302,10 @@ background-color: #f5f5f5;
 							<h1 th:text="${card.name}">카드 이름</h1>
 							<p>
 								<strong>카드: </strong> <span
-									th:text="${card.categoryMajorDisplay}"></span> | <strong>상태:
-								</strong> <span th:text="${card.statusDisplay}"></span>
+									th:text="${card.categoryMajorDisplay}"></span>
+							</p>
+							<p>
+								<strong>연회비: </strong> <span th:utext="${card.annualFee}"></span>
 							</p>
 							<p class="card-description" th:utext="${card.description}">카드
 								요약 설명</p>
@@ -336,13 +336,17 @@ background-color: #f5f5f5;
 			</div>
 
 
-			<!-- 2x2 모달 버튼 -->
+			<!-- 2x2 모달 버튼 영역 -->
 			<div class="grid-buttons">
-				<button onclick="openModal('guideModal')">상품 안내</button>
-<!-- 					<button onclick="openModal('onlinePaymentModal')">온라인 결제
-						안내</button>
-					<button onclick="openModal('etcGuideModal')">기타 안내</button> -->
-				<button onclick="openModal('termsModal')">상품 설명서 및 이용약관</button>
+				<!-- 상품 안내 버튼 -->
+				<div class="grid-button-item">
+					<button onclick="openModal('guideModal')">상품 안내</button>
+				</div>
+			
+				<!-- 상품 설명서 및 이용약관 버튼 -->
+				<div class="grid-button-item">
+					<button onclick="openModal('termsModal')">상품 설명서 및 이용약관</button>
+				</div>
 			</div>
 
 			<!-- 모달들 -->
@@ -356,7 +360,7 @@ background-color: #f5f5f5;
 				</div>
 			</div>
 
-<!-- 				<div id="onlinePaymentModal" class="modal">
+			<!-- 				<div id="onlinePaymentModal" class="modal">
 					<div class="modal-content">
 						<span class="close-btn" onclick="closeModal('onlinePaymentModal')">&times;</span>
 						<h2>온라인 결제 안내</h2>
@@ -373,7 +377,7 @@ background-color: #f5f5f5;
 					</div>
 				</div> -->
 
-<!-- 				<div id="termsModal" class="modal">
+			<!-- 				<div id="termsModal" class="modal">
 					<div class="modal-content">
 						<span class="close-btn" onclick="closeModal('termsModal')">&times;</span>
 						<h2>상품 설명서 및 이용약관</h2>

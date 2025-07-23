@@ -57,7 +57,7 @@ public class CardService {
 	public CardDto getCardDetail(Long cardId) {
 		Card card = cardRepository.findByIdWithCategories(cardId)
 				.orElseThrow(() -> new RuntimeException("해당 카드 없음: " + cardId));
-		
+		card.setAnnualFee(card.getAnnualFee().replace("\\n", "<br>"));
 		card.setGuideInfo(MarkdownUtil.toHtml(card.getGuideInfo()));	// MarkDown → HTML
 		
 		return convertToDto(card);
@@ -157,11 +157,6 @@ public class CardService {
 		cardTestResultRepository.save(cardTestResult);
 	}
 
-	public List<CardDto> getTopFiveByViewCount() {
-		List<Card> cardList = cardRepository.findTopFiveByViewCount();
-
-		return cardList.stream().map(this::convertToDto).collect(Collectors.toList());
-	}
 
 	@Transactional
 	public List<CardDto> searchByKeywords(String keywords) {

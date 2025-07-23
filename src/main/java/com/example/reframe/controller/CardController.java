@@ -147,10 +147,10 @@ public class CardController {
 	}
 	
 	
-	// 조회수 기준으로 Top 5 카드 추천 : 메인 페이지
+	// 조회수 기준으로 Top 6 카드 추천 : 메인 페이지
 	@GetMapping("/recommend/list")
 	public @ResponseBody ResponseEntity<List<CardDto>> getRecommendCards() {
-    	List<CardDto> cardList = cardService.getTopFiveByViewCount();
+    	List<CardDto> cardList = cardService.getTop6Cards();
     	
     	if(cardList == null) {
     		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

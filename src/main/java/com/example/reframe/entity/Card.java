@@ -71,17 +71,17 @@ public class Card {
     @Column(name = "guide_info")
     private String guideInfo; // 상품 안내 (MarkDown)
 
-//    @Lob
-//    @Column(name = "online_payment_guide")
-//    private String onlinePaymentGuide; // 온라인 결제 안내 (관리자 등록)
+    @Lob
+    @Column(name = "online_payment_guide")
+    private String onlinePaymentGuide; // 온라인 결제 안내 (관리자 등록)
 
-//    @Lob
-//    @Column(name = "etc_guide")
-//    private String etcGuide; // 기타 안내 (관리자 등록)
+    @Lob
+    @Column(name = "etc_guide")
+    private String etcGuide; // 기타 안내 (관리자 등록)
 
-//    @Lob
-//    @Column(name = "terms_guide")
-//    private String termsGuide; // 상품 설명서 및 이용약관
+    @Lob
+    @Column(name = "terms_guide")
+    private String termsGuide; // 상품 설명서 및 이용약관
     
 	@ManyToOne(fetch = FetchType.LAZY)	// 추가됨
 	@JoinColumn(name = "TERM_ID")
