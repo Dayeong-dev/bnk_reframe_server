@@ -143,6 +143,12 @@ header #sub-header a:hover {
 	color: var(--primary-color);
 }
 
+header #sub-header .recent-views {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
 header #sub-header .recent-views h4 {
 	margin-bottom: 0.5rem;
 }
