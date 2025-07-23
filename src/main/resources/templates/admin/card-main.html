@@ -6,6 +6,7 @@
 <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<script th:src="@{/admin/sidebar.js}"></script>
 <style>
 	/* 리팩토링된 버튼 스타일 */
 	.top-menu {
@@ -481,6 +482,120 @@
     	#modal .search-form {
     		margin-bottom: 1rem;
     	}
+    	/*cnrk*/
+    	.styled-form {
+  margin-top: 20px;
+  padding: 24px;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* form 안의 테이블 영역 (flex row 2열 구성) */
+.form-table {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* 각 항목 wrapper (1줄당 2칸) */
+.form-item {
+  display: flex;
+  flex-direction: column;
+  width: calc(50% - 10px);
+}
+
+/* 라벨 */
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+/* input, select, textarea wrapper */
+.form-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-input-wrapper input,
+.form-input-wrapper select,
+.form-input-wrapper textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #ffffff;
+}
+
+.form-input-wrapper textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* 등록 / 저장 버튼 */
+.form-button,
+.search-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.form-button:hover,
+.search-btn:hover {
+  background-color: #0056b3;
+}
+.service > div {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f1f3f5;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.service label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.title-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.content-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
 </style>
 </head>
 <body>
@@ -652,50 +767,73 @@
 		
 		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
 		function showCardDetail(card) {
-			console.log("hello");
-			console.log(card);
-			
-		    let html = '<form id="cardDetailForm" class="detail-table">';
+  let html = `<form id="cardDetailForm" class="styled-form"><div class="form-table">`;
 
-		    html += `<div class="detail-item"><label>카드 ID</label><input type="text" name="cardId" value="${card.cardId}" readonly></div>`;
-		    html += `<div class="detail-item"><label>카드명</label><input type="text" name="name" value="${card.name}" readonly></div>`;
-		    html += `<div class="detail-item"><label>설명</label><input type="text" name="description" value="${card.description}" readonly></div>`;
-		    html += `<div class="detail-item"><label>해시태그</label><input type="text" name="tags" value="${card.tags}" readonly></div>`;
-		    html += `<div class="detail-item"><label>대분류</label><input type="text" name="categoryMajor" value="${card.categoryMajor}" readonly></div>`;
-		    html += `<div class="detail-item"><label>상태</label><input type="text" name="status" value="${card.status}" readonly></div>`;
-		    html += `<div class="detail-item"><label>연회비</label><input type="text" name="annualFee" value="${card.annualFee}" readonly></div>`;
-		    /* html += `<div class="detail-item"><label>카드 서비스</label><textarea name="service" readonly>${card.service}</textarea></div>`; */
-		    html += `<div class="detail-item"><label>적립/할인</label><input type="text" name="pointInfo" value="${card.pointInfo}" readonly></div>`;
-		    html += `<div class="detail-item"><label>조회수</label><input type="text" name="viewCount" value="${card.viewCount}" readonly></div>`;
-		    html += `<div class="detail-item"><label>상품 안내</label><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></div>`;
-		    /* html += `<div class="detail-item"><label>온라인 결제 안내</label><textarea name="onlinePaymentGuide" readonly>${card.onlinePaymentGuide}</textarea></div>`;
-		    html += `<div class="detail-item"><label>기타 안내</label><textarea name="etcGuide" readonly>${card.etcGuide}</textarea></div>`; */
-		    html += `<div class="detail-item"><label>약관</label><input type="text" name="termId" value="${card.termId}" /><button type="button" onclick="openModal('T')">검색</button></div>`;
-		    html += `<div class="detail-item"><label>상품설명서</label><input type="text" name="manualId" value="${card.manualId}" /><button type="button" onclick="openModal('M')">검색</button></div>`;
-		   	html += `<div></div>`;
+  const readonly = (key, val) => `
+    <div class="form-item">
+      <label class="form-label">${key}</label>
+      <div class="form-input-wrapper"><input type="text" name="${key}" value="${val}" readonly></div>
+    </div>
+  `;
 
-		    // 소분류 리스트 출력
-		    if (card.subcategories && card.subcategories.length > 0) {
-		        html += `<div class="detail-item"><label>소분류</label><input type="text" value="${card.subcategories.join(', ')}" readonly></div>`;
-		    }
-		    
-		    html += `<div class="detail-item service"><label>서비스</label>`;
-		    html += `<button type="button" onclick="createBlock()">추가</button><br/>`;
-		    for(let service of card.serviceList) {
-				html += `<div>
-					<label>제목: <input type="text" name="title" value="${service.title}" class="title-input" /></label><br/>
-					<label>설명: <textarea name="desc" class="content-textarea">${service.desc}</textarea></label><br/>
-					<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
-				</div>`;
-			}
-		   	html += `</div>`;
+  html += readonly("카드 ID", card.cardId);
+  html += readonly("카드명", card.name);
+  html += readonly("설명", card.description);
+  html += readonly("해시태그", card.tags);
+  html += readonly("대분류", card.categoryMajor);
+  html += readonly("상태", card.status);
+  html += readonly("연회비", card.annualFee);
+  html += readonly("적립/할인", card.pointInfo);
+  html += readonly("조회수", card.viewCount);
 
-		    html += `<button type="button" class="search-btn" onclick="enableEditMode()">수정</button>`;
-			html += `<button type="button" id="saveBtn" class="search-btn" onclick="saveProductChanges()" style="display:none;">저장</button>`;
-		    html += '</form>';
+  html += `
+    <div class="form-item" style="width:100%">
+      <label class="form-label">상품 안내</label>
+      <div class="form-input-wrapper"><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></div>
+    </div>
+  `;
 
-		    document.getElementById('content-detail').innerHTML = html;
-		}
+  html += `
+    <div class="form-item">
+      <label class="form-label">약관</label>
+      <div class="form-input-wrapper"><input type="text" name="termId" value="${card.termId}" /><button type="button" onclick="openModal('T')">검색</button></div>
+    </div>
+    <div class="form-item">
+      <label class="form-label">상품설명서</label>
+      <div class="form-input-wrapper"><input type="text" name="manualId" value="${card.manualId}" /><button type="button" onclick="openModal('M')">검색</button></div>
+    </div>
+  `;
+
+  if (card.subcategories && card.subcategories.length > 0) {
+    html += readonly("소분류", card.subcategories.join(', '));
+  }
+
+  html += `<div class="form-item service" style="width: 100%;"><label class="form-label">서비스</label>`;
+  html += `<button type="button" onclick="createBlock()">추가</button><br/>`;
+
+  for (let service of card.serviceList) {
+    html += `
+      <div>
+        <label>제목: <input type="text" name="title" value="${service.title}" class="title-input" /></label><br/>
+        <label>설명: <textarea name="desc" class="content-textarea">${service.desc}</textarea></label><br/>
+        <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+
+  html += `
+    <div style="text-align:right; margin-top: 20px;">
+      <button type="button" class="search-btn" onclick="enableEditMode()">수정</button>
+      <button type="button" id="saveBtn" class="search-btn" onclick="saveProductChanges()" style="display:none;">저장</button>
+    </div>
+  `;
+
+  html += `</div></form>`;
+
+  document.getElementById('content-detail').innerHTML = html;
+}
 		
 		//============================================================
 		
@@ -787,39 +925,73 @@
 		
 		// 상품 등록 폼 열기
 		function showCardForm() {
-		    let html = '<form id="cardCreateForm">';
-		    html += '<div class="form-table">';
-		
-		    html += '<div class="form-item"><label>카드명</label><input type="text" name="name" required /></div>';
-		    html += '<div class="form-item"><label>설명</label><input type="text" name="description" /></div>';
-		    html += '<div class="form-item"><label>해시태그</label><input type="text" name="tags" /></div>';
-		
-		    html += '<div class="form-item"><label>대분류</label><select name="categoryMajor">';
-		    html += '<option value="P">개인</option>';
-		    html += '<option value="C">기업</option>';
-		    html += '<option value="K">체크</option>';
-		    html += '</select></div>';
-		
-		    html += '<div class="form-item"><label>연회비</label><input type="text" name="annualFee" /></div>';
-		    /* html += '<div class="form-item"><label>카드 서비스</label><textarea name="service"></textarea></div>'; */
-		    html += '<div class="form-item"><label>적립/할인</label><textarea name="pointInfo"></textarea></div>';
-		    html += '<div class="form-item"><label>상품 안내</label><textarea name="guideInfo"></textarea></div>';
-		    /* html += '<div class="form-item"><label>온라인 결제 안내</label><textarea name="onlinePaymentGuide"></textarea></div>';
-		    html += '<div class="form-item"><label>기타 안내</label><textarea name="etcGuide"></textarea></div>'; */
-		    html += '<div class="form-item"><label>약관</label><input type="text" name="termId" /><button type="button" onclick="openModal(\'T\')">검색</button></div>';
-		    html += '<div class="form-item"><label>상품설명서</label><input type="text" name="manualId" /><button type="button" value="검색" onclick="openModal(\'M\')">검색</button></div>';
-		    html += '<div class="form-item service"><label>서비스</label>';
-		    html += '<button type="button" onclick="createBlock()">추가</button><br/><div>';
-		    html += '<label>제목: <input type="text" name="title" class="title-input" /></label><br/>';
-		    html += '<label>설명: <textarea name="desc" class="content-textarea"></textarea></label><br/>';
-		    html += '<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/></div></div>';  
-		
-		    html += '<div class="form-item"><button type="button" onclick="submitCardForm()">등록</button></div>';
-		    html += '</div>';
-		    html += '</form>';
-		
-		    document.getElementById("content-detail").innerHTML = html;
-		}
+  let html = `
+    <form id="cardCreateForm" class="styled-form">
+      <div class="form-table">
+        <div class="form-item">
+          <label class="form-label">카드명</label>
+          <div class="form-input-wrapper"><input type="text" name="name" required /></div>
+        </div>
+        <div class="form-item">
+          <label class="form-label">설명</label>
+          <div class="form-input-wrapper"><input type="text" name="description" /></div>
+        </div>
+        <div class="form-item">
+          <label class="form-label">대분류</label>
+          <div class="form-input-wrapper">
+            <select name="categoryMajor">
+              <option value="P">개인</option>
+              <option value="C">기업</option>
+              <option value="K">체크</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <label class="form-label">연회비</label>
+          <div class="form-input-wrapper"><input type="text" name="annualFee" /></div>
+        </div>
+        <div class="form-item">
+          <label class="form-label">적립/할인</label>
+          <div class="form-input-wrapper"><input type="text" name="pointInfo" /></div>
+        </div>
+        <div class="form-item" style="width: 100%;">
+          <label class="form-label">상품 안내</label>
+          <div class="form-input-wrapper"><textarea name="guideInfo"></textarea></div>
+        </div>
+        <div class="form-item">
+          <label class="form-label">약관</label>
+          <div class="form-input-wrapper">
+            <input type="text" name="termId" />
+            <button type="button" onclick="openModal('T')">검색</button>
+          </div>
+        </div>
+        <div class="form-item">
+          <label class="form-label">상품설명서</label>
+          <div class="form-input-wrapper">
+            <input type="text" name="manualId" />
+            <button type="button" onclick="openModal('M')">검색</button>
+          </div>
+        </div>
+        <div class="form-item service" style="width: 100%;">
+          <label class="form-label">서비스</label>
+          <div class="form-input-wrapper">
+            <button type="button" onclick="createBlock()">추가</button>
+            <div class="detail-block">
+              <label>제목: <input type="text" name="title" class="title-input" /></label>
+              <label>설명: <textarea name="desc" class="content-textarea"></textarea></label>
+              <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-item" style="width: 100%; text-align: right;">
+          <button type="button" onclick="submitCardForm()" class="form-button">등록</button>
+        </div>
+      </div>
+    </form>
+  `;
+  document.getElementById("content-detail").innerHTML = html;
+}
+
 
 		
 		// 버튼 클릭시 폼 열기
