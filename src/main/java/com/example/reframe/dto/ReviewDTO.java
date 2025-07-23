@@ -1,6 +1,6 @@
 package com.example.reframe.dto;
 
-import com.example.reframe.entity.Userr;
+import com.example.reframe.entity.User;
 
 import lombok.Data;
 
