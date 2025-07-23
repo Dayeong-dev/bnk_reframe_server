@@ -6,35 +6,7 @@
 <link rel="stylesheet" href="/css/common.css"></link>
 <link rel="stylesheet" href="/css/user.css"></link>
 <style>
-	h4 {
-		font-size: 1.25rem;
-		margin-bottom: 1rem;
-	}
 
-	table {
-		width: 42rem;
-    	text-align: center;
-    	border-collapse: collapse;
-    	margin-bottom: 2rem;
-	}
-	
-	thead {
-	    background-color: #f6f6f6;
-	}
-	
-	thead th {
-	    color: #444;
-	    padding: 0.5rem 1rem;
-	    font-weight: 700;
-	}
-	
-	tbody td {
-	    padding: 0.5rem 1rem;
-	}
-	
-	th, td {
-		word-break: keep-all;
-	}
 </style>
 </head>
 <body>
@@ -44,60 +16,57 @@
 	
 	<div id="container">
 		<section id="search-list" class="content-wrapper">
-			<div th:replace="~{user/fragments/main-search :: mainSearchFragment}"></div>
-			<h4>예적금 상품</h4>
-			<table border="1">
-				<thead>
-					<tr>
-						<th>상품 ID</th>
-						<th>상품 이름</th>
-						<th>상품 요약</th>
-						<th>상품 유형</th>
-						<th>최고 금리</th>
-						<th>최소 금리</th>
-					</tr>
-				</thead>
-				<tbody th:if="${depositList != null and not #lists.isEmpty(depositList)}">
-					<tr th:each="deposit : ${depositList}">
-						<td th:text="${deposit.productId}"></td>
-						<td th:text="${deposit.name}"></td>
-						<td th:text="${deposit.summary}"></td>
-						<td th:text="${deposit.category}"></td>
-						<td th:text="${deposit.maxRate}"></td>
-						<td th:text="${deposit.minRate}"></td>
-					</tr>
-				</tbody>
-				<tbody th:if="${depositList == null or #lists.isEmpty(depositList)}">
-					<tr>
-						<td colspan="6">검색된 상품이 없습니다. </td>
-					</tr>
-				</tbody>
-			</table>
-			<hr/>
-			<h4>카드 상품</h4>
-			<table border="1">
-				<thead>
-					<tr>
-						<th>카드 ID</th>
-						<th>카드 이름</th>
-						<th>카드 요약</th>
-						<th>카드 대분류</th>
-					</tr>
-				</thead>
-				<tbody th:if="${cardList != null and not #lists.isEmpty(cardList)}">
-					<tr th:each="card : ${cardList}">
-						<td th:text="${card.cardId}"></td>
-						<td th:text="${card.name}"></td>
-						<td th:text="${card.description}"></td>
-						<td th:text="${card.categoryMajor}"></td>
-					</tr>
-				</tbody>
-				<tbody th:if="${cardList == null or #lists.isEmpty(cardList)}">
-					<tr>
-						<td colspan="6">검색된 상품이 없습니다. </td>
-					</tr>
-				</tbody>
-			</table>
+			<h4>상품을 검색해보세요!</h4>
+			<div class="search-section">
+				<form class="search-form" action="/search" method="get">
+					<input type="text" name="keyword" id="searchInput"
+						class="search-input" placeholder="검색어를 입력하세요" autocomplete="off">
+					<button type="submit" class="search-icon" aria-label="검색"></button>
+				</form>
+			</div>
+			<div class="list-wrap">
+				<div class="list-header">
+					<h4>예적금 상품</h4>
+					<a th:href="${'/deposit/list?keyword=' + keyword}"><button class="btn">더보기</button></a>
+				</div>
+				<div class="deposit-list" th:if="${depositList != null and not #lists.isEmpty(depositList)}">
+					<div class="deposit" th:each="deposit : ${depositList}" th:onclick="'location.href=\'/deposit/detail/' + ${deposit.productId} + '\''">
+						<h3 th:text="${deposit.name}">상품명</h3>
+						<p th:utext="${deposit.summary}">상품 요약</p>
+						<div class="rate-container">
+							<span class="high-rate" th:text="'최고 '+ ${#numbers.formatDecimal(deposit.maxRate, 1, 'POINT', 2, 'POINT')} + '%'"></span>
+							<span class="low-rate" th:text="${#numbers.formatDecimal(deposit.minRate, 1, 'POINT', 2, 'POINT')} + '%'"></span>
+						</div>
+					</div>
+				</div>
+				<div th:if="${depositList == null or #lists.isEmpty(depositList)}" style="text-align: center; margin: 40px 0; color: #999; font-size: 1.1rem;">
+					검색 결과가 없습니다.
+				</div>
+			</div>
+			<div class="list-wrap">
+				<div class="list-header">
+					<h4>카드 상품</h4>
+					<a th:href="${'/card/list?keyword=' + keyword}"><button class="btn">더보기</button></a>
+				</div>
+				<div class="card-list" style="margin-top: 20px;" th:if="${cardList != null and not #lists.isEmpty(cardList)}">
+					<div class="card-item" th:each="card : ${cardList}">
+						<a th:href="@{'/card/detail/' + ${card.cardId}}"> <img
+							th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+							th:alt="${card.name}" />
+						</a>
+						<h3>
+							<a th:href="@{'/card/detail/' + ${card.cardId}}"
+								th:text="${card.name}">카드 이름</a>
+						</h3>
+						<p th:utext="${card.description}">카드 설명</p>
+						<button type="button"
+							th:attr="onclick=|addToCompare(${card.cardId}, &quot;${card.name}&quot;, '/images/cards/' + ${card.cardId} + '_front.PNG')|">비교함 담기</button>
+					</div>
+				</div>
+				<div th:if="${cardList == null or #lists.isEmpty(cardList)}" style="text-align: center; margin: 40px 0; color: #999; font-size: 1.1rem;">
+					검색 결과가 없습니다.
+				</div>
+			</div>
 		</section>
 	</div>
 </body>

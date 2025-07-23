@@ -1,11 +1,15 @@
 package com.example.reframe.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.reframe.dto.CardDto;
+import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.SearchResultResponse;
 import com.example.reframe.service.AccessLogService;
 import com.example.reframe.service.MainService;
@@ -34,11 +38,17 @@ public class MainController {
 	
 	/* 메인 검색 */
 	@GetMapping("/search")
-	public String searchProduct(@RequestParam("keywords") String keywords, Model model) {
-		SearchResultResponse searchResult = mainService.searchByKeywords(keywords);
+	public String searchProduct(@RequestParam("keyword") String keyword, Model model) {
+		SearchResultResponse searchResult = mainService.searchByKeywords(keyword);
 		
-		model.addAttribute("depositList", searchResult.getDeposits());
-		model.addAttribute("cardList", searchResult.getCards());
+		List<DepositProductDTO> depositList = searchResult.getDeposits()
+				.subList(0, Math.min(4, searchResult.getDeposits().size()));	// 4개만 출력
+		List<CardDto> cardList = searchResult.getCards()
+				.subList(0, Math.min(3, searchResult.getCards().size()));	// 4개만 출력
+		
+		model.addAttribute("depositList", depositList);
+		model.addAttribute("cardList", cardList);
+		model.addAttribute("keyword", keyword);
 		
 		return "user/search_list";
 		

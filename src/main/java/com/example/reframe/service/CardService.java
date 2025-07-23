@@ -199,5 +199,11 @@ public class CardService {
 
 		return result.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
+	
+	public List<CardDto> getTopFiveByViewCount() {
+		List<Card> cardList = cardRepository.findTopFiveByViewCount();
+
+		return cardList.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
 
 }
