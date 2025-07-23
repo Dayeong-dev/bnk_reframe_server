@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
+    private final DocumentService documentService;
     private final EntityManager em;
     
     private SetProductContent setProductContent = new SetProductContent();
@@ -189,6 +190,16 @@ public class DepositProductServiceImpl implements DepositProductService {
         String modalDetail = MarkdownUtil.toHtml(product.getModalDetail());		// MarkDown → HTML
         String modalRate = MarkdownUtil.toHtml(product.getModalRate());			// MarkDown → HTML
         
+        List<String> termImages = new ArrayList<>();
+        List<String> manualImages = new ArrayList<>();
+        
+        if(product.getTerm() != null) {
+        	termImages = documentService.getImages(product.getTerm().getDocumentId());	// 약관 이미지 조회
+        }
+        if(product.getManual() != null) {
+        	manualImages = documentService.getImages(product.getManual().getDocumentId());	// 상품설명서 이미지 조회
+        }
+        
         // 조회수 증가
         product.setViewCount(product.getViewCount() + 1);
         depositProductRepository.save(product);
@@ -207,6 +218,8 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .period(product.getPeriod())
                 .viewCount(product.getViewCount())
                 .imageUrl(product.getImageUrl())
+                .termImages(termImages)
+                .manualImages(manualImages)
                 .build();
     }
     @Override
