@@ -2,7 +2,7 @@
 
 :root {
 	--primary-color: #fe504f;
-	--secondary-color: #B4161B;
+	--secondary-color: #e04444;
 	--border-color: #ddd;
 	--red-color: #fe504f;
 	--blue-color: #4FA9FE;
@@ -218,10 +218,10 @@ width: fit-content;
 
 #main .recommend-area .btn-list {
 	display: inline-flex;
-	border: 2px solid var(--red-color);
+	border: 2px solid #000;
 	border-radius: 0.25rem;
 	overflow: hidden;
-	margin-bottom: 1rem;
+	margin-bottom: 2rem;
 }
 
 #main .recommend-area .btn-list input[type="radio"] {
@@ -233,7 +233,7 @@ width: fit-content;
 	padding: 0.25rem 0.5rem;
 	font-size: 0.75rem;
 	font-weight: bold;
-	color: var(--red-color);
+	color: #000;
 	background-color: transparent;
 	cursor: pointer;
 	transition: background-color 0.3s, color 0.3s;
@@ -241,7 +241,7 @@ width: fit-content;
 
 #main .recommend-area .btn-list input[type="radio"]:checked + label {
 	color: white;
-	background-color: var(--red-color);
+	background-color: #000;
 }
 
 #main .recommend-area ul {
@@ -310,50 +310,6 @@ width: fit-content;
 #main .recommend-area li.card-item p {
 	font-weight: bold;
 }
-
-/* ============================== */
-/* 메인 검색                        */
-/* ============================== */
-/* #main-search {
-	width: 100%;
-	padding: 4rem;
-	text-align: center;
-}
-
-#main-search h4 {
-	font-size: 1.5rem;
-	margin-bottom: 1rem;
-}
-
-#main-search .search-form {
-	width: 60%;
-	min-width: 15rem;
-	max-width: 50rem;
-	border: 1px solid #000;
-	border-radius: 2rem;
-	margin: 0 auto;
-	padding: 0.5rem 1rem;
-	
-	display: flex;
-	align-items: center;
-	column-gap: 1rem;
-}
-
-#main-search .search-form input {
-	flex: 1;
-	border: none;
-	padding: 0.5rem;
-}
-
-#main-search .search-form input {
-	outline: none;
-}
-
-#main-search .search-form button {
-	outline: none;
-	border: none;
-	background-color: transparent;
-} */
 
 /* ============================== */
 /* 메인페이지 마우스 무브 이벤트         */
