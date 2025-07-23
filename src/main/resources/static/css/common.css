@@ -168,6 +168,30 @@ header #sub-header .recent-views li a {
 }
 
 /* ============================== */
+/* 푸터                            */
+/* ============================== */
+div#footer {
+	width: 100vw;
+	height: 4rem;
+	border-top: 1px solid #ddd;
+	margin-top: 2rem;
+}
+
+footer {
+	height: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0rem 2rem;
+}
+
+footer p {
+	color: #aaa;
+	font-size: 0.65rem;
+	font-weight: bold;
+}
+
+/* ============================== */
 /* 사이드 메뉴(플로팅 버튼)            */
 /* ============================== */
 

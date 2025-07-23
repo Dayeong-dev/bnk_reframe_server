@@ -26,6 +26,7 @@
 			<p th:if="${msg != null}" th:text="${msg}"></p>
 		</section>
 	</div>
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
 	<script>
 		const $form = document.querySelector("form");
 		const $errors = document.querySelectorAll('.error');
