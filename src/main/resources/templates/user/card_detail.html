@@ -169,6 +169,89 @@
 	font-weight: bold;
 }
 
+/* 모달  */
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 999;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.modal .modal-wrapper {
+	background: #fff;
+	border-radius: 10px;
+	width: 80%;
+	max-width: 600px;
+	max-height: 80%;
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.modal .modal-header {
+	display: flex;
+	justify-content: space-between;
+}
+
+.modal .modal-content {
+	width: 100%;
+	flex: 1;
+	overflow-y: auto;
+	padding: 1rem;
+}
+
+.modal .modal-content h2 {
+	font-size: 24px;
+	font-weight: bold;
+	margin: 24px 0 12px;
+	padding-bottom: 6px;
+}
+
+.modal .modal-content p {
+	margin: 0.5rem 0;
+	color: #444;
+}
+
+.modal .modal-content ul, .modal .modal-content ol {
+	margin: 10px 0 10px;
+	padding-left: 20px;
+}
+
+.modal .modal-content ul {
+	list-style-type: disc;
+}
+
+.modal .modal-content li {
+	margin-bottom: 6px;
+	line-height: 1.6;
+}
+
+.modal .modal-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 20px 0;
+}
+
+.modal .modal-content th, #guideModal .modal-content td {
+	border: 1px solid #ccc;
+	padding: 10px;
+	text-align: left;
+}
+
+.modal .modal-content th {
+	background-color: #f5f7fa;
+	color: #2c3e50;
+	font-weight: bold;
+}
+
 .close-btn {
 	float: right;
 	font-size: 1.5em;
@@ -239,7 +322,7 @@
 
 .grid-buttons {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(3, 1fr);
 	gap: 15px;
 	margin: 30px auto;
 	max-width: 500px;
@@ -343,9 +426,14 @@
 					<button onclick="openModal('guideModal')">상품 안내</button>
 				</div>
 			
-				<!-- 상품 설명서 및 이용약관 버튼 -->
+				<!-- 상품 설명서 버튼 -->
 				<div class="grid-button-item">
-					<button onclick="openModal('termsModal')">상품 설명서 및 이용약관</button>
+					<button onclick="openModal('termModal')">상품 설명서 보기</button>
+				</div>
+				
+				<!-- 이용 약관 버튼 -->
+				<div class="grid-button-item">
+					<button onclick="openModal('manualModal')">이용 약관 보기</button>
 				</div>
 			</div>
 
@@ -359,31 +447,34 @@
 					<div class="modal-content" th:utext="${card.guideInfo}"></div>
 				</div>
 			</div>
-
-			<!-- 				<div id="onlinePaymentModal" class="modal">
+			
+			<div id="termModal" class="modal">
+				<div class="modal-wrapper">
+					<div class="modal-header">
+						<h2>상품 설명서</h2>
+						<span class="close-btn" onclick="closeModal('termModal')">&times;</span>
+					</div>
 					<div class="modal-content">
-						<span class="close-btn" onclick="closeModal('onlinePaymentModal')">&times;</span>
-						<h2>온라인 결제 안내</h2>
-						<pre th:text="${card.onlinePaymentGuide}"></pre>
-
+						<div th:if="${card.termImages != null and not #lists.isEmpty(card.termImages)}" th:each="img : ${card.termImages}">
+							<img th:src="@{${img}}" alt="약관 이미지" style="width: 100%;" />
+						</div>
 					</div>
 				</div>
-
-				<div id="etcGuideModal" class="modal">
-					<div class="modal-content">
-						<span class="close-btn" onclick="closeModal('etcGuideModal')">&times;</span>
-						<h2>기타 안내</h2>
-						<pre th:text="${card.etcGuide}"></pre>
+			</div>
+			
+			<div id="manualModal" class="modal">
+				<div class="modal-wrapper">
+					<div class="modal-header">
+						<h2>이용 약관</h2>
+						<span class="close-btn" onclick="closeModal('manualModal')">&times;</span>
 					</div>
-				</div> -->
-
-			<!-- 				<div id="termsModal" class="modal">
 					<div class="modal-content">
-						<span class="close-btn" onclick="closeModal('termsModal')">&times;</span>
-						<h2>상품 설명서 및 이용약관</h2>
-						<pre th:text="${card.termsGuide}"></pre>
+						<div th:if="${card.manualImages != null and not #lists.isEmpty(card.manualImages)}" th:each="img : ${card.manualImages}">
+							<img th:src="@{${img}}" alt="상품 설명서 이미지" style="width: 100%;" />
+						</div>
 					</div>
-				</div> -->
+				</div>
+			</div>
 
 
 			<div class="list-button-wrapper">

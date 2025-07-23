@@ -1,9 +1,14 @@
 package com.example.reframe.service;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.DocumentDTO;
@@ -15,6 +20,9 @@ import com.example.reframe.util.DocumentMapper;
 public class DocumentService {
 	private final DocumentRepository documentRepository;
 	private final DocumentMapper documentMapper = new DocumentMapper();
+	
+	private String TERM_PATH = System.getProperty("user.dir") + "/uploads/terms/";
+	private String MANUAL_PATH = System.getProperty("user.dir") + "/uploads/manuals/";
 	
 	public DocumentService(DocumentRepository documentRepository) {
 		this.documentRepository = documentRepository;
@@ -76,5 +84,23 @@ public class DocumentService {
 		Document result = documentRepository.save(documentMapper.toEntity(documentDTO));
 		
 		return documentMapper.toDTO(result);
+	}
+	
+	public List<String> getImages(Integer documentId) {
+		Document document = documentRepository.findById(documentId)
+				.orElseThrow(() -> new IllegalArgumentException(documentId + "번 문서를 찾을 수 없습니다. "));
+		
+		String path = document.getDocumentType().equals("T") ? TERM_PATH : MANUAL_PATH;
+		String filename = document.getFilename();
+		
+		File dir = new File(path);
+		File[] jpgFiles = dir.listFiles((d, name) -> name.startsWith(filename) && name.endsWith(".jpg"));
+
+	    List<String> imagePaths = Arrays.stream(jpgFiles)
+	        .sorted(Comparator.comparing(File::getName))
+	        .map(file -> "/uploads/" + (document.getDocumentType().equals("T") ? "terms" : "manuals") + "/" + file.getName()) // 웹 접근 경로
+	        .toList();
+
+	    return imagePaths;
 	}
 }
