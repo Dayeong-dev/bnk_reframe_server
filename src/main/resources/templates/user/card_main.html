@@ -9,362 +9,406 @@
 <link rel="stylesheet" href="/css/user.css"></link>
 <!-- slick CSS -->
 <link rel="stylesheet" type="text/css"
-  href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+	href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
 <link rel="stylesheet" type="text/css"
-  href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+	href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
 
 <!-- Swiper CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script
-  src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
 <style>
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #fff;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	margin: 0;
+	padding: 0;
+	background: #fff;
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
 }
 
 h1 {
-  text-align: center;
-  margin: 40px 0 20px;
-  font-weight: 700;
-  color: #222;
+	text-align: center;
+	margin: 40px 0 20px;
+	font-weight: 700;
+	color: #222;
 }
 
-.search-box {
-  text-align: center;
-  margin: 20px 0 40px;
+.autocomplete-box:empty {
+	display: none;
 }
 
-/* 반응형으로 너비 조절 */
-.search-box input {
-  width: 80%;
-  max-width: 400px;
-  min-width: 180px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;
-  font-size: 16px;
-  box-sizing: border-box;
+/* ✅ 검색 영역 전체 컨테이너 */
+.search-section {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	padding: 2rem 1rem;
+	box-sizing: border-box;
 }
 
-.search-box button {
-  padding: 8px 16px;
-  border: 1px solid #007bff;
-  background-color: #007bff;
-  color: white;
-  font-weight: 600;
-  border-radius: 0 4px 4px 0;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+/* ✅ 검색 폼 */
+.search-form {
+	display: flex;
+	width: 100%;
+	max-width: 500px; /* 최대 너비: input + icon에 딱 맞게 */
+	position: relative; /* 아이콘 위치 기준 */
 }
 
-.search-box button:hover {
-  background-color: #0056b3;
+/* ✅ 검색 인풋 */
+.search-input {
+	width: 100%; padding : 14px 50px 14px 20px; /* 오른쪽 여백으로 아이콘 자리 확보 */
+	border: 1px solid #ccc;
+	border-radius: 30px;
+	font-size: 17px;
+	box-sizing: border-box;
+	padding: 14px 50px 14px 20px;
+}
+
+/* ✅ 검색 아이콘 버튼 */
+.search-icon {
+	position: absolute;
+	top: 50%;
+	right: 18px; /* 적당히 안쪽으로 */
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	cursor: pointer;
+	width: 22px;
+	height: 22px;
+	background-image: url("/images/search.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	padding: 0;
+}
+
+/* ✅ 자동완성 박스(필요하다면) */
+.autocomplete-box {
+	position: absolute;
+	top: calc(100% + 5px); /* 인풋 아래 살짝 간격 */
+	left: 0;
+	right: 0;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-top: none;
+	max-height: 200px;
+	overflow-y: auto;
+	z-index: 10;
+	box-sizing: border-box;
+	border-radius: 0 0 10px 10px; /* 아래 모서리 둥글게 */
 }
 
 /* 스와이퍼 아이템 */
-
 .swiper-3d .swiper-slide-shadow {
-    background: transparent;
+	background: transparent;
 }
+
 .swiper-slide p {
-  display: none;
+	display: none;
 }
 
 .swiper-slide-active p {
-  display: block;
-  color: #222;
-  font-weight: bold; /* 필요하면 진하게 */
+	display: block;
+	color: #888;
+	font-weight: bold; /* 필요하면 진하게 */
 }
 
 .slider-container {
-  margin: 0 auto 40px;
-  position: relative;
+	margin: 0 auto 40px;
+	position: relative;
 }
 
 /* 슬릭 슬라이드 아이템 스타일 */
 .slide-item {
-  transition: transform 0.3s ease;
-  padding: 0 10px;
-  box-sizing: border-box;
-  cursor: pointer;
+	transition: transform 0.3s ease;
+	padding: 0 10px;
+	box-sizing: border-box;
+	cursor: pointer;
 }
 
 .slide-item img {
-  width: 100%;  /* 원하는 이미지 너비 */
-  height: auto;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
-  transition: transform 0.3s ease;
+	width: 100%; /* 원하는 이미지 너비 */
+	height: auto;
+	object-fit: cover;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgb(0 0 0/ 0.1);
+	transition: transform 0.3s ease;
 }
 
 /* 이미지 호버 시 살짝 커지는 효과 */
 .slide-item img:hover {
-  transform: scale(1.05);
+	transform: scale(1.05);
 }
 
-  
-
 .slide-item p {
-  margin-top: 10px;
-  font-weight: 700;
-  color: #333;
-  font-size: 16px;
+	margin-top: 10px;
+	font-weight: 700;
+	color: #333;
+	font-size: 16px;
+}
+
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    margin: 30px 0px;
 }
 
 /* 카드 목록 그리드 스타일 */
 /* 반응형 그리드 1~3열 */
 .section-header {
-  margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 
 .more-link-wrapper {
-  text-align: center;
-  margin-top: 30px; /* 카드 그리드와 간격 */
+	text-align: center;
+	margin-top: 30px; /* 카드 그리드와 간격 */
 }
 
 .more-link {
-  display: inline-block;
-  font-weight: 600;
-  color: #007bff;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.3s ease;
+	display: inline-block;
+	font-weight: 600;
+	color: #fe504f;
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.3s ease;
+	margin-bottom: 15px;
 }
 
 .more-link:hover {
-  color: #0056b3;
-  text-decoration: underline;
+	font-size: 1.03em;
 }
 
 .card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 2열 고정 grid-template-rows: repeat(3, auto);   3행 고정*/ 
-
-  grid-gap: 20px;
-  margin-bottom: 40px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	/* 2열 고정 grid-template-rows: repeat(3, auto);   3행 고정*/
+	grid-gap: 20px;
+	margin-bottom: 40px;
 }
-
 
 .card-item:hover {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
+
 .card-item {
-  display: flex;
-  border-radius: 8px;
-  transition: box-shadow 0.3s ease;
-  min-height: 250px;
-  align-items: flex-start; /* 상단 정렬 유지 */
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  gap: 12px; /* 적당한 간격 */
-  padding: 20px;
-  box-sizing: border-box; /* 패딩 포함 크기 계산 */
+	display: flex;
+	border-radius: 8px;
+	transition: box-shadow 0.3s ease;
+	min-height: 250px;
+	align-items: flex-start; /* 상단 정렬 유지 */
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	gap: 12px; /* 적당한 간격 */
+	padding: 20px;
+	box-sizing: border-box; /* 패딩 포함 크기 계산 */
 }
 
 .card-tags {
-  margin-bottom: 5px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px; /* 태그 사이 간격 */
+	margin-bottom: 5px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 3px; /* 태그 사이 간격 */
 }
 
 .card-tags span {
-  background: #eee;
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-size: 0.75em;
-  color: #555;
-  user-select: none;
-  display: inline-block;
+	background: #eee;
+	padding: 3px 6px;
+	border-radius: 4px;
+	font-size: 0.75em;
+	color: #555;
+	user-select: none;
+	display: inline-block;
 }
 
 .img-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 250px;
-  width: 150px; /* 이미지 눕는 가로 길이 맞춤 */
-  margin-top: 0;
-  overflow: hidden; /* 튀어나옴 방지 */
-  box-sizing: border-box;
-  position: relative; /* transform-origin 조절 위해 */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 250px;
+	width: 150px; /* 이미지 눕는 가로 길이 맞춤 */
+	margin-top: 0;
+	overflow: hidden; /* 튀어나옴 방지 */
+	box-sizing: border-box;
+	position: relative; /* transform-origin 조절 위해 */
 }
 
 .img-container img {
-  width: auto;
-  height: 150px;
-  object-fit: contain;
-  transform: rotate(90deg);
-  transform-origin: center center; /* 기준점 조절 */
-  flex-shrink: 0;
-  display: block;
-  margin: 0;
+	width: auto;
+	height: 150px;
+	object-fit: contain;
+	transform: rotate(90deg);
+	transform-origin: center center; /* 기준점 조절 */
+	flex-shrink: 0;
+	display: block;
+	margin: 0;
 }
 
 .card-desc {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  margin-top: 10px; /* 위쪽 정렬 */
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	margin-top: 10px; /* 위쪽 정렬 */
 }
-
 
 /* 카드 이름도 클릭 영역에 포함되도록 a 태그로 감싸기 */
 .card-desc h4 {
-  margin: 0 0 10px;
-  font-size: 18px;
-  color: #222;
-  cursor: pointer;
+	margin: 0 0 10px;
+	font-size: 18px;
+	color: #222;
+	cursor: pointer;
 }
 
 .card-desc p {
-  margin: 0;
-  font-size: 14px;
-  color: #555;
-  line-height: 1.3;
+	margin: 0;
+	font-size: 14px;
+	color: #555;
+	line-height: 1.3;
 }
 
 .banner {
-  text-align: center;
-  margin: 50px 0;
+	text-align: center;
+	margin: 50px 0;
 }
 
 .banner img {
-  max-width: 800px;
-  width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-  cursor: pointer;
+	max-width: 800px;
+	width: 100%;
+	border-radius: 10px;
+	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease;
+	cursor: pointer;
 }
 
 .banner img:hover {
-  transform: scale(1.03);
+	transform: scale(1.03);
 }
 
 /* 슬릭 커스텀 좌우 화살표 스타일 */
 .slick-prev, .slick-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.5);
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  z-index: 10;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s ease;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(0, 0, 0, 0.5);
+	border-radius: 50%;
+	width: 38px;
+	height: 38px;
+	z-index: 10;
+	cursor: pointer;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.3s ease;
 }
 
 .slick-prev:hover, .slick-next:hover {
-  background: rgba(0,0,0,0.8);
+	background: rgba(0, 0, 0, 0.8);
 }
 
 .slick-prev {
-  left: -50px;
+	left: -50px;
 }
 
 .slick-next {
-  right: -50px;
+	right: -50px;
 }
 
 /* 화살표 아이콘 텍스트 */
 .slick-prev::before, .slick-next::before {
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-  font-size: 24px;
-  color: white;
-  opacity: 1;
+	font-family: Arial, sans-serif;
+	font-weight: bold;
+	font-size: 24px;
+	color: white;
+	opacity: 1;
 }
 
 .slick-prev::before {
-  content: '<';
+	content: '<';
 }
 
 .slick-next::before {
-  content: '>';
+	content: '>';
 }
 
 /* 반응형 */
-@media (max-width: 768px) {
-  .slick-prev {
-    left: -35px;
-  }
-  .slick-next {
-    right: -35px;
-  }
+@media ( max-width : 768px) {
+	.slick-prev {
+		left: -35px;
+	}
+	.slick-next {
+		right: -35px;
+	}
 }
 
-@media (max-width: 480px) {
-  .slick-prev, .slick-next {
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
-  }
-  .slick-prev {
-    left: -30px;
-  }
-  .slick-next {
-    right: -30px;
-  }
+@media ( max-width : 480px) {
+	.slick-prev, .slick-next {
+		width: 32px;
+		height: 32px;
+		font-size: 18px;
+	}
+	.slick-prev {
+		left: -30px;
+	}
+	.slick-next {
+		right: -30px;
+	}
 }
 
-@media (max-width: 400px) {
-  .search-box input {
-    width: 100%;
-    border-radius: 4px 4px 0 0;
-  }
-  .search-box button {
-    width: 100%;
-    border-radius: 0 0 4px 4px;
-    margin-top: 8px;
-  }
-  .search-box {
-    margin-bottom: 20px;
-  }
+@media ( max-width : 400px) {
+	.search-box input {
+		width: 100%;
+		border-radius: 4px 4px 0 0;
+	}
+	.search-box button {
+		width: 100%;
+		border-radius: 0 0 4px 4px;
+		margin-top: 8px;
+	}
+	.search-box {
+		margin-bottom: 20px;
+	}
 }
 </style>
 </head>
 
 <body>
-<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
-<div th:replace="~{user/fragments/header :: headerFragment}"></div>
-<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
-	<div id="container" >
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+	<div id="container">
 		<section>
 			<div class="container">
-			    <!-- 스와이퍼 -->
-				<div class="swiper mySwiper" style="width: 100%; max-width: 600px; margin: 0 auto;">
-				  <div class="swiper-wrapper">
-				    <div class="swiper-slide" th:each="card : ${allCards}" style="text-align:center;">
-				      <a th:href="@{'/card/detail/' + ${card.cardId}}">
-				        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" alt="" style="width:300px; height:auto; border-radius:8px;" />
-				        <p th:text="${card.name}"></p>
-				      </a>
-				    </div>
-				  </div>
+				<!-- 스와이퍼 -->
+				<div class="swiper mySwiper"
+					style="width: 100%; max-width: 600px; margin: 0 auto;">
+					<div class="swiper-wrapper">
+						<div class="swiper-slide" th:each="card : ${allCards}"
+							style="text-align: center;">
+							<a th:href="@{'/card/detail/' + ${card.cardId}}"> <img
+								th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+								alt="" style="width: 300px; height: auto; border-radius: 8px;" />
+								<p th:text="${card.name}"></p>
+							</a>
+						</div>
+					</div>
 				</div>
-			
-			    <!-- 슬릭 슬라이더 컨테이너 
+
+				<!-- 슬릭 슬라이더 컨테이너 
 			    <div class="slider-container">
 			      <div class="slider">
 					<div class="slide-item" th:each="card : ${allCards}">
@@ -376,112 +420,120 @@ h1 {
 			        </div>
 			      </div>
 			    </div>-->
-			
-			    <!-- 카드 이름 검색 폼 -->
-			    <div class="search-box">
-			      <form method="get" action="/card/list">
-			        <input type="text" name="keyword" placeholder="카드 이름 검색" />
-			        <button type="submit">검색</button>
-			      </form>
-			    </div>
-			
+
+				<!-- 카드 이름 검색 박스 -->
+				<div class="search-section">
+					<form class="search-form" action="/card/list" method="get">
+						<input type="text" name="keyword" id="searchInput"
+							class="search-input" placeholder="카드 이름 검색" autocomplete="off">
+						<button type="submit" class="search-icon" aria-label="검색"></button>
+						<div id="autocompleteList" class="autocomplete-box"></div>
+						<!-- 🔥 자동완성 드롭다운 -->
+					</form>
+				</div>
+
 				<!-- 카드 목록 헤더 -->
 				<div class="content-wrapper">
-				  <div class="section-header">
-				    <h2>인기/추천 카드</h2>
-				  </div>
-				
-				  <!-- 카드 목록 그리드 -->
-				  <div class="card-grid">
-				    <a class="card-item" th:href="@{'/card/detail/' + ${card.cardId}}" th:each="card : ${topCards}">
-				      <div class="img-container">
-				        <img th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}" th:alt="${card.name}" />
-				      </div>
-				      <div class="card-desc">
-				        <div class="card-tags" th:if="${card.tags != null}">
-				          <span class="tag" th:each="tag : ${#strings.arraySplit(card.tags, ' ')}" th:text="${tag}"></span>
-				        </div>
-				        <h4 th:text="${card.name}"></h4>
-				        <p th:text="${card.description}"></p>
-				      </div>
-				    </a>
-				  </div>
-				
-				  <!-- 더보기 버튼을 그리드 아래에 -->
-				  <div class="more-link-wrapper">
-				    <a href="/card/list" class="more-link">전체 상품 &gt;</a>
-				  </div>
+					<div class="section-header"></div>
+
+					<!-- 카드 목록 그리드 -->
+					<div class="card-grid">
+						<a class="card-item" th:href="@{'/card/detail/' + ${card.cardId}}"
+							th:each="card : ${topCards}">
+							<div class="img-container">
+								<img
+									th:src="@{'/images/cards/' + ${card.cardId} + '_front.PNG'}"
+									th:alt="${card.name}" />
+							</div>
+							<div class="card-desc">
+								<div class="card-tags" th:if="${card.tags != null}">
+									<span class="tag"
+										th:each="tag : ${#strings.arraySplit(card.tags, ' ')}"
+										th:text="${tag}"></span>
+								</div>
+								<h4 th:text="${card.name}"></h4>
+								<p th:text="${card.description}"></p>
+							</div>
+						</a>
+					</div>
+
+					<!-- 더보기 버튼을 그리드 아래에 -->
+					<div class="more-link-wrapper">
+						<a href="/card/list" class="more-link">전체 상품 &gt;</a>
+					</div>
 				</div>
-			
-			
-			    <!-- 텅장진단기 배너 -->
-			    <div class="banner">
-			      <a href="/card/card_test">
-			        <img src="/images/cardTest/card_test_banner.png" alt="텅장진단기" />
-			      </a>
-			    </div>
-			  </div>
-		</section>	
+
+
+				<!-- 텅장진단기 배너 -->
+				<div class="banner">
+					<a href="/card/card_test"> <img
+						src="/images/cardTest/card_test_banner.png" alt="텅장진단기" />
+					</a>
+				</div>
+			</div>
+		</section>
 	</div>
-  
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-  <script>
-  
-  var swiper = new Swiper(".mySwiper", {
-	  effect: "cards",
-	  grabCursor: true,
-	  autoplay: {
-	    delay: 1300, // 자동 슬라이드(1.3초)
-	    disableOnInteraction: false // 사용자가 손대도 자동 재생 계속
-	  },
-	  loop: true // cards 효과는 loop랑 같이 쓰는 걸 권장!
-	});
-  
-  /*
-    $(document).ready(function () {
-      $('.slider').slick({
-        centerMode: true,          // 가운데 슬라이드 강조 모드 활성화
-        slidesToShow: 3,           // 한번에 보이는 슬라이드 개수
-        centerPadding: '60px',     // 좌우 패딩 (슬라이드 주변 여백)
-        variableWidth: false,  // 각 슬라이드 너비 내부 콘텐츠 기준 자동 조절
-        slidesToScroll: 1,         // 한번에 넘어가는 슬라이드 개수
-        autoplay: true,            // 자동 슬라이드 활성화
-        autoplaySpeed: 1500,       // 자동 슬라이드 속도 (1.5초)
-        infinite: true, 		   // 무한 반복 활성화
-        arrows: true,              // 좌우 화살표 표시
-        dots: true,                // 하단 점 네비게이션 표시
-        pauseOnHover: false,     // 마우스 올려도 멈추지 않게
-        pauseOnFocus: false,     // 포커스(화살표/점 클릭)해도 멈추지 않게
-        pauseOnDotsHover: false, // 점 네비게이션 hover 시 멈추지 않게
-        prevArrow: '<button type="button" class="slick-prev" aria-label="Previous slide">&lt;</button>',  // 커스텀 이전 버튼
-        nextArrow: '<button type="button" class="slick-next" aria-label="Next slide">&gt;</button>',      // 커스텀 다음 버튼
-        responsive: [
-          {
-            breakpoint: 768,
-            settings: {
-              slidesToShow: 2,
-              arrows: true,
-              dots: true,
-              centerPadding: '40px',
-            }
-          },
-          {
-            breakpoint: 480,
-            settings: {
-              slidesToShow: 1,
-              arrows: false,
-              dots: true,
-              centerMode: true,
-              centerPadding: '40px',
-            }
-          }
-        ]
-      });
-    });
-  */
-  </script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+	<script>
+		var swiper = new Swiper(".mySwiper", {
+			effect : "cards",
+			grabCursor : true,
+			autoplay : {
+				delay : 1300, // 자동 슬라이드(1.3초)
+				disableOnInteraction : false
+			// 사용자가 손대도 자동 재생 계속
+			},
+			loop : true
+		// cards 효과는 loop랑 같이 쓰는 걸 권장!
+		});
+
+		/*
+		  $(document).ready(function () {
+		    $('.slider').slick({
+		      centerMode: true,          // 가운데 슬라이드 강조 모드 활성화
+		      slidesToShow: 3,           // 한번에 보이는 슬라이드 개수
+		      centerPadding: '60px',     // 좌우 패딩 (슬라이드 주변 여백)
+		      variableWidth: false,  // 각 슬라이드 너비 내부 콘텐츠 기준 자동 조절
+		      slidesToScroll: 1,         // 한번에 넘어가는 슬라이드 개수
+		      autoplay: true,            // 자동 슬라이드 활성화
+		      autoplaySpeed: 1500,       // 자동 슬라이드 속도 (1.5초)
+		      infinite: true, 		   // 무한 반복 활성화
+		      arrows: true,              // 좌우 화살표 표시
+		      dots: true,                // 하단 점 네비게이션 표시
+		      pauseOnHover: false,     // 마우스 올려도 멈추지 않게
+		      pauseOnFocus: false,     // 포커스(화살표/점 클릭)해도 멈추지 않게
+		      pauseOnDotsHover: false, // 점 네비게이션 hover 시 멈추지 않게
+		      prevArrow: '<button type="button" class="slick-prev" aria-label="Previous slide">&lt;</button>',  // 커스텀 이전 버튼
+		      nextArrow: '<button type="button" class="slick-next" aria-label="Next slide">&gt;</button>',      // 커스텀 다음 버튼
+		      responsive: [
+		        {
+		          breakpoint: 768,
+		          settings: {
+		            slidesToShow: 2,
+		            arrows: true,
+		            dots: true,
+		            centerPadding: '40px',
+		          }
+		        },
+		        {
+		          breakpoint: 480,
+		          settings: {
+		            slidesToShow: 1,
+		            arrows: false,
+		            dots: true,
+		            centerMode: true,
+		            centerPadding: '40px',
+		          }
+		        }
+		      ]
+		    });
+		  });
+		 */
+	</script>
 
 </body>
-</html> 
+</html>
