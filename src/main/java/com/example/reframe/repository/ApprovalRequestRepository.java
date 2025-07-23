@@ -10,4 +10,8 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
 
 	List<ApprovalRequest> findByStatus(String string);
 
+	List<ApprovalRequest> findByRequestedBy(String username);
+
+	List<ApprovalRequest> findByRequestedByAndStatus(String username, String status);
+
 }

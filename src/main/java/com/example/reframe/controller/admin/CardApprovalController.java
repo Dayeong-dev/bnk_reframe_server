@@ -1,13 +1,14 @@
 package com.example.reframe.controller.admin;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.reframe.dto.BenefitItem;
 import com.example.reframe.dto.CardApprovalRequestDTO;
 import com.example.reframe.dto.CardDto;
-import com.example.reframe.entity.Card;
+import com.example.reframe.entity.admin.CardApprovalRequest;
+import com.example.reframe.entity.admin.CardApprovalRequestDetail;
+import com.example.reframe.repository.CardApprovalRequestRepository;
 import com.example.reframe.service.CardApprovalService;
 import com.example.reframe.util.SessionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,8 +31,11 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/admin/card/approval")
 public class CardApprovalController {
 
-	 @Autowired
+		@Autowired
 	    private CardApprovalService cardApprovalService;
+	 	
+		@Autowired
+	    private CardApprovalRequestRepository requestRepo;
 
 	    // 수정 결재 요청 생성
 	    @PostMapping("/request")
@@ -87,4 +93,34 @@ public class CardApprovalController {
 	        cardApprovalService.rejectRequest(id, approver, reason);
 	        return ResponseEntity.ok().build();
 	    }
+	    
+	    @GetMapping("/my")
+	    public List<CardApprovalRequest> getMyRequests(HttpSession session) {
+	        String username = SessionUtil.getLoginUser(session).getUsername();
+	        List<CardApprovalRequest> requests = cardApprovalService.getMyCardRequests(username);
+	        return requests;
+	    }
+
+	    @GetMapping("/my/{status}")
+	    public List<CardApprovalRequest> getMyRequestsByStatus(@PathVariable("status") String status,
+	    														HttpSession session) {
+	        String username = SessionUtil.getLoginUser(session).getUsername();
+	        List<CardApprovalRequest> requests = cardApprovalService.getMyCardRequestsByStatus(username, status.toUpperCase());
+	        return requests;
+	    }
+
+	    @GetMapping("/details/{requestId}")
+	    public List<CardApprovalRequestDetail> getRequestDetails(@PathVariable("requestId") Long requestId) {
+	    	System.out.println(requestId);
+	    	Optional<CardApprovalRequest> requestOpt = requestRepo.findById(requestId);
+	    	if (requestOpt.isPresent()) {
+		         List<CardApprovalRequestDetail> details = requestOpt.get().getDetails();
+		         System.out.println(details);
+		         return details;
+		         
+		     } else {
+		         return Collections.emptyList();
+		     }
+	    }
+	    
 	}

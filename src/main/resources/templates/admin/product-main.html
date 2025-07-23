@@ -462,7 +462,7 @@
             <h1>예/적금 관리</h1>
 
             <div class="top-menu">
-                <button class="menu-btn active" onclick="selectMenu(this,'all')">전체보기</button>
+                <button class="menu-btn active" onclick="selectMenu(this,'all')">전체</button>
                 <button class="menu-btn" onclick="selectMenu(this,'예금')">예금</button>
                 <button class="menu-btn" onclick="selectMenu(this,'적금')">적금</button>
                 <button class="register-btn" onclick="showProductForm()">상품 등록</button>
@@ -952,7 +952,7 @@
 				contentType: "application/json",
 				data: JSON.stringify(data),
 				success: function() {
-					alert("수정 완료");
+					alert("수정 요청이 등록되었습니다. 승인 대기 중입니다.");
 					selectMenu("all"); // 다시 전체 목록 새로고침
 				},
 				error: function(err) {

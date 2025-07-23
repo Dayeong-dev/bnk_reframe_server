@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>상위관리자 카드 결재</title>
+<title>관리자 메인</title>
 <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
@@ -102,6 +102,7 @@
 
 	/* 카드 테이블 래퍼 */
 	.card-table-wrapper {
+		/* border: 1px solid #dee2e6; */
 		border-radius: 8px;
 		margin-top: 16px;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -159,11 +160,11 @@
 	}
 
 	/* 상세 정보 스타일 */
-	#approval-detail {
+	#content-detail {
 		margin-top: 20px;
 	}
 
-	#approval-detail h3 {
+	#content-detail h3 {
 		color: #212529;
 		font-size: 18px;
 		font-weight: 600;
@@ -173,77 +174,18 @@
 	}
 
 	/* 상세 테이블 스타일 */
-	#approval-detail table {
+	#content-detail table {
 		margin-top: 10px;
 	}
 
-	#approval-detail table th {
+	#content-detail table th {
 		background-color: #e9ecef;
 		font-weight: 600;
 	}
 
-	#approval-detail table td {
+	#content-detail table td {
 		font-size: 13px;
 		line-height: 1.4;
-	}
-
-	/* 액션 버튼 스타일 */
-	.action-buttons {
-		margin-top: 20px;
-		display: flex;
-		gap: 12px;
-		justify-content: flex-start;
-	}
-
-	.btn-approve {
-		background-color: #28a745;
-		color: white;
-		border: none;
-		padding: 10px 20px;
-		border-radius: 6px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.btn-approve:hover {
-		background-color: #218838;
-		transform: translateY(-1px);
-	}
-
-	.btn-reject {
-		background-color: #dc3545;
-		color: white;
-		border: none;
-		padding: 10px 20px;
-		border-radius: 6px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.btn-reject:hover {
-		background-color: #c82333;
-		transform: translateY(-1px);
-	}
-
-	.btn-detail {
-		background-color: #007bff;
-		color: white;
-		border: none;
-		padding: 8px 16px;
-		border-radius: 4px;
-		font-size: 12px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.btn-detail:hover {
-		background-color: #0056b3;
-		transform: translateY(-1px);
 	}
 
 	/* 상태별 색상 */
@@ -293,10 +235,6 @@
 		table th,
 		table td {
 			padding: 8px 10px;
-		}
-
-		.action-buttons {
-			flex-direction: column;
 		}
 	}
 
@@ -352,49 +290,42 @@
 
 		<!-- 본문 -->
 		<div class="content">
-			<h1>상위관리자 카드 결재 페이지</h1>
+			<h1>예/적금 결재함</h1>
 
 			<div class="top-menu">
-				<button class="status-btn active" data-status="PENDING">전체</button>
-				<!-- <button class="status-btn" data-status="APPROVED">승인완료</button>
-				<button class="status-btn" data-status="REJECTED">반려완료</button>
-				<button class="status-btn" data-status="">전체</button> -->
+				<button class="status-btn active" data-status="">전체</button>
+				<button class="status-btn" data-status="PENDING">대기</button>
+				<button class="status-btn" data-status="APPROVED">승인</button>
+				<button class="status-btn" data-status="REJECTED">반려</button>
 			</div>
 
-			<!-- 결재 목록 출력 부분 -->
-			<div id="approval-list"></div>
+			<!-- 데이터 출력 부분 -->
+			<div id="content"></div>
 			
-			<!-- 결재 상세 출력 부분 -->
-			<div id="approval-detail"></div>
+			<!-- 상품 디테일 출력 부분 -->
+			<div id="content-detail"></div>
 
 		</div>
 	</div>
 
 	<script>
-	// 상태 필터 버튼 클릭 시
+	//상태 필터 버튼 클릭 시
 	$('.status-btn').on('click', function () {
 	  // 모든 버튼에서 active 클래스 제거
 	  $('.status-btn').removeClass('active');
 	  // 클릭된 버튼에 active 클래스 추가
 	  $(this).addClass('active');
 	  
-	  const status = $(this).data('status'); // "PENDING" | "APPROVED" | "REJECTED" | ""
-	  loadCardApprovalList(status);
+	  const status = $(this).data('status'); // "" | "PENDING" | "APPROVED" | "REJECTED"
+	  loadApprovalRequests(status);
 	});
 	
 	// 결재 요청 목록 불러오기
-	function loadCardApprovalList(status = 'PENDING') {
-	  let url = '/admin/card/approval/pending';
-	  if (status === 'APPROVED') {
-	    url = '/admin/card/approval/approved';
-	  } else if (status === 'REJECTED') {
-	    url = '/admin/card/approval/rejected';
-	  } else if (status === '') {
-	    url = '/admin/card/approval/all';
-	  }
+	function loadApprovalRequests(status) {
+	  const url = status ? `/admin/approval/my/${status}` : `/admin/approval/my`;
 	
 	  // 로딩 표시
-	  $('#approval-list').html('<div class="loading">로딩 중...</div>');
+	  $('#content').html('<div class="loading">로딩 중...</div>');
 	
 	  $.ajax({
 	    url: url,
@@ -403,8 +334,8 @@
 	      renderApprovalTable(data);
 	    },
 	    error: function (xhr) {
-	      alert('카드 결재 목록을 불러오지 못했습니다.');
-	      $('#approval-list').html('<div class="empty-message">데이터를 불러오지 못했습니다.</div>');
+	      alert('결재 요청 목록을 불러오지 못했습니다.');
+	      $('#content').html('<div class="empty-message">데이터를 불러오지 못했습니다.</div>');
 	    }
 	  });
 	}
@@ -413,33 +344,37 @@
 	function renderApprovalTable(data) {
 	  let html = `
 	    <div class="card-table-wrapper">
-	      <table class="card-table" id="card-approval-table">
+	      <table class="card-table" id="approval-table">
 	        <thead>
 	          <tr>
-	            <th>결재 ID</th>
-	            <th>카드 ID</th>
-	            <th>요청자</th>
-	            <th>요청일시</th>
-	            <th>상태</th>
-	            <th>액션</th>
+	            <th>결재 번호</th>
+	            <th>상품 번호</th>
+	            <th>결재 상태</th>
+	            <th>결재 요청자</th>
+	            <th>결재 요청일시</th>
+	            <th>승인자</th>
+	            <th>승인일시</th>
+	            <th>반려 사유</th>
 	          </tr>
 	        </thead>
 	        <tbody>
 	  `;
 	
 	  if (data.length === 0) {
-	    html += `<tr><td colspan="6" class="empty-message">결과가 없습니다.</td></tr>`;
+	    html += `<tr><td colspan="8" class="empty-message">결과가 없습니다.</td></tr>`;
 	  } else {
 	    data.forEach(item => {
 	      const statusClass = getStatusClass(item.status);
 	      html += `
-	        <tr class="request-row">
+	        <tr class="request-row" data-request-id="${item.id}">
 	          <td>${item.id}</td>
-	          <td>${item.cardId}</td>
+	          <td>${item.productId}</td>
+	          <td><span class="${statusClass}">${getStatusText(item.status)}</span></td>
 	          <td>${item.requestedBy}</td>
 	          <td>${item.requestedAt ? formatDate(item.requestedAt) : '-'}</td>
-	          <td><span class="${statusClass}">${getStatusText(item.status)}</span></td>
-	          <td><button class="btn-detail" onclick="loadCardApprovalDetail(${item.id})">상세보기</button></td>
+	          <td>${item.approvedBy || '-'}</td>
+	          <td>${item.approvedAt ? formatDate(item.approvedAt) : '-'}</td>
+	          <td>${item.rejectionReason || '-'}</td>
 	        </tr>
 	      `;
 	    });
@@ -447,7 +382,13 @@
 	
 	  html += `</tbody></table></div>`;
 	
-	  $('#approval-list').html(html);
+	  $('#content').html(html);
+	
+	  // ✅ 각 행에 클릭 이벤트 추가
+	  $('.request-row').on('click', function () {
+	    const requestId = $(this).data('request-id');
+	    loadRequestDetails(requestId);
+	  });
 	}
 	
 	// 상태별 클래스 반환
@@ -463,34 +404,34 @@
 	// 상태 텍스트 변환
 	function getStatusText(status) {
 	  switch(status) {
-	    case 'PENDING': return '대기중';
-	    case 'APPROVED': return '승인완료';
-	    case 'REJECTED': return '반려완료';
+	    case 'PENDING': return '대기';
+	    case 'APPROVED': return '승인';
+	    case 'REJECTED': return '반려';
 	    default: return status;
 	  }
 	}
 	
-	// 상세보기
-	function loadCardApprovalDetail(id) {
-	  $('#approval-detail').html('<div class="loading">상세 정보 로딩 중...</div>');
+	// 상세 정보 불러오기
+	function loadRequestDetails(requestId) {
+	  $('#content-detail').html('<div class="loading">상세 정보 로딩 중...</div>');
 	  
 	  $.ajax({
-	    url: `/admin/card/approval/detail/${id}`,
+	    url: `/admin/approval/details/${requestId}`,
 	    method: 'GET',
 	    success: function (data) {
-	      renderDetailView(data);
+	      renderDetailTable(data);
 	    },
-	    error: function (xhr) {
+	    error: function () {
 	      alert('상세 정보를 불러오지 못했습니다.');
-	      $('#approval-detail').html('<div class="empty-message">상세 정보를 불러오지 못했습니다.</div>');
+	      $('#content-detail').html('<div class="empty-message">상세 정보를 불러오지 못했습니다.</div>');
 	    }
 	  });
 	}
 	
-	// 상세 정보 렌더링
-	function renderDetailView(data) {
+	// 상세 내역 테이블 렌더링
+	function renderDetailTable(details) {
 	  let html = `
-	    <h3>결재 상세 정보 (ID: ${data.id})</h3>
+	    <h3>변경 상세 내역</h3>
 	    <div class="card-table-wrapper">
 	      <table class="card-table">
 	        <thead>
@@ -503,15 +444,15 @@
 	        <tbody>
 	  `;
 	
-	  if (data.details && data.details.length === 0) {
+	  if (details.length === 0) {
 	    html += `<tr><td colspan="3" class="empty-message">변경 내역이 없습니다.</td></tr>`;
-	  } else if (data.details) {
-	    data.details.forEach(detail => {
+	  } else {
+	    details.forEach(d => {
 	      html += `
 	        <tr>
-	          <td class="field-name">${detail.fieldName}</td>
-	          <td>${detail.oldValue || '-'}</td>
-	          <td class="changed-value">${detail.newValue || '-'}</td>
+	          <td class="field-name">${d.fieldName}</td>
+	          <td>${d.oldValue || '-'}</td>
+	          <td class="changed-value">${d.newValue || '-'}</td>
 	        </tr>
 	      `;
 	    });
@@ -519,55 +460,7 @@
 	
 	  html += `</tbody></table></div>`;
 	
-	  // 대기 상태인 경우에만 승인/반려 버튼 표시
-	  if (data.status === 'PENDING') {
-	    html += `
-	      <div class="action-buttons">
-	        <button class="btn-approve" onclick="approve(${data.id})">승인</button>
-	        <button class="btn-reject" onclick="reject(${data.id})">반려</button>
-	      </div>
-	    `;
-	  }
-	
-	  $('#approval-detail').html(html);
-	}
-	
-	// 승인 처리
-	function approve(id) {
-	  if (!confirm('이 결재를 승인하시겠습니까?')) {
-	    return;
-	  }
-	
-	  $.post(`/admin/card/approval/approve/${id}`, function() {
-	    alert("승인이 완료되었습니다.");
-	    loadCardApprovalList($('.status-btn.active').data('status'));
-	    $('#approval-detail').empty();
-	  }).fail(function() {
-	    alert("승인 처리 중 오류가 발생했습니다.");
-	  });
-	}
-	
-	// 반려 처리
-	function reject(id) {
-	  const reason = prompt("반려 사유를 입력하세요:");
-	  if (!reason || reason.trim() === '') {
-	    alert("반려 사유를 입력해주세요.");
-	    return;
-	  }
-	
-	  $.ajax({
-	    url: `/admin/card/approval/reject/${id}`,
-	    method: 'POST',
-	    data: { reason: reason },
-	    success: function() {
-	      alert("반려가 완료되었습니다.");
-	      loadCardApprovalList($('.status-btn.active').data('status'));
-	      $('#approval-detail').empty();
-	    },
-	    error: function() {
-	      alert("반려 처리 중 오류가 발생했습니다.");
-	    }
-	  });
+	  $('#content-detail').html(html);
 	}
 	
 	// 날짜 포맷 함수
@@ -583,9 +476,9 @@
 	  });
 	}
 	
-	// 페이지 로딩 시 대기 중인 목록 먼저 로딩
+	// 페이지 로딩 시 전체 목록 먼저 로딩
 	$(document).ready(function () {
-	  loadCardApprovalList('PENDING');
+	  loadApprovalRequests("");
 	});
 </script>
 </body>
