@@ -95,7 +95,7 @@ body {
 }
 
 .dot.active {
-	background-color: var(--primary-color);
+	background-color: #fe504f;
 }
 
 /* 목적별 추천 */
@@ -196,7 +196,7 @@ body {
 
 /* ✅ 기간(12개월 등) 강조 (선택) */
 .highlight-product p:nth-child(3) {
-	color: var(--primary-color);
+	color: #fe504f;
 }
 .card p:last-of-type, .highlight-product p:last-of-type {
 	font-weight: bold;
@@ -356,7 +356,7 @@ body {
 }
 
 .theme-card .rate {
-	color: var(--primary-color);
+	color: #fe504f;
 	font-weight: bold;
 	font-size: 17px;
 }
@@ -389,6 +389,24 @@ body {
 
 .theme-next {
 	right: 0px; /* ✅ 더 안쪽으로 */
+}
+
+.btn {
+	display: inline-block;
+	background-color: #fe504f;
+	color: white;
+	padding: 12px 24px;
+	border-radius: 30px;
+	font-size: 16px;
+	font-weight: 500;
+	text-decoration: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn:hover {
+	background-color: #e64945;
+	transform: translateY(-2px);
 }
 </style>
 </head>
@@ -522,6 +540,11 @@ body {
 				</div>
 			</div>
 		</section>
+		
+		<div style="text-align: center; margin-top: 10px;">
+				<a href="/deposit/list" class="btn">전체 상품 보러가기</a>
+			</div>
+		
 	</div>
 
 	<script>
