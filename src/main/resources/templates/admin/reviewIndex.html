@@ -33,7 +33,6 @@
 	.middle-menu {
 	    display: flex;
 	    align-items: center;
-	    gap: 15px;
 	    margin-bottom: 20px;
 	    padding: 15px;
 	    background-color: #f8f9fa;
@@ -93,29 +92,43 @@
     /* 필터 버튼 스타일 */
     #filter-buttons {
         display: flex;
-        gap: 10px;
         margin-bottom: 20px;
     }
 
     .filter-btn {
-        padding: 8px 16px;
         background-color: #f8f9fa;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        color: #495057;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
+		color: #495057;
+		padding: 8px 16px;
+		border: 1px solid #dee2e6;
+		border-right: none;
+		font-size: 14px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		height: 40px;
     }
-
+	.filter-btn:last-child {
+		border-right: 1px solid #dee2e6;
+	}
+	
+	.filter-btn:first-child {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+	}
+	
+	.filter-btn:last-child {
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+	}
     .filter-btn.active {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
+       background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+		z-index: 1;
+		position: relative;
     }
 
     .filter-btn:hover {
-        background-color: #e2e6ea;
+        background-color: #0056b3;
     }
 
     .hidden {

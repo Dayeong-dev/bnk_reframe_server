@@ -116,7 +116,7 @@ public class UserService {
 	}
 	
 	/** 회원가입 시 공통 처리(암호화, 포맷팅, 권한 및 유형 설정) */
-	private UserDTO prepareUserForRegistratio(UserDTO userDTO, String role, String usertype) {
+	public UserDTO prepareUserForRegistratio(UserDTO userDTO, String role, String usertype) {
 		// 비밀번호 암호화
 		userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
 		
@@ -163,5 +163,19 @@ public class UserService {
 			return dto;
 		}).collect(Collectors.toList());
 	}
+
+	public void updateRoles(List<UserDTO> roleList) {
+	    for (UserDTO dto : roleList) {
+	        User user = userRepository.findByUsername(dto.getUsername());
+	        
+	        if (user == null) {
+	            throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + dto.getUsername());
+	        }
+	        user.setRole(dto.getRole());
+	        userRepository.save(user);
+	    }
+	}
+	
+	
 
 }
