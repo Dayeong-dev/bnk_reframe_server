@@ -41,17 +41,22 @@
     }
 
     .search-icon {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: url('/img/search-icon.png') no-repeat center center;
-      background-size: 24px 24px;
-      width: 32px;
-      height: 32px;
-      border: none;
-      cursor: pointer;
-    }
+	position: absolute;
+	top: 50%;
+	right: 18px;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	cursor: pointer;
+	width: 22px;
+	height: 22px;
+	background-image:
+		url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	padding: 0;
+}
 
     .autocomplete-box {
       position: absolute;
@@ -148,7 +153,7 @@
     .high-rate {
       font-size: 20px;
       font-weight: bold;
-      color: #D7191F;
+      color:#fe504f;
     }
 
     .low-rate {
@@ -240,7 +245,7 @@
       </div>
     </section>
   </div>
-
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
   <script>
     const input = document.getElementById("searchInput");
     const box = document.getElementById("autocompleteList");

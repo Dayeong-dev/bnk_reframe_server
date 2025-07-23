@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.DepositProductDTO;
-
 import com.example.reframe.service.DepositProductService;
 import com.example.reframe.service.DepositProductServiceImpl;
-import com.example.reframe.service.InterestRateService;
 import com.example.reframe.session.RecentViewManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -34,7 +32,7 @@ public class DepositProductController {
     private final DepositProductService depositProductService;
     private final DepositProductServiceImpl depositProductServiceImpl;
     private final RecentViewManager recentViewManager;
-    private final InterestRateService interestRateService;
+  
 
 
     /**

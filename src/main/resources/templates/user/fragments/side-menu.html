@@ -1,17 +1,26 @@
-<div id="side-menu" xmlns:th="http://www.thymeleaf.org"
-	th:fragment="sideMenuFragment">
-	<div class="item" onclick="btn1()">
-		<img class="icon" src="/icons/search.svg" alt="아이콘" /> <span>고객센터</span>
-	</div>
-	<div class="item" onclick="btn2()">
-		<img class="icon" src="/icons/card.svg" alt="아이콘" /> <span>카드
-			비교함</span>
-	</div>
-	<div class="item" onclick="btn3()">
-		<img class="icon" src="/icons/chatbot.svg" alt="아이콘" /> <span>챗봇
-			문의</span>
+<div id="side-menu" xmlns:th="http://www.thymeleaf.org" th:fragment="sideMenuFragment">
+	<div id="side-menu">
+	    <!-- 서브 버튼 -->
+	    <div class="fab-sub" onclick="btn1()">
+			<img class="icon" src="/icons/customer.png" alt="아이콘" />
+			<span class="tooltip">고객센터</span>
+	    </div>
+	    <div class="fab-sub" onclick="btn2()">
+			<img class="icon" src="/icons/card.png" alt="아이콘" />
+			<span class="tooltip">카드 비교함</span>
+	    </div>
+	    <div class="fab-sub" onclick="btn3()">
+			<img class="icon" src="/icons/chatbot.png" alt="아이콘" />
+			<span class="tooltip">챗봇 문의</span>
+	    </div>
+	
+	    <!-- 메인 플로팅 버튼 -->
+	    <button class="fab-main" onclick="toggleFab()">+</button>
 	</div>
 	<script>
+		function toggleFab() {
+			document.getElementById('side-menu').classList.toggle('open');
+	    }
 
 		function btn1() {	// 고객센터
 			location.href = "/faq/faq";

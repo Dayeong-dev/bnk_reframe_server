@@ -35,4 +35,6 @@ public class DepositProductDTO {
     private String imageUrl;      // 썸네일 이미지 URL
     
     private List<DepositProductContentDTO> productContentList;	// 상세 설명 내용 리스트
+    private List<String> termImages;	// 약관 이미지 파일 리스트
+    private List<String> manualImages;	// 상품 설명서 이미지 파일 리스트
 }

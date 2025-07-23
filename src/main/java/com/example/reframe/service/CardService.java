@@ -1,4 +1,5 @@
 package com.example.reframe.service;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,6 +39,9 @@ public class CardService {
 
 	@Autowired
 	private CardTestResultRepository cardTestResultRepository;
+	
+	@Autowired
+	private DocumentService documentService; 
 
 	@Autowired
 	private EntityManager em;
@@ -54,13 +58,30 @@ public class CardService {
 	}
 
 	// 상세 - 카드 상세정보 가져오기 + 소분류명 리스트
+	@Transactional
 	public CardDto getCardDetail(Long cardId) {
 		Card card = cardRepository.findByIdWithCategories(cardId)
 				.orElseThrow(() -> new RuntimeException("해당 카드 없음: " + cardId));
 		
+		card.setAnnualFee(card.getAnnualFee().replace("\\n", "<br>"));
 		card.setGuideInfo(MarkdownUtil.toHtml(card.getGuideInfo()));	// MarkDown → HTML
 		
-		return convertToDto(card);
+		List<String> termImages = new ArrayList<>();
+        List<String> manualImages = new ArrayList<>();
+        
+        if(card.getTerm() != null) {
+        	termImages = documentService.getImages(card.getTerm().getDocumentId());	// 약관 이미지 조회
+        }
+        if(card.getManual() != null) {
+        	manualImages = documentService.getImages(card.getManual().getDocumentId());	// 상품설명서 이미지 조회
+        }
+        
+        CardDto cardDTO = convertToDto(card);
+        
+        cardDTO.setTermImages(termImages);		// 약관 이미지 파일 set
+        cardDTO.setManualImages(manualImages);	// 상품설명서 이미지 파일 set
+		
+		return cardDTO;
 	}
 
 	// 상세 - 조회수 +1 증가
@@ -157,11 +178,6 @@ public class CardService {
 		cardTestResultRepository.save(cardTestResult);
 	}
 
-	public List<CardDto> getTopFiveByViewCount() {
-		List<Card> cardList = cardRepository.findTopFiveByViewCount();
-
-		return cardList.stream().map(this::convertToDto).collect(Collectors.toList());
-	}
 
 	@Transactional
 	public List<CardDto> searchByKeywords(String keywords) {
@@ -182,6 +198,12 @@ public class CardService {
 		List<Card> result = query.getResultList();
 
 		return result.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+	
+	public List<CardDto> getTopFiveByViewCount() {
+		List<Card> cardList = cardRepository.findTopFiveByViewCount();
+
+		return cardList.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
 }

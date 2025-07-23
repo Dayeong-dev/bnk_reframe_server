@@ -33,6 +33,9 @@ public class CardDto {
     private List<String> subcategories; // 소분류명 리스트
 
     private List<BenefitItem> serviceList;
+    
+    private List<String> termImages;	// 약관 이미지 파일 리스트
+    private List<String> manualImages;	// 상품 설명서 이미지 파일 리스트
 
  // categoryMajor 변환 메서드
     public String getCategoryMajorDisplay() {

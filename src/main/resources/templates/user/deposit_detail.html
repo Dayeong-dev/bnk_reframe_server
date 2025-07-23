@@ -336,8 +336,9 @@ body {
 			<span class="close" onclick="closeGuideImgModal()">&times;</span>
 			<h2 style="text-align: center; margin-top: 0;">상품설명서</h2>
 			<div style="text-align: center;">
-				<img th:src="@{/img/guide_sample.png}" alt="상품설명서"
-					style="max-width: 100%; height: auto;" />
+				<div th:if="${product.manualImages != null and not #lists.isEmpty(product.manualImages)}" th:each="img : ${product.manualImages}">
+					<img th:src="@{${img}}" alt="설명서 이미지" style="width: 100%;" />
+				</div>
 			</div>
 			<div style="text-align: center; margin-top: 20px;">
 				<button class="btn" onclick="closeGuideImgModal()">닫기</button>
@@ -351,15 +352,16 @@ body {
 			<span class="close" onclick="closeTermsImgModal()">&times;</span>
 			<h2 style="text-align: center; margin-top: 0;">이용약관</h2>
 			<div style="text-align: center;">
-				<img th:src="@{/img/terms_sample.png}" alt="이용약관"
-					style="max-width: 100%; height: auto;" />
+				<div th:if="${product.termImages != null and not #lists.isEmpty(product.termImages)}" th:each="img : ${product.termImages}">
+					<img th:src="@{${img}}" alt="약관 이미지" style="width: 100%;" />
+				</div>
 			</div>
 			<div style="text-align: center; margin-top: 20px;">
 				<button class="btn" onclick="closeTermsImgModal()">닫기</button>
 			</div>
 		</div>
 	</div>
-
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
 
 	<script>
   function openModal() {
