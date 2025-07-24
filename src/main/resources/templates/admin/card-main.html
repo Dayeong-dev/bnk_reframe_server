@@ -596,9 +596,11 @@
 .delete-btn:hover {
   background-color: #c82333;
 }
+
 #content-detail {
 padding-bottom: 50px;
 }
+
 </style>
 </head>
 <body>
@@ -770,6 +772,7 @@ padding-bottom: 50px;
 		
 		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
 		function showCardDetail(card) {
+
 		  let html = `<form id="cardDetailForm" class="styled-form"><div class="form-table">`;
 		
 		  const readonly = (label, key, val) => `
@@ -840,6 +843,7 @@ padding-bottom: 50px;
 		
 		  document.getElementById('content-detail').innerHTML = html;
 		}
+
 		
 		//============================================================
 		
@@ -931,6 +935,7 @@ padding-bottom: 50px;
 		
 		// 상품 등록 폼 열기
 		function showCardForm() {
+
 		  let html = `
 		    <form id="cardCreateForm" class="styled-form">
 		      <div class="form-table">
@@ -1003,6 +1008,7 @@ padding-bottom: 50px;
 		  `;
 		  document.getElementById("content-detail").innerHTML = html;
 		}
+
 
 
 		

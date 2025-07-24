@@ -812,6 +812,7 @@
 		
 		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
 		function showProductDetail(product) {
+
 		  let html = `<form id="productForm" class="styled-form"><div class="form-table">`;
 		
 		  const addField = (label, name, value) => `
@@ -881,6 +882,7 @@
 		  html += `</div></form>`;
 		  document.getElementById('content-detail').innerHTML = html;
 		}
+
 		
 		//============================================================
 			
@@ -1151,6 +1153,7 @@
 		// 상품 등록 폼 열기
 		
 		function showProductForm() {
+
 		  let html = `<form id="productCreateForm" class="styled-form"><div class="form-table">`;
 		
 		  const input = (label, name, type = "text", required = false) => `
@@ -1222,6 +1225,7 @@
 		  html += `</div></form>`;
 		  document.getElementById("content-detail").innerHTML = html;
 		}
+
 		
 		// 버튼 클릭시 폼 열기
 		function submitProductForm() {
