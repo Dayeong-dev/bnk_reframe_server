@@ -596,6 +596,9 @@
 .delete-btn:hover {
   background-color: #c82333;
 }
+#content-detail {
+padding-bottom: 50px;
+}
 </style>
 </head>
 <body>
@@ -767,73 +770,73 @@
 		
 		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
 		function showCardDetail(card) {
-  let html = `<form id="cardDetailForm" class="styled-form"><div class="form-table">`;
-
-  const readonly = (key, val) => `
-    <div class="form-item">
-      <label class="form-label">${key}</label>
-      <div class="form-input-wrapper"><input type="text" name="${key}" value="${val}" readonly></div>
-    </div>
-  `;
-
-  html += readonly("카드 ID", card.cardId);
-  html += readonly("카드명", card.name);
-  html += readonly("설명", card.description);
-  html += readonly("해시태그", card.tags);
-  html += readonly("대분류", card.categoryMajor);
-  html += readonly("상태", card.status);
-  html += readonly("연회비", card.annualFee);
-  html += readonly("적립/할인", card.pointInfo);
-  html += readonly("조회수", card.viewCount);
-
-  html += `
-    <div class="form-item" style="width:100%">
-      <label class="form-label">상품 안내</label>
-      <div class="form-input-wrapper"><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></div>
-    </div>
-  `;
-
-  html += `
-    <div class="form-item">
-      <label class="form-label">약관</label>
-      <div class="form-input-wrapper"><input type="text" name="termId" value="${card.termId}" /><button type="button" onclick="openModal('T')">검색</button></div>
-    </div>
-    <div class="form-item">
-      <label class="form-label">상품설명서</label>
-      <div class="form-input-wrapper"><input type="text" name="manualId" value="${card.manualId}" /><button type="button" onclick="openModal('M')">검색</button></div>
-    </div>
-  `;
-
-  if (card.subcategories && card.subcategories.length > 0) {
-    html += readonly("소분류", card.subcategories.join(', '));
-  }
-
-  html += `<div class="form-item service" style="width: 100%;"><label class="form-label">서비스</label>`;
-  html += `<button type="button" onclick="createBlock()">추가</button><br/>`;
-
-  for (let service of card.serviceList) {
-    html += `
-      <div>
-        <label>제목: <input type="text" name="title" value="${service.title}" class="title-input" /></label><br/>
-        <label>설명: <textarea name="desc" class="content-textarea">${service.desc}</textarea></label><br/>
-        <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
-      </div>
-    `;
-  }
-
-  html += `</div>`;
-
-  html += `
-    <div style="text-align:right; margin-top: 20px;">
-      <button type="button" class="search-btn" onclick="enableEditMode()">수정</button>
-      <button type="button" id="saveBtn" class="search-btn" onclick="saveProductChanges()" style="display:none;">저장</button>
-    </div>
-  `;
-
-  html += `</div></form>`;
-
-  document.getElementById('content-detail').innerHTML = html;
-}
+		  let html = `<form id="cardDetailForm" class="styled-form"><div class="form-table">`;
+		
+		  const readonly = (key, val) => `
+		    <div class="form-item">
+		      <label class="form-label">${key}</label>
+		      <div class="form-input-wrapper"><input type="text" name="${key}" value="${val}" readonly></div>
+		    </div>
+		  `;
+		
+		  html += readonly("cardId", card.cardId);
+		  html += readonly("name", card.name);
+		  html += readonly("description", card.description);
+		  html += readonly("tags", card.tags);
+		  html += readonly("categoryMajor", card.categoryMajor);
+		  html += readonly("status", card.status);
+		  html += readonly("annualFee", card.annualFee);
+		  html += readonly("pointInfo/할인", card.pointInfo);
+		  html += readonly("viewCount", card.viewCount);
+		
+		  html += `
+		    <div class="form-item" style="width:100%">
+		      <label class="form-label">상품 안내</label>
+		      <div class="form-input-wrapper"><textarea name="guideInfo" readonly>${card.guideInfo}</textarea></div>
+		    </div>
+		  `;
+		
+		  html += `
+		    <div class="form-item">
+		      <label class="form-label">약관</label>
+		      <div class="form-input-wrapper"><input type="text" name="termId" value="${card.termId}" /><button type="button" onclick="openModal('T')">검색</button></div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">상품설명서</label>
+		      <div class="form-input-wrapper"><input type="text" name="manualId" value="${card.manualId}" /><button type="button" onclick="openModal('M')">검색</button></div>
+		    </div>
+		  `;
+		
+		  if (card.subcategories && card.subcategories.length > 0) {
+		    html += readonly("소분류", card.subcategories.join(', '));
+		  }
+		
+		  html += `<div class="form-item service" style="width: 100%;"><label class="form-label">서비스</label>`;
+		  html += `<button type="button" onclick="createBlock()">추가</button><br/>`;
+		
+		  for (let service of card.serviceList || []) {
+		    html += `
+		      <div>
+		        <label>제목: <input type="text" name="title" value="${service.title}" class="title-input" /></label><br/>
+		        <label>설명: <textarea name="desc" class="content-textarea">${service.desc}</textarea></label><br/>
+		        <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>
+		      </div>
+		    `;
+		  }
+		
+		  html += `</div>`;
+		
+		  html += `
+		    <div style="text-align:right; margin-top: 20px;">
+		      <button type="button" class="search-btn" onclick="enableEditMode()">수정</button>
+		      <button type="button" id="saveBtn" class="search-btn" onclick="saveProductChanges()" style="display:none;">저장</button>
+		    </div>
+		  `;
+		
+		  html += `</div></form>`;
+		
+		  document.getElementById('content-detail').innerHTML = html;
+		}
 		
 		//============================================================
 		
@@ -925,72 +928,78 @@
 		
 		// 상품 등록 폼 열기
 		function showCardForm() {
-  let html = `
-    <form id="cardCreateForm" class="styled-form">
-      <div class="form-table">
-        <div class="form-item">
-          <label class="form-label">카드명</label>
-          <div class="form-input-wrapper"><input type="text" name="name" required /></div>
-        </div>
-        <div class="form-item">
-          <label class="form-label">설명</label>
-          <div class="form-input-wrapper"><input type="text" name="description" /></div>
-        </div>
-        <div class="form-item">
-          <label class="form-label">대분류</label>
-          <div class="form-input-wrapper">
-            <select name="categoryMajor">
-              <option value="P">개인</option>
-              <option value="C">기업</option>
-              <option value="K">체크</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-item">
-          <label class="form-label">연회비</label>
-          <div class="form-input-wrapper"><input type="text" name="annualFee" /></div>
-        </div>
-        <div class="form-item">
-          <label class="form-label">적립/할인</label>
-          <div class="form-input-wrapper"><input type="text" name="pointInfo" /></div>
-        </div>
-        <div class="form-item" style="width: 100%;">
-          <label class="form-label">상품 안내</label>
-          <div class="form-input-wrapper"><textarea name="guideInfo"></textarea></div>
-        </div>
-        <div class="form-item">
-          <label class="form-label">약관</label>
-          <div class="form-input-wrapper">
-            <input type="text" name="termId" />
-            <button type="button" onclick="openModal('T')">검색</button>
-          </div>
-        </div>
-        <div class="form-item">
-          <label class="form-label">상품설명서</label>
-          <div class="form-input-wrapper">
-            <input type="text" name="manualId" />
-            <button type="button" onclick="openModal('M')">검색</button>
-          </div>
-        </div>
-        <div class="form-item service" style="width: 100%;">
-          <label class="form-label">서비스</label>
-          <div class="form-input-wrapper">
-            <button type="button" onclick="createBlock()">추가</button>
-            <div class="detail-block">
-              <label>제목: <input type="text" name="title" class="title-input" /></label>
-              <label>설명: <textarea name="desc" class="content-textarea"></textarea></label>
-              <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
-            </div>
-          </div>
-        </div>
-        <div class="form-item" style="width: 100%; text-align: right;">
-          <button type="button" onclick="submitCardForm()" class="form-button">등록</button>
-        </div>
-      </div>
-    </form>
-  `;
-  document.getElementById("content-detail").innerHTML = html;
-}
+		  let html = `
+		    <form id="cardCreateForm" class="styled-form">
+		      <div class="form-table">
+		        <div class="form-item">
+		          <label class="form-label">카드명</label>
+		          <div class="form-input-wrapper"><input type="text" name="name" required /></div>
+		        </div>
+		        
+		        <div class="form-item">
+		          <label class="form-label">설명</label>
+		          <div class="form-input-wrapper"><input type="text" name="description" /></div>
+		        </div>
+		        
+		        <div class="form-item">
+		          <label class="form-label">해시태그</label>
+		          <div class="form-input-wrapper"><input type="text" name="tags" /></div>
+		        </div>
+		        <div class="form-item">
+		          <label class="form-label">대분류</label>
+		          <div class="form-input-wrapper">
+		            <select name="categoryMajor">
+		              <option value="P">개인</option>
+		              <option value="C">기업</option>
+		              <option value="K">체크</option>
+		            </select>
+		          </div>
+		        </div>
+		        <div class="form-item">
+		          <label class="form-label">연회비</label>
+		          <div class="form-input-wrapper"><input type="text" name="annualFee" /></div>
+		        </div>
+		        <div class="form-item">
+		          <label class="form-label">적립/할인</label>
+		          <div class="form-input-wrapper"><input type="text" name="pointInfo" /></div>
+		        </div>
+		        <div class="form-item" style="width: 100%;">
+		          <label class="form-label">상품 안내</label>
+		          <div class="form-input-wrapper"><textarea name="guideInfo"></textarea></div>
+		        </div>
+		        <div class="form-item">
+		          <label class="form-label">약관</label>
+		          <div class="form-input-wrapper">
+		            <input type="text" name="termId" />
+		            <button type="button" onclick="openModal('T')">검색</button>
+		          </div>
+		        </div>
+		        <div class="form-item">
+		          <label class="form-label">상품설명서</label>
+		          <div class="form-input-wrapper">
+		            <input type="text" name="manualId" />
+		            <button type="button" onclick="openModal('M')">검색</button>
+		          </div>
+		        </div>
+		        <div class="form-item service" style="width: 100%;">
+		          <label class="form-label">서비스</label>
+		          <div class="form-input-wrapper">
+		            <button type="button" onclick="createBlock()">추가</button>
+		            <div class="detail-block">
+		              <label>제목: <input type="text" name="title" class="title-input" /></label>
+		              <label>설명: <textarea name="desc" class="content-textarea"></textarea></label>
+		              <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
+		            </div>
+		          </div>
+		        </div>
+		        <div class="form-item" style="width: 100%; text-align: right;">
+		          <button type="button" onclick="submitCardForm()" class="form-button">등록</button>
+		        </div>
+		      </div>
+		    </form>
+		  `;
+		  document.getElementById("content-detail").innerHTML = html;
+		}
 
 
 		

@@ -67,6 +67,7 @@ public class AdminCardController {
 		// 카드 디테일 데이터 반환 
 		@GetMapping("/detail/{cardId}")
 		public CardDto getProductDetail(@PathVariable("cardId") Long cardId) {
+			System.out.println("카드아이디확인......."+cardId);
 			Card card = cardRepository.findById(cardId)
 					.orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. ID: " + cardId));
 
