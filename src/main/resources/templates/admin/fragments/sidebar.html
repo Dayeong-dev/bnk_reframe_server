@@ -8,24 +8,7 @@
 				<ul class="dropdown">
 					<li><a href="/admin/product-main">예/적금</a></li>
 					<li><a href="/admin/card-main">카드</a></li>
-				</ul>
-			</li>
-			
-			<li class="sidebar-list">
-				<a href="/admin/approval-box" class="sidebar-a">결재내역</a>
-				<ul class="dropdown">
-					<li><a href="/admin/approval-box"> 예/적금 </a></li>
-					<li><a href="/admin/card-approval-box"> 카드 </a></li>
-				</ul>
-			</li>
-			
-			<!-- <li class="sidebar-list">
-				<a href="/admin/user-main" class="sidebar-a">회원관리</a>
-				<ul class="dropdown">
-					<li><a href=""> 개인 </a></li>
-					<li><a href=""> 기업 </a></li>
-				</ul>
-			</li> -->
+
 			
 			
 			<li class="sidebar-list">
@@ -35,14 +18,6 @@
 					<li><a href="/admin/index3"> 1:1 문의사항 관리 </a></li>
 				</ul>
 			</li>
-			
-			<!-- <li class="sidebar-list">
-				<a href=" " class="sidebar-a">키워드관리</a>
-				<ul class="dropdown">
-					<li><a href=""> - </a></li>
-					<li><a href=""> - </a></li>
-				</ul>
-			</li> -->
 			
 			<li class="sidebar-list">
 				<a href="/admin/index4" class="sidebar-a">리뷰 관리</a>
@@ -66,16 +41,35 @@
 				</ul> -->
 			</li>
 			
-			<!-- 상위관리자 전용 메뉴 -->
-			<li th:if="${session.role == 'ROLE_SUPERADMIN'}" class="sidebar-list">
-				<a href="/superadmin/admin-manage" class="sidebar-a">관리자관리</a>
-				<!-- <ul class="dropdown">
-					<li><a href=""> 통계1 </a></li>
-					<li><a href="/admin/chart/2"> 통계2 </a></li>
-					<li><a href=""> 통계3 </a></li>
-					<li><a href=""> 통계4 </a></li>
-				</ul> -->
+			<li class="sidebar-list">
+				<a href="/admin/approval-box" class="sidebar-a">결재내역</a>
+				<ul class="dropdown">
+					<li><a href="/admin/approval-box"> 예/적금 </a></li>
+					<li><a href="/admin/card-approval-box"> 카드 </a></li>
+				</ul>
 			</li>
+			
+			<!-- <li class="sidebar-list">
+				<a href="/admin/user-main" class="sidebar-a">회원관리</a>
+				<ul class="dropdown">
+					<li><a href=""> 개인 </a></li>
+					<li><a href=""> 기업 </a></li>
+				</ul>
+			</li> -->
+			
+			
+			
+			
+			<!-- <li class="sidebar-list">
+				<a href=" " class="sidebar-a">키워드관리</a>
+				<ul class="dropdown">
+					<li><a href=""> - </a></li>
+					<li><a href=""> - </a></li>
+				</ul>
+			</li> -->
+			
+			
+			
 			<!-- 상위관리자 전용 메뉴 -->
 			<li th:if="${session.role == 'ROLE_SUPERADMIN'}" class="sidebar-list">
 				<a href="/superadmin/approval-main" class="sidebar-a ">결재함</a>
@@ -86,6 +80,19 @@
 					<li><a href=""> 통계4 </a></li> -->
 				</ul>
 			</li>
+			
+			
+			<!-- 상위관리자 전용 메뉴 -->
+			<li th:if="${session.role == 'ROLE_SUPERADMIN'}" class="sidebar-list">
+				<a href="/superadmin/admin-manage" class="sidebar-a">관리자관리</a>
+				<!-- <ul class="dropdown">
+					<li><a href=""> 통계1 </a></li>
+					<li><a href="/admin/chart/2"> 통계2 </a></li>
+					<li><a href=""> 통계3 </a></li>
+					<li><a href=""> 통계4 </a></li>
+				</ul> -->
+			</li>
+			
 		</ul>
 	</div>
 	

@@ -812,75 +812,77 @@
 		
 		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
 		function showProductDetail(product) {
-  let html = `<form id="productForm" class="styled-form"><div class="form-table">`;
 
-  const addField = (label, name, value) => `
-    <div class="form-item">
-      <label class="form-label">${label}</label>
-      <div class="form-input-wrapper"><input type="text" name="${name}" value="${value}" readonly /></div>
-    </div>`;
+		  let html = `<form id="productForm" class="styled-form"><div class="form-table">`;
+		
+		  const addField = (label, name, value) => `
+		    <div class="form-item">
+		      <label class="form-label">${label}</label>
+		      <div class="form-input-wrapper"><input type="text" name="${name}" value="${value}" readonly /></div>
+		    </div>`;
+		
+		  html += addField('상품 ID', 'productId', product.productId);
+		  html += addField('상품명', 'name', product.name);
+		  html += addField('카테고리', 'category', product.category);
+		  html += addField('추천 대상', 'purpose', product.purpose);
+		  html += addField('요약', 'summary', product.summary);
+		  html += addField('금리', 'rate', `${product.minRate}% ~ ${product.maxRate}%`);
+		  html += addField('가입 기간', 'period', `${product.period}개월`);
+		  html += addField('상태', 'status', product.status);
+		
+		  html += `
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상품 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalDetail" readonly>${product.modalDetail}</textarea></div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">금리 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalRate" readonly>${product.modalRate}</textarea></div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">약관</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="termId" value="${product.termId ?? ''}" />
+		        <button type="button" onclick="openModal('T')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">상품설명서</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="manualId" value="${product.manualId ?? ''}" />
+		        <button type="button" onclick="openModal('M')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상세 설명</label>
+		      <div class="form-input-wrapper service">
+		        <button type="button" onclick="createBlock()">추가</button><br/>
+		  `;
+		
+		  for (let item of product.productContentList) {
+		    html += `
+		      <div class="detail-block">
+		        <label>제목: <input type="text" name="title" value="${item.title}" class="title-input" /></label>
+		        <label>내용: <textarea name="content" class="content-textarea">${item.content}</textarea></label>
+		        <label>이미지 URL: <input type="text" name="imageURL" value="${item.imageURL}" class="image-input" /></label>
+		        <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
+		      </div>
+		    `;
+		  }
+		
+		  html += `</div></div>`;
+		
+		  html += `
+		    <div class="form-item" style="width: 100%; text-align: right;">
+		      <button type="button" onclick="enableEditMode()" class="form-button">수정</button>
+		      <button type="button" id="saveBtn" onclick="saveProductChanges()" class="form-button" style="display:none;">저장</button>
+		    </div>
+		  `;
+		
+		  html += `</div></form>`;
+		  document.getElementById('content-detail').innerHTML = html;
+		}
 
-  html += addField('상품 ID', 'productId', product.productId);
-  html += addField('상품명', 'name', product.name);
-  html += addField('카테고리', 'category', product.category);
-  html += addField('추천 대상', 'purpose', product.purpose);
-  html += addField('요약', 'summary', product.summary);
-  html += addField('금리', 'rate', `${product.minRate}% ~ ${product.maxRate}%`);
-  html += addField('가입 기간', 'period', `${product.period}개월`);
-  html += addField('상태', 'status', product.status);
-
-  html += `
-    <div class="form-item" style="width: 100%;">
-      <label class="form-label">상품 안내</label>
-      <div class="form-input-wrapper"><textarea name="modalDetail" readonly>${product.modalDetail}</textarea></div>
-    </div>
-    <div class="form-item" style="width: 100%;">
-      <label class="form-label">금리 안내</label>
-      <div class="form-input-wrapper"><textarea name="modalRate" readonly>${product.modalRate}</textarea></div>
-    </div>
-    <div class="form-item">
-      <label class="form-label">약관</label>
-      <div class="form-input-wrapper">
-        <input type="text" name="termId" value="${product.termId ?? ''}" />
-        <button type="button" onclick="openModal('T')">검색</button>
-      </div>
-    </div>
-    <div class="form-item">
-      <label class="form-label">상품설명서</label>
-      <div class="form-input-wrapper">
-        <input type="text" name="manualId" value="${product.manualId ?? ''}" />
-        <button type="button" onclick="openModal('M')">검색</button>
-      </div>
-    </div>
-    <div class="form-item" style="width: 100%;">
-      <label class="form-label">상세 설명</label>
-      <div class="form-input-wrapper service">
-        <button type="button" onclick="createBlock()">추가</button><br/>
-  `;
-
-  for (let item of product.productContentList) {
-    html += `
-      <div class="detail-block">
-        <label>제목: <input type="text" name="title" value="${item.title}" class="title-input" /></label>
-        <label>내용: <textarea name="content" class="content-textarea">${item.content}</textarea></label>
-        <label>이미지 URL: <input type="text" name="imageURL" value="${item.imageURL}" class="image-input" /></label>
-        <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
-      </div>
-    `;
-  }
-
-  html += `</div></div>`;
-
-  html += `
-    <div class="form-item" style="width: 100%; text-align: right;">
-      <button type="button" onclick="enableEditMode()" class="form-button">수정</button>
-      <button type="button" id="saveBtn" onclick="saveProductChanges()" class="form-button" style="display:none;">저장</button>
-    </div>
-  `;
-
-  html += `</div></form>`;
-  document.getElementById('content-detail').innerHTML = html;
-}
 		
 		//============================================================
 			
@@ -1151,77 +1153,79 @@
 		// 상품 등록 폼 열기
 		
 		function showProductForm() {
-  let html = `<form id="productCreateForm" class="styled-form"><div class="form-table">`;
 
-  const input = (label, name, type = "text", required = false) => `
-    <div class="form-item">
-      <label class="form-label">${label}</label>
-      <div class="form-input-wrapper">
-        <input type="${type}" name="${name}" ${required ? "required" : ""} />
-      </div>
-    </div>`;
+		  let html = `<form id="productCreateForm" class="styled-form"><div class="form-table">`;
+		
+		  const input = (label, name, type = "text", required = false) => `
+		    <div class="form-item">
+		      <label class="form-label">${label}</label>
+		      <div class="form-input-wrapper">
+		        <input type="${type}" name="${name}" ${required ? "required" : ""} />
+		      </div>
+		    </div>`;
+		
+		  html += input('상품명', 'name', 'text', true);
+		  html += `
+		    <div class="form-item">
+		      <label class="form-label">유형</label>
+		      <div class="form-input-wrapper">
+		        <select name="category">
+		          <option value="예금">예금</option>
+		          <option value="적금">적금</option>
+		          <option value="입출금자유">입출금자유</option>
+		        </select>
+		      </div>
+		    </div>`;
+		  html += input('추천 대상', 'purpose');
+		  html += input('요약', 'summary');
+		  html += input('최소 금리', 'minRate', 'number', true);
+		  html += input('최대 금리', 'maxRate', 'number', true);
+		  html += input('가입 기간(개월)', 'period', 'number', true);
+		
+		  html += `
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상품 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalDetail"></textarea></div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">금리 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalRate"></textarea></div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">약관</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="termId" />
+		        <button type="button" onclick="openModal('T')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">상품설명서</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="manualId" />
+		        <button type="button" onclick="openModal('M')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상세 설명</label>
+		      <div class="form-input-wrapper service">
+		        <button type="button" onclick="createBlock()">추가</button><br/>
+		        <div class="detail-block">
+		          <label>제목: <input type="text" name="title" class="title-input" /></label>
+		          <label>내용: <textarea name="content" class="content-textarea"></textarea></label>
+		          <label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
+		          <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
+		        </div>
+		      </div>
+		    </div>
+		    <div class="form-item" style="width: 100%; text-align: right;">
+		      <button type="button" onclick="submitProductForm()" class="form-button">등록</button>
+		    </div>
+		  `;
+		
+		  html += `</div></form>`;
+		  document.getElementById("content-detail").innerHTML = html;
+		}
 
-  html += input('상품명', 'name', 'text', true);
-  html += `
-    <div class="form-item">
-      <label class="form-label">유형</label>
-      <div class="form-input-wrapper">
-        <select name="category">
-          <option value="예금">예금</option>
-          <option value="적금">적금</option>
-          <option value="입출금자유">입출금자유</option>
-        </select>
-      </div>
-    </div>`;
-  html += input('추천 대상', 'purpose');
-  html += input('요약', 'summary');
-  html += input('최소 금리', 'minRate', 'number', true);
-  html += input('최대 금리', 'maxRate', 'number', true);
-  html += input('가입 기간(개월)', 'period', 'number', true);
-
-  html += `
-    <div class="form-item" style="width: 100%;">
-      <label class="form-label">상품 안내</label>
-      <div class="form-input-wrapper"><textarea name="modalDetail"></textarea></div>
-    </div>
-    <div class="form-item" style="width: 100%;">
-      <label class="form-label">금리 안내</label>
-      <div class="form-input-wrapper"><textarea name="modalRate"></textarea></div>
-    </div>
-    <div class="form-item">
-      <label class="form-label">약관</label>
-      <div class="form-input-wrapper">
-        <input type="text" name="termId" />
-        <button type="button" onclick="openModal('T')">검색</button>
-      </div>
-    </div>
-    <div class="form-item">
-      <label class="form-label">상품설명서</label>
-      <div class="form-input-wrapper">
-        <input type="text" name="manualId" />
-        <button type="button" onclick="openModal('M')">검색</button>
-      </div>
-    </div>
-    <div class="form-item" style="width: 100%;">
-      <label class="form-label">상세 설명</label>
-      <div class="form-input-wrapper service">
-        <button type="button" onclick="createBlock()">추가</button><br/>
-        <div class="detail-block">
-          <label>제목: <input type="text" name="title" class="title-input" /></label>
-          <label>내용: <textarea name="content" class="content-textarea"></textarea></label>
-          <label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
-          <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
-        </div>
-      </div>
-    </div>
-    <div class="form-item" style="width: 100%; text-align: right;">
-      <button type="button" onclick="submitProductForm()" class="form-button">등록</button>
-    </div>
-  `;
-
-  html += `</div></form>`;
-  document.getElementById("content-detail").innerHTML = html;
-}
 		
 		// 버튼 클릭시 폼 열기
 		function submitProductForm() {
