@@ -382,7 +382,6 @@ form {
 /* ============================== */
 #container {
 	padding-top: 5rem;
-	margin-left: 200px; /* sidebar 너비만큼 띄우기 */
 }
 
 .content-wrapper {
