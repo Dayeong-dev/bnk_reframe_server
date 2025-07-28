@@ -1,0 +1,401 @@
+@charset "UTF-8";
+
+:root {
+	--primary-color: #fe504f;
+	--secondary-color: #e04444;
+}
+
+@font-face {
+    font-family: 'BNKGothic';
+    src: url('/fonts/BNKGothic-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BNKGothic';
+    src: url('/fonts/BNKGothic-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+/* ============================== */
+/* 기본 스타일 제거                   */
+/* ============================== */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    font-family: 'BNKGothic', sans-serif;
+    font-weight: 400;
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+
+/* ============================== */
+/* 메인 헤더                        */
+/* ============================== */
+
+header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+    z-index: 15;
+    background-color: #fff;
+}
+
+header #main-header .logo img {
+	height: 5rem;
+}
+
+header #main-header {
+	width: 100%;
+	height: 5rem;
+	
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	column-gap: 2rem;
+	padding: 0rem 2rem;
+}
+
+header #main-header ul {
+    display: flex;
+    column-gap: 2rem;
+}
+
+header #main-header .left-group {
+	display: flex;
+	align-items: center;
+	column-gap: 4rem;
+}
+
+header #main-header .menu ul {
+    height: 5rem;
+    font-weight: bold;
+}
+
+header #main-header .menu li {
+    display: flex;
+	align-items: center;
+}
+
+header #main-header .login-menu {
+	font-size: 0.75rem;
+	color: #777;
+}
+
+header #main-header a:hover {
+	text-decoration: underline;
+}
+
+/* ============================== */
+/* 서브 헤더                        */
+/* ============================== */
+header #sub-header {
+	width: 100%;
+    height: 0rem;
+    position: absolute;
+    overflow: hidden;
+    transition: height 0.4s ease;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+header #sub-header .content-wrapper {
+	display: flex;
+    column-gap: 2rem;
+    padding: 0rem 4rem;
+}
+
+header #sub-header .sub-menu {
+	width: 12.5rem;
+	color: #000;
+	font-size: 0.9rem;
+	text-align: left;
+	line-height: 200%;
+	border-right: 1px solid #ddd;
+}
+
+header #sub-header .sub-menu .title {
+	color: #777;
+	font-size: 0.75rem;
+	font-weight: bold;
+}
+
+header #sub-header.active {
+    height: 15rem;
+}
+
+header #sub-header a:hover {
+	color: var(--primary-color);
+}
+
+header #sub-header .recent-views {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+header #sub-header .recent-views h4 {
+	margin-bottom: 0.5rem;
+}
+
+header #sub-header .recent-views ul {
+	height: 11rem;
+	overflow-y: auto;
+	padding-right: 1rem;
+}
+
+header #sub-header .recent-views li {
+	margin-bottom: 0.5rem;
+}
+
+header #sub-header .recent-views li a {
+	word-break: keep-all;
+}
+
+/* ============================== */
+/* 푸터                            */
+/* ============================== */
+div#footer {
+	width: 100vw;
+	height: 4rem;
+	border-top: 1px solid #ddd;
+	margin-top: 2rem;
+}
+
+footer {
+	height: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0rem 2rem;
+}
+
+footer p {
+	color: #aaa;
+	font-size: 0.65rem;
+	font-weight: bold;
+}
+
+/* ============================== */
+/* 사이드 메뉴(플로팅 버튼)            */
+/* ============================== */
+
+/* 플로팅 버튼 영역 */
+#side-menu {
+	position: fixed;
+	bottom: 2rem;
+	right: 2rem;
+	z-index: 100;
+}
+
+/* 메인 버튼 */
+#side-menu .fab-main {
+	width: 4rem;
+	height: 4rem;
+	border-radius: 50%;
+	background-color: var(--primary-color);
+	color: white;
+	border: none;
+	font-size: 1.5rem;
+	cursor: pointer;
+	box-shadow: 0px 0px 4px #aaa;
+	transition: all 0.3s ease;
+}
+
+/* 서브 버튼 */
+#side-menu .fab-sub {
+  	width: 3rem;
+	height: 3rem;
+	position: absolute;
+	right: 0.5rem;
+	border-radius: 50%;
+	background-color: #fff;
+	bottom: 0;
+	opacity: 0;
+  	visibility: hidden;
+  	transform: translateY(0);
+  	transition: all 0.3s ease;
+  	
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
+  	
+  	box-shadow: 0px 0px 6px #aaa;
+}
+
+#side-menu .fab-sub .icon {
+	width: 1.5rem;
+	height: 1.5rem;
+}
+
+#side-menu.open .fab-main {
+	transform: rotate(45deg);
+}
+
+#side-menu.open .fab-sub:nth-child(1) {
+	transform: translateY(-5rem);
+	opacity: 1;
+	visibility: visible;
+}
+
+#side-menu.open .fab-sub:nth-child(2) {
+	transform: translateY(-9rem);
+	opacity: 1;
+	visibility: visible;
+}
+
+#side-menu.open .fab-sub:nth-child(3) {
+	transform: translateY(-13rem);
+	opacity: 1;
+	visibility: visible;
+}
+
+#side-menu .fab-sub button {
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	background-color: #72D48F;
+	color: white;
+	border: none;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+/* 툴팁 */
+#side-menu .fab-sub .tooltip {
+	position: absolute;
+	right: 3.5rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background-color: rgba(51, 51, 51, 0.9);
+	color: white;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 0.8rem;
+	white-space: nowrap;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.2s ease;
+	pointer-events: none;
+}
+
+#side-menu .fab-sub:hover .tooltip {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* #side-menu .fab-sub img {
+  filter: brightness(0) invert(1);
+} */
+
+
+/* ============================== */
+/* 글로벌 모달(카드 비교함)            */
+/* ============================== */
+#global-modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	min-height: 100vh;
+	background-color: rgba(0, 0, 0, 0.4);
+	z-index: 50;
+}
+
+#global-modal .modal-wrapper {
+	width: 50rem;
+	max-width: 80%;
+	height: 80%;
+	
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #fff;
+	border-radius: 1rem;
+	padding: 2rem;
+	
+	display: flex;
+	flex-direction: column;
+}
+
+#global-modal .modal-wrapper .modal-content {
+	flex: 1;
+	width: 100%;
+	overflow-y: auto;
+	padding: 1rem 0rem;
+}
+
+#global-modal .modal-close {
+	position: fixed;
+	top: 1rem;
+	right: 1rem;
+	cursor: pointer;
+}
+
+/* ============================== */
+/* 공통 요소                        */
+/* ============================== */
+#container > section {
+    width: 100%;
+    min-height: calc(100vh - 5rem);
+    padding-top: 2rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#container > section > h2 {
+    margin: 1.5rem 0;
+}
+
+::placeholder {
+    color: #aaa;
+}
+
+/* ============================== */
+/* 폼 요소                         */
+/* ============================== */
+form {
+    text-align: center;
+}
+
+/* ============================== */
+/* 공통 클래스                      */
+/* ============================== */
+#container {
+	padding-top: 5rem;
+}
+
+.content-wrapper {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.error {
+	color: var(--primary-color);
+	margin: 0rem 1rem;
+}
+
+.icon {
+	width: 2rem;
+	height: 2rem;
+	cursor: pointer;
+}

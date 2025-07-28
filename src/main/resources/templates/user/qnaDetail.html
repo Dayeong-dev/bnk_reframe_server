@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>1:1 문의 상세</title>
+<link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="/css/user.css" />
+</head>
+<body>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+
+	<div id="container">
+		<!-- ✅ section 컨테이너 안으로 제목과 상세 테이블 넣기 -->
+		<section class="qna-section">
+			<h2 class="page-title">1:1 문의 상세</h2>
+
+			<div class="qna-detail-container">
+
+				<table class="qna-detail-table">
+					<tr>
+						<th>번호</th>
+						<td th:text="${qna.qnaId}">1</td>
+					</tr>
+					<tr>
+						<th>제목</th>
+						<td th:text="${qna.title}">문의 제목입니다</td>
+					</tr>
+					<tr>
+						<th>작성자</th>
+						<td th:text="${qna.user.username}">사용자이름</td>
+					</tr>
+					<tr>
+						<th>작성일</th>
+						<td
+							th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}">2025-07-15</td>
+					</tr>
+					<tr>
+						<th>카테고리</th>
+						<td th:text="${qna.category}">예금</td>
+					</tr>
+					<tr>
+						<th>상태</th>
+						<td th:text="${qna.status}">답변대기</td>
+					</tr>
+					<tr>
+						<th>내용</th>
+						<td><div class="content" th:text="${qna.content}">문의
+								내용입니다</div></td>
+					</tr>
+					<tr>
+						<th>답변</th>
+						<td><div class="answer" th:text="${qna.answer}">관리자
+								답변입니다</div></td>
+					</tr>
+				</table>
+
+				<div class="back-button-wrapper">
+					<a href="/qna/qna" class="btn-back">목록으로 돌아가기</a>
+				</div>
+
+			</div>
+		</section>
+	</div>
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
+</body>
+</html>

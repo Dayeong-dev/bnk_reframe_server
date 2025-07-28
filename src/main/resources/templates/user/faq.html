@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자주 묻는 질문</title>
+<link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="/css/user.css" />
+<link rel="stylesheet" href="/css/faq.css" />
+</head>
+<body>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+
+	<div id="container">
+		<section>
+			<div
+				style="max-width: 1000px; margin: 0rem auto 1rem; padding: 0 1rem;">
+				<h1
+					style="text-align: center; font-size: 2rem; margin-bottom: 1rem; font-family: 'BNKGothic', sans-serif;">
+					자주 묻는 질문</h1>
+				<hr>
+				<p style="text-align: center; color: #555; margin: 0.5rem 0;">자주
+					문의하시는 상담 내용을 모았습니다.</p>
+				<p style="text-align: center; color: #555; margin: 0.5rem 0;">
+					해결되지 않는 문의는 1:1 문의나 챗봇을 이용해 주세요.</p>
+			</div>
+
+			<div class="faq-container">
+
+
+				<!-- 검색 -->
+				<div class="faq-search">
+					<input type="text" id="search-input" placeholder="검색어를 입력하세요..."
+						list="autocomplete-list">
+					<datalist id="autocomplete-list"></datalist>
+				</div>
+
+				<!-- 카테고리 -->
+				<div id="category-buttons"></div>
+
+				<!-- 리스트 -->
+				<div id="faq-list" th:if="${faqlist != null}">
+					<table>
+						<thead>
+							<tr>
+								<th>글번호</th>
+								<th>구분</th>
+								<th>제목</th>
+							</tr>
+						</thead>
+						<tbody id="faq-tbody">
+							<tr th:each="faq, iterStat : ${faqlist}"
+								th:attr="data-index=${iterStat.index}, data-faq-id=${faq.faqId}">
+
+								<td th:text="${faq.faqId}"></td>
+								<td th:text="${faq.category}"></td>
+								<td th:text="${faq.question}"></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- 페이지네이션 -->
+					<div class="pagination" id="pagination"></div>
+				</div>
+			</div>
+		</section>
+	</div>
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
+	<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const rowsPerPage = 10;
+  const rows = Array.from(document.querySelectorAll("#faq-tbody tr"));
+  const pagination = document.getElementById("pagination");
+  const searchInput = document.getElementById("search-input");
+  const datalist = document.getElementById("autocomplete-list");
+  const categoryContainer = document.getElementById("category-buttons");
+
+  let filteredRows = [...rows];
+  let currentCategory = "전체";
+
+  function showPage(page, list = filteredRows) {
+    list.forEach((row, index) => {
+      row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+    });
+  }
+
+  function renderPagination(list = filteredRows) {
+    pagination.innerHTML = "";
+    const pageCount = Math.ceil(list.length / rowsPerPage);
+
+    for (let i = 0; i < pageCount; i++) {
+      const button = document.createElement("button");
+      button.textContent = i + 1;
+      if (i === 0) button.classList.add("active");
+
+      button.addEventListener("click", () => {
+        pagination.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        showPage(i, list);
+      });
+
+      pagination.appendChild(button);
+    }
+
+    showPage(0, list);
+  }
+
+  function updateAutocompleteOptions() {
+    const questions = rows.map(row => row.querySelector("td:nth-child(3)").textContent.trim());
+    datalist.innerHTML = "";
+    [...new Set(questions)].forEach(text => {
+      const option = document.createElement("option");
+      option.value = text;
+      datalist.appendChild(option);
+    });
+  }
+
+  function filterRows() {
+    const keyword = searchInput.value.trim().toLowerCase();
+    filteredRows = rows.filter(row => {
+      const question = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+      const category = row.querySelector("td:nth-child(2)").textContent.trim();
+      const matchKeyword = question.includes(keyword);
+      const matchCategory = currentCategory === "전체" || category === currentCategory;
+      return matchKeyword && matchCategory;
+    });
+
+    rows.forEach(row => row.classList.add("hidden"));
+    renderPagination(filteredRows);
+  }
+
+  // 검색어 자동완성 및 필터링
+  searchInput.addEventListener("input", () => {
+    const keyword = searchInput.value.trim().toLowerCase();
+    const matchedQuestions = rows
+      .map(row => row.querySelector("td:nth-child(3)").textContent.trim())
+      .filter(q => q.toLowerCase().includes(keyword));
+
+    datalist.innerHTML = "";
+    [...new Set(matchedQuestions)].slice(0, 10).forEach(text => {
+      const option = document.createElement("option");
+      option.value = text;
+      datalist.appendChild(option);
+    });
+
+    filterRows();
+  });
+
+  // 카테고리 버튼 생성
+  const categories = [...new Set(rows.map(row => row.querySelector("td:nth-child(2)").textContent.trim()))];
+  ["전체", ...categories].forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "category-btn";
+    btn.dataset.category = cat;
+    btn.textContent = cat;
+    if (cat === "전체") btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentCategory = cat;
+      filterRows();
+    });
+    categoryContainer.appendChild(btn);
+  });
+
+  // ✅ 행 클릭 시 상세 페이지로 이동
+  rows.forEach(row => {
+    const faqId = row.getAttribute("data-faq-id");
+    row.style.cursor = "pointer";
+    row.addEventListener("click", () => {
+      window.location.href = `/faq/detail/${faqId}`;
+    });
+  });
+
+  // 초기 렌더링
+  updateAutocompleteOptions();
+  renderPagination();
+});
+</script>
+
+
+</body>
+</html>

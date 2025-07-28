@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>약관/상품설명서 등록</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<script th:src="@{/admin/sidebar.js}"></script>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 14px;
+        background-color: white;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    table th,
+    table td {
+        border: 1px solid #dee2e6;
+        padding: 12px 16px;
+        text-align: left;
+    }
+
+    table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    input[type="text"],
+    input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    h2 {
+        color: #212529;
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #dee2e6;
+    }
+</style>
+</head>
+<body>
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+        <!-- 본문 -->
+        <div class="content">
+            <h2>약관/상품설명서 등록</h2>
+            <form method="POST" action="/admin/document/upload" enctype="multipart/form-data">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>문서 유형</th>
+                            <td>
+                                <input id="term" type="radio" name="documentType" value="T" checked/>
+                                <label for="term">약관</label>
+                                <input id="manual" type="radio" name="documentType" value="M" />
+                                <label for="manual">상품설명서</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>상품 유형</th>
+                            <td>
+                                <input id="deposit" type="radio" name="productType" value="예적금" checked/>
+                                <label for="deposit">예적금</label>
+                                <input id="card" type="radio" name="productType" value="카드" />
+                                <label for="card">카드</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>제목</th>
+                            <td>
+                                <input type="text" name="title" placeholder="제목을 입력해주세요." required />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>업로드 파일</th>
+                            <td>
+                                <input type="file" name="file" accept="application/pdf" required />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td>
+                                <input type="submit" value="등록" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+            <p th:if="${msg != null}" th:text="${msg}"></p>
+        </div>
+    </div>
+</body>
+</html>

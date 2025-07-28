@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>1:1 문의</title>
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/user.css" />
+  <link rel="stylesheet" href="/css/qna.css" />
+</head>
+<body>
+  	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+
+	<div id="container">
+	<section class="qna-section">
+	    <h2 class="page-title">1:1 문의</h2>
+	    <div class="qna-tabs">
+	      <button id="tab-form" class="active" onclick="showForm()">등록하기</button>
+	      <button id="tab-list" onclick="showList()">조회하기</button>
+	    </div>
+	
+	    <!-- 등록 폼 -->
+	    <div id="qna-form" class="qna-form-box">
+	      <form method="post" action="/qna/qnaRegist">
+	        <div class="form-row">
+	          <label for="category">문의 유형</label>
+	          <select name="category" id="category" required>
+	            <option value="">선택하세요</option>
+	            <option value="예금">예적금</option>
+	            <option value="카드">카드</option>
+	            <option value="기타">기타</option>
+	          </select>
+	        </div>
+	
+	        <div class="form-row">
+	          <label for="title">제목</label>
+	          <input type="text" id="title" name="title" placeholder="제목을 입력해 주세요" required />
+	        </div>
+	
+	        <div class="form-row">
+	          <label for="content">내용</label>
+	          <textarea name="content" id="content" rows="15" placeholder="내용을 입력해 주세요" required></textarea>
+	        </div>
+	
+	        <div class="form-buttons">
+	          <button type="button" class="btn-cancel" onclick="showList()">취소하기</button>
+	          <button type="submit" class="btn-submit">문의하기</button>
+	        </div>
+	      </form>
+	    </div>
+	
+	    <!-- 문의 목록 -->
+	    <div id="qna-list" class="qna-list-box" style="display:none;" th:if="${qnalist != null}">
+	      <div id="category-buttons"></div>
+	
+	      <table>
+	        <thead>
+	          <tr>
+	            <th>글번호</th>
+	            <th>제목</th>
+	            <th>작성자</th>
+	            <th>작성일</th>
+	            <th>구분</th>
+	            <th>상태</th>
+	          </tr>
+	        </thead>
+	        <tbody id="qna-tbody">
+	          <tr th:each="qna : ${qnalist}" th:attr="data-qna-id=${qna.qnaId}">
+	            <td th:text="${qna.qnaId}"></td>
+	            <td th:text="${qna.title}"></td>
+	            <td th:text="${qna.user.username}"></td>
+	            <td th:text="${#temporals.format(qna.regdate, 'yyyy-MM-dd HH:mm')}"></td>
+	            <td th:text="${qna.category}"></td>
+	            <td th:text="${qna.status}"></td>
+	          </tr>
+	        </tbody>
+	      </table>
+	      <div class="pagination" id="pagination"></div>
+	    </div>
+	  </section>
+	</div>
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
+  <script>
+    const rowsPerPage = 10;
+    let currentCategory = "전체";
+    let currentPage = 0;
+    let allRows = [];
+    let filteredRows = [];
+
+    function showForm() {
+      document.getElementById('qna-form').style.display = 'block';
+      document.getElementById('qna-list').style.display = 'none';
+      document.getElementById('tab-form').classList.add('active');
+      document.getElementById('tab-list').classList.remove('active');
+    }
+
+    function showList() {
+    	  document.getElementById('qna-form').style.display = 'none';
+    	  document.getElementById('qna-list').style.display = 'block';
+    	  document.getElementById('tab-form').classList.remove('active');
+    	  document.getElementById('tab-list').classList.add('active');
+
+    	  // 모든 행 새로 수집
+    	  allRows = Array.from(document.querySelectorAll("#qna-tbody tr"));
+
+    	  // ✅ 각 행 클릭 이벤트 추가
+    	  allRows.forEach(row => {
+    	    const qnaId = row.getAttribute("data-qna-id");
+    	    row.style.cursor = "pointer";
+    	    row.addEventListener("click", () => {
+    	      window.location.href = `/qna/detail/${qnaId}`;
+    	    });
+    	  });
+
+    	  // 필터 초기화 및 실행
+    	  currentCategory = "전체";
+    	  initCategoryButtons();
+    	  filterAndRender();
+    	}
+
+
+
+    function initCategoryButtons() {
+      const container = document.getElementById("category-buttons");
+      const categories = [...new Set(allRows.map(row => row.querySelector("td:nth-child(5)").textContent.trim()))];
+      container.innerHTML = "";
+      ["전체", ...categories].forEach(cat => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        btn.dataset.category = cat;
+        if (cat === currentCategory) btn.classList.add("active");
+        btn.onclick = () => {
+          currentCategory = cat;
+          container.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          filterAndRender();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function filterAndRender() {
+      const pagination = document.getElementById("pagination");
+
+      filteredRows = allRows.filter(row => {
+        const category = row.querySelector("td:nth-child(5)").textContent.trim();
+        return currentCategory === "전체" || category === currentCategory;
+      });
+
+      renderPagination(pagination);
+    }
+
+    function renderPagination(pagination) {
+      const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
+      pagination.innerHTML = "";
+
+      function showPage(page) {
+        allRows.forEach(row => row.classList.add("hidden"));
+        filteredRows.forEach((row, index) => {
+          row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+        });
+        currentPage = page;
+      }
+
+      for (let i = 0; i < pageCount; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i + 1;
+        if (i === 0) btn.classList.add("active");
+        btn.onclick = () => {
+          document.querySelectorAll(".pagination button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          showPage(i);
+        };
+        pagination.appendChild(btn);
+      }
+
+      showPage(0);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      showForm();
+      const success = /*[[${qnaSuccess != null and qnaSuccess}]]*/ false;
+      if (success) {
+        alert("등록되었습니다!");
+        showList();
+      }
+    });
+  </script>
+</body>
+</html>

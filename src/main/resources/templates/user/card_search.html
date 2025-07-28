@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<h1 th:text="'검색 결과: ' + ${keyword}"></h1>
+
+<div th:if="${cards.isEmpty()}">
+  <p>검색 결과가 없습니다.</p>
+</div>
+
+<div th:unless="${cards.isEmpty()}">
+  <ul>
+    <li th:each="card : ${cards}">
+      <a th:href="@{'/card/detail/' + ${card.cardId}}">
+        <span th:text="${card.name}"></span>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<!-- 페이지네이션 예시 -->
+<div>
+  <span th:if="${cards.hasPrevious()}">
+    <a th:href="@{|/card/search?keyword=${keyword}&page=${cards.number - 1}|}">이전</a>
+  </span>
+
+  <span th:if="${cards.hasNext()}">
+    <a th:href="@{|/card/search?keyword=${keyword}&page=${cards.number + 1}|}">다음</a>
+  </span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<header xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="headerFragment">
+	<div class="content-wrapper">
+		<div id="main-header">
+			<div class="left-group">
+				<div class="logo"><a href="/"><img src="/images/logo/bnk_logo.png" /></a></div>
+				<div class="menu">
+					<ul>
+						<li><a href="/deposit/main">예적금</a></li>
+						<li><a href="/card/main">카드</a></li>
+						<li><a href="/faq/faq">고객센터</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="right-group">
+				<div class="login-menu" sec:authorize="isAnonymous()">
+					<ul>
+						<li><a href="/signin/form">로그인</a></li>
+						<li><a href="/signup">회원가입</a></li>
+					</ul>
+				</div>
+				<div class="login-menu" sec:authorize="isAuthenticated()">
+					<ul>
+						<li><a href="/signout">로그아웃</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="sub-header">
+		<div class="content-wrapper">
+			<ul class="sub-menu">
+				<li class="title">예적금</li>
+				<li><a href="/deposit/list">전체 상품</a></li>
+				<li><a href="/deposit/detail/69">오징어 모임통장 시즌2</a></li>
+				<li><a href="/deposit/detail/70">롯데자이언츠 승리기원적금</a></li>
+				<li><a href="/deposit/detail/73">매일출석적금</a></li>
+				<li><a href="/deposit/detail/6">아이사랑 적금</a></li>
+				<li><a href="/deposit/detail/7">아기천사 적금</a></li>
+			</ul>
+			<ul class="sub-menu">
+				<li class="title">카드</li>
+				<li><a href="/card/list">전체 상품</a></li>
+				<li><a href="/card/list?categoryMajor=P">신용카드</a></li>
+				<li><a href="/card/list?categoryMajor=C">기업카드</a></li>
+				<li><a href="/card/list?categoryMajor=K">체크카드</a></li>
+			</ul>
+			<ul class="sub-menu">
+				<li class="title">고객센터</li>
+				<li><a href="/qna/qna">1:1 문의</a></li>
+				<li><a href="/faq/faq">자주 묻는 질문</a></li>
+			</ul>
+			<div class="recent-views">
+				<h4>최근 본 상품</h4>
+				<ul th:if="${recentViewList != null and not #lists.isEmpty(recentViewList)}">
+					<li th:each="recentView : ${recentViewList}">
+						<a th:href="${'/' + recentView.type + '/detail/' + recentView.id}" th:text="${recentView.name}"></a>
+					</li>
+				</ul>
+			</div>
+	    </div>
+	</div>
+    <script>
+    	const $menu = document.querySelector("#main-header .menu");
+    	const $subHeader = document.getElementById("sub-header");
+    	
+    	$menu.addEventListener("mouseenter", e => {
+			$subHeader.classList.add("active");
+		});
+		
+		$menu.addEventListener("mouseleave", e => {
+			$subHeader.classList.remove("active");
+		});
+		
+		$subHeader.addEventListener("mouseenter", e => {
+			$subHeader.classList.add("active");
+		});
+		
+		$subHeader.addEventListener("mouseleave", e => {
+			$subHeader.classList.remove("active");
+		});
+    </script>
+</header>

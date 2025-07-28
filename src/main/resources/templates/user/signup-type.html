@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+<link rel="stylesheet" href="/css/common.css"></link>
+<link rel="stylesheet" href="/css/user.css"></link>
+</head>
+<body>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	
+	<div id="container">
+		<section id="signup-type">
+			<h2>회원가입 유형 선택</h2>
+			<div class="btn-list">
+				<a href="/signup/personal">
+					<img class="icon" src="/icons/personal.png" alt="개인" />
+					<span>개인</span>
+				</a>
+				<a href="/signup/corporate/verify">
+					<img class="icon" src="/icons/corporation.png" alt="기업" />
+					<span>기업</span>
+				</a>
+			</div>
+		</section>
+	</div>
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
+</body>
+</html>

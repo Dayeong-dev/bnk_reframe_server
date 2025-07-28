@@ -1,0 +1,150 @@
+<div id="side-menu" xmlns:th="http://www.thymeleaf.org" th:fragment="sideMenuFragment">
+	<div id="side-menu">
+	    <!-- 서브 버튼 -->
+	    <div class="fab-sub" onclick="btn1()">
+			<img class="icon" src="/icons/customer.png" alt="아이콘" />
+			<span class="tooltip">고객센터</span>
+	    </div>
+	    <div class="fab-sub" onclick="btn2()">
+			<img class="icon" src="/icons/card.png" alt="아이콘" />
+			<span class="tooltip">카드 비교함</span>
+	    </div>
+	    <div class="fab-sub" onclick="btn3()">
+			<img class="icon" src="/icons/chatbot.png" alt="아이콘" />
+			<span class="tooltip">챗봇 문의</span>
+	    </div>
+	
+	    <!-- 메인 플로팅 버튼 -->
+	    <button class="fab-main" onclick="toggleFab()">+</button>
+	</div>
+	<script>
+		function toggleFab() {
+			document.getElementById('side-menu').classList.toggle('open');
+	    }
+
+		function btn1() {	// 고객센터
+			location.href = "/faq/faq";
+		}
+				
+		async function btn2() {	// 카드 비교함
+			const $globalModal = document.getElementById("global-modal");
+			const $modalContent = document.querySelector(".modal-content");
+			
+			$globalModal.style.display = "block";
+			document.body.style.overflow = 'hidden';
+			
+			$modalContent.innerHTML = "";
+			
+			const data = await fetch("/card/compare/list").then(response => response.json());
+			
+			if(data === null || data.length === 0) {
+				$modalContent.innerText = "카드 비교함이 비어있습니다. ";
+				return;
+			}
+			
+			const arr = {
+				name: '상품이름',
+				annualFee: '연회비', 
+				tags: "특성",
+				service: "혜택"
+			};
+			
+			const table = document.createElement("table");
+			const tbody = document.createElement("tbody");
+			
+			$modalContent.appendChild(table);
+			table.appendChild(tbody);
+			
+			table.classList.add("compare-list");
+			
+			// 카드 이미지 출력
+			const tr = document.createElement("tr");
+			const th = document.createElement("th");
+			
+			tbody.appendChild(tr);
+			tr.appendChild(th);
+			
+			th.innerText = "이미지";
+			
+			for(let card of data) {
+				const td = document.createElement("td");
+				
+				tr.appendChild(td);
+				
+				td.classList.add("image");
+				td.innerHTML = `<div class="remove-btn" onclick="removeCard(${card.cardId})">&times;</div>`;
+				td.innerHTML += `<img src="/images/cards/${card.cardId}_front.PNG" alt="${card.name} 이미지" />`;
+			}
+			
+			// 카드 데이터 출력
+ 			for(let ctg in arr) {
+				const tr = document.createElement("tr");
+				const th = document.createElement("th");
+				
+				tbody.appendChild(tr);
+				tr.appendChild(th);
+				
+				th.classList.add(ctg);
+				th.innerText = arr[ctg];
+				
+				for(let card of data) {
+					const td = document.createElement("td");
+					
+					tr.appendChild(td);
+					
+					td.innerText = card[ctg];
+				}
+			}
+			
+			// 카드 상세보기 연결
+			const tr2 = document.createElement("tr");
+			const th2 = document.createElement("th");
+			
+			tbody.appendChild(tr2);
+			tr2.appendChild(th2);
+			
+			th2.innerText = "상세";
+			
+			for(let card of data) {
+				const td = document.createElement("td");			
+				
+				tr2.appendChild(td);
+				td.style.textAlign = "center";
+				td.style.color = "blue";
+				
+				td.innerHTML = `<a href="/card/detail/${card.cardId}">상세보기</a>`;
+			}
+		}
+		
+		async function removeCard(cardId) {
+			const response = await fetch("/card/compare/remove", {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({cardId: cardId})
+			});
+			
+			if(response.status !== 200) {
+				console.log("Remove Error");
+				return;
+			}
+			
+			await btn2();
+		}
+		
+		function btn3() {
+			  const width = 520;  // 내부 padding 고려하여 조금 여유있게
+			  const height = 740; // 세로도 padding 포함해서 맞춤
+
+			  const left = (screen.width - width) / 2;
+			  const top = (screen.height - height) / 2;
+
+			  window.open(
+			    "/chatbot",
+			    "ChatbotWindow",
+			    `width=${width},height=${height},left=${left},top=${top},resizable=no,scrollbars=no`
+			  );
+			}
+
+
+	</script>
+</div>

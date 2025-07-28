@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    <style>
+    	/* 리팩토링된 버튼 스타일 */
+	.top-menu {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		margin-bottom: 20px;
+	}
+
+	.menu-btn {
+		height: 40px;
+		padding: 0 20px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-right: none;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.menu-btn:first-child {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+	}
+
+	.menu-btn:nth-child(4) {
+		border-right: 1px solid #dee2e6;
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+	}
+
+	.menu-btn:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
+
+	.menu-btn.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	.menu-btn.active:hover {
+		background-color: #0056b3;
+	}
+
+	/* 상품 등록 버튼 분리 */
+	.register-btn {
+		height: 40px;
+		padding: 0 20px;
+		margin-left: auto;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.register-btn:hover {
+		background-color: #0056b3;
+	}
+
+	/* 중간 메뉴 스타일 개선 */
+	.middle-menu {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		margin-bottom: 20px;
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: 6px;
+		border: 1px solid #dee2e6;
+	}
+
+	.middle-menu select,
+	.middle-menu input[type="text"] {
+		height: 36px;
+		padding: 0 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+	}
+
+	.middle-menu select {
+		min-width: 120px;
+	}
+
+	.middle-menu input[type="text"] {
+		min-width: 200px;
+		flex: 1;
+	}
+
+	.search-btn {
+		height: 36px;
+		padding: 0 16px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		
+		
+	}
+
+	.search-btn:hover {
+		background-color: #0056b3;
+	}
+
+	/* 상태 변경 버튼 스타일 개선 */
+	.status-actions {
+		display: flex;
+		gap: 10px;
+		margin-top: 15px;
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: 6px;
+		border: 1px solid #dee2e6;
+	}
+
+	.status-btn {
+		height: 36px;
+		padding: 0 16px;
+		background-color: white;
+		color: #495057;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.status-btn:hover {
+		background-color: #e9ecef;
+		border-color: #adb5bd;
+	}
+
+	.status-btn.sale {
+		background-color: #d4edda;
+		border-color: #c3e6cb;
+		color: #155724;
+	}
+
+	.status-btn.pause {
+		background-color: #fff3cd;
+		border-color: #ffeaa7;
+		color: #856404;
+	}
+
+	.status-btn.end {
+		background-color: #f8d7da;
+		border-color: #f5c6cb;
+		color: #721c24;
+	}
+
+	/* 테이블 스타일 */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 14px;
+		background-color: white;
+		border-radius: 6px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	table th,
+	table td {
+		border: 1px solid #dee2e6;
+		padding: 12px 16px;
+		text-align: left;
+	}
+
+	table th {
+		background-color: #f8f9fa;
+		font-weight: 600;
+		color: #495057;
+	}
+
+	table td a {
+		color: #007bff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	table td a:hover {
+		text-decoration: underline;
+		color: #0056b3;
+	}
+
+	/* 폼 섹션 스타일 */
+	.form-section {
+		margin-top: 20px;
+		background-color: #ffffff;
+		padding: 24px;
+		border: 1px solid #dee2e6;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.form-section input,
+	.form-section select,
+	.form-section textarea {
+		width: 100%;
+		padding: 12px;
+		margin: 8px 0;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+	}
+
+	.form-section button {
+		padding: 12px 24px;
+		margin-top: 15px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.form-section button:hover {
+		background-color: #0056b3;
+	}
+
+	/* 상세 보기 스타일 */
+	.detail-table {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+		background-color: #fff;
+		padding: 24px;
+		border: 1px solid #dee2e6;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.detail-item {
+		display: flex;
+		flex-direction: column;
+		width: calc(50% - 10px);
+	}
+
+	.detail-item label {
+		font-weight: 600;
+		margin-bottom: 8px;
+		color: #495057;
+	}
+
+	.detail-item input,
+	.detail-item textarea {
+		padding: 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: #f8f9fa;
+	}
+
+	.detail-item img {
+		max-width: 120px;
+		border: 1px solid #dee2e6;
+		border-radius: 4px;
+	}
+
+	/* 폼 테이블 스타일 */
+	.form-table {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+		margin-top: 16px;
+	}
+
+	.form-table .form-item {
+		display: flex;
+		flex-direction: column;
+		width: calc(50% - 10px);
+	}
+
+	.form-table .form-item label {
+		font-weight: 600;
+		margin-bottom: 8px;
+		color: #495057;
+	}
+
+	.form-table .form-item input,
+	.form-table .form-item select,
+	.form-table .form-item textarea {
+		padding: 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: #ffffff;
+	}
+
+	/* 카드 테이블 래퍼 */
+	.card-table-wrapper {
+		border: 1px solid #dee2e6;
+		
+		border-radius: 8px;
+		margin-top: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.card-table {
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+		table-layout: fixed;
+		height: 100%;
+	}
+
+	.card-table thead {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background-color: #f8f9fa;
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	.card-table thead th {
+		padding: 16px 12px;
+		font-weight: 600;
+		text-align: left;
+		border-bottom: 2px solid #dee2e6;
+		color: #495057;
+	}
+
+	.card-table tbody {
+		display: inline-block;
+		width: calc(100% + 17px);
+		box-sizing: content-box;
+		max-height: 400px;
+		overflow-y: auto;
+		scrollbar-gutter: stable;
+	}
+
+	.card-table tbody tr {
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+		transition: background-color 0.2s ease;
+	}
+
+	.card-table tbody tr:hover {
+		background-color: #f8f9fa;
+	}
+
+	.card-table tbody td {
+		padding: 12px;
+		border-bottom: 1px solid #dee2e6;
+	}
+
+	/* 컬럼 너비 설정 */
+	.card-table thead th:nth-child(1),
+	.card-table tbody td:nth-child(1) {
+		width: 50px;
+	}
+
+	.card-table thead th:nth-child(2),
+	.card-table tbody td:nth-child(2) {
+		width: 80px;
+	}
+
+	.card-table thead th:nth-child(3),
+	.card-table tbody td:nth-child(3) {
+		width: 300px;
+	}
+
+	.card-table thead th:nth-child(4),
+	.card-table tbody td:nth-child(4) {
+		width: 100px;
+	}
+
+	.card-table thead th:nth-child(5),
+	.card-table tbody td:nth-child(5) {
+		width: 120px;
+	}
+
+	.card-table thead th:nth-child(6),
+	.card-table tbody td:nth-child(6) {
+		width: 80px;
+	}
+
+	/* 반응형 디자인 */
+	@media (max-width: 768px) {
+		.detail-item,
+		.form-table .form-item {
+			width: 100%;
+		}
+		
+		.top-menu {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+		
+		.menu-btn {
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+		}
+		
+		.register-btn {
+			margin-left: 0;
+			width: 100%;
+		}
+		
+		.middle-menu {
+			flex-direction: column;
+			align-items: stretch;
+		}
+		
+		.middle-menu input[type="text"] {
+			min-width: auto;
+		}
+	}
+
+	/* 페이지 제목 스타일 */
+	h1 {
+		color: #212529;
+		font-size: 24px;
+		font-weight: 600;
+		margin-bottom: 24px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #dee2e6;
+	}
+	
+	/* 등록 폼 추가 */
+	.styled-form {
+	  margin-top: 20px;
+	  padding: 24px;
+	  border: 1px solid #dee2e6;
+	  border-radius: 8px;
+	  background-color: #ffffff;
+	  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	}
+	
+	.styled-table {
+	  width: 100%;
+	  border-collapse: collapse;
+	}
+	
+	.styled-table th {
+	  background-color: #f1f3f5;
+	  font-weight: 600;
+	  font-size: 16px;
+	  padding: 14px;
+	  border: 1px solid #dee2e6;
+	}
+	
+	.styled-table td {
+	  padding: 12px 16px;
+	  vertical-align: top;
+	  border: 1px solid #dee2e6;
+	}
+	
+	.form-label {
+	  font-weight: 600;
+	  color: #495057;
+	  width: 160px;
+	}
+	
+	.form-input-wrapper {
+	  display: flex;
+	  flex-direction: column;
+	  gap: 8px;
+	}
+	
+	.form-input-wrapper input,
+	.form-input-wrapper select,
+	.form-input-wrapper textarea {
+	  padding: 10px;
+	  font-size: 14px;
+	  border: 1px solid #ced4da;
+	  border-radius: 4px;
+	  background-color: #ffffff;
+	}
+	.form-input-wrapper textarea{
+	  height: 160px;
+	}
+	
+	.detail-block {
+	  padding: 12px;
+	  margin-bottom: 12px;
+	  border: 1px dashed #adb5bd;
+	  border-radius: 6px;
+	  background-color: #f8f9fa;
+	}
+	
+	.detail-block label {
+	  font-weight: 500;
+	  display: block;
+	  margin-bottom: 4px;
+	}
+	
+	.delete-btn {
+	  margin-top: 8px;
+	  align-self: flex-start;
+	  background-color: #dc3545;
+	  color: white;
+	  border: none;
+	  padding: 6px 12px;
+	  border-radius: 4px;
+	  font-size: 13px;
+	  cursor: pointer;
+	}
+	
+	.delete-btn:hover {
+	  background-color: #c82333;
+	}
+	
+	.form-button {
+	  padding: 10px 20px;
+	  font-weight: 600;
+	  background-color: #007bff;
+	  color: white;
+	  border: none;
+	  border-radius: 4px;
+	  cursor: pointer;
+	  margin-top: 16px;
+	}
+	
+	.form-button:hover {
+	  background-color: #0056b3;
+	}
+	/* 모달 */
+    	
+    	#modal {
+    		display: none;
+    		position: fixed;
+    		top: 0;
+    		left: 0;
+    		width: 100%;
+    		height: 100vh;
+    		background-color: rgba(0, 0, 0, 0.4);
+    	}
+    	
+    	#modal .modal-wrapper {
+    		max-width: 80%;
+    		max-height: 80%;
+    		border-radius: 1rem;
+    		background-color: #fff;
+    		padding: 2rem;
+    		
+    		position: absolute;
+    		top: 50%;
+    		left: 50%;
+    		transform: translate(-50%, -50%);
+    	}
+    	
+    	#modal .modal-wrapper .modal-close {
+    		position: absolute;
+    		top: 0.75rem;
+    		right: 0.75rem;
+    		cursor: pointer;
+    	}
+    	
+    	#modal .search-form {
+    		margin-bottom: 1rem;
+    	}
+    </style>
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/admin/sidebar.js}"></script>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1>예/적금 관리</h1>
+
+            <div class="top-menu">
+                <button class="menu-btn active" onclick="selectMenu(this,'all')">전체</button>
+                <button class="menu-btn" onclick="selectMenu(this,'예금')">예금</button>
+                <button class="menu-btn" onclick="selectMenu(this,'적금')">적금</button>
+                <button class="menu-btn" onclick="selectMenu(this,'입출금자유')">입출금자유</button>
+                <button class="register-btn" onclick="showProductForm()">상품 등록</button>
+            </div>
+
+            <div class="middle-menu">
+                <select id="statusFilter" onchange="filterByStatus(this.value)">
+                    <option value="all">전체</option>
+                    <option value="S">판매중</option>
+                    <option value="P">판매중단</option>
+                    <option value="E">판매종료</option>
+                </select>
+
+                <input type="text" id="searchInput" placeholder="상품명을 입력하세요" >
+                <button class="search-btn" onclick="">검색</button>
+            </div>
+
+            <div id="content"></div>
+
+            <div class="status-actions">
+                <button class="status-btn sale" onclick="changeStatus('S')">판매중</button>
+                <button class="status-btn pause" onclick="changeStatus('P')">판매중단</button>
+                <button class="status-btn end" onclick="changeStatus('E')">판매종료</button>
+            </div>
+
+            <div id="content-detail"></div>
+        </div>
+    </div>
+
+    <!-- 모달 -->
+    <div id="modal">
+        <div class="modal-wrapper">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-content">
+                <form class="search-form">
+                    <input type="text" name="search" placeholder="검색 내용을 입력하세요." />
+                    <input type="submit" value="검색" />
+                </form>
+                <table>
+                    <thead><tr></tr></thead>
+                    <tbody class=""></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+	<script>
+	
+		let currentCategory = "all";
+		let currentStatus = "all";
+		//============================================================	
+			
+		// 체크박스
+		$(document).on("change", "#checkAll", function () {
+		    $(".product-check").prop("checked", this.checked);
+		});
+	
+		// 개별 체크에 따른 전체 선택 해제
+		$(document).on("change", ".product-check", function () {
+		    const allChecked = $(".product-check").length === $(".product-check:checked").length;
+		    $("#checkAll").prop("checked", allChecked);
+		});
+	
+		//============================================================		
+		
+		// 전체, 예금, 적금 메뉴에 맞는 데이터 요청 
+		function selectMenu(button, value) {
+		    document.querySelectorAll('.menu-btn').forEach(btn => {
+		        btn.classList.remove('active');
+		    });
+		    button.classList.add('active');
+		
+		    currentCategory = value;
+		    fetchFilteredProducts();
+		
+			/* 통합처리
+			console.log("선택 메뉴:" + value);
+			$.ajax({
+				url: '/admin/products/' + value ,
+				type: 'GET',
+				success: function(response){
+					console.log("응답 데이터: " + response);
+					showProductList(response);
+				},
+				error: function (error){
+					console.error("요청 실패: " + error);
+				}
+			
+			});
+			*/
+			currentCategory = value;
+		    fetchFilteredProducts();
+			
+		}
+			
+		// 상태에 따른 데이터
+		function filterByStatus(statusCode) {
+			/*	통합처리
+		    let url = "/admin/products/status";
+		
+		    if (statusCode !== "all") {
+		        url += "/" + statusCode;
+		    }
+		
+		    $.ajax({
+		        url: url,
+		        type: 'GET',
+		        success: function(response){
+		            console.log("Status 필터 응답:", response);
+		            showProductList(response);
+		        },
+		        error: function(error){
+		            console.error("Status 필터 요청 실패:", error);
+		        }
+		    });
+			*/ 
+			currentStatus = statusCode;
+		    fetchFilteredProducts();
+		}
+		
+		// 선택 메뉴, 선택 상태에 따른 List 출력 
+		function fetchFilteredProducts() {
+		    $.ajax({
+		        url: "/admin/products/filter",
+		        type: "GET",
+		        data: {
+		            category: currentCategory,
+		            status: currentStatus
+		        },
+		        success: function(response) {
+		            showProductList(response);
+		        },
+		        error: function(error) {
+		            console.error("필터 요청 실패:", error);
+		        }
+		    });
+		}
+		
+		
+		// JSON 데이터를 view로 데이터 출력
+		function showProductList(products){
+			let html = '<table border="1" style="margin-top: 10px; width:100%;">';
+			html += '<thead>';
+			html += '<tr>';
+			html += '<th><input type="checkbox" id="checkAll"></th>';
+			html += '<th>상품 ID</th>';
+			html += '<th>상품명</th>';
+			html += '<th>유형</th>';
+			html += '<th>상태</th>';
+			html += '<th>등록일</th>';
+			html += '<th>조회수</th>';
+			html += '</tr>';
+			html += '</thead><tbody>';
+		
+			for (let product of products) {
+				html += `<tr>`;
+				html += `<td><input type="checkbox" class="product-check" value="${product.productId}"></td>`;
+				html += `<td>${product.productId}</td>`;
+				html += `<td><a href="#none" onclick="loadProductDetail('${product.productId}')">${product.name}</a></td>`; // ✅ 유지됨
+				html += `<td>${product.category}</td>`;
+				html += `<td>${product.status}</td>`;
+				html += `<td>${product.createdAt}</td>`;
+				html += `<td>${product.viewCount}</td>`;
+				html += '</tr>';
+			}
+		
+			html += '</tbody></table>';
+			document.getElementById('content').innerHTML = html;
+		}
+		
+		//============================================================
+		
+		/* 
+			삭제 / is_active -> status 변경됨 
+		
+		// 활성화, 비활성화 상태 변경 
+		function toggleProducts(activeFlag) {
+		    const ids = [];
+		    $(".product-check:checked").each(function() {
+		        ids.push(Number($(this).val()));
+		    });
+			console.log(ids);
+		    $.ajax({
+		        url: "/admin/products/toggle",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify({ ids: ids, active: activeFlag }),
+		        success: function() {
+		            alert("상태 변경 완료");
+		        }
+		    });
+		} 
+		*/
+		
+		//============================================================
+		
+		// 제품 상세 불러오기
+		function loadProductDetail(productId){
+			$.ajax({
+				url: "/admin/products/detail/"+productId ,
+				type: "GET",
+				success: function(response){
+					console.log(response);
+					showProductDetail(response);
+				},
+				error: function (error){
+					console.error("요청 실패: " + error);
+				}	
+			});
+		}
+		
+		// 제품 상세 데이터 JSON을 VIEW 로 데이터 출력
+		function showProductDetail(product) {
+
+		  let html = `<form id="productForm" class="styled-form"><div class="form-table">`;
+		
+		  const addField = (label, name, value) => `
+		    <div class="form-item">
+		      <label class="form-label">${label}</label>
+		      <div class="form-input-wrapper"><input type="text" name="${name}" value="${value}" readonly /></div>
+		    </div>`;
+		
+		  html += addField('상품 ID', 'productId', product.productId);
+		  html += addField('상품명', 'name', product.name);
+		  html += addField('카테고리', 'category', product.category);
+		  html += addField('추천 대상', 'purpose', product.purpose);
+		  html += addField('요약', 'summary', product.summary);
+		  html += addField('금리', 'rate', `${product.minRate}% ~ ${product.maxRate}%`);
+		  html += addField('가입 기간', 'period', `${product.period}개월`);
+		  html += addField('상태', 'status', product.status);
+		
+		  html += `
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상품 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalDetail" readonly>${product.modalDetail}</textarea></div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">금리 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalRate" readonly>${product.modalRate}</textarea></div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">약관</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="termId" value="${product.termId ?? ''}" />
+		        <button type="button" onclick="openModal('T')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">상품설명서</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="manualId" value="${product.manualId ?? ''}" />
+		        <button type="button" onclick="openModal('M')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상세 설명</label>
+		      <div class="form-input-wrapper service">
+		        <button type="button" onclick="createBlock()">추가</button><br/>
+		  `;
+		
+		  for (let item of product.productContentList) {
+		    html += `
+		      <div class="detail-block">
+		        <label>제목: <input type="text" name="title" value="${item.title}" class="title-input" /></label>
+		        <label>내용: <textarea name="content" class="content-textarea">${item.content}</textarea></label>
+		        <label>이미지 URL: <input type="text" name="imageURL" value="${item.imageURL}" class="image-input" /></label>
+		        <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
+		      </div>
+		    `;
+		  }
+		
+		  html += `</div></div>`;
+		
+		  html += `
+		    <div class="form-item" style="width: 100%; text-align: right;">
+		      <button type="button" onclick="enableEditMode()" class="form-button">수정</button>
+		      <button type="button" id="saveBtn" onclick="saveProductChanges()" class="form-button" style="display:none;">저장</button>
+		    </div>
+		  `;
+		
+		  html += `</div></form>`;
+		  document.getElementById('content-detail').innerHTML = html;
+		}
+
+		
+		//============================================================
+			
+		/* 상세 설명 입력창 삭제 함수 */
+		function deleteBlock(button) {
+			const div = button.closest("div");
+			if(div) div.remove();
+		}
+		
+		/* 상세 설명 입력창 생성 함수 */
+		function createBlock() {
+			const $detail = document.querySelector(".detail");
+			const count = $detail.querySelectorAll("div");
+			
+			if(count.length >= 7) {	// 7개 제한
+				alert("상세 설명은 최대 7개까지만 등록 가능합니다. ");
+				return;
+			}
+			
+			const div = document.createElement("div");
+			
+			div.innerHTML = `<label>제목: <input type="text" name="title" class="title-input" /></label><br/>
+					<label>내용: <textarea name="content" class="content-textarea"></textarea></label><br/>
+					<label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
+					<button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button><br/>`;
+					
+			$detail.appendChild(div);
+		}
+		
+		
+		//============================================================
+			
+		const $modal = document.getElementById("modal");
+		const $header = $modal.querySelector("thead tr");
+		const $content = $modal.querySelector("tbody");
+		const $searchForm = $modal.querySelector(".search-form");
+		
+		/* 약관/설명서 검색 모달 열기 */
+		function openModal(curr_type) {
+			$modal.style.display = "block";
+			document.body.style.overflow = "hidden";
+			
+			if(curr_type === "T") {
+				getTerms();
+			}
+			if(curr_type === "M") {
+				getManuals();
+			}
+		}
+		
+		/* 모달 닫기 */
+		function closeModal() {
+			$modal.style.display = "none";
+			document.body.style.overflow = "auto";
+			
+			$header.innerHTML = "";
+			$content.innerHTML = "";
+		}
+		
+		let curr_type = "T";
+		
+		function getTerms(search = null) {
+			
+			// 현재 목록 = 약관(Term)
+			curr_type = "T";
+			
+			fetch(`/admin/terms${search != null ? ("?search=" + search) : ""}`)
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>선택</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td><button onclick="selectTerm(${element.documentId})">선택</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function getManuals(search = null) {
+			// 현재 목록 = 상품설명서(Manual)
+			curr_type = "M";
+			
+			fetch(`/admin/manuals${search != null ? ("?search=" + search) : ""}`)
+			.then(response => response.json())
+			.then(data => {
+				$header.innerHTML = `<th>번호</th>`;
+				$header.innerHTML += `<th>상품 유형</th>`;
+				$header.innerHTML += `<th>제목</th>`;
+				$header.innerHTML += `<th>선택</th>`;
+				
+				$content.innerHTML = "";
+				
+				if(data === null || data.length === 0) {
+					const tr = document.createElement("tr");
+					tr.innerHTML = `<td colspan='6'>현재 데이터가 없습니다.</td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+				for(let element of data) {
+					const tr = document.createElement("tr");
+					
+					tr.innerHTML = `<td>${element.documentId}</td>`;
+					tr.innerHTML += `<td>${element.productType}</td>`;
+					tr.innerHTML += `<td>${element.title}</td>`;
+					tr.innerHTML += `<td><button onclick="selectManual(${element.documentId})">선택</button></td>`;
+					
+					$content.appendChild(tr);
+				}
+				
+			})
+			.catch(error => console.log(error));
+		}
+		
+		function selectTerm(documentId) {
+		    const termInput = document.querySelector("input[name='termId']");
+		    if (termInput) {
+		        termInput.value = documentId;
+		    }
+		    closeModal();
+		}
+
+		function selectManual(documentId) {
+		    const manualInput = document.querySelector("input[name='manualId']");
+		    if (manualInput) {
+		        manualInput.value = documentId;
+		    }
+		    closeModal();
+		}
+		
+		$searchForm.addEventListener("submit", function(e) {
+			e.preventDefault();
+
+			const search = this.search.value.trim();
+
+			if (!search) {
+				alert("검색어를 입력해주세요.");
+				return;
+			}
+
+			if (curr_type === "T") {
+				getTerms(search);
+			} else if (curr_type === "M") {
+				getManuals(search);
+			}
+		});
+		
+		//============================================================
+			
+		// 수정모드 전환
+		function enableEditMode() {
+			const inputs = document.querySelectorAll("#productForm input[type='text']");
+			inputs.forEach(input => input.removeAttribute("readonly"));
+			document.getElementById("saveBtn").style.display = "inline";
+		}
+			
+		// 데이터 수정하기	
+		function saveProductChanges() {
+			const form = document.getElementById("productForm");
+			const formData = new FormData(form);
+			const rawRate = formData.get("rate").replace("%", "").split("~");
+			
+			// 상세 정보 리스트
+			const details = document.querySelectorAll(".detail div");
+		    const titles = formData.getAll("title");
+		    const contents = formData.getAll("content");
+		    const imageURLs = formData.getAll("imageURL");
+		    
+			const productContentList = [];
+		   	for(let i = 0; i < details.length; i++) {
+		   		let obj = {
+		   				title: titles[i],
+		   				content: contents[i],
+		   				imageURL: imageURLs[i],
+		   		};
+		   		productContentList.push(obj);
+		   	}
+
+			const data = {
+				productId: Number(formData.get("productId")),
+				name: formData.get("name"),
+				category: formData.get("category"),
+				purpose: formData.get("purpose"),
+				summary: formData.get("summary"),
+				/* detail: formData.get("detail"), */
+				modalDetail: formData.get("modalDetail"), 
+				modalRate: formData.get("modalRate"),
+				termId: formData.get("termId"), 
+				manualId: formData.get("manualId"), 
+				productContentList: productContentList, 
+				minRate: parseFloat(rawRate[0]),
+				maxRate: parseFloat(rawRate[1]),
+				period: Number(formData.get("period")),
+				status: formData.get("status")
+			};
+
+			$.ajax({
+				url: "/admin/products/update",
+				type: "PUT",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				success: function() {
+					alert("수정 요청이 등록되었습니다. 승인 대기 중입니다.");
+					selectMenu("all"); // 다시 전체 목록 새로고침
+				},
+				error: function(err) {
+					alert("수정 실패");
+					console.error(err);
+				}
+			});
+		}
+		
+		//============================================================
+		
+		// 제품 상태 변경 
+		function changeStatus(newStatus) {
+		    const ids = [];
+		    $(".product-check:checked").each(function () {
+		        ids.push(Number($(this).val()));
+		    });
+		
+		    if (ids.length === 0) {
+		        alert("변경할 상품을 선택하세요.");
+		        return;
+		    }
+		
+		    $.ajax({
+		        url: "/admin/products/status-update",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify({
+		            ids: ids,
+		            status: newStatus
+		        }),
+		        success: function () {
+		            alert("상태 변경 완료");
+		            selectMenu("all"); 
+		        },
+		        error: function (err) {
+		            console.error("상태 변경 실패:", err);
+		            alert("오류 발생");
+		        }
+		    });
+		}
+	
+		//============================================================
+		
+		// 상품 등록 폼 열기
+		
+		function showProductForm() {
+
+		  let html = `<form id="productCreateForm" class="styled-form"><div class="form-table">`;
+		
+		  const input = (label, name, type = "text", required = false) => `
+		    <div class="form-item">
+		      <label class="form-label">${label}</label>
+		      <div class="form-input-wrapper">
+		        <input type="${type}" name="${name}" ${required ? "required" : ""} />
+		      </div>
+		    </div>`;
+		
+		  html += input('상품명', 'name', 'text', true);
+		  html += `
+		    <div class="form-item">
+		      <label class="form-label">유형</label>
+		      <div class="form-input-wrapper">
+		        <select name="category">
+		          <option value="예금">예금</option>
+		          <option value="적금">적금</option>
+		          <option value="입출금자유">입출금자유</option>
+		        </select>
+		      </div>
+		    </div>`;
+		  html += input('추천 대상', 'purpose');
+		  html += input('요약', 'summary');
+		  html += input('최소 금리', 'minRate', 'number', true);
+		  html += input('최대 금리', 'maxRate', 'number', true);
+		  html += input('가입 기간(개월)', 'period', 'number', true);
+		
+		  html += `
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상품 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalDetail"></textarea></div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">금리 안내</label>
+		      <div class="form-input-wrapper"><textarea name="modalRate"></textarea></div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">약관</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="termId" />
+		        <button type="button" onclick="openModal('T')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item">
+		      <label class="form-label">상품설명서</label>
+		      <div class="form-input-wrapper">
+		        <input type="text" name="manualId" />
+		        <button type="button" onclick="openModal('M')">검색</button>
+		      </div>
+		    </div>
+		    <div class="form-item" style="width: 100%;">
+		      <label class="form-label">상세 설명</label>
+		      <div class="form-input-wrapper service">
+		        <button type="button" onclick="createBlock()">추가</button><br/>
+		        <div class="detail-block">
+		          <label>제목: <input type="text" name="title" class="title-input" /></label>
+		          <label>내용: <textarea name="content" class="content-textarea"></textarea></label>
+		          <label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
+		          <button type="button" class="delete-btn" onclick="deleteBlock(this)">삭제</button>
+		        </div>
+		      </div>
+		    </div>
+		    <div class="form-item" style="width: 100%; text-align: right;">
+		      <button type="button" onclick="submitProductForm()" class="form-button">등록</button>
+		    </div>
+		  `;
+		
+		  html += `</div></form>`;
+		  document.getElementById("content-detail").innerHTML = html;
+		}
+
+		
+		// 버튼 클릭시 폼 열기
+		function submitProductForm() {
+		    const form = document.getElementById("productCreateForm");
+		    const formData = new FormData(form);
+		    
+		    // 상세 정보 리스트
+		    const details = document.querySelectorAll(".detail div");
+		    const titles = formData.getAll("title");
+		    const contents = formData.getAll("content");
+		    const imageURLs = formData.getAll("imageURL");
+		    
+		    const productContentList = [];
+		   	for(let i = 0; i < details.length; i++) {
+		   		let obj = {
+		   				title: titles[i],
+		   				content: contents[i],
+		   				imageURL: imageURLs[i],
+		   		};
+		   		productContentList.push(obj);
+		   	}
+
+		    const data = {
+		        name: formData.get("name"),
+		        category: formData.get("category"),
+		        purpose: formData.get("purpose"),
+		        summary: formData.get("summary"),
+		        /* detail: formData.get("detail"), */
+		        modalDetail: formData.get("modalDetail"), 
+				modalRate: formData.get("modalRate"),
+				termId: formData.get("termId"), 
+				manualId: formData.get("manualId"), 
+		        productContentList: productContentList, 
+		        minRate: parseFloat(formData.get("minRate")),
+		        maxRate: parseFloat(formData.get("maxRate")),
+		        period: parseInt(formData.get("period")),
+		        imageUrl: formData.get("imageUrl"),
+		        status: "S" 
+		    };
+
+		    $.ajax({
+		        url: "/admin/products/create",
+		        type: "POST",
+		        contentType: "application/json",
+		        data: JSON.stringify(data),
+		        success: function () {
+		            alert("상품 등록 완료");
+		            selectMenu("all"); 
+		        },
+		        error: function (err) {
+		            alert("등록 실패");
+		            console.error(err);
+		        }
+		    });
+		}
+		
+		
+		// 최초 로딩
+        $(document).ready(function() {
+        	fetchFilteredProducts();
+        });
+		
+	</script>
+</body>
+</html>

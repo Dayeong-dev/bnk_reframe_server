@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎉 맥북 룰렛 이벤트 🎉</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+
+    #wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+    }
+
+    #pointer {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 30px solid orange;
+      z-index: 10;
+    }
+
+    svg {
+      transform: rotate(0deg);
+      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #spin-btn {
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      min-height: 24px;
+    }
+
+    #macbook-link {
+      display: none;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    #macbook-link a {
+      color: orange;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎉 맥북 룰렛 이벤트 🎉</h1>
+
+<div id="wheel-container">
+  <div id="pointer" aria-label="룰렛 포인터"></div>
+  <svg id="wheel" width="300" height="300" viewBox="0 0 300 300" role="img" aria-describedby="result">
+    <g transform="translate(150,150)">
+      <!-- 부채꼴 조각과 텍스트는 JS에서 동적으로 생성 -->
+    </g>
+  </svg>
+</div>
+
+<button id="spin-btn" aria-controls="wheel" aria-live="polite">룰렛 돌리기</button>
+<div id="result" role="alert" aria-live="polite"></div>
+<div id="macbook-link" aria-hidden="true">
+  <!-- 링크 및 안내 문구는 JS에서 세팅 -->
+</div>
+
+<script>
+  const sectors = [
+    "꽝", "꽝", "커피 쿠폰", "꽝", "맥북 프로!", "스타벅스 쿠폰", "꽝", "꽝"
+  ];
+  const colors = ["#28a745", "#218838"];
+  const sectorCount = sectors.length;
+  const sectorAngle = 360 / sectorCount;
+  const r = 150;
+  const svgGroup = document.querySelector("#wheel g");
+  const wheel = document.getElementById("wheel");
+  const spinBtn = document.getElementById("spin-btn");
+  const result = document.getElementById("result");
+  const macbookLink = document.getElementById("macbook-link");
+  const STORAGE_KEY = "rouletteSpunDate";
+  let currentRotation = 0;
+  let isSpinning = false;
+
+  // 부채꼴 + 텍스트 그리기
+  function drawWheel() {
+    for(let i = 0; i < sectorCount; i++) {
+      const startAngle = i * sectorAngle;
+      const endAngle = startAngle + sectorAngle;
+      const largeArcFlag = sectorAngle > 180 ? 1 : 0;
+
+      const x1 = r * Math.cos((startAngle - 90) * Math.PI / 180);
+      const y1 = r * Math.sin((startAngle - 90) * Math.PI / 180);
+      const x2 = r * Math.cos((endAngle - 90) * Math.PI / 180);
+      const y2 = r * Math.sin((endAngle - 90) * Math.PI / 180);
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", `M0 0 L${x1} ${y1} A${r} ${r} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`);
+      path.setAttribute("fill", colors[i % colors.length]);
+      svgGroup.appendChild(path);
+
+      const midAngle = startAngle + sectorAngle / 2;
+      const textRadius = 100;
+      const textX = textRadius * Math.cos((midAngle - 90) * Math.PI / 180);
+      const textY = textRadius * Math.sin((midAngle - 90) * Math.PI / 180);
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", textX);
+      text.setAttribute("y", textY);
+      text.setAttribute("fill", "#fff");
+      text.setAttribute("font-size", "13");
+      text.setAttribute("font-weight", "bold");
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("alignment-baseline", "middle");
+      text.setAttribute("transform", `rotate(${midAngle}, ${textX}, ${textY})`);
+      text.textContent = sectors[i];
+      svgGroup.appendChild(text);
+    }
+  }
+
+  function hasSpunToday() {
+    const lastSpin = localStorage.getItem(STORAGE_KEY);
+    if (!lastSpin) return false;
+    return new Date(lastSpin).toDateString() === new Date().toDateString();
+  }
+
+  function setSpunToday() {
+    localStorage.setItem(STORAGE_KEY, new Date().toISOString());
+  }
+
+  // 초기 쿠팡 링크 안내 문구 세팅
+  function showMacbookLink(defaultMsg = '당첨이 안 돼도 맥북은 여기서 살 수도 있어요 👉') {
+    macbookLink.style.display = "block";
+    macbookLink.setAttribute("aria-hidden", "false");
+    macbookLink.innerHTML = `${defaultMsg} <a href="https://www.coupang.com/np/search?component=&q=맥북+프로" target="_blank" rel="noopener noreferrer">맥북 최저가 보러가기</a>`;
+  }
+
+  // 룰렛 돌리기 함수
+  function spin() {
+    if (isSpinning) return;
+    if (hasSpunToday()) {
+      alert("하루에 한 번만 참여할 수 있어요!");
+      return;
+    }
+
+    isSpinning = true;
+    spinBtn.disabled = true;
+    result.textContent = "돌리는 중...";
+    macbookLink.style.display = "none";
+    macbookLink.innerHTML = '';
+
+    const targetIndex = Math.floor(Math.random() * sectorCount);
+
+    const spins = 360 * 5 + (360 - (targetIndex * sectorAngle + sectorAngle / 2));
+    currentRotation += spins;
+
+    wheel.style.transition = "transform 5s cubic-bezier(0.33, 1, 0.68, 1)";
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+    function onTransitionEnd() {
+      wheel.style.transition = "none";
+      currentRotation = currentRotation % 360;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      const prize = sectors[targetIndex];
+
+      result.textContent = `🎉 결과: ${prize} 당첨!`;
+
+      if (prize === "맥북 프로!") {
+        // 당첨 메시지 + 링크 안내 (강조)
+        showMacbookLink('🎉 축하합니다! 맥북 프로 당첨! 🎉 구매는 여기서 👉');
+      } else {
+        // 당첨 아니어도 안내 메시지 + 링크 표시
+        showMacbookLink();
+      }
+
+      setSpunToday();
+      isSpinning = false;
+      spinBtn.disabled = false;
+
+      wheel.removeEventListener("transitionend", onTransitionEnd);
+    }
+
+    wheel.addEventListener("transitionend", onTransitionEnd);
+  }
+
+  // 초기 설정
+  drawWheel();
+
+  if (hasSpunToday()) {
+    spinBtn.disabled = true;
+    result.textContent = "오늘 이미 룰렛을 돌리셨습니다. 내일 다시 도전하세요!";
+    showMacbookLink();
+  }
+
+  spinBtn.addEventListener("click", spin);
+</script>
+
+</body>
+</html>

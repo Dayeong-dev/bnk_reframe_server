@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    <script th:src="@{/admin/sidebar.js}"></script>
+	<style>
+
+        .top-menu {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		margin-bottom: 20px;
+	}
+
+	.status-btn {
+		height: 40px;
+		padding: 0 20px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-right: none;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.status-btn:first-child {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+	}
+
+	.status-btn:last-child {
+		border-right: 1px solid #dee2e6;
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+	}
+
+	.status-btn:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
+
+	.status-btn.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	.status-btn.active:hover {
+		background-color: #0056b3;
+	}
+
+	/* 테이블 스타일 */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 14px;
+		background-color: white;
+		border-radius: 6px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		margin-top: 20px;
+	}
+
+	table th,
+	table td {
+		border: 1px solid #dee2e6;
+		padding: 12px 16px;
+		text-align: left;
+	}
+
+	table th {
+		background-color: #f8f9fa;
+		font-weight: 600;
+		color: #495057;
+	}
+
+	table td a {
+		color: #007bff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	table td a:hover {
+		text-decoration: underline;
+		color: #0056b3;
+	}
+
+	/* 행 호버 효과 */
+	.request-row {
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+	}
+
+	.request-row:hover {
+		background-color: #f8f9fa;
+	}
+
+	/* 카드 테이블 래퍼 */
+	.card-table-wrapper {
+		border-radius: 8px;
+		margin-top: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.card-table {
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+		table-layout: fixed;
+		height: 100%;
+	}
+
+	.card-table thead {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background-color: #f8f9fa;
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	.card-table thead th {
+		padding: 16px 12px;
+		font-weight: 600;
+		text-align: left;
+		border-bottom: 2px solid #dee2e6;
+		color: #495057;
+	}
+
+	.card-table tbody {
+		display: inline-block;
+		width: calc(100% + 17px);
+		box-sizing: content-box;
+		max-height: 400px;
+		overflow-y: auto;
+		scrollbar-gutter: stable;
+	}
+
+	.card-table tbody tr {
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+		transition: background-color 0.2s ease;
+	}
+
+	.card-table tbody tr:hover {
+		background-color: #f8f9fa;
+	}
+
+	.card-table tbody td {
+		padding: 12px;
+		border-bottom: 1px solid #dee2e6;
+	}
+
+	/* 상세 정보 스타일 */
+	#approval-detail {
+		margin-top: 20px;
+	}
+
+	#approval-detail h3 {
+		color: #212529;
+		font-size: 18px;
+		font-weight: 600;
+		margin-bottom: 16px;
+		padding-bottom: 8px;
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	/* 상세 테이블 스타일 */
+	#approval-detail table {
+		margin-top: 10px;
+	}
+
+	#approval-detail table th {
+		background-color: #e9ecef;
+		font-weight: 600;
+	}
+
+	#approval-detail table td {
+		font-size: 13px;
+		line-height: 1.4;
+	}
+
+	/* 액션 버튼 스타일 */
+	.action-buttons {
+		margin-top: 20px;
+		display: flex;
+		gap: 12px;
+		justify-content: flex-start;
+	}
+
+	.btn-approve {
+		background-color: #28a745;
+		color: white;
+		border: none;
+		padding: 10px 20px;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.btn-approve:hover {
+		background-color: #218838;
+		transform: translateY(-1px);
+	}
+
+	.btn-reject {
+		background-color: #dc3545;
+		color: white;
+		border: none;
+		padding: 10px 20px;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.btn-reject:hover {
+		background-color: #c82333;
+		transform: translateY(-1px);
+	}
+
+	.btn-detail {
+		background-color: #007bff;
+		color: white;
+		border: none;
+		padding: 8px 16px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.btn-detail:hover {
+		background-color: #0056b3;
+		transform: translateY(-1px);
+	}
+
+	/* 상태별 색상 */
+	.status-pending {
+		color: #856404;
+		background-color: #fff3cd;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	.status-approved {
+		color: #155724;
+		background-color: #d4edda;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	.status-rejected {
+		color: #721c24;
+		background-color: #f8d7da;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	/* 반응형 디자인 */
+	@media (max-width: 768px) {
+		.top-menu {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+		
+		.status-btn {
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+		}
+		
+		table {
+			font-size: 12px;
+		}
+		
+		table th,
+		table td {
+			padding: 8px 10px;
+		}
+
+		.action-buttons {
+			flex-direction: column;
+		}
+	}
+
+	/* 페이지 제목 스타일 */
+	h1 {
+		color: #212529;
+		font-size: 24px;
+		font-weight: 600;
+		margin-bottom: 24px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	/* 빈 결과 메시지 스타일 */
+	.empty-message {
+		text-align: center;
+		color: #6c757d;
+		font-style: italic;
+		padding: 20px;
+	}
+
+	/* 로딩 상태 */
+	.loading {
+		text-align: center;
+		padding: 40px;
+		color: #6c757d;
+	}
+
+	/* 필드명 스타일 */
+	.field-name {
+		font-weight: 600;
+		color: #495057;
+		background-color: #f8f9fa;
+	}
+
+	/* 변경 값 강조 */
+	.changed-value {
+		background-color: #fff3cd;
+		border-left: 3px solid #ffc107;
+		padding-left: 12px;
+	}
+    </style>
+
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content">
+            <h1>상위관리자 예/적금 결재 페이지</h1>
+            
+            <div class="top-menu">
+				<button class="status-btn active" data-status="PENDING">전체</button>
+				<!-- <button class="status-btn" data-status="APPROVED">승인완료</button>
+				<button class="status-btn" data-status="REJECTED">반려완료</button>
+				<button class="status-btn" data-status="">전체</button> -->
+			</div>
+            
+            <!-- 결재 요청 목록 -->
+            <div id="approval-list"></div>
+
+            <!-- 결재 상세 보기 -->
+            <div id="approval-detail" style="margin-top: 30px;"></div>
+        </div>
+    </div>
+
+
+<script>
+	function loadApprovalList() {
+	    $.ajax({
+	        url: '/admin/approvals',
+	        method: 'GET',
+	        success: function(data) {
+	            let html = '<table class="card-table">';
+	            html += '<thead><tr><th>ID</th><th>상품ID</th><th>요청자</th><th>요청일시</th><th>상태</th><th>보기</th></tr></thead><tbody>';
+	            data.forEach(item => {
+	            	const statusClass = getStatusClass(item.status);
+	            	html += `<tr class="request-row">
+	                            <td>${item.id}</td>
+	                            <td>${item.productId}</td>
+	                            <td>${item.requestedBy}</td>
+	                            <td>${item.requestedAt ? formatDate(item.requestedAt) : '-'}</td>
+	                            <td><span class="${statusClass}">${getStatusText(item.status)}</span></td>
+	                            <td><button class="btn-detail" onclick="loadApprovalDetail(${item.id})">상세</button></td>
+	                        </tr>`;
+	            });
+	            html += '</tbody></table>';
+	            $('#approval-list').html(html);
+	        }
+	    });
+	}
+	
+	function loadApprovalDetail(id) {
+	    $.ajax({
+	        url: `/admin/approvals/${id}`,
+	        method: 'GET',
+	        success: function(data) {
+	            let html = `<h3>결재 요청 상세 (요청ID: ${data.id})</h3>`;
+	            html += '<table class="card-table">';
+	            html += '<thead><tr><th>필드</th><th>기존 값</th><th>변경 값</th></tr></thead><tbody>';
+	            data.details.forEach(detail => {
+	                html += `<tr>
+	                            <td class="field-name">${detail.fieldName}</td>
+	                            <td>${detail.oldValue}</td>
+	                            <td class="changed-value">${detail.newValue}</td>
+	                        </tr>`;
+	            });
+	            html += '</tbody></table>';
+	            html += `<button class="btn-approve" onclick="approve(${data.id})">승인</button>
+	                     <button class="btn-reject" onclick="reject(${data.id})">반려</button>`;
+	            $('#approval-detail').html(html);
+	        }
+	    });
+	}
+	
+	function approve(id) {
+	    $.post(`/admin/approvals/${id}/approve`, function() {
+	        alert('승인 완료');
+	        loadApprovalList();
+	        $('#approval-detail').empty();
+	    });
+	}
+	
+	function reject(id) {
+	    const reason = prompt("반려 사유를 입력하세요:");
+	    if (!reason) return;
+	    $.ajax({
+	        url: `/admin/approvals/${id}/reject`,
+	        method: 'POST',
+	        contentType: 'application/json',
+	        data: JSON.stringify({ reason: reason }),
+	        success: function() {
+	            alert('반려 처리 완료');
+	            loadApprovalList();
+	            $('#approval-detail').empty();
+	        }
+	    });
+	}
+	
+	// 상태별 클래스 반환
+	function getStatusClass(status) {
+	  switch(status) {
+	    case 'PENDING': return 'status-pending';
+	    case 'APPROVED': return 'status-approved';
+	    case 'REJECTED': return 'status-rejected';
+	    default: return '';
+	  }
+	}
+	
+	// 상태 텍스트 변환
+	function getStatusText(status) {
+	  switch(status) {
+	    case 'PENDING': return '대기중';
+	    case 'APPROVED': return '승인완료';
+	    case 'REJECTED': return '반려완료';
+	    default: return status;
+	  }
+	}
+	
+	// 날짜 포맷 함수
+	function formatDate(datetime) {
+	  const date = new Date(datetime);
+	  return date.toLocaleString('ko-KR', {
+	    year: 'numeric',
+	    month: '2-digit',
+	    day: '2-digit',
+	    hour: '2-digit',
+	    minute: '2-digit',
+	    second: '2-digit'
+	  });
+	}
+	
+	$(document).ready(function() {
+	    loadApprovalList();
+	});
+    </script>
+</body>
+</html>

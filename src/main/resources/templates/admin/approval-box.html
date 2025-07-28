@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>관리자 메인</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<style>
+	/* 리팩토링된 버튼 스타일 */
+	.top-menu {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		margin-bottom: 20px;
+	}
+
+	.status-btn {
+		height: 40px;
+		padding: 0 20px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-right: none;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.status-btn:first-child {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+	}
+
+	.status-btn:last-child {
+		border-right: 1px solid #dee2e6;
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+	}
+
+	.status-btn:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
+
+	.status-btn.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	.status-btn.active:hover {
+		background-color: #0056b3;
+	}
+
+	/* 테이블 스타일 */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 14px;
+		background-color: white;
+		border-radius: 6px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		margin-top: 20px;
+	}
+
+	table th,
+	table td {
+		border: 1px solid #dee2e6;
+		padding: 12px 16px;
+		text-align: left;
+	}
+
+	table th {
+		background-color: #f8f9fa;
+		font-weight: 600;
+		color: #495057;
+	}
+
+	table td a {
+		color: #007bff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	table td a:hover {
+		text-decoration: underline;
+		color: #0056b3;
+	}
+
+	/* 행 호버 효과 */
+	.request-row {
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+	}
+
+	.request-row:hover {
+		background-color: #f8f9fa;
+	}
+
+	/* 카드 테이블 래퍼 */
+	.card-table-wrapper {
+		/* border: 1px solid #dee2e6; */
+		border-radius: 8px;
+		margin-top: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.card-table {
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+		table-layout: fixed;
+		height: 100%;
+	}
+
+	.card-table thead {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background-color: #f8f9fa;
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	.card-table thead th {
+		padding: 16px 12px;
+		font-weight: 600;
+		text-align: left;
+		border-bottom: 2px solid #dee2e6;
+		color: #495057;
+	}
+
+	.card-table tbody {
+		display: inline-block;
+		width: calc(100% + 17px);
+		box-sizing: content-box;
+		max-height: 400px;
+		overflow-y: auto;
+		scrollbar-gutter: stable;
+	}
+
+	.card-table tbody tr {
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+		transition: background-color 0.2s ease;
+	}
+
+	.card-table tbody tr:hover {
+		background-color: #f8f9fa;
+	}
+
+	.card-table tbody td {
+		padding: 12px;
+		border-bottom: 1px solid #dee2e6;
+	}
+
+	/* 상세 정보 스타일 */
+	#content-detail {
+		margin-top: 20px;
+	}
+
+	#content-detail h3 {
+		color: #212529;
+		font-size: 18px;
+		font-weight: 600;
+		margin-bottom: 16px;
+		padding-bottom: 8px;
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	/* 상세 테이블 스타일 */
+	#content-detail table {
+		margin-top: 10px;
+	}
+
+	#content-detail table th {
+		background-color: #e9ecef;
+		font-weight: 600;
+	}
+
+	#content-detail table td {
+		font-size: 13px;
+		line-height: 1.4;
+	}
+
+	/* 상태별 색상 */
+	.status-pending {
+		color: #856404;
+		background-color: #fff3cd;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	.status-approved {
+		color: #155724;
+		background-color: #d4edda;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	.status-rejected {
+		color: #721c24;
+		background-color: #f8d7da;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	/* 반응형 디자인 */
+	@media (max-width: 768px) {
+		.top-menu {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+		
+		.status-btn {
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+		}
+		
+		table {
+			font-size: 12px;
+		}
+		
+		table th,
+		table td {
+			padding: 8px 10px;
+		}
+	}
+
+	/* 페이지 제목 스타일 */
+	h1 {
+		color: #212529;
+		font-size: 24px;
+		font-weight: 600;
+		margin-bottom: 24px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	/* 빈 결과 메시지 스타일 */
+	.empty-message {
+		text-align: center;
+		color: #6c757d;
+		font-style: italic;
+		padding: 20px;
+	}
+
+	/* 로딩 상태 */
+	.loading {
+		text-align: center;
+		padding: 40px;
+		color: #6c757d;
+	}
+
+	/* 필드명 스타일 */
+	.field-name {
+		font-weight: 600;
+		color: #495057;
+		background-color: #f8f9fa;
+	}
+
+	/* 변경 값 강조 */
+	.changed-value {
+		background-color: #fff3cd;
+		border-left: 3px solid #ffc107;
+		padding-left: 12px;
+	}
+</style>
+</head>
+<body>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script th:src="@{/admin/sidebar.js}"></script>
+
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+		<!-- 본문 -->
+		<div class="content">
+			<h1>예/적금 결재함</h1>
+
+			<div class="top-menu">
+				<button class="status-btn active" data-status="">전체</button>
+				<button class="status-btn" data-status="PENDING">대기</button>
+				<button class="status-btn" data-status="APPROVED">승인</button>
+				<button class="status-btn" data-status="REJECTED">반려</button>
+			</div>
+
+			<!-- 데이터 출력 부분 -->
+			<div id="content"></div>
+			
+			<!-- 상품 디테일 출력 부분 -->
+			<div id="content-detail"></div>
+
+		</div>
+	</div>
+
+	<script>
+	//상태 필터 버튼 클릭 시
+	$('.status-btn').on('click', function () {
+	  // 모든 버튼에서 active 클래스 제거
+	  $('.status-btn').removeClass('active');
+	  // 클릭된 버튼에 active 클래스 추가
+	  $(this).addClass('active');
+	  
+	  const status = $(this).data('status'); // "" | "PENDING" | "APPROVED" | "REJECTED"
+	  loadApprovalRequests(status);
+	});
+	
+	// 결재 요청 목록 불러오기
+	function loadApprovalRequests(status) {
+	  const url = status ? `/admin/approval/my/${status}` : `/admin/approval/my`;
+	
+	  // 로딩 표시
+	  $('#content').html('<div class="loading">로딩 중...</div>');
+	
+	  $.ajax({
+	    url: url,
+	    method: 'GET',
+	    success: function (data) {
+	      renderApprovalTable(data);
+	    },
+	    error: function (xhr) {
+	      alert('결재 요청 목록을 불러오지 못했습니다.');
+	      $('#content').html('<div class="empty-message">데이터를 불러오지 못했습니다.</div>');
+	    }
+	  });
+	}
+	
+	// 테이블 렌더링 함수
+	function renderApprovalTable(data) {
+	  let html = `
+	    <div class="card-table-wrapper">
+	      <table class="card-table" id="approval-table">
+	        <thead>
+	          <tr>
+	            <th>결재 번호</th>
+	            <th>상품 번호</th>
+	            <th>결재 상태</th>
+	            <th>결재 요청자</th>
+	            <th>결재 요청일시</th>
+	            <th>승인자</th>
+	            <th>승인일시</th>
+	            <th>반려 사유</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	  `;
+	
+	  if (data.length === 0) {
+	    html += `<tr><td colspan="8" class="empty-message">결과가 없습니다.</td></tr>`;
+	  } else {
+	    data.forEach(item => {
+	      const statusClass = getStatusClass(item.status);
+	      html += `
+	        <tr class="request-row" data-request-id="${item.id}">
+	          <td>${item.id}</td>
+	          <td>${item.productId}</td>
+	          <td><span class="${statusClass}">${getStatusText(item.status)}</span></td>
+	          <td>${item.requestedBy}</td>
+	          <td>${item.requestedAt ? formatDate(item.requestedAt) : '-'}</td>
+	          <td>${item.approvedBy || '-'}</td>
+	          <td>${item.approvedAt ? formatDate(item.approvedAt) : '-'}</td>
+	          <td>${item.rejectionReason || '-'}</td>
+	        </tr>
+	      `;
+	    });
+	  }
+	
+	  html += `</tbody></table></div>`;
+	
+	  $('#content').html(html);
+	
+	  // ✅ 각 행에 클릭 이벤트 추가
+	  $('.request-row').on('click', function () {
+	    const requestId = $(this).data('request-id');
+	    loadRequestDetails(requestId);
+	  });
+	}
+	
+	// 상태별 클래스 반환
+	function getStatusClass(status) {
+	  switch(status) {
+	    case 'PENDING': return 'status-pending';
+	    case 'APPROVED': return 'status-approved';
+	    case 'REJECTED': return 'status-rejected';
+	    default: return '';
+	  }
+	}
+	
+	// 상태 텍스트 변환
+	function getStatusText(status) {
+	  switch(status) {
+	    case 'PENDING': return '대기';
+	    case 'APPROVED': return '승인';
+	    case 'REJECTED': return '반려';
+	    default: return status;
+	  }
+	}
+	
+	// 상세 정보 불러오기
+	function loadRequestDetails(requestId) {
+	  $('#content-detail').html('<div class="loading">상세 정보 로딩 중...</div>');
+	  
+	  $.ajax({
+	    url: `/admin/approval/details/${requestId}`,
+	    method: 'GET',
+	    success: function (data) {
+	      renderDetailTable(data);
+	    },
+	    error: function () {
+	      alert('상세 정보를 불러오지 못했습니다.');
+	      $('#content-detail').html('<div class="empty-message">상세 정보를 불러오지 못했습니다.</div>');
+	    }
+	  });
+	}
+	
+	// 상세 내역 테이블 렌더링
+	function renderDetailTable(details) {
+	  let html = `
+	    <h3>변경 상세 내역</h3>
+	    <div class="card-table-wrapper">
+	      <table class="card-table">
+	        <thead>
+	          <tr>
+	            <th>필드명</th>
+	            <th>수정 전 값</th>
+	            <th>수정 후 값</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	  `;
+	
+	  if (details.length === 0) {
+	    html += `<tr><td colspan="3" class="empty-message">변경 내역이 없습니다.</td></tr>`;
+	  } else {
+	    details.forEach(d => {
+	      html += `
+	        <tr>
+	          <td class="field-name">${d.fieldName}</td>
+	          <td>${d.oldValue || '-'}</td>
+	          <td class="changed-value">${d.newValue || '-'}</td>
+	        </tr>
+	      `;
+	    });
+	  }
+	
+	  html += `</tbody></table></div>`;
+	
+	  $('#content-detail').html(html);
+	}
+	
+	// 날짜 포맷 함수
+	function formatDate(datetime) {
+	  const date = new Date(datetime);
+	  return date.toLocaleString('ko-KR', {
+	    year: 'numeric',
+	    month: '2-digit',
+	    day: '2-digit',
+	    hour: '2-digit',
+	    minute: '2-digit',
+	    second: '2-digit'
+	  });
+	}
+	
+	// 페이지 로딩 시 전체 목록 먼저 로딩
+	$(document).ready(function () {
+	  loadApprovalRequests("");
+	});
+</script>
+</body>
+</html>

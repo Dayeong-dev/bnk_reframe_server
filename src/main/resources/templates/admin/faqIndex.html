@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>FAQ 관리</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<script th:src="@{/admin/sidebar.js}"></script>
+<style>
+	/* 리팩토링된 버튼 스타일 */
+	.top-menu {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		margin-bottom: 20px;
+	}
+
+	.menu-btn {
+		height: 40px;
+		padding: 0 20px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-right: none;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.menu-btn:first-child {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+	}
+	
+	.menu-btn:nth-child(4) {
+		border-right: 1px solid #dee2e6;
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+	}
+
+	.menu-btn:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
+
+	.menu-btn.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	.menu-btn.active:hover {
+		background-color: #0056b3;
+	}
+
+	/* 추가하기 버튼 분리 */
+	.register-btn {
+		height: 40px;
+		padding: 0 20px;
+		margin-left: auto;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.register-btn:hover {
+		background-color: #0056b3;
+	}
+
+	/* 테이블 스타일 */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 14px;
+		background-color: white;
+		border-radius: 6px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	table th,
+	table td {
+		border: 1px solid #dee2e6;
+		padding: 12px 16px;
+		text-align: left;
+	}
+
+	table th {
+		background-color: #f8f9fa;
+		font-weight: 600;
+		color: #495057;
+	}
+
+	table td a {
+		color: #007bff;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	table td a:hover {
+		text-decoration: underline;
+		color: #0056b3;
+	}
+
+	.middle-menu {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		margin-bottom: 20px;
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: 6px;
+		border: 1px solid #dee2e6;
+	}
+	
+	.middle-menu input[type="text"] {
+		height: 36px;
+		padding: 0 12px;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+		min-width: 200px;
+		flex: 1;
+	}
+	
+	.search-btn {
+		height: 36px;
+		padding: 0 16px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	
+	.search-btn:hover {
+		background-color: #0056b3;
+	}
+
+	/* 페이지네이션 스타일 */
+	.pagination {
+		margin-top: 20px;
+		text-align: center;
+	}
+
+	.pagination button {
+		height: 36px;
+		padding: 0 12px;
+		margin: 0 2px;
+		background-color: #f8f9fa;
+		color: #495057;
+		border: 1px solid #dee2e6;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.pagination button:hover {
+		background-color: #e9ecef;
+		color: #212529;
+	}
+
+	.pagination button.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	/* 폼 섹션 스타일 */
+	.form-section {
+		margin-top: 20px;
+		background-color: #ffffff;
+		padding: 24px;
+		border: 1px solid #dee2e6;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.form-section input,
+	.form-section select,
+	.form-section textarea {
+		width: 100%;
+		padding: 12px;
+		margin: 8px 0;
+		font-size: 14px;
+		border: 1px solid #ced4da;
+		border-radius: 4px;
+		background-color: white;
+	}
+
+	.form-section label {
+		font-weight: 600;
+		color: #495057;
+		margin-bottom: 4px;
+		display: block;
+	}
+
+	.form-section button {
+		padding: 12px 24px;
+		margin-top: 15px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.form-section button:hover {
+		background-color: #0056b3;
+	}
+
+	/* 상세 보기 스타일 */
+	.detail-section {
+		margin-top: 20px;
+		background-color: #fff;
+		padding: 24px;
+		border: 1px solid #dee2e6;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.detail-section p {
+		margin: 12px 0;
+		font-size: 14px;
+		color: #495057;
+	}
+
+	.detail-section strong {
+		font-weight: 600;
+		color: #212529;
+	}
+
+	.detail-section .content-box {
+		background-color: #f8f9fa;
+		padding: 16px;
+		border: 1px solid #dee2e6;
+		border-radius: 4px;
+		margin-top: 8px;
+		white-space: pre-wrap;
+		line-height: 1.5;
+	}
+
+	.detail-section button {
+		padding: 8px 16px;
+		margin-right: 8px;
+		margin-top: 12px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.detail-section button:hover {
+		background-color: #0056b3;
+	}
+
+	.detail-section button:last-child {
+		background-color: #dc3545;
+	}
+
+	.detail-section button:last-child:hover {
+		background-color: #c82333;
+	}
+
+	/* 페이지 제목 스타일 */
+	h1 {
+		color: #212529;
+		font-size: 24px;
+		font-weight: 600;
+		margin-bottom: 24px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	/* 숨김 처리 */
+	.hidden {
+		display: none;
+	}
+
+	#faq-form, #faq-detail {
+		display: none;
+	}
+
+	/* 구분선 스타일 */
+	hr {
+		margin: 24px 0;
+		border: none;
+		border-top: 1px solid #dee2e6;
+	}
+
+	/* 반응형 디자인 */
+	@media (max-width: 768px) {
+		.top-menu {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+		
+		.menu-btn {
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+		}
+		
+		.register-btn {
+			margin-left: 0;
+			width: 100%;
+		}
+	}
+</style>
+</head>
+<body>
+
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
+
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+		<!-- 본문 -->
+		<div class="content" id="main-content">
+			<h1>FAQ 관리</h1>
+
+			<!-- 카테고리 버튼 영역 -->
+			<div class="top-menu" id="category-buttons">
+				<!-- 버튼은 JS로 생성 -->
+				<button class="register-btn" onclick="toggleFaqForm()">추가하기</button>
+			</div>
+		
+			<div class="middle-menu">
+			    <input type="text" id="searchInput" placeholder="제목을 입력하세요">
+			    <button class="search-btn" onclick="">검색</button>
+			</div>
+			
+			<div id="faq-list" th:if="${faqlist != null}">
+				<table id="faq-table">
+					<thead>
+						<tr>
+							<th>글번호</th>
+							<th>구분</th>
+							<th>제목</th>
+						</tr>
+					</thead>
+					<tbody id="faq-tbody">
+						<tr th:each="faq, iterStat : ${faqlist}"
+							th:attr="data-index=${iterStat.index}">
+							<td th:text="${faq.faqId}"></td>
+							<td th:text="${faq.category}"></td>
+							<td><a href="#" th:attr="data-id=${faq.faqId}"
+								th:text="${faq.question}"
+								onclick="loadFaqDetail(this); return false;"></a></td>
+						</tr>
+					</tbody>
+				</table>
+
+				<!-- 페이지네이션 -->
+				<div class="pagination" id="pagination"></div>
+			</div>
+
+			<hr>
+
+			<div id="faq-detail" class="detail-section">
+				<p>
+					<strong>글번호:</strong> <span id="detail-id"></span>
+				</p>
+				<p>
+					<strong>제목:</strong> <span id="detail-question"></span>
+				</p>
+				<p>
+					<strong>카테고리:</strong> <span id="detail-category"></span>
+				</p>
+
+				<p>
+					<strong>작성일:</strong> <span id="detail-regdate"></span>
+				</p>
+
+				<hr>
+				<p>
+					<strong>답변:</strong>
+				</p>
+				<div class="content-box" id="detail-answer"></div>
+				<button onclick="enableFaqEdit()">수정</button>
+				<button onclick="deleteFaq()">삭제</button>
+			</div>
+
+			<div id="faq-form" class="form-section">
+				<form id="faqForm" data-mode="create">
+					<label for="category">카테고리:</label>
+					<select id="category" name="category" required>
+						<option value="">-- 선택하세요 --</option>
+						<option value="예금">예적금</option>
+						<option value="카드">카드</option>
+						<option value="기타">기타</option>
+					</select>
+					
+					<label for="question">제목:</label>
+					<input type="text" id="question" name="question" required>
+					
+					<label for="answer">답변:</label>
+					<textarea id="answer" name="answer" rows="10" required></textarea>
+					
+					<button id="faq-submit-btn" type="button" onclick="faqRegist()">FAQ 등록하기</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+<script>
+function enableFaqEdit() {
+    const faqId = document.getElementById("detail-id").textContent;
+    const category = document.getElementById("detail-category").textContent;
+    const question = document.getElementById("detail-question").textContent;
+    const answer = document.getElementById("detail-answer").textContent;
+
+    document.getElementById("category").value = category;
+    document.getElementById("question").value = question;
+    document.getElementById("answer").value = answer;
+
+    const form = document.getElementById("faqForm");
+    form.setAttribute("data-mode", "edit");
+    form.setAttribute("data-id", faqId);
+
+    document.getElementById("faq-form").style.display = "block";
+    document.getElementById("faq-detail").style.display = "none";
+
+    document.getElementById("faq-submit-btn").textContent = "FAQ 수정하기";
+}
+
+function faqRegist() {
+    const form = document.getElementById("faqForm");
+    const mode = form.getAttribute("data-mode") || "create";
+    const faqId = form.getAttribute("data-id");
+
+    const formData = new FormData();
+    formData.append("category", document.getElementById("category").value);
+    formData.append("question", document.getElementById("question").value);
+    formData.append("answer", document.getElementById("answer").value);
+
+    let url = '/admin/faqRegist';
+    if (mode === "edit") {
+        formData.append("faqId", faqId);
+        url = '/admin/faqUpdate';
+    }
+
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(result => {
+        alert(result);
+        location.reload();
+    })
+    .catch(error => {
+        console.error('FAQ 저장 실패:', error);
+        alert('FAQ 저장에 오류 발생.');
+    });
+}
+
+function deleteFaq() {
+    const faqId = document.getElementById("detail-id").textContent;
+
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    fetch('/admin/faqDelete/' + faqId, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("삭제 실패");
+        return response.text();
+    })
+    .then(result => {
+        alert("삭제되었습니다.");
+        location.reload();
+    })
+    .catch(error => {
+        console.error("삭제 오류:", error);
+        alert("FAQ 삭제 중 오류 발생.");
+    });
+}
+
+function toggleFaqForm() {
+    const formDiv = document.getElementById("faq-form");
+    const form = document.getElementById("faqForm");
+
+    form.setAttribute("data-mode", "create");
+    form.removeAttribute("data-id");
+    document.getElementById("faq-submit-btn").textContent = "FAQ 등록하기";
+
+    formDiv.style.display = "block";
+    document.getElementById("faq-detail").style.display = "none";
+
+    form.reset();
+}
+
+function loadFaqDetail(element) {
+    const faqId = element.getAttribute('data-id');
+
+    fetch('/admin/detail/' + faqId)
+    .then(response => response.json())
+    .then(faq => {
+        document.getElementById("detail-id").textContent = faq.faqId;
+        document.getElementById("detail-question").textContent = faq.question;
+        document.getElementById("detail-category").textContent = faq.category;
+        document.getElementById("detail-regdate").textContent = faq.regdate;
+        document.getElementById("detail-answer").textContent = faq.answer;
+
+        document.getElementById("faq-detail").style.display = "block";
+        document.getElementById("faq-form").style.display = "none";
+    })
+    .catch(error => {
+        console.error("FAQ 상세보기 실패:", error);
+        alert("상세보기를 불러오지 못했습니다.");
+    });
+}
+
+// 페이지네이션 및 카테고리 필터 처리
+document.addEventListener("DOMContentLoaded", () => {
+    const rowsPerPage = 5;
+    const rows = Array.from(document.querySelectorAll("#faq-tbody tr"));
+    const pagination = document.getElementById("pagination");
+    const categoryContainer = document.getElementById("category-buttons");
+
+    let currentCategory = "전체";
+    let filteredRows = [...rows];
+
+    function renderPagination(list = filteredRows) {
+        pagination.innerHTML = "";
+        const pageCount = Math.ceil(list.length / rowsPerPage);
+
+        for (let i = 0; i < pageCount; i++) {
+            const button = document.createElement("button");
+            button.textContent = i + 1;
+            button.addEventListener("click", () => {
+                // 기존 활성 버튼 제거
+                document.querySelectorAll('.pagination button').forEach(btn => btn.classList.remove('active'));
+                // 클릭된 버튼 활성화
+                button.classList.add('active');
+                showPage(i, list);
+            });
+            pagination.appendChild(button);
+        }
+
+        // 첫 번째 페이지 버튼 활성화
+        if (pagination.firstChild) {
+            pagination.firstChild.classList.add('active');
+        }
+
+        showPage(0, list);
+    }
+
+    function showPage(page, list = filteredRows) {
+        rows.forEach(row => row.classList.add("hidden"));
+        list.forEach((row, index) => {
+            row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+        });
+    }
+
+    function filterRowsByCategory() {
+        filteredRows = rows.filter(row => {
+            const category = row.querySelector("td:nth-child(2)").textContent.trim();
+            return currentCategory === "전체" || category === currentCategory;
+        });
+
+        renderPagination(filteredRows);
+    }
+
+    // 카테고리 버튼 생성
+    const categories = [...new Set(rows.map(row => row.querySelector("td:nth-child(2)").textContent.trim()))];
+    ["전체", ...categories].forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "menu-btn";
+        btn.dataset.category = cat;
+        btn.textContent = cat;
+
+        if (cat === "전체") btn.classList.add("active");
+
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentCategory = cat;
+            filterRowsByCategory();
+        });
+
+        // 추가하기 버튼 앞에 삽입
+        categoryContainer.insertBefore(btn, categoryContainer.querySelector('.register-btn'));
+    });
+
+    filterRowsByCategory(); // 초기 렌더링
+});
+</script>
+
+</body>
+</html>

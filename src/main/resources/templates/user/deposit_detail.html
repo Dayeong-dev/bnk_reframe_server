@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/css/common.css" />
+<link rel="stylesheet" href="/css/user.css" />
+<title th:text="${product.name}">예적금 상품 상세</title>
+<style>
+body {
+	font-family: 'Noto Sans KR', sans-serif;
+	margin: 0;
+}
+
+.container {
+	max-width: 1000px;
+	margin: 30px auto;
+	background: white;
+	padding: 30px;
+	border-radius: 10px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+	margin: 0;
+	font-size: 1.8rem;
+}
+
+.info-box {
+	display: flex;
+	justify-content: center;
+	gap: 80px; /* 항목 간 간격 */
+	margin: 30px 0;
+	text-align: center;
+	flex-wrap: wrap;
+}
+
+.info-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 100px;
+}
+
+.info-value {
+	font-size: 1.4rem;
+	font-weight: bold;
+	color: #000; /* 기본값 검정 */
+}
+
+.info-value.red {
+	color: #d9230f; /* 최고금리만 빨간색 */
+}
+
+.info-label {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #000;
+	margin-top: 5px;
+}
+
+.calc-container {
+	background: #fefefe;
+	padding: 20px;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	margin: 40px 0;
+}
+
+.btn {
+	background: #fe504f;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	margin: 10px;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.btn:hover {
+	background: #b71510;
+}
+
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 999;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+	background: white;
+	margin: 5% auto;
+	padding: 40px;
+	border-radius: 10px;
+	width: 80%;
+	max-width: 700px;
+	max-height: 80vh;
+	overflow-y: auto;
+	line-height: 1.6; /* ✅ 줄간격 추가 */
+}
+
+.modal-content h2 {
+	font-size: 24px;
+	font-weight: bold;
+	margin: 24px 0 12px;
+	padding-bottom: 6px;
+}
+
+.modal-content p {
+	margin: 0.5rem 0;
+	color: #444;
+}
+
+.modal-content ul, .modal-content ol {
+	margin: 10px 0 10px;
+	padding-left: 20px;
+}
+
+.modal-content ul {
+	list-style-type: disc;
+}
+
+.modal-content li {
+	margin-bottom: 6px;
+	line-height: 1.6;
+}
+
+.modal-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 20px 0;
+}
+
+.modal-content th, .modal-content td {
+	border: 1px solid #ccc;
+	padding: 10px;
+	text-align: left;
+}
+
+.modal-content th {
+	background-color: #f5f7fa;
+	color: #2c3e50;
+	font-weight: bold;
+}
+
+.close {
+	position: absolute;
+	top: 16px;
+	right: 20px;
+	font-size: 28px;
+	font-weight: bold;
+	color: #aaa;
+	cursor: pointer;
+	transition: color 0.2s ease;
+	z-index: 10;
+}
+
+.close:hover {
+	color: #000;
+}
+
+/* 추가 스타일 (필요 시 head 영역에 포함) */
+#detailContent section {
+	display: flex;
+	min-height: auto;
+	align-items: center;
+	justify-content: space-between; /* ✅ 내부 요소 사이 간격 확보 */
+	flex-direction: row;
+	min-width: 1200px;
+	max-width: 1200px;
+	margin: 100px auto; /* ✅ 상하 여백 확보 */
+	padding: 0 20px; /* ✅ 양쪽 여백 확보 */
+	box-sizing: border-box;
+	align-items: center;
+}
+
+#detailContent section.reverse {
+	flex-direction: row-reverse;
+}
+
+#detailContent section .text-wrap {
+	flex: 1;
+	padding: 0 20px;
+	text-align: left;
+}
+
+#detailContent section.reverse .text-wrap {
+	text-align: right;
+}
+
+#detailContent section h2 {
+	font-size: 1.6rem; /* 기존 1.4 → 더 큼 */
+	font-weight: bold; /* ✅ 볼드 적용 */
+	margin-bottom: 10px;
+}
+
+#detailContent section p {
+	font-size: 1.2rem; /* 기존 1.1 → 조금 키움 */
+	font-weight: 500; /* ✅ 중간 볼드 (너무 두껍지 않게) */
+	line-height: 1.7;
+	margin: 0;
+}
+
+#detailContent section img {
+	width: 240px;
+	height: auto;
+	object-fit: cover;
+}
+</style>
+</head>
+<body>
+	<div th:replace="~{user/fragments/modal :: modalFragment}"></div>
+	<div th:replace="~{user/fragments/header :: headerFragment}"></div>
+	<div th:replace="~{user/fragments/side-menu :: sideMenuFragment}"></div>
+
+	<div id="container">
+		<section>
+			<!-- 🟢 상단 정보 -->
+			<div class="header" style="text-align: center;">
+				<h1 th:text="${product.name}"
+					style="margin-bottom: 8px; font-size: 2.8rem;">상품명</h1>
+				<p th:utext="${product.summary}"
+					style="font-size: 1rem; color: #666;">상품요약</p>
+			</div>
+
+			<div class="info-box">
+				<div class="info-item">
+					<span class="info-value red"
+						th:text="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')} + '%'">2.10%</span>
+					<span class="info-label">최고금리</span>
+				</div>
+				<div class="info-item">
+					<span class="info-value"
+						th:text="${#numbers.formatDecimal(product.minRate,1,'POINT',2,'POINT')} + '%'">1.80%</span>
+					<span class="info-label">최저금리</span>
+				</div>
+				<div class="info-item">
+					<span class="info-value" th:text="${product.period} + '개월'">12개월</span>
+					<span class="info-label">가입기간</span>
+				</div>
+			</div>
+
+			<!-- 상세 설명 영역 (7개 섹션 포함) -->
+			<div id="detailContent" th:utext="${product.detail}">상세 설명</div>
+
+			<!-- 🟡 세부 기능 버튼 (계산기 위로 이동) -->
+			<div
+				style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
+				<button class="btn" onclick="openModal()">상품 이용 가이드</button>
+				<button class="btn" onclick="openRateModal()">금리표 보기</button>
+				<button class="btn" onclick="openGuideImgModal()">상품설명서 보기</button>
+				<button class="btn" onclick="openTermsImgModal()">이용약관 보기</button>
+			</div>
+
+			<div class="calc-container" style="text-align: center;">
+				<h3 style="font-size: 1.5rem; margin-bottom: 20px;">💰 간편 이자
+					계산기</h3>
+
+				<div
+					style="display: inline-flex; flex-wrap: wrap; align-items: center; gap: 15px; font-size: 1.2rem; justify-content: center;">
+					<label> 이 상품을 <input id="monthsInput" type="text"
+						th:value="${product.period}"
+						style="width: 60px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+						<span>개월 간</span>
+					</label> <label> <input id="depositAmount" type="text"
+						value="1,000,000"
+						style="width: 170px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+						<span>원으로</span>
+					</label> <label> 금리 연 <input id="rateInput" type="text"
+						th:value="${#numbers.formatDecimal(product.maxRate,1,'POINT',2,'POINT')}"
+						style="width: 70px; padding: 10px; text-align: right; font-size: 1.1rem;" />
+						<span>%를 적용하면?</span>
+					</label>
+				</div>
+
+				<br>
+				<button class="btn" style="margin-top: 20px; background: #F0AD4E;"
+					onclick="calcInterest()">✔ 결과보기</button>
+
+
+				<div style="margin-top: 25px; font-size: 1.3rem;">
+					세전 이자: <b id="interestResult"
+						style="font-size: 1.5rem; color: #1565c0;">0</b> 원
+				</div>
+			</div>
+
+			<div style="text-align: center; margin-top: 10px;">
+				<a href="/deposit/list" class="btn">목록으로</a>
+			</div>
+		</section>
+	</div>
+
+
+	<!-- 모달창 -->
+	<div id="productModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">상품 이용 가이드</h2>
+			<div th:utext="${modalDetailForModal}" style="margin-bottom: 20px;">가이드
+				내용</div>
+
+			<!-- ✅ 하단 닫기 버튼 -->
+			<div style="text-align: center;">
+				<button class="btn" onclick="closeModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 금리표 모달 -->
+	<div id="rateModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeRateModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">금리표</h2>
+			<div th:utext="${modalRateTable}" style="margin-bottom: 20px;">
+				<!-- 금리표 HTML 출력 -->
+			</div>
+			<p class="rate-note">
+				※ 본 금리는 <span
+					th:text="${#dates.format(#dates.createNow(), 'yyyy년 MM월 dd일')}"></span>
+				기준입니다.
+			</p>
+			<div style="text-align: center;">
+				<button class="btn" onclick="closeRateModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 상품설명서 모달 -->
+	<div id="guideImgModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeGuideImgModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">상품설명서</h2>
+			<div style="text-align: center;">
+				<div th:if="${product.manualImages != null and not #lists.isEmpty(product.manualImages)}" th:each="img : ${product.manualImages}">
+					<img th:src="@{${img}}" alt="설명서 이미지" style="width: 100%;" />
+				</div>
+			</div>
+			<div style="text-align: center; margin-top: 20px;">
+				<button class="btn" onclick="closeGuideImgModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 이용약관 모달 -->
+	<div id="termsImgModal" class="modal">
+		<div class="modal-content" style="position: relative;">
+			<span class="close" onclick="closeTermsImgModal()">&times;</span>
+			<h2 style="text-align: center; margin-top: 0;">이용약관</h2>
+			<div style="text-align: center;">
+				<div th:if="${product.termImages != null and not #lists.isEmpty(product.termImages)}" th:each="img : ${product.termImages}">
+					<img th:src="@{${img}}" alt="약관 이미지" style="width: 100%;" />
+				</div>
+			</div>
+			<div style="text-align: center; margin-top: 20px;">
+				<button class="btn" onclick="closeTermsImgModal()">닫기</button>
+			</div>
+		</div>
+	</div>
+	<div th:replace="~{user/fragments/footer :: footerFragment}"></div>
+
+	<script>
+  function openModal() {
+    document.getElementById("productModal").style.display = "block";
+  }
+  function closeModal() {
+    document.getElementById("productModal").style.display = "none";
+  }
+  
+  
+ 	 function openRateModal() {
+	  document.getElementById("rateModal").style.display = "block";
+	}
+	function closeRateModal() {
+	  document.getElementById("rateModal").style.display = "none";
+	}
+	
+		function openGuideImgModal() {
+		  document.getElementById("guideImgModal").style.display = "block";
+		}
+		function closeGuideImgModal() {
+		  document.getElementById("guideImgModal").style.display = "none";
+		}
+
+			function openTermsImgModal() {
+			  document.getElementById("termsImgModal").style.display = "block";
+			}
+			function closeTermsImgModal() {
+			  document.getElementById("termsImgModal").style.display = "none";
+			}
+
+		// 배경 클릭 시 닫기 처리도 추가
+		window.onclick = function (e) {
+		  if (e.target === document.getElementById("productModal")) closeModal();
+		  if (e.target === document.getElementById("rateModal")) closeRateModal();
+		  if (e.target === document.getElementById("guideImgModal")) closeGuideImgModal();
+		  if (e.target === document.getElementById("termsImgModal")) closeTermsImgModal();
+		};
+
+  // 쉼표 자동 삽입
+ document.getElementById("depositAmount").addEventListener("input", function() {
+  const val = this.value.replace(/,/g, '').replace(/\D/g, '');
+  this.value = Number(val).toLocaleString();
+});
+
+function calcInterest() {
+  const amount = Number(document.getElementById("depositAmount").value.replace(/,/g, ''));
+  const months = Number(document.getElementById("monthsInput").value);
+  const rate = Number(document.getElementById("rateInput").value);
+
+  if (isNaN(amount) || isNaN(months) || isNaN(rate)) {
+    alert("모든 값을 숫자로 입력해주세요.");
+    return;
+  }
+
+  const interest = (amount * rate * months) / (12 * 100);
+  document.getElementById("interestResult").innerText = Math.floor(interest).toLocaleString();
+}
+
+
+  
+  
+window.addEventListener("load", () => {
+	  const sections = document.querySelectorAll("#detailContent section");
+
+	  sections.forEach((section, i) => {
+	    const h2 = section.querySelector("h2");
+	    const p = section.querySelector("p");
+	    const img = section.querySelector("img");
+
+	    if (h2 && p && img) {
+	      const wrapper = document.createElement("div");
+	      wrapper.className = "text-wrap";
+	      wrapper.appendChild(h2);
+	      wrapper.appendChild(p);
+	      section.insertBefore(wrapper, img);
+	    }
+
+	    // 짝수번째 reverse 적용
+	    if ([2, 4, 6].includes(i + 1)) {
+	      section.classList.add("reverse");
+	    }
+	  });
+	});
+</script>
+</body>
+</html>

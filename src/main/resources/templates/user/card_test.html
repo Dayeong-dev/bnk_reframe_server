@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>텅장진단기</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@400;700&display=swap"
+	rel="stylesheet">
+<style>
+body {
+	font-family: 'Gmarket Sans', sans-serif;
+	background: #f8f9fa;
+	color: #333;
+	text-align: center;
+	margin: 0;
+	padding: 0;
+}
+
+
+h2 {
+	font-size: 30px;
+	margin: 20px 0;
+}
+
+h3 {
+	font-size: 24px;
+	margin: 120px 0 0 0;
+}
+
+h4 {
+	font-size: 20px;
+	margin: 15px 0;
+}
+
+p {
+	line-height: 1.5;
+	font-size: 16px;
+	color: #555;
+	margin: 10px 0;
+}
+
+button {
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.3s ease;
+}
+
+.section {
+	display: none;
+	max-width: 1000px;
+	margin: 0 auto;
+	background: #fff;
+	border-radius: 12px;
+	padding: 40px 30px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.section.active {
+	display: block;
+}
+
+#progress-area {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+#prev-btn {
+	background: none;
+	border: none;
+	font-size: 16px;
+	color: #888;
+}
+
+#prev-btn:hover {
+	color: #111;
+	text-decoration: underline;
+}
+
+#progress-bar {
+	position: relative;
+	width: 100%;
+	height: 12px;
+	background: #e0e0e0;
+	border-radius: 6px;
+	overflow: hidden;
+	margin: 20px 0;
+}
+
+#progress-fill {
+	height: 100%;
+	width: 0%;
+	background: linear-gradient(90deg, #fad684, #f5b21d);
+	transition: width 0.3s ease;
+}
+
+.progress-text {
+	font-size: 14px;
+	color: #666;
+}
+
+.question-img {
+	width: 100%;
+	max-width: 600px;
+	border-radius: 12px;
+	margin: 30px 0;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.question {
+	font-size: 22px;
+	font-weight: 600;
+	color: #222;
+}
+
+#options {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 30px;
+	margin-top: 30px;
+}
+
+#start-section .option-btn {
+  margin-top: 40px;
+}
+
+.option-btn {
+	flex: 1 1 40%;
+	min-width: 260px;
+	max-width: 450px;
+	padding: 20px 30px;
+	font-size: 18px;
+	border: 2px solid #ddd;
+	border-radius: 50px;
+	background: #fdfdfd;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.option-btn:hover {
+	transform: translateY(-4px);
+}
+
+.card-list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-top: 30px;
+	gap: 20px;
+}
+
+.card-item {
+	width: 220px;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	overflow: hidden;
+	background: #fff;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+	padding: 15px;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.card-item img {
+	width: 100%;
+	max-width: 200px;
+	border-radius: 8px;
+}
+
+.card-item h4 {
+	font-size: 18px;
+	margin: 5px 0;
+	color: #222;
+}
+
+.recommend-reason {
+  font-size: 15px;
+  color: #333;
+  margin: 15px auto 10px;
+  white-space: pre-line;
+  max-width: 600px;
+  line-height: 1.6;
+}
+/* 결과 텍스트 - 상단 메시지 */
+.result-text.top {
+  font-size: 30px;
+  font-weight: 400;
+  color: #888;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* 결과 이름 - 중앙 타이틀 */
+.result-name {
+  font-size: 42px;
+  font-weight: 750;
+  color: #f5b21d;
+  margin-bottom: 40px;
+}
+
+/* 결과 퍼센트 */
+.result-percentage {
+  font-size: 25px;
+  font-weight: 700;
+  color: #111;
+  margin: 20px 0 10px;
+}
+
+/* 하단 설명 */
+.result-text.bottom {
+  font-size: 16px;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 30px;
+  white-space: pre-line;
+}
+
+/* 결과 이미지 정렬 */
+#result-img {
+  margin: 10px auto 10px;
+  width: 400px;
+  display: block;
+}
+
+
+/* 추천 카드 */
+#recommend-reason,
+#recommended-cards {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.6s ease;
+}
+
+#recommend-reason.show,
+#recommended-cards.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-item.recommend-card {
+  margin: 5px auto 0;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 174, 239, 0.1);
+  width: 350px;
+}
+
+.card-item.recommend-card img {
+  max-width: 300px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.card-item.recommend-card h4 {
+  font-size: 15px;
+  color: #7f7f7f;
+  margin: 5px 0 0;
+}
+
+#document .s1_arrow {
+  display: inline-block;
+  position: relative;
+  top: 28px;
+  margin-left: -10px;
+  text-align: center;
+  animation: arrow_down 1.5s infinite;
+}
+
+#document .s1_arrow .scroll-arrow {
+  width: 12px;
+  height: 12px;
+  border-right: 3px solid gray;
+  border-bottom: 3px solid gray;
+  transform: rotate(45deg);
+  animation: arrow-wave 1s infinite alternate;
+}
+
+#document .s1_arrow .scroll-arrow:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+#document .s1_arrow .scroll-arrow:nth-child(2) {
+  margin-top: 6px;
+  animation-delay: 0.2s;
+}
+
+#document .s1_arrow .scroll-arrow:nth-child(3) {
+  margin-top: 6px;
+  animation-delay: 0.3s;
+}
+
+@keyframes arrow-wave {
+  0% { opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes arrow_down {
+  0% { top: 28px; }
+  50% { top: 40px; }
+  100% { top: 28px; }
+}
+</style>
+</head>
+
+<body>
+	<!-- 시작 화면 -->
+	<div id="start-section" class="section active">
+		<img src="/images/cardTest/card_test_main.gif" alt="텅장 분석기"
+			width="400" />
+		<h2>텅장진단기</h2>
+		<p>내 통장이 텅장이 된 이유를 분석해드립니다!</p>
+		<p>나의 소비성향을 확인해보세요!</p>
+		<button class="option-btn" onclick="startTest()">테스트 시작</button>
+	</div>
+
+	<!-- 질문 화면 -->
+	<div id="question-section" class="section">
+		<!-- 진행 영역 -->
+		<div id="progress-area">
+			<button id="prev-btn" onclick="goBack()">← 이전</button>
+			<div id="progress"></div>
+		</div>
+		<!-- 진행바 -->
+		<div id="progress-bar">
+			<div id="progress-fill"></div>
+		</div>
+		<div class="progress-text" id="progress-text"></div>
+
+		<!-- 질문 이미지 -->
+		<img id="question-img" src="" alt="질문 이미지" class="question-img" />
+
+		<!-- 질문 텍스트 -->
+		<div id="question-text" class="question"></div>
+
+		<!-- 선택 버튼 -->
+		<div id="options">
+			<button id="optionA" class="option-btn" onclick="selectOption('A')"></button>
+			<button id="optionB" class="option-btn" onclick="selectOption('B')"></button>
+		</div>
+	</div>
+
+	<!-- 결과 화면 -->
+	<div id="document" class="section">
+		<div id="result-title"></div>
+		<p id="result-desc"></p>
+		
+		 <!-- 스크롤 화살표 -->
+  		<div class="s1_arrow">
+		  <div class="scroll-arrow"></div>
+		  <div class="scroll-arrow"></div>
+		  <div class="scroll-arrow"></div>
+		</div>
+  	
+		<h3>추천 카드</h3>
+		<p id="recommend-reason" class="recommend-reason"></p>
+		<div id="recommended-cards" class="card-list"></div>
+	</div>
+
+	<script>
+  // 질문 데이터
+	const questions = [
+	  {
+	    img: '/images/cardTest/q1.png',
+	    text: '1. 쇼핑할 때 더 설레는 순간은?',
+	    A: '택배 도착 알림 똑딱📦',
+	    B: '매장 가서 실물 딱 보는 순간✨',
+	    typeA: '온라인',
+	    typeB: '오프라인'
+	  },
+	  {
+	    img: '/images/cardTest/q2.png',
+	    text: '2. 결제할 땐?',
+	    A: '‘폰만 있으면 끝! 간편결제 최고’',
+	    B: '‘카드 꺼내서 긁는 맛 있어야지~’',
+	    typeA: '온라인',
+	    typeB: '오프라인'
+	  },
+	  {
+	    img: '/images/cardTest/q3.png',
+	    text: '3. 급하게 필요한 물건이 생겼을 땐?',
+	    A: '‘이럴 땐 로켓 배송!! 바로 주문 ㄱ ㄱ’',
+	    B: '‘지금 나가서 사와야지!!’',
+	    typeA: '온라인',
+	    typeB: '오프라인'
+	  },
+	  {
+	    img: '/images/cardTest/q4.png',
+	    text: '4. 월급 들어오면 제일 먼저 하는 생각?',
+	    A: '‘일단 저축부터 하고.. 남은 돈으로 버텨보자!’',
+	    B: '‘휴 한달동안 넘 고생했다~ 오늘은 치킨이닭!!’',
+	    typeA: '저축',
+	    typeB: '소비'
+	  },
+	  {
+	    img: '/images/cardTest/q5.png',
+	    text: '5. 할인 쿠폰이 생겼을 때 나는?',
+	    A: '‘아깝지만.. 필요한 건 아니니깐 안 살래🙅‍♀️’',
+	    B: '‘싸면 일단 득템이지~🛍️’',
+	    typeA: '저축',
+	    typeB: '소비'
+	  },
+	  {
+	    img: '/images/cardTest/q6.png',
+	    text: '6. 우왓 로또 3등 당첨!! 150만원으로 뭘 하지?',
+	    A: '‘나이스~ 일단 비상금으로 둬야겠다’',
+	    B: '‘꽁돈 생겼다~~ flex 가보자고~~💸🤑💰💰’',
+	    typeA: '저축',
+	    typeB: '소비'
+	  },
+	  {
+	    img: '/images/cardTest/q7.png',
+	    text: '7. 해외여행을 떠나기 3달 전, 나는?',
+	    A: '‘비행기는 미리미리 예매해서 최저가격에 창가자리까지 겟~!’',
+	    B: '‘자리는 있겠지 뭐~~ 예약은 한달 전에 하면 되겠지??’',
+	    typeA: '계획',
+	    typeB: '충동'
+	  },
+	  {
+	    img: '/images/cardTest/q8.png',
+	    text: '8. 눈을 사로잡는 SNS 속 핫템! 이거 탐난다..',
+	    A: '‘혹하긴 하지만 당장 필요한 물건은 아니니깐.. 필요하면 사야지’',
+	    B: '‘이게 진짜 효과가 있다고? 당장 구매 ㄱ ㄱ’',
+	    typeA: '계획',
+	    typeB: '충동'
+	  },
+	  {
+	    img: '/images/cardTest/q9.png',
+	    text: '9. 로션이 다 떨어져서 하나 사야겠어!',
+	    A: '‘후기 하나하나 찾아보며 나에게 맞는지 꼼꼼히 비교’',
+	    B: '친구가 좋다고 추천해준 거 들고 바로 계산대 직행~!',
+	    typeA: '계획',
+	    typeB: '충동'
+	  }
+	];
+
+  // 결과 유형 이름, 설명
+	const resultMap = {
+	  'ONLINE-SAVE-PLAN': {
+	    id: 1,
+	    name: '통장 철옹성',
+	    front: '지름신이 와도 철벽수비하는',
+	    percentage: '텅장력 10%',
+	    back: '꼼꼼하게 비교하여 소비하는 당신!\n잔고가 쌓이는 통장을 보면 밥 안 먹어도 배부르다~~',
+	    card: {
+	      id: 4,
+	      name: 'BNK 부자되세요 홈쇼핑카드',
+	      reason: '온라인 쇼핑몰, 홈쇼핑 집중형으로 \n온라인 결제·자동이체 할인에 계획적 저축에 적합한'
+	    }
+	  },
+	  'OFFLINE-SAVE-PLAN': {
+	    id: 2,
+	    name: '명예 통장지킴이',
+	    front: '통장.. 넌 내가 지킨다.\n시켜줘 너만의',
+	    percentage: '텅장력 20%',
+	    back: '지름신이 찾아오는 그 순간에도\n이성의 끈을 놓지 않는 명예 통장지킴이!',
+	    card: {
+	      id: 3,
+	      name: 'BNK 프렌즈 신용카드',
+	      reason: '대중교통 10%, 휴대폰 자동이체 5%, \n주중/주말 할인 등 오프라인 생활비 절약에 초점을 맞춘'
+	    }
+	  },
+	  'ONLINE-SAVE-IMPULSE': {
+	    id: 3,
+	    name: '팔랑팔랑 팔랑귀',
+	    front: '분명히 계획에 없었는데..\n어라랍스타?',
+	    percentage: '텅장력 40%',
+	    back: '처음 계획과는 다르게 점점 늘어나는 소비..\n분명히 통장 잔고가 있었는데요? 없어졌습니다?',
+	    card: {
+	      id: 12,
+	      name: '팟(pod) 카드',
+	      reason: '온라인 쇼핑과 배달 앱에서 10~15% 할인, 간편결제 10% 할인 등 \n충동적 온라인 소비에 혜택이 많은'
+	    }
+	  },
+	  'OFFLINE-SAVE-IMPULSE': {
+	    id: 4,
+	    name: '무계획 지출러',
+	    front: '나는 가끔 눈물을 흘린다..⭐',
+	    percentage: '텅장력 50%',
+	    back: '저축도 열심이지만 소비도 열심히 하는 당신!\n내 통장은 울지만 잠깐이나마 행복했으니 그걸로 된 거 아닐까..? ㅜ',
+	    card: {
+	      id: 5,
+	      name: '딩딩 신용카드',
+	      reason: '음식점 10%, 커피&베이커리 10%, 영화관 할인 등 \n오프라인 충동성 소비에 혜택이 많은'
+	    }
+	  },
+	  'ONLINE-SPEND-PLAN': {
+	    id: 5,
+	    name: '계획소비러',
+	    front: '저 결심했어요. 돈 쓸 결심..',
+	    percentage: '텅장력 60%',
+	    back: '내 소비엔 다 계획이 있다구~\n이 정도는 써줘야 인생 살 맛 나지!! \n오늘도 온라인 쇼핑 한번 해볼까~',
+	    card: {
+	      id: 16,
+	      name: '오늘은e 신용카드',
+	      reason: '간편결제 5%, 학원 5%, 통신 5%, 커피 5%, 대중교통 5%, 영화 5% 청구 할인 등 \n생활 필수 소비 계획에 딱 맞는'
+	    }
+	  },
+	  'OFFLINE-SPEND-PLAN': {
+	    id: 6,
+	    name: '소비요정',
+	    front: '요정 등장! 내가 나간다!',
+	    percentage: '텅장력 70%',
+	    back: '노는 게 제일 좋아!\n밖에 나가면 일단 지갑부터 여는 소비요정!! \n그런데 어디서 우는 소리 안 들리나요? 통장 우는 소리..',
+	    card: {
+	      id: 8,
+	      name: 'ZipL 신용카드',
+	      reason: '아파트관리비, 도시가스, 보험, 학원 등 \n오프라인 생활 필수 지출에 10% 청구 할인되는'
+	    }
+	  },
+	  'ONLINE-SPEND-IMPULSE': {
+	    id: 7,
+	    name: '이 구역 지름신',
+	    front: '핸드폰만 키면 왜 잔고가 줄줄 새니..',
+	    percentage: '텅장력 90%',
+	    back: '일단 담고보자!\n장바구니가 항상 풀로 차있는.. \n오늘 밤 지름신은 나야 나!',
+	    card: {
+	      id: 14,
+	      name: '2030 언택트 체크카드',
+	      reason: '쿠팡, 마켓컬리, 배달의민족 등 온라인 쇼핑과 \n딜리버리 3% 할인에 구독 서비스 20% 할인까지 \n충동 소비용으로 적합한'
+	    }
+	  },
+	  'OFFLINE-SPEND-IMPULSE': {
+	    id: 8,
+	    name: '프로탕진러',
+	    front: '사고싶은 건 못 참아 다 사고말테야!!',
+	    percentage: '텅장력 100%',
+	    back: '이것도 내 거, 저것도 내 거..\n맘에 드는 건 다 내 거야! \n일단 맘에 드는 건 사고보는 프로탕진러',
+	    card: {
+	      id: 18,
+	      name: '딩딩 체크카드',
+	      reason: '편의점, 베이커리, 외식, 커피, 영화 등 \n오프라인 충동성 소비에 할인폭 크고 활용도가 높은'
+	    }
+	  }
+	};
+
+
+
+
+  let current = 0;
+  let counts = { 온라인: 0, 오프라인: 0, 저축: 0, 소비: 0, 계획: 0, 충동: 0 };
+  let lastAnswers = [];
+
+  function startTest() {
+    document.getElementById('start-section').classList.remove('active');
+    document.getElementById('question-section').classList.add('active');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = questions[current];
+    document.getElementById('question-img').src = q.img;
+    document.getElementById('question-text').innerText = q.text;
+    document.getElementById('optionA').innerText = q.A;
+    document.getElementById('optionB').innerText = q.B;
+
+    const progressPercent = ((current + 1) / questions.length) * 100;
+    document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+    document.getElementById('progress-text').innerText = `${current + 1} / ${questions.length}`;
+  }
+
+  function selectOption(option) {
+    const q = questions[current];
+    const selectedType = option === 'A' ? q.typeA : q.typeB;
+    counts[selectedType]++;
+    lastAnswers.push(selectedType);
+    current++;
+    if (current < questions.length) {
+      showQuestion();
+    } else {
+      finishTest();
+    }
+  }
+
+  function goBack() {
+    if (current > 0) {
+      const lastSelectedType = lastAnswers.pop();
+      if (lastSelectedType) {
+        counts[lastSelectedType]--;
+      }
+      current--;
+      showQuestion();
+    }
+  }
+
+  function finishTest() {
+	  document.getElementById('question-section').classList.remove('active');
+	  document.getElementById('document').classList.add('active');
+
+	  const type1 = counts.온라인 >= counts.오프라인 ? 'ONLINE' : 'OFFLINE';
+	  const type2 = counts.저축 >= counts.소비 ? 'SAVE' : 'SPEND';
+	  const type3 = counts.계획 >= counts.충동 ? 'PLAN' : 'IMPULSE';
+	  const resultType = `${type1}-${type2}-${type3}`;
+
+	  const result = resultMap[resultType] || { id: 0, name: '알 수 없음' };
+
+	  const resultHTML = `
+	    <p class="result-text top">${result.front}</p>
+	    <h2 class="result-name">${result.name}</h2>
+	    <img id="result-img" src="/images/cardTest/r${result.id}.png" alt="결과 이미지" />
+	    <p class="result-percentage">${result.percentage}</p>
+	    <p class="result-text bottom">${result.back}</p>
+	  `;
+	  document.getElementById('result-title').innerHTML = resultHTML;
+
+	  const container = document.getElementById('recommended-cards');
+	  document.getElementById('recommend-reason').innerText = result.card.reason;
+
+	  container.innerHTML = `
+	    <a href="/card/detail/${result.card.id}" class="card-item recommend-card">
+	      <img src="/images/cards/${result.card.id}_front.PNG" alt="${result.card.name}" />
+	      <h4>${result.card.name}</h4>
+	    </a>
+	  `;
+
+	  const recommendReason = document.getElementById('recommend-reason');
+	  const recommendedCards = document.getElementById('recommended-cards');
+	  observer.observe(recommendReason);
+	  observer.observe(recommendedCards);
+	}
+  
+	  const observer = new IntersectionObserver((entries) => {
+		    entries.forEach((entry) => {
+		      if (entry.isIntersecting) {
+		        entry.target.classList.add('show');
+		        observer.unobserve(entry.target); // 한 번만 애니메이션 적용
+		      }
+		    });
+		  }, {
+		    threshold: 0.3
+		  });
+
+
+</script>
+
+
+</body>
+</html>
