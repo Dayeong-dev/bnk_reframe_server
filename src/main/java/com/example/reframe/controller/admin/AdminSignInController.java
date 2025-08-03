@@ -1,12 +1,19 @@
 package com.example.reframe.controller.admin;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.entity.User;
 import com.example.reframe.repository.UserRepository;
@@ -91,8 +98,21 @@ public class AdminSignInController {
 				
 				// 관리자의 등급 확인
 				User user = userRepository.findByUsername(username);
+			    
+				// Security 연동
+			    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+			            user.getUsername(), null, List.of(new SimpleGrantedAuthority(user.getRole())));
+
+			    SecurityContextHolder.getContext().setAuthentication(auth);
+			    
+			    session.setAttribute(
+		    	    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+		    	    SecurityContextHolder.getContext()
+		    	);
+			    
 			    session.setAttribute("role", user.getRole());
 			    session.setAttribute("loginInfo", user);
+			    
 				return "redirect:/admin/product-main"; // 로그인 완료
 				
 			} else {
@@ -113,7 +133,7 @@ public class AdminSignInController {
 	
 	// 인증번호 이메일 발송 처리 (AJAX)
     @PostMapping("/send-auth-code")
-    public ResponseEntity<String> sendAuthCode(@RequestParam("username") String username,
+    public @ResponseBody ResponseEntity<String> sendAuthCode(@RequestParam("username") String username,
                                                @RequestParam("email") String email,
                                                HttpSession session) {
 

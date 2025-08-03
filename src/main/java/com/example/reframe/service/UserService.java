@@ -176,6 +176,14 @@ public class UserService {
 	    }
 	}
 	
-	
+	public UserDTO signin(UserDTO userDTO) {
+		User user = userRepository.findByUsername(userDTO.getUsername());
+		
+		if(user == null || !bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
+			return null;
+		}
+		
+		return userMapper.toDTO(user);
+	}
 
 }
