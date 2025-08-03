@@ -2,6 +2,7 @@ package com.example.reframe.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,11 +26,38 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	@Order(1)
+	SecurityFilterChain adminFilterChane(HttpSecurity http) throws Exception {
+		http.securityMatcher("/admin/**", "/superadmin/**", "/admin/signin-form", "/admin/login", "/admin/send-auth-code");
 		
 		http.authorizeHttpRequests(auth -> auth
-//				.requestMatchers("/admin/**").hasRole("ADMIN")
-//				.requestMatchers("/superadmin/**").hasRole("SUPERADMIN")
+				.requestMatchers("/admin/signin-form", "/admin/login", "/admin/send-auth-code").permitAll()
+				.requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
+				.requestMatchers("/superadmin/**").hasRole("SUPERADMIN")
+				.anyRequest().denyAll());
+		
+		http.formLogin(auth -> auth.disable());
+		
+		http.logout(auth -> auth
+			    .logoutUrl("/admin/signout")
+			    .logoutSuccessUrl("/admin/signin-form")
+			    .invalidateHttpSession(true)
+			    .deleteCookies("JSESSIONID")
+			    .permitAll());
+		
+		http.exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint));
+		
+		http.csrf(auth -> auth.disable());
+		
+		return http.build();
+	}
+	
+	@Bean
+	@Order(2)
+	SecurityFilterChain userFilterChain(HttpSecurity http) throws Exception {		
+		http.securityMatcher("/**");
+		
+		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/qna/**").hasRole("MEMBER")
 				.anyRequest().permitAll());
 		
