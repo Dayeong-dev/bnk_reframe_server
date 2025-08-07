@@ -18,6 +18,9 @@ public interface DepositProductService {
 
     // ✅ 상품 상세 조회 (+ 조회수 증가)
     DepositProductDTO getProductDetail(Long productId) throws JsonMappingException, JsonProcessingException;
+    
+    // ✅ 상품 상세 조회(모바일) (+ 조회수 증가)
+    DepositProductDTO getProductDetail2(Long productId) throws JsonMappingException, JsonProcessingException;
 
     // ✅ 관리자 상품 등록/수정/삭제
     Long saveProduct(DepositProductDTO dto);

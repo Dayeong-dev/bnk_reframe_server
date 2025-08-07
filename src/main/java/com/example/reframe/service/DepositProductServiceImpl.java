@@ -222,6 +222,48 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .manualImages(manualImages)
                 .build();
     }
+    
+    public DepositProductDTO getProductDetail2(Long productId) throws JsonMappingException, JsonProcessingException {
+        DepositProduct product = depositProductRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
+        
+        String modalDetail = MarkdownUtil.toHtml(product.getModalDetail());		// MarkDown → HTML
+        String modalRate = MarkdownUtil.toHtml(product.getModalRate());			// MarkDown → HTML
+        
+        
+        List<String> termImages = new ArrayList<>();
+        List<String> manualImages = new ArrayList<>();
+        
+        if(product.getTerm() != null) {
+        	termImages = documentService.getImages(product.getTerm().getDocumentId());	// 약관 이미지 조회
+        }
+        if(product.getManual() != null) {
+        	manualImages = documentService.getImages(product.getManual().getDocumentId());	// 상품설명서 이미지 조회
+        }
+        
+        // 조회수 증가
+        product.setViewCount(product.getViewCount() + 1);
+        depositProductRepository.save(product);
+
+        // Entity → DTO 변환
+        return DepositProductDTO.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .summary(product.getSummary())
+                .detail(product.getDetail())
+                .modalDetail(modalDetail)
+                .modalRate(modalRate)
+                .detail(product.getDetail())
+                .maxRate(product.getMaxRate())
+                .minRate(product.getMinRate())
+                .period(product.getPeriod())
+                .viewCount(product.getViewCount())
+                .imageUrl(product.getImageUrl())
+                .termImages(termImages)
+                .manualImages(manualImages)
+                .build();
+    }
+    
     @Override
     public List<DepositProductDTO> getProductsByCategory(String category) {
         List<DepositProduct> products = depositProductRepository.findByCategoryAndStatus(category, "S");

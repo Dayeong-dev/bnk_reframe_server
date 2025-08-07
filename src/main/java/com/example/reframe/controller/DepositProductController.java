@@ -153,6 +153,9 @@ public class DepositProductController {
 		return "redirect:/";
     }
 
+    
+
+    
     @GetMapping("/autocomplete")
     @ResponseBody
     public List<String> getAutocomplete(@RequestParam("keyword") String keyword) {
@@ -172,5 +175,49 @@ public class DepositProductController {
     	
     	return ResponseEntity.status(HttpStatus.OK).body(depositList);
     }
+    
+    
+    
+    
+    
+    @GetMapping("/api/detail/{id}")
+    @ResponseBody
+    public ResponseEntity<DepositProductDTO> getProductDetailJson(@PathVariable("id") Long productId) throws JsonMappingException, JsonProcessingException {
+        DepositProductDTO product = depositProductService.getProductDetail2(productId);
+        return ResponseEntity.ok(product);
+    }
+
+    @GetMapping("/api/list")
+    @ResponseBody
+    public ResponseEntity<List<DepositProductDTO>> getAllProducts() {
+        List<DepositProductDTO> productList = depositProductService.getAllProducts("S", null); // 판매중 상품 전체
+        return ResponseEntity.ok(productList);
+    }
+    
+    @GetMapping("/api/preview")
+    @ResponseBody
+    public Map<String, List<DepositProductDTO>> getPreviewByCategory() {
+        Map<String, List<DepositProductDTO>> previewMap = new HashMap<>();
+
+        List<String> categories = List.of("예금", "적금", "입출금자유");
+
+        for (String category : categories) {
+            List<DepositProductDTO> list = depositProductService.getAllProducts("S", category);
+            previewMap.put(category, list.stream().limit(3).toList());
+        }
+
+        return previewMap;
+    }
+
+ // DepositProductController.java
+    @GetMapping("/api/category")
+    @ResponseBody
+    public List<DepositProductDTO> getProductsByCategoryAPI(@RequestParam("category") String category) {
+        return depositProductService.getAllProducts("S", category);
+    }
+
+    
+    
+    
 
 }
