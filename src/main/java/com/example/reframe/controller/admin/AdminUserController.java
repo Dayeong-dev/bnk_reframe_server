@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.reframe.service.UserService;
+import com.example.reframe.service.auth.UserService;
 
 @RestController
 @RequestMapping("/admin/user")

@@ -22,18 +22,16 @@ import com.example.reframe.session.RecentViewManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/deposit")
 public class DepositProductController {
-
     private final DepositProductService depositProductService;
     private final DepositProductServiceImpl depositProductServiceImpl;
     private final RecentViewManager recentViewManager;
-  
-
 
     /**
      * 예적금 메인 (추천상품, 테마별 추천 상품)
@@ -109,7 +107,6 @@ public class DepositProductController {
         Page<DepositProductDTO> productsPage = depositProductService.getPagedProducts("S", null, keyword, sort, page);
         // "S" = 판매중, category = null (전체)
 
-
         model.addAttribute("products", productsPage.getContent());
         model.addAttribute("page", productsPage);
         model.addAttribute("products", productsPage.getContent()); // 현재 페이지의 상품 리스트
@@ -175,49 +172,4 @@ public class DepositProductController {
     	
     	return ResponseEntity.status(HttpStatus.OK).body(depositList);
     }
-    
-    
-    
-    
-    
-    @GetMapping("/api/detail/{id}")
-    @ResponseBody
-    public ResponseEntity<DepositProductDTO> getProductDetailJson(@PathVariable("id") Long productId) throws JsonMappingException, JsonProcessingException {
-        DepositProductDTO product = depositProductService.getProductDetail2(productId);
-        return ResponseEntity.ok(product);
-    }
-
-    @GetMapping("/api/list")
-    @ResponseBody
-    public ResponseEntity<List<DepositProductDTO>> getAllProducts() {
-        List<DepositProductDTO> productList = depositProductService.getAllProducts("S", null); // 판매중 상품 전체
-        return ResponseEntity.ok(productList);
-    }
-    
-    @GetMapping("/api/preview")
-    @ResponseBody
-    public Map<String, List<DepositProductDTO>> getPreviewByCategory() {
-        Map<String, List<DepositProductDTO>> previewMap = new HashMap<>();
-
-        List<String> categories = List.of("예금", "적금", "입출금자유");
-
-        for (String category : categories) {
-            List<DepositProductDTO> list = depositProductService.getAllProducts("S", category);
-            previewMap.put(category, list.stream().limit(3).toList());
-        }
-
-        return previewMap;
-    }
-
- // DepositProductController.java
-    @GetMapping("/api/category")
-    @ResponseBody
-    public List<DepositProductDTO> getProductsByCategoryAPI(@RequestParam("category") String category) {
-        return depositProductService.getAllProducts("S", category);
-    }
-
-    
-    
-    
-
 }

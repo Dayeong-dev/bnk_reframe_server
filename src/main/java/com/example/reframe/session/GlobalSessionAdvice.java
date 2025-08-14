@@ -3,7 +3,7 @@ package com.example.reframe.session;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.example.reframe.entity.User;
+import com.example.reframe.entity.auth.User;
 
 import jakarta.servlet.http.HttpSession;
 

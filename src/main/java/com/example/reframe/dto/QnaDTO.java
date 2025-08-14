@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class QnaDTO {
 
     private Integer qnaId;
-    private String username; // user 엔티티에서 username만 가져옴
+    private Long userId; // user 엔티티에서 username만 가져옴
     private String category;
     private String title;
     private String content;
@@ -26,7 +26,7 @@ public class QnaDTO {
     // Qna 엔티티로부터 DTO로 변환
     public QnaDTO(Qna qna) {
         this.qnaId = qna.getQnaId();
-        this.username = qna.getUser() != null ? qna.getUser().getUsername() : null;
+        this.userId = qna.getUser() != null ? qna.getUser().getId() : null;
         this.category = qna.getCategory();
         this.title = qna.getTitle();
         this.content = qna.getContent();

@@ -1,4 +1,4 @@
-package com.example.reframe.service;
+package com.example.reframe.service.auth;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,12 +9,16 @@ import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.CorporateDTO;
 import com.example.reframe.dto.CorporateUserDTO;
-import com.example.reframe.dto.UserDTO;
-import com.example.reframe.entity.CorporateUser;
-import com.example.reframe.entity.User;
-import com.example.reframe.repository.CorporateUserRepository;
-import com.example.reframe.repository.UserRepository;
+import com.example.reframe.dto.auth.RefreshIssueResult;
+import com.example.reframe.dto.auth.TokenResponse;
+import com.example.reframe.dto.auth.UserDTO;
+import com.example.reframe.entity.auth.CorporateUser;
+import com.example.reframe.entity.auth.User;
+import com.example.reframe.repository.auth.CorporateUserRepository;
+import com.example.reframe.repository.auth.UserRepository;
+import com.example.reframe.service.PublicApiService;
 import com.example.reframe.util.CorpUserMapper;
+import com.example.reframe.util.JWTUtil;
 import com.example.reframe.util.UserMapper;
 
 import jakarta.servlet.http.HttpSession;
@@ -27,22 +31,27 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final CorporateUserRepository corporateUserRepository;
 	private final PublicApiService publicApiService;
+	private final RefreshTokenService refreshTokenService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	private final JWTUtil jwtUtil;
 	
 	private final UserMapper userMapper = new UserMapper();
 	private final CorpUserMapper corpUserMapper = new CorpUserMapper();
 	
 	public UserService(HttpSession session, 
 					   UserRepository userRepository, 
-					   CorporateUserRepository corporateUserRepository, 
+					   CorporateUserRepository corporateUserRepository,
 					   PublicApiService publicApiService, 
-					   BCryptPasswordEncoder bCryptPasswordEncoder) {
+					   RefreshTokenService refreshTokenService, 
+					   BCryptPasswordEncoder bCryptPasswordEncoder, 
+					   JWTUtil jwtUtil) {
 		this.session = session;
 		this.userRepository = userRepository;
 		this.corporateUserRepository = corporateUserRepository;
 		this.publicApiService = publicApiService;
+		this.refreshTokenService = refreshTokenService;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-		
+		this.jwtUtil = jwtUtil;
 	}
 	
 	// 사업자 확인
@@ -66,7 +75,7 @@ public class UserService {
 	
 	// 아이디 중복체크
 	public boolean checkUsername(String username) {
-		Optional<User> user = userRepository.findById(username);
+		Optional<User> user = userRepository.findByUsername(username);
 		
 		if(user.isEmpty()) {
 			return true;
@@ -150,7 +159,7 @@ public class UserService {
 		return corpList.stream().map(corp -> {
 			CorporateDTO dto = new CorporateDTO();
 
-			dto.setUsername(corp.getUsername());
+			dto.setUserId(corp.getUserId());
 			dto.setBusinessNumber(corp.getBusinessNumber());
 			dto.setBusinessStartDate(corp.getBusinessStartDate());
 			dto.setCeoName(corp.getCeoName());
@@ -166,24 +175,30 @@ public class UserService {
 
 	public void updateRoles(List<UserDTO> roleList) {
 	    for (UserDTO dto : roleList) {
-	        User user = userRepository.findByUsername(dto.getUsername());
-	        
-	        if (user == null) {
-	            throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + dto.getUsername());
-	        }
+	        User user = userRepository.findByUsername(dto.getUsername())
+	        		.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+
 	        user.setRole(dto.getRole());
 	        userRepository.save(user);
 	    }
 	}
 	
-	public UserDTO signin(UserDTO userDTO) {
-		User user = userRepository.findByUsername(userDTO.getUsername());
+	public TokenResponse signin(UserDTO userDTO) {
+		User user = userRepository.findByUsername(userDTO.getUsername())
+				.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
 		
 		if(user == null || !bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
-			return null;
+			throw new RuntimeException("아이디 또는 비밀번호가 잘못되었습니다. ");
 		}
 		
-		return userMapper.toDTO(user);
+		UserDTO currUserDTO = userMapper.toDTO(user);
+		RefreshIssueResult issueResult = refreshTokenService.issue(currUserDTO);
+		
+		String accessToken = jwtUtil.createAccessToken(currUserDTO, RefreshTokenService.ACCESS_EXPIRATION_MS);
+		String refreshToken = jwtUtil.createRefreshToken(issueResult.getJti(), currUserDTO, RefreshTokenService.REFRESH_EXPIRATION_MS);
+		
+		TokenResponse tokenResponse = new TokenResponse("Bearer", accessToken, refreshToken);
+		
+		return tokenResponse;
 	}
-
 }

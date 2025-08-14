@@ -8,10 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.reframe.entity.CorporateUser;
-import com.example.reframe.entity.User;
-import com.example.reframe.repository.CorporateUserRepository;
-import com.example.reframe.repository.UserRepository;
+import com.example.reframe.entity.auth.CorporateUser;
+import com.example.reframe.entity.auth.User;
+import com.example.reframe.repository.auth.CorporateUserRepository;
+import com.example.reframe.repository.auth.UserRepository;
 
 @SpringBootTest
 public class TestUserFactory {

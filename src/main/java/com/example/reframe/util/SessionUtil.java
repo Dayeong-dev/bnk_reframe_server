@@ -1,6 +1,6 @@
 package com.example.reframe.util;
 
-import com.example.reframe.entity.User;
+import com.example.reframe.entity.auth.User;
 
 import jakarta.servlet.http.HttpSession;
 

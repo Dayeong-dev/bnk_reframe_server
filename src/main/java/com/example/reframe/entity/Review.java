@@ -1,5 +1,7 @@
 package com.example.reframe.entity;
 
+import com.example.reframe.entity.auth.User;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +28,7 @@ public class Review extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
     private String content;
     private boolean negative;  // 부정 여부

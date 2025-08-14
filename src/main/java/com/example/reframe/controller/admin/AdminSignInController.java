@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.example.reframe.entity.User;
-import com.example.reframe.repository.UserRepository;
+import com.example.reframe.entity.auth.User;
+import com.example.reframe.repository.auth.UserRepository;
 import com.example.reframe.service.AdminSignInService;
 
 import jakarta.servlet.http.HttpSession;
@@ -97,7 +97,7 @@ public class AdminSignInController {
 				session.removeAttribute("authCode"); 
 				
 				// 관리자의 등급 확인
-				User user = userRepository.findByUsername(username);
+				User user = userRepository.findByUsername(username).get();
 			    
 				// Security 연동
 			    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

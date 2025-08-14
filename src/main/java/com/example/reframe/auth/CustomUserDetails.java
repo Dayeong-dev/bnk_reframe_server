@@ -6,7 +6,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.example.reframe.entity.User;
+import com.example.reframe.entity.auth.User;
 
 public class CustomUserDetails implements UserDetails {
 	
@@ -43,6 +43,10 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public String getUsername() {
 		return user.getUsername();
+	}
+	
+	public Long getId() {
+		return user.getId();
 	}
 	
 	public String getName() {

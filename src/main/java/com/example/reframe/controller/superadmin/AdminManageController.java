@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.reframe.dto.UserDTO;
-import com.example.reframe.entity.User;
-import com.example.reframe.repository.UserRepository;
-import com.example.reframe.service.UserService;
+import com.example.reframe.dto.auth.UserDTO;
+import com.example.reframe.entity.auth.User;
+import com.example.reframe.repository.auth.UserRepository;
+import com.example.reframe.service.auth.UserService;
 
 @RestController
 @RequestMapping("/superadmin/admin-manage")

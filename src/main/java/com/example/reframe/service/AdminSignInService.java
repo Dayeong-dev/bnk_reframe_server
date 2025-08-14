@@ -9,8 +9,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.reframe.entity.User;
-import com.example.reframe.repository.UserRepository;
+import com.example.reframe.entity.auth.User;
+import com.example.reframe.repository.auth.UserRepository;
 
 @Service
 public class AdminSignInService {
@@ -25,7 +25,8 @@ public class AdminSignInService {
 	private JavaMailSender javaMailSender;
 	
 	public boolean validateUsernameAndPassword(String username, String password) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+        		.orElseThrow(() -> new RuntimeException("해당 관리자를 찾을 수 없습니다"));
 
         if (user == null) {
         	return false;
@@ -37,7 +38,8 @@ public class AdminSignInService {
     }
 
     public boolean validateEmail(String username, String email) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+        		.orElseThrow(() -> new RuntimeException("해당 관리자를 찾을 수 없습니다"));
 
         if (user == null) {
         	return false;

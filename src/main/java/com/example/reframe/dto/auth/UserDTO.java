@@ -1,9 +1,11 @@
-package com.example.reframe.dto;
+package com.example.reframe.dto.auth;
 
 import lombok.Data;
 
 @Data
 public class UserDTO {
+	
+	private Long id;			// 회원 고유 식별 ID
 	
 	private String username;	// 회원 아이디
 	

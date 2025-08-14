@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reframe.dto.CorporateUserDTO;
-import com.example.reframe.dto.UserDTO;
+import com.example.reframe.dto.auth.UserDTO;
 import com.example.reframe.service.RecaptchaService;
-import com.example.reframe.service.UserService;
+import com.example.reframe.service.auth.UserService;
 
 @Controller
 public class UserController {

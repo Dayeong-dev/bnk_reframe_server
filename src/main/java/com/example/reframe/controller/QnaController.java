@@ -15,9 +15,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reframe.auth.CustomUserDetails;
 import com.example.reframe.entity.Qna;
-import com.example.reframe.entity.User;
+import com.example.reframe.entity.auth.User;
 import com.example.reframe.repository.QnaRepository;
-import com.example.reframe.repository.UserRepository;
+import com.example.reframe.repository.auth.UserRepository;
 
 @RequestMapping("/qna")
 @Controller
@@ -31,7 +31,7 @@ public class QnaController {
 	
 	@PostMapping("/qnaRegist")
 	public String registBoard(Qna qna, RedirectAttributes redirectAttributes,@AuthenticationPrincipal CustomUserDetails user) {
-		User user1 = userRepository.findById(user.getUsername())
+		User user1 = userRepository.findById(user.getId())
               .orElseThrow(() -> new RuntimeException("로그인된 사용자 없음"));
 		qna.setUser(user1);
 		qnaRepository.save(qna);
@@ -41,7 +41,7 @@ public class QnaController {
 	
 	@GetMapping("/qna")
 	public String qna(Model model,@AuthenticationPrincipal CustomUserDetails user) {
-		List<Qna> qnalist = qnaRepository.findByUser_Username(user.getUsername());
+		List<Qna> qnalist = qnaRepository.findByUser_id(user.getId());
 		System.out.println(qnalist);
 		model.addAttribute("qnalist", qnalist);
 		return "user/qna";
@@ -57,8 +57,5 @@ public class QnaController {
             return "redirect:/qna/qna";
         }
     }
-	
-	
-	
-	
+
 }

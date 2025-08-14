@@ -8,6 +8,6 @@ import com.example.reframe.entity.Qna;
 
 public interface QnaRepository extends JpaRepository<Qna, Integer>{
 
-	List<Qna> findByUser_Username(String username);
+	List<Qna> findByUser_id(Long id);
 	
 }

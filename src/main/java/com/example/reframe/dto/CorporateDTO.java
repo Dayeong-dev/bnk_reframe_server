@@ -10,7 +10,7 @@ import lombok.Setter;
 
 public class CorporateDTO {
 
-	private String username;
+	private Long userId;
 
 	@JsonProperty("b_no")
 	private String businessNumber;

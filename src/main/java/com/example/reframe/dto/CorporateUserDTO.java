@@ -1,6 +1,6 @@
 package com.example.reframe.dto;
 
-import com.example.reframe.entity.User;
+import com.example.reframe.entity.auth.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class CorporateUserDTO {
 	
-	private String username;
+	private Long userId;
 	
 	private User user;
 	

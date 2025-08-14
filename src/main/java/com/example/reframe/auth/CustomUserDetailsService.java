@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.reframe.entity.User;
-import com.example.reframe.repository.UserRepository;
+import com.example.reframe.entity.auth.User;
+import com.example.reframe.repository.auth.UserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<User> optionalUser = userRepository.findById(username);
+		Optional<User> optionalUser = userRepository.findByUsername(username);
 		
 		if(optionalUser.isPresent()) {
 			User user = optionalUser.get();
