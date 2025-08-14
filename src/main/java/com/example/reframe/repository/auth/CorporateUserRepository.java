@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.reframe.entity.auth.CorporateUser;
 
-public interface CorporateUserRepository extends JpaRepository<CorporateUser, String> {
+public interface CorporateUserRepository extends JpaRepository<CorporateUser, Long> {
 
 }
