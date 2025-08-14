@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.reframe.util.ChatRequest;
 import com.example.reframe.util.ChatResponse;
-
+//일반적인 ai 사용분야 
 @Service
 public class OpenAIService {
 
