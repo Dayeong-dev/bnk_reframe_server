@@ -1,5 +1,8 @@
 package com.example.reframe.entity.auth;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,4 +49,20 @@ public class User {
 	
 	@NotNull
 	private String role;		// 회원 역할		// 회원: ROLE_MEMBER
+	
+	private Gender gender;		// 회원 성별		// M : 남자, F : 여자
+	
+	private LocalDate birth;	// 회원 생년월일
+	
+	public String toGenderString() {
+		if (gender == null) return null;
+		
+		return gender.name();
+	}
+	
+	public String toBirthString() {
+		if (birth == null) return null;
+		
+		return birth.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+	}
 }

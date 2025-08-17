@@ -44,8 +44,14 @@ public class AuthController {
 	}
 	
 	@PostMapping("/signup")
-	private ResponseEntity<Void> signup(@RequestBody UserDTO userDTO) {		
+	private ResponseEntity<Void> signup(@RequestBody UserDTO userDTO) {
+		System.out.println(userDTO);
+		
+		UserDTO result = userService.signup(userDTO);
 
+		if(result == null) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 		
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}

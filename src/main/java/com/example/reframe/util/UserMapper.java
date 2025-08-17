@@ -15,6 +15,8 @@ public class UserMapper {
 		userEntity.setPhone(userDTO.getPhone());
 		userEntity.setUsertype(userDTO.getUsertype());
 		userEntity.setRole(userDTO.getRole());
+		userEntity.setGender(userDTO.toGenderEnum());
+		userEntity.setBirth(userDTO.toBirthDate());
 		
 		return userEntity;
 	}
@@ -30,6 +32,8 @@ public class UserMapper {
 		userDTO.setPhone(userEntity.getPhone());
 		userDTO.setUsertype(userEntity.getUsertype());
 		userDTO.setRole(userEntity.getRole());
+		userDTO.setGender(userEntity.toGenderString());
+		userDTO.setBirth(userEntity.toBirthString());
 		
 		return userDTO;
 	}
