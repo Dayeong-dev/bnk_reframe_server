@@ -1,243 +1,253 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>관리자 메인</title>
-    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
-    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
-    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
-    <script th:src="@{/admin/sidebar.js}"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            padding: 24px;
-        }
+<meta charset="UTF-8">
+<title>관리자 메인</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<script th:src="@{/admin/sidebar.js}"></script>
 
-        .chart-box {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            padding: 20px;
-            position: relative;
-            height: 300px; /* ✅ 도넛 포함 모든 차트의 높이 통일 */
-        }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        .chart-box canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
+<style>
+.chart-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 24px;
+	padding: 24px;
+}
 
-        h1 {
-            padding-left: 24px;
-        }
-    </style>
-    
+.chart-box {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	padding: 20px;
+	position: relative;
+	height: 300px; /* ✅ 도넛 포함 모든 차트의 높이 통일 */
+}
+
+.chart-box canvas {
+	width: 100% !important;
+	height: 100% !important;
+}
+
+h1 {
+	padding-left: 24px;
+}
+</style>
+
 </head>
 <body>
 
-    <!-- 공통 헤더 -->
-    <div th:replace="admin/fragments/header :: header" class="header"></div>
+	<!-- 공통 헤더 -->
+	<div th:replace="admin/fragments/header :: header" class="header"></div>
 
-    <div id="body">
-        <!-- 사이드바 -->
-        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+	<div id="body">
+		<!-- 사이드바 -->
+		<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
 
-        <!-- 본문 -->
-        <div class="content">
-		    <div class="chart-grid">
-                <div class="chart-box">
-                    <canvas id="visitChart"></canvas>
-                </div>
-                <div class="chart-box">
-                    <canvas id="productChart"></canvas>
-                </div>
-                <div class="chart-box">
-                    <canvas id="sentimentChart"></canvas>
-                </div>
-                <div class="chart-box">
-                    <canvas id="testResultChart"></canvas>
-                </div>
-            </div>
+		<!-- 본문 -->
+		<div class="content">
+			<div class="chart-grid">
+				<div class="chart-box">
+					<canvas id="visitChart"></canvas>
+				</div>
+				<div class="chart-box">
+					<canvas id="productChart"></canvas>
+				</div>
+				<div class="chart-box">
+					<canvas id="sentimentChart"></canvas>
+				</div>
+				<div class="chart-box">
+					<canvas id="testResultChart"></canvas>
+				</div>
+			</div>
 		</div>
 	</div>
-    
+
+
+
+	<!-- 리포트 다운 -->
+	<div style="display: flex; gap: 8px; margin: 16px 24px;">
+		<a class="btn" th:href="@{/admin/reports/users(format='pdf')}">PDF
+			다운</a> <a class="btn" th:href="@{/admin/reports/users(format='xlsx')}">엑셀
+			다운</a>
+	</div>
 
 	<script th:inline="javascript">
-	
 		// 방문자 수 
-		
-	    const labels = /*[[${visitLabels}]]*/ [];
-	    const counts = /*[[${visitCounts}]]*/ [];
-	    console.log("✅ labels:", labels);
-	    console.log("✅ counts:", counts);
-	
-	    const ctx = document.getElementById('visitChart').getContext('2d');
-	    new Chart(ctx, {
-	        type: 'bar',	
-	        data: {
-	            labels: labels,
-	            datasets: [{
-	                label: '방문자 수',
-	                data: counts,
-	                backgroundColor: 'rgba(47, 235, 97, 0.5)',
-	                borderColor: 'rgba(47, 235, 97, 1)',
-	                borderWidth: 1
-	            }]
-	        },
-	        options: {
-	            scales: {
-	                y: { 
-	                	beginAtZero: true ,
-	                	ticks: {
-	                		stepSize:1
-	                	}	
-	                }
-	            }
-	        }
-	    });
-	    
-	    //==================================================================
-	    
-	    //상품 조회수
-	    const productLabels = /*[[${labels}]]*/ [];
-	    const productCounts = /*[[${counts}]]*/ [];
 
-	    const ctxProduct = document.getElementById('productChart').getContext('2d');
-	    new Chart(ctxProduct, {
-	        type: 'bar',
-	        data: {
-	            labels: productLabels,
-	            datasets: [{
-	                label: '상품별 조회수',
-	                data: productCounts,
-	                backgroundColor: 'rgba(254, 80, 79, 0.5)',
-	                borderColor: 'rgba(254, 80, 79, 1)',
-	                borderWidth: 1
-	            }]
-	        },
-	        options: {
-	            indexAxis: 'x', // 수평 막대그래프
-	            responsive: true,
-	            scales: {
-	                x: {
-	                    beginAtZero: true,
-	                    title: {
-	                        display: false,
-	                        text: '조회수'
-	                    }
-	                },
-	                y: {
-	                    title: {
-	                        display: true,
-	                        text: '상품명'
-	                    }
-	                }
-	            },
-	            plugins: {
-	                legend: { display: false },
-	                title: {
-	                    display: true,
-	                    text: '📊 인기 상품 TOP 10 (조회수 기준)'
-	                }
-	            }
-	        }
-	    });
-	    
-	 // =============================================
-	 // 리뷰 긍정 부정 통계 	 
-	
-	 const sentimentLabels = /*[[${sentimentLabels}]]*/ [];
-	 const sentimentCounts = /*[[${sentimentCounts}]]*/ [];
+		const labels = /*[[${visitLabels}]]*/[];
+		const counts = /*[[${visitCounts}]]*/[];
+		console.log("✅ labels:", labels);
+		console.log("✅ counts:", counts);
 
-	 const ctxSentiment = document.getElementById('sentimentChart').getContext('2d');
-	 new Chart(ctxSentiment, {
-	     type: 'doughnut',  
-	     data: {
-	         labels: sentimentLabels,
-	         datasets: [{
-	             label: '리뷰 감정 통계',
-	             data: sentimentCounts,
-	             backgroundColor: [
-	                 'rgba(254, 80, 79, 0.6)' ,// 부정
-	                 'rgba(60, 129, 247, 0.6)'  // 긍정
-	             ],
-	             borderColor: [
-	                 'rgba(254, 80, 79, 1)',
-	                 'rgba(60, 129, 247, 1)'
-	             ],
-	             borderWidth: 1
-	         }]
-	     },
-	     options: {
-	         responsive: true,
-	         maintainAspectRatio: false,
-	         plugins: {
-	             legend: { position: 'top' },
-	             title: {
-	                 display: true,
-	                 text: '👍 리뷰 감정 통계 (긍정 vs 부정)'
-	             }
-	         }
-	     }
-	 });
-	
-	 
-	 // =============================================
-	 // 소비유형 결과 
-	
-	 const testResultLabels = /*[[${testResultLabels}]]*/ [];
-	 const testResultCounts = /*[[${testResultCounts}]]*/ [];
+		const ctx = document.getElementById('visitChart').getContext('2d');
+		new Chart(ctx, {
+			type : 'bar',
+			data : {
+				labels : labels,
+				datasets : [ {
+					label : '방문자 수',
+					data : counts,
+					backgroundColor : 'rgba(47, 235, 97, 0.5)',
+					borderColor : 'rgba(47, 235, 97, 1)',
+					borderWidth : 1
+				} ]
+			},
+			options : {
+				scales : {
+					y : {
+						beginAtZero : true,
+						ticks : {
+							stepSize : 1
+						}
+					}
+				}
+			}
+		});
 
-	 const ctxTestResult = document.getElementById('testResultChart').getContext('2d');
-	 new Chart(ctxTestResult, {
-	     type: 'bar',
-	     data: {
-	         labels: testResultLabels,
-	         datasets: [{
-	             label: '테스트 결과 분포',
-	             data: testResultCounts,
-	             backgroundColor: 'rgba(47, 235, 97, 0.5)',
-	             borderColor: 'rgba(47, 235, 97, 1)',
-	             borderWidth: 1
-	         }]
-	     },
-	     options: {
-	         responsive: true,
-	         scales: {
-	             y: {
-	                 beginAtZero: true,
-	                 title: {
-	                     display: true,
-	                     text: '응답 수'
-	                 },
-	     			 ticks:{
-	     				 stepSize:5
-	     			 }
-	             },
-	             x: {
-	                 title: {
-	                     display: true,
-	                     text: '테스트 유형'
-	                 }
-	             }
-	         },
-	         plugins: {
-	             legend: { display: false },
-	             title: {
-	                 display: true,
-	                 text: '🧠 테스트 결과 통계'
-	             }
-	         }
-	     }
-	 });
-	 
-	    
+		//==================================================================
+
+		//상품 조회수
+		const productLabels = /*[[${labels}]]*/[];
+		const productCounts = /*[[${counts}]]*/[];
+
+		const ctxProduct = document.getElementById('productChart').getContext(
+				'2d');
+		new Chart(ctxProduct, {
+			type : 'bar',
+			data : {
+				labels : productLabels,
+				datasets : [ {
+					label : '상품별 조회수',
+					data : productCounts,
+					backgroundColor : 'rgba(254, 80, 79, 0.5)',
+					borderColor : 'rgba(254, 80, 79, 1)',
+					borderWidth : 1
+				} ]
+			},
+			options : {
+				indexAxis : 'x', // 수평 막대그래프
+				responsive : true,
+				scales : {
+					x : {
+						beginAtZero : true,
+						title : {
+							display : false,
+							text : '조회수'
+						}
+					},
+					y : {
+						title : {
+							display : true,
+							text : '상품명'
+						}
+					}
+				},
+				plugins : {
+					legend : {
+						display : false
+					},
+					title : {
+						display : true,
+						text : '📊 인기 상품 TOP 10 (조회수 기준)'
+					}
+				}
+			}
+		});
+
+		// =============================================
+		// 리뷰 긍정 부정 통계 	 
+
+		const sentimentLabels = /*[[${sentimentLabels}]]*/[];
+		const sentimentCounts = /*[[${sentimentCounts}]]*/[];
+
+		const ctxSentiment = document.getElementById('sentimentChart')
+				.getContext('2d');
+		new Chart(ctxSentiment, {
+			type : 'doughnut',
+			data : {
+				labels : sentimentLabels,
+				datasets : [ {
+					label : '리뷰 감정 통계',
+					data : sentimentCounts,
+					backgroundColor : [ 'rgba(254, 80, 79, 0.6)',// 부정
+					'rgba(60, 129, 247, 0.6)' // 긍정
+					],
+					borderColor : [ 'rgba(254, 80, 79, 1)',
+							'rgba(60, 129, 247, 1)' ],
+					borderWidth : 1
+				} ]
+			},
+			options : {
+				responsive : true,
+				maintainAspectRatio : false,
+				plugins : {
+					legend : {
+						position : 'top'
+					},
+					title : {
+						display : true,
+						text : '👍 리뷰 감정 통계 (긍정 vs 부정)'
+					}
+				}
+			}
+		});
+
+		// =============================================
+		// 소비유형 결과 
+
+		const testResultLabels = /*[[${testResultLabels}]]*/[];
+		const testResultCounts = /*[[${testResultCounts}]]*/[];
+
+		const ctxTestResult = document.getElementById('testResultChart')
+				.getContext('2d');
+		new Chart(ctxTestResult, {
+			type : 'bar',
+			data : {
+				labels : testResultLabels,
+				datasets : [ {
+					label : '테스트 결과 분포',
+					data : testResultCounts,
+					backgroundColor : 'rgba(47, 235, 97, 0.5)',
+					borderColor : 'rgba(47, 235, 97, 1)',
+					borderWidth : 1
+				} ]
+			},
+			options : {
+				responsive : true,
+				scales : {
+					y : {
+						beginAtZero : true,
+						title : {
+							display : true,
+							text : '응답 수'
+						},
+						ticks : {
+							stepSize : 5
+						}
+					},
+					x : {
+						title : {
+							display : true,
+							text : '테스트 유형'
+						}
+					}
+				},
+				plugins : {
+					legend : {
+						display : false
+					},
+					title : {
+						display : true,
+						text : '🧠 테스트 결과 통계'
+					}
+				}
+			}
+		});
 	</script>
 </body>
 </html>
