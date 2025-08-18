@@ -16,6 +16,7 @@ import com.example.reframe.entity.auth.CorporateUser;
 import com.example.reframe.entity.auth.User;
 import com.example.reframe.repository.auth.CorporateUserRepository;
 import com.example.reframe.repository.auth.UserRepository;
+import com.example.reframe.service.AccountService;
 import com.example.reframe.service.PublicApiService;
 import com.example.reframe.util.CorpUserMapper;
 import com.example.reframe.util.JWTUtil;
@@ -32,6 +33,7 @@ public class UserService {
 	private final CorporateUserRepository corporateUserRepository;
 	private final PublicApiService publicApiService;
 	private final RefreshTokenService refreshTokenService;
+	private final AccountService accountService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final JWTUtil jwtUtil;
 	
@@ -43,6 +45,7 @@ public class UserService {
 					   CorporateUserRepository corporateUserRepository,
 					   PublicApiService publicApiService, 
 					   RefreshTokenService refreshTokenService, 
+					   AccountService accountService, 
 					   BCryptPasswordEncoder bCryptPasswordEncoder, 
 					   JWTUtil jwtUtil) {
 		this.session = session;
@@ -50,6 +53,7 @@ public class UserService {
 		this.corporateUserRepository = corporateUserRepository;
 		this.publicApiService = publicApiService;
 		this.refreshTokenService = refreshTokenService;
+		this.accountService = accountService;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 		this.jwtUtil = jwtUtil;
 	}
@@ -85,18 +89,26 @@ public class UserService {
 	}
 	
 	// 개인 회원가입
+	@Transactional
 	public UserDTO signup(UserDTO userDTO) {	
-		if(userDTO == null || userDTO.getUsername() == null) {
-			return null;
-		}
-		
-		// 회원가입 시 공통 처리
-		userDTO = prepareUserForRegistratio(userDTO, "ROLE_MEMBER", "P");
-		
-		// 회원 정보 등록
-		User user = userRepository.save(userMapper.toEntity(userDTO));
+		try {
+			if(userDTO == null || userDTO.getUsername() == null) {
+				return null;
+			}
+			
+			// 회원가입 시 공통 처리
+			userDTO = prepareUserForRegistratio(userDTO, "ROLE_MEMBER", "P");
+			
+			// 회원 정보 등록
+			User user = userRepository.save(userMapper.toEntity(userDTO));
+			
+			// 더미 계좌 발급
+			accountService.createDefaultAccount(user);
 
-		return userMapper.toDTO(user);
+			return userMapper.toDTO(user);
+		} catch(Exception e) {
+			throw new RuntimeException("회원가입 중 오류 발생");
+		}
 	}
 	
 	// 기업 회원가입
