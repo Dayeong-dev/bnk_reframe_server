@@ -19,11 +19,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 		String uri = request.getRequestURI();
 
         if (uri.startsWith("/admin")) {
-            response.sendRedirect("/admin/signin");  // 관리자 로그인 URL 
+            response.sendRedirect("/admin/signin-form");  // 관리자 로그인 URL 
         } else {
             response.sendRedirect("/signin/form?needLogin");
         }
-		
 	}
-
 }
