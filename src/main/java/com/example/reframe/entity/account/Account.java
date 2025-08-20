@@ -6,6 +6,8 @@ import com.example.reframe.entity.auth.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,6 +36,7 @@ public class Account {
     @Column(name = "bank_name", nullable = false, length = 50)
     private String bankName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false, length = 30)
     private AccountType accountType;  // DEMAND, PRODUCT
 
@@ -42,6 +45,7 @@ public class Account {
     @Column(name = "is_default", nullable = false)
     private int isDefault; // 0: 아니오, 1: 예
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private AccountStatus status; // ACTIVE, CLOSED 등
 
