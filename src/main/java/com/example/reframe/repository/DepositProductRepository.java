@@ -65,5 +65,8 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
     
     @Query("SELECT d.name FROM DepositProduct d")
     List<String> findAllNames();
+    
+    @Query("select p from DepositProduct p where p.status = 'S'")
+    List<DepositProduct> findActive();
    
 }
