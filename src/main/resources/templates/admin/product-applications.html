@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>상품 신청 관리</title>
+
+  <!-- 공통 리소스 -->
+  <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+  <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+  <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+
+  <!-- 페이지 전용 스타일: pa- 접두사 -->
+  <style>
+    .pa-page { display: block; }
+    .pa-page .pa-title { font-size: 20px; font-weight: 700; margin: 12px 0 16px; }
+
+    /* 요약지표(구조 유지) */
+    .pa-summary { display:grid; grid-template-columns:repeat(4,minmax(140px,1fr)); gap:12px; margin-bottom:16px; }
+    .pa-summary-card { border:1px solid #e5e7eb; border-radius:10px; padding:12px; background:#fff; }
+    .pa-summary-label { font-size:12px; color:#6b7280; }
+    .pa-summary-value { font-size:18px; font-weight:700; margin-top:6px; }
+
+    /* 2컬럼 레이아웃 */
+    .pa-layout { display:grid; grid-template-columns:42% 58%; gap:16px; }
+
+    /* 좌측: 상품 목록 */
+    .pa-left { background:#fff; border:1px solid #e5e7eb; border-radius:10px; }
+    .pa-left-header { padding:12px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; }
+    .pa-left-title { font-weight:600; }
+    .pa-left-body { padding:0 12px 12px; }
+    .pa-table-wrapper { max-height:45vh; overflow-y:auto; border-radius:8px; border:1px solid #e5e7eb; } /* 스크롤 */
+    .pa-table { width:100%; border-collapse:collapse; font-size:14px; background:#fff; }
+    .pa-table thead th { position:sticky; top:0; z-index:1; background:#f8fafc; text-align:left; padding:10px; border-bottom:1px solid #e5e7eb; white-space:nowrap; }
+    .pa-table tbody td { padding:10px; border-bottom:1px solid #f1f5f9; vertical-align:middle; }
+    .pa-table tbody tr { cursor:pointer; }
+    .pa-table tbody tr:hover { background:#fafafa; }
+    .pa-row-active { background:#f0f9ff !important; }
+    .pa-col-name { font-weight:600; }
+    .pa-col-cat, .pa-col-period, .pa-col-views { color:#6b7280; font-size:12px; }
+    .pa-col-counts { font-variant-numeric:tabular-nums; }
+
+    /* 우측: 가입 내역 */
+    .pa-right { background:#fff; border:1px solid #e5e7eb; border-radius:10px; display:flex; flex-direction:column; }
+    .pa-right-header { padding:12px; border-bottom:1px solid #f1f5f9; display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center; }
+    .pa-right-title { font-weight:600; }
+    .pa-filter { display:flex; gap:8px; flex-wrap:wrap; }
+    .pa-filter-btn { border:1px solid #e5e7eb; background:#fff; padding:6px 10px; border-radius:8px; font-size:13px; cursor:pointer; }
+    .pa-filter-btn:hover { background:#f8fafc; }
+    .pa-filter-btn-active { border-color:#2563eb; color:#2563eb; background:#eff6ff; }
+
+    .pa-right-body { padding:12px; display:flex; flex-direction:column; gap:8px; }
+    .pa-app-table-wrapper { border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; }
+    .pa-app-table { width:100%; border-collapse:collapse; font-size:14px; }
+    .pa-app-table thead th { position:sticky; top:0; background:#f8fafc; text-align:left; padding:10px; border-bottom:1px solid #e5e7eb; }
+    .pa-app-table tbody td { padding:10px; border-bottom:1px solid #f1f5f9; }
+
+    .pa-badge { border-radius:999px; padding:2px 8px; font-size:12px; display:inline-block; }
+    .pa-badge-progress { background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; }
+    .pa-badge-completed { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+    .pa-badge-canceled { background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
+
+    /* 유틸 */
+    .pa-muted { color:#6b7280; }
+    .pa-flex { display:flex; align-items:center; gap:8px; }
+    .pa-search-input { border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; width:220px; }
+    .pa-empty { text-align:center; color:#94a3b8; padding:16px; }
+  </style>
+</head>
+
+<body>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script th:src="@{/admin/sidebar.js}"></script>
+
+  <!-- 공통 헤더: ~{} 문법 사용 -->
+  <div th:replace="~{admin/fragments/header :: header}" class="header"></div>
+
+  <div id="body">
+    <!-- 공통 사이드바: ~{} 문법 사용 -->
+    <div th:replace="~{admin/fragments/sidebar :: sidebar}" class="sidebar"></div>
+
+    <!-- 본문 -->
+    <div class="content">
+
+      <!-- data-* 속성에 주석 넣지 않기 -->
+      <div id="pa-page"
+           class="pa-page"
+           th:data-products-url="@{/admin/products}"
+           th:data-applications-url="@{/admin/product-applications}"
+           th:data-summary-url="@{/admin/product-applications/summary}">
+
+        <div class="pa-title">상품 신청 관리</div>
+
+        <!-- 요약지표 -->
+        <div class="pa-summary" id="pa-summary">
+          <div class="pa-summary-card">
+            <div class="pa-summary-label">전체 신청</div>
+            <div class="pa-summary-value" id="pa-sum-total">-</div>
+          </div>
+          <div class="pa-summary-card">
+            <div class="pa-summary-label">진행</div>
+            <div class="pa-summary-value" id="pa-sum-progress">-</div>
+          </div>
+          <div class="pa-summary-card">
+            <div class="pa-summary-label">완료</div>
+            <div class="pa-summary-value" id="pa-sum-completed">-</div>
+          </div>
+          <div class="pa-summary-card">
+            <div class="pa-summary-label">취소</div>
+            <div class="pa-summary-value" id="pa-sum-canceled">-</div>
+          </div>
+        </div>
+
+        <!-- 2컬럼 -->
+        <div class="pa-layout">
+
+          <!-- 좌측: 상품 목록 -->
+          <section class="pa-left">
+            <div class="pa-left-header">
+              <div class="pa-left-title">상품 목록</div>
+              <div class="pa-flex">
+                <input class="pa-search-input" id="pa-product-search" type="text" placeholder="상품명 검색" />
+              </div>
+            </div>
+
+            <div class="pa-left-body">
+              <div class="pa-table-wrapper">
+                <table class="pa-table" id="pa-products-table">
+                  <thead>
+                    <tr>
+                      <th style="width:40%;">상품명</th>
+                      <th style="width:18%;">카테고리</th>
+                      <th style="width:18%;">기간</th>
+                      <th style="width:24%;">가입 수 (전체/진행/완료/취소)</th>
+                      <!-- 금리 컬럼 제거 -->
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div id="pa-products-empty" class="pa-empty" style="display:none;">상품이 없습니다.</div>
+            </div>
+          </section>
+
+          <!-- 우측: 가입 내역 -->
+          <section class="pa-right">
+            <div class="pa-right-header">
+              <div class="pa-right-title">가입 내역</div>
+              <div class="pa-filter" id="pa-filter">
+                <button class="pa-filter-btn pa-filter-btn-active" data-status="ALL">전체</button>
+                <button class="pa-filter-btn" data-status="IN_PROGRESS">진행</button>
+                <button class="pa-filter-btn" data-status="COMPLETED">완료</button>
+                <button class="pa-filter-btn" data-status="CANCELED">취소</button>
+              </div>
+            </div>
+
+            <div class="pa-right-body">
+              <div class="pa-app-table-wrapper">
+                <table class="pa-app-table" id="pa-apps-table">
+                  <thead>
+                    <tr>
+                      <th style="width:20%;">가입자</th>
+                      <th style="width:22%;">신청일</th>
+                      <th style="width:18%;">상태</th>
+                      <th style="width:20%;">상품계좌</th>
+                      <th style="width:20%;">이체계좌</th>
+                      <!-- 금리 컬럼 제거 -->
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div id="pa-apps-empty" class="pa-empty" style="display:none;">가입 내역이 없습니다.</div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 페이지 전용 스크립트 -->
+  <script>
+(function ($) {
+  'use strict';
+
+  $(function () {
+    var selectedProductId = null;
+    var currentStatusFilter = 'ALL';
+
+    function fetchProducts() {
+      $.getJSON('/admin/api/products', function (list) {
+        renderProductList(list || []);
+      });
+    }
+
+    function renderProductList(products) {
+      var $tb = $('#pa-products-tbody');
+      $tb.empty();
+
+      products.forEach(function (p) {
+        var counts = p.counts || {};
+        var total  = counts.total || 0;
+        var inProg = counts.inProgress || counts.inProg || 0;
+        var done   = counts.done || counts.completed || 0;
+        var cancel = counts.cancel || counts.canceled || counts.cancelled || 0;
+
+        var $tr = $('<tr>').attr('data-product-id', (p.productId || p.id || ''));
+        var $td1 = $('<td>');
+        $td1.append($('<div>').addClass('pa-col-name').text(p.name || p.productName || '-'));
+        $td1.append($('<div>').addClass('pa-col-cat').text(p.purpose || ''));
+
+        var $td2 = $('<td>').append($('<span>').text(p.category || '-'));
+        var $td3 = $('<td>').append($('<span>').addClass('pa-col-period').text(p.period || '-'));
+        var $td4 = $('<td>').addClass('pa-col-counts')
+          .text(total + '/' + inProg + '/' + done + '/' + cancel);
+
+        $tr.append($td1, $td2, $td3, $td4);
+        $tb.append($tr);
+      });
+
+      if (selectedProductId !== null && selectedProductId !== undefined && selectedProductId !== '') {
+        $tb.find('tr[data-product-id="' + String(selectedProductId) + '"]').addClass('pa-row-active');
+      }
+    }
+
+    // 좌측 상품행 클릭 -> 선택/하이라이트/우측 조회
+    $(document).on('click', '#pa-products-tbody tr', function () {
+      selectedProductId = $(this).attr('data-product-id') || '';
+      $('#pa-products-tbody tr').removeClass('pa-row-active');
+      $(this).addClass('pa-row-active');
+      fetchApplications(selectedProductId);
+    });
+
+    function fetchApplications(productId) {
+      if (!productId) { return; }
+      $.getJSON('/admin/api/products/' + encodeURIComponent(productId) + '/applications', function (list) {
+        renderApplications(list || []);
+      });
+    }
+
+    function statusToBadge(status) {
+      var s = (status || '').toUpperCase();
+      var $span = $('<span>').addClass('pa-badge');
+
+      if (s === 'IN_PROGRESS' || s === 'PROGRESS') {
+        $span.addClass('is-progress').text('진행');
+      } else if (s === 'DONE' || s === 'COMPLETED' || s === 'COMPLETE') {
+        $span.addClass('is-done').text('완료');
+      } else if (s === 'CANCEL' || s === 'CANCELED' || s === 'CANCELLED') {
+        $span.addClass('is-cancel').text('취소');
+      } else {
+        $span.text(s || '-');
+      }
+      return $span;
+    }
+
+    function renderApplications(apps) {
+      var $tb = $('#pa-apps-tbody');
+      $tb.empty();
+
+      var f = (currentStatusFilter || 'ALL').toUpperCase();
+      var filtered = apps.filter(function (a) {
+        if (f === 'ALL') { return true; }
+        var s = (a.status || '').toUpperCase();
+        if (f === 'PROGRESS') { return s === 'IN_PROGRESS' || s === 'PROGRESS'; }
+        if (f === 'DONE')     { return s === 'DONE' || s === 'COMPLETED' || s === 'COMPLETE'; }
+        if (f === 'CANCEL')   { return s === 'CANCEL' || s === 'CANCELED' || s === 'CANCELLED'; }
+        return true;
+      });
+
+      filtered.forEach(function (a) {
+        var userName  = (a.user && (a.user.name || a.user.username)) || a.userName || '-';
+        var startAt   = a.startAt || a.start_at || a.createdAt || '';
+        var productAcc= (a.productAccount && a.productAccount.accountNumber) || a.productAccountNumber || '';
+        var fromAcc   = (a.fromAccount && a.fromAccount.accountNumber) || a.fromAccountNumber || '';
+
+        var $tr = $('<tr>');
+        $tr.append($('<td>').text(userName));
+        $tr.append($('<td>').text(startAt));
+        $tr.append($('<td>').append(statusToBadge(a.status)));
+        $tr.append($('<td>').append($('<span>').addClass('pa-muted').text(productAcc)));
+        $tr.append($('<td>').append($('<span>').addClass('pa-muted').text(fromAcc)));
+        $tb.append($tr);
+      });
+    }
+
+    // 상태 필터 버튼
+    $(document).on('click', '.pa-filter-btn', function () {
+      $('.pa-filter-btn').removeClass('is-active');
+      $(this).addClass('is-active');
+      currentStatusFilter = $(this).attr('data-status') || 'ALL';
+      if (selectedProductId) {
+        fetchApplications(selectedProductId);
+      }
+    });
+
+    // 초기 로딩
+    fetchProducts();
+  });
+
+})(jQuery);
+</script>
+
+</body>
+</html>

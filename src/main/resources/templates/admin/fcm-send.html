@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 메인</title>
+  <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+  <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+  <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    /* ===== FCM 전용 스코프 (충돌 방지) ===== */
+    #adm-fcm-root { --gap: 16px; }
+    #adm-fcm-root .adm-fcm-header-bar{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:16px;
+    }
+    #adm-fcm-root .adm-fcm-page-title{font-size:20px; font-weight:700; color:#212529; margin:0;}
+    #adm-fcm-root .adm-fcm-link-btn{
+      height:34px; padding:0 12px; border-radius:8px; border:1px solid #ced4da;
+      background:#fff; font-size:13px; color:#495057; text-decoration:none; display:inline-flex; align-items:center;
+    }
+
+    #adm-fcm-root .adm-fcm-grid{
+      display:grid; grid-template-columns: 1.2fr 1fr; gap: var(--gap);
+    }
+    #adm-fcm-root .adm-fcm-col{ min-width:0; }
+
+    #adm-fcm-root .adm-fcm-card{
+      background:#fff; border:1px solid #e9ecef; border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.04);
+    }
+    #adm-fcm-root .adm-fcm-card-header{
+      padding:14px 16px; border-bottom:1px solid #f1f3f5;
+    }
+    #adm-fcm-root .adm-fcm-card-title{ font-size:16px; font-weight:700; color:#212529; }
+    #adm-fcm-root .adm-fcm-card-sub{ font-size:12px; color:#868e96; margin-left:6px; }
+    #adm-fcm-root .adm-fcm-card-body{ padding:16px; }
+
+    #adm-fcm-root .adm-fcm-row{
+      display:grid; grid-template-columns:120px 1fr; gap:10px; align-items:start; margin-bottom:12px;
+    }
+    #adm-fcm-root .adm-fcm-label{ font-size:13px; color:#495057; padding-top:8px; }
+    #adm-fcm-root .adm-fcm-input, #adm-fcm-root .adm-fcm-textarea{
+      width:100%; border:1px solid #ced4da; border-radius:10px; padding:10px 12px; font-size:14px;
+      outline:none; transition:border-color .15s ease-in-out;
+    }
+    #adm-fcm-root .adm-fcm-input:focus, #adm-fcm-root .adm-fcm-textarea:focus{ border-color:#74c0fc; }
+    #adm-fcm-root .adm-fcm-textarea{ min-height:120px; resize:vertical; }
+
+    #adm-fcm-root .adm-fcm-chip-wrap{ display:flex; flex-wrap:wrap; gap:8px; }
+    #adm-fcm-root .adm-fcm-chip{
+      display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:1px solid #ced4da;
+      background:#fff; border-radius:999px; font-size:13px; color:#495057;
+    }
+
+    #adm-fcm-root .adm-fcm-btn-row{ display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+    #adm-fcm-root .adm-fcm-btn{
+      min-width:96px; height:38px; border-radius:10px; border:1px solid #228be6; background:#339af0; color:#fff;
+      font-weight:700; cursor:pointer; padding:0 14px;
+    }
+    #adm-fcm-root .adm-fcm-btn.secondary{ border-color:#adb5bd; background:#f8f9fa; color:#495057; }
+
+    /* 템플릿 목록을 표처럼 보이게 */
+    #adm-fcm-root .adm-fcm-list-wrap{ border-top:1px solid #f1f3f5; margin-top:8px; max-height:420px; overflow:auto; }
+    #adm-fcm-template-list{ list-style:none; padding:0; margin:0; }
+    #adm-fcm-template-list li{
+      display:grid; grid-template-columns:1fr auto auto; gap:8px; padding:12px 6px;
+      border-bottom:1px solid #f1f3f5; align-items:center;
+    }
+    #adm-fcm-template-list li b{ color:#212529; }
+    #adm-fcm-root .adm-fcm-row-meta{ font-size:12px; color:#868e96; }
+    #adm-fcm-root .adm-fcm-row-actions button{
+      height:30px; padding:0 10px; border-radius:8px; border:1px solid #ced4da; background:#fff; font-size:12px; margin-left:6px;
+    }
+
+    /* ===== (Android 전용) 미리보기 모달 + 디바이스 스타일 ===== */
+    #adm-fcm-root .adm-fcm-preview-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.45);
+      display:none; align-items:center; justify-content:center; z-index:2000;
+    }
+    #adm-fcm-root .adm-fcm-preview-backdrop.is-open{ display:flex; }
+    #adm-fcm-root .adm-fcm-preview-modal{
+      width:520px; max-width:96vw; background:#fff; border-radius:12px;
+      box-shadow:0 10px 30px rgba(0,0,0,.2); overflow:hidden;
+    }
+    #adm-fcm-root .adm-fcm-preview-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px; border-bottom:1px solid #f1f3f5;
+    }
+    #adm-fcm-root .adm-fcm-preview-title{ font-size:15px; font-weight:700; color:#212529; }
+    #adm-fcm-root .adm-fcm-preview-close{ height:30px; padding:0 10px; border-radius:8px; border:1px solid #ced4da; background:#fff; font-size:12px; cursor:pointer; }
+
+    #adm-fcm-root .adm-fcm-preview-body{ padding:14px; }
+
+    /* 모드 토글 */
+    #adm-fcm-root .adm-fcm-preview-modes{ display:flex; gap:8px; margin-bottom:12px; }
+    #adm-fcm-root .adm-fcm-mode-btn{
+      height:28px; padding:0 10px; border-radius:8px; border:1px solid #ced4da;
+      background:#fff; font-size:12px; cursor:pointer;
+    }
+    #adm-fcm-root .adm-fcm-mode-btn.is-active{ background:#339af0; color:#fff; border-color:#228be6; }
+
+    /* Android 디바이스 프레임 */
+    #adm-fcm-root .adm-fcm-device-card{
+      background:#f8f9fa; border:1px solid #dee2e6; border-radius:12px; padding:12px;
+    }
+    #adm-fcm-root .adm-fcm-device-title{ font-size:12px; color:#868e96; margin:0 0 8px; }
+
+    /* 알림 카드 */
+    #adm-fcm-root .adm-fcm-noti-card{
+      background:#212529; color:#fff; border-radius:8px;
+      padding:10px 12px; display:grid; grid-template-columns:1fr 32px; gap:8px; align-items:center;
+      width: 340px; font-family: Roboto, 'Noto Sans KR', system-ui, sans-serif;
+    }
+    #adm-fcm-root .adm-fcm-noti-title{
+      font-size:14px; font-weight:700; line-height:1.25; margin:0 0 2px;
+      display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    #adm-fcm-root .adm-fcm-noti-body{
+      font-size:13px; line-height:1.35; margin:0; white-space:pre-wrap;
+      overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical;
+    }
+    /* 초기 상태(접힘) vs 펼쳐보기 */
+    #adm-fcm-root .is-collapsed .adm-fcm-noti-body{ -webkit-line-clamp:2; }
+    #adm-fcm-root .is-expanded  .adm-fcm-noti-body{ -webkit-line-clamp:6; }
+
+    /* 썸네일 (이미지 자리표시) */
+    #adm-fcm-root .adm-fcm-thumb{
+      width:32px; height:32px; border-radius:6px; background:#495057; display:flex;
+      align-items:center; justify-content:center; font-size:12px; color:#fff;
+    }
+
+    #adm-fcm-root .adm-fcm-preview-footer{
+      padding:12px 14px; border-top:1px solid #f1f3f5; display:flex; justify-content:space-between; align-items:center;
+      font-size:12px; color:#868e96;
+    }
+
+    @media (max-width:1200px){
+      #adm-fcm-root .adm-fcm-grid{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+<script th:src="@{/admin/sidebar.js}"></script>
+
+  <!-- 공통 헤더 -->
+  <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+  <div id="body">
+    <!-- 사이드바 -->
+    <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+    <!-- 본문 -->
+    <div class="content">
+      <div id="adm-fcm-root">
+        <div class="adm-fcm-header-bar">
+          <h1 class="adm-fcm-page-title">FCM 관리</h1>
+          <a class="adm-fcm-link-btn" id="adm-fcm-history-link" href="/admin/fcm/get-fcm-history">발송 이력 보기</a>
+        </div>
+
+        <div class="adm-fcm-grid">
+          <!-- 좌측: 그룹 즉시 발송 -->
+          <section class="adm-fcm-col">
+            <div class="adm-fcm-card">
+              <div class="adm-fcm-card-header">
+                <div class="adm-fcm-card-title">그룹 푸시 알림 발송 <span class="adm-fcm-card-sub">단일·복수 그룹 선택 가능</span></div>
+              </div>
+              <div class="adm-fcm-card-body">
+                <div class="adm-fcm-row">
+                  <div class="adm-fcm-label">대상 그룹</div>
+                  <div>
+                    <div id="adm-fcm-group-select" class="adm-fcm-chip-wrap">
+                      <label class="adm-fcm-chip"><input type="checkbox" class="adm-fcm-group" value="all" id="adm-fcm-chk-all"> 전체(all)</label>
+                      <label class="adm-fcm-chip"><input type="checkbox" class="adm-fcm-group" value="event"> event</label>
+                      <label class="adm-fcm-chip"><input type="checkbox" class="adm-fcm-group" value="vip"> vip</label>
+                      <label class="adm-fcm-chip"><input type="checkbox" class="adm-fcm-group" value="premium"> premium</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="adm-fcm-row">
+                  <label class="adm-fcm-label" for="adm-fcm-title">제목</label>
+                  <div><input type="text" id="adm-fcm-title" class="adm-fcm-input" placeholder="예) 신규 적금 출시 기념 1%p 우대" /></div>
+                </div>
+
+                <div class="adm-fcm-row">
+                  <label class="adm-fcm-label" for="adm-fcm-body">내용</label>
+                  <div><textarea id="adm-fcm-body" class="adm-fcm-textarea" placeholder="푸시 본문 내용을 입력하세요."></textarea></div>
+                </div>
+
+                <div class="adm-fcm-btn-row">
+                  <button id="adm-fcm-send-btn" class="adm-fcm-btn">발송</button>
+                  <button type="button" class="adm-fcm-btn secondary" id="adm-fcm-preview-btn">미리보기</button>
+                  <button type="button" class="adm-fcm-btn secondary" id="adm-fcm-clear-send-btn">초기화</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 우측: 템플릿 관리 -->
+          <section class="adm-fcm-col">
+            <div class="adm-fcm-card" style="margin-bottom: var(--gap);">
+              <div class="adm-fcm-card-header">
+                <div class="adm-fcm-card-title">FCM 템플릿 작성/수정</div>
+              </div>
+              <div class="adm-fcm-card-body">
+                <form id="adm-fcm-template-form">
+                  <input type="hidden" id="adm-fcm-tpl-id" name="id"/>
+
+                  <div class="adm-fcm-row">
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-group">Group</label>
+                    <div><input type="text" id="adm-fcm-tpl-group" name="groupCode" class="adm-fcm-input" placeholder="예) event / vip / premium" /></div>
+                  </div>
+
+                  <div class="adm-fcm-row">
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-title">Title</label>
+                    <div><input type="text" id="adm-fcm-tpl-title" name="title" class="adm-fcm-input" placeholder="템플릿 제목" /></div>
+                  </div>
+
+                  <div class="adm-fcm-row">
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-body">Body</label>
+                    <div><textarea id="adm-fcm-tpl-body" name="body" class="adm-fcm-textarea" placeholder="템플릿 본문"></textarea></div>
+                  </div>
+
+                  <div class="adm-fcm-row">
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-cron">Cron</label>
+                    <div><input type="text" id="adm-fcm-tpl-cron" name="cron" class="adm-fcm-input" placeholder="예) 0 0 9 * * ?" /></div>
+                  </div>
+
+                  <div class="adm-fcm-row">
+                    <div class="adm-fcm-label">Active</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="adm-fcm-tpl-active" name="active"/>
+                      <label for="adm-fcm-tpl-active" style="font-size:13px; color:#495057;">스케줄 활성화</label>
+                    </div>
+                  </div>
+
+                  <div class="adm-fcm-btn-row">
+                    <button type="submit" class="adm-fcm-btn">저장</button>
+                    <button type="button" class="adm-fcm-btn secondary" id="adm-fcm-tpl-clear-btn">새로 작성</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="adm-fcm-card">
+              <div class="adm-fcm-card-header">
+                <div class="adm-fcm-card-title">템플릿 목록 <span class="adm-fcm-card-sub" id="adm-fcm-tpl-count"></span></div>
+              </div>
+              <div class="adm-fcm-card-body">
+                <div class="adm-fcm-list-wrap">
+                  <ul id="adm-fcm-template-list"></ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ===== (Android 전용) 미리보기 모달 ===== -->
+        <div id="adm-fcm-preview" class="adm-fcm-preview-backdrop" aria-hidden="true">
+          <div class="adm-fcm-preview-modal" role="dialog" aria-modal="true" aria-labelledby="adm-fcm-preview-modal-title">
+            <div class="adm-fcm-preview-head">
+              <div id="adm-fcm-preview-modal-title" class="adm-fcm-preview-title">푸시 미리보기</div>
+              <button type="button" id="adm-fcm-preview-close" class="adm-fcm-preview-close">닫기</button>
+            </div>
+
+            <div class="adm-fcm-preview-body">
+              <div class="adm-fcm-preview-modes">
+                <button type="button" id="adm-fcm-mode-collapsed" class="adm-fcm-mode-btn is-active">초기 상태</button>
+                <button type="button" id="adm-fcm-mode-expanded"  class="adm-fcm-mode-btn">펼쳐보기</button>
+              </div>
+
+              <div class="adm-fcm-device-card">
+                <p class="adm-fcm-device-title">Android</p>
+                <div id="adm-fcm-android-card" class="adm-fcm-noti-card is-collapsed">
+                  <div>
+                    <p id="adm-fcm-preview-title" class="adm-fcm-noti-title">(제목없음)</p>
+                    <p id="adm-fcm-preview-body"  class="adm-fcm-noti-body">(내용없음)</p>
+                  </div>
+                  <div class="adm-fcm-thumb">Img</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="adm-fcm-preview-footer">
+              <div class="meta">
+                <span id="adm-fcm-preview-meta-title">제목 0자</span>
+                <span>·</span>
+                <span id="adm-fcm-preview-meta-body">본문 0자</span>
+              </div>
+              <div>※ 시스템 폰트/폭에 따라 줄바꿈·말줄임이 조금 다를 수 있어요.</div>
+            </div>
+          </div>
+        </div>
+        <!-- /모달 -->
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== 즉시 발송: 그룹 체크박스 제어 & 발송 =====
+  $(function(){
+    // "전체" 체크 시 나머지 비활성화
+    $('#adm-fcm-chk-all').on('change', function(){
+      const allChecked = $(this).is(':checked');
+      $('.adm-fcm-group').not('#adm-fcm-chk-all').prop('checked', false).prop('disabled', allChecked);
+    });
+
+    // 다른 그룹 체크 시 "전체" 자동 해제
+    $('.adm-fcm-group').not('#adm-fcm-chk-all').on('change', function(){
+      if ($(this).is(':checked')) {
+        $('#adm-fcm-chk-all').prop('checked', false);
+        $('.adm-fcm-group').not('#adm-fcm-chk-all').prop('disabled', false);
+      }
+    });
+
+    // 발송
+    $('#adm-fcm-send-btn').on('click', function(){
+      const title = $('#adm-fcm-title').val().trim();
+      const body  = $('#adm-fcm-body').val().trim();
+      const groups = $('.adm-fcm-group:checked').map(function(){ return this.value; }).get();
+
+      if (!title || !body) return alert('제목/내용을 입력하세요.');
+      if (groups.length === 0) return alert('대상 그룹을 선택하세요.');
+
+      // 전체만 선택된 경우
+      if (groups.length === 1 && groups[0] === 'all') {
+        $.ajax({
+          url: '/api/v1/fcm/send-all',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ title, body }),
+        }).done(res => alert(`전체 발송 완료\n성공: ${res.success}`))
+          .fail(() => alert('발송 실패'));
+        return;
+      }
+
+      // 여러 그룹(또는 단일 그룹) 선택
+      $.ajax({
+        url: '/api/v1/fcm/send-bulk',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ title, body, groupCodes: groups }),
+      }).done(res => {
+          alert(`그룹 발송 완료\n대상: ${res.targets.join(', ')}\n성공 합계: ${res.success}`);
+        })
+        .fail(() => alert('발송 실패'));
+    });
+
+    // 즉시 발송 폼 초기화
+    $('#adm-fcm-clear-send-btn').on('click', function(){
+      $('#adm-fcm-title').val('');
+      $('#adm-fcm-body').val('');
+      $('.adm-fcm-group').prop('checked', false).prop('disabled', false);
+      $('#adm-fcm-chk-all').prop('checked', false);
+    });
+  });
+
+  // ===== 템플릿 CRUD =====
+  $(document).ready(function(){
+    fetchAdmFcmTemplates();
+
+    $('#adm-fcm-template-form').on('submit', function(e){
+      e.preventDefault();
+
+      const $f = $('#adm-fcm-template-form');
+      const id = $f.find('#adm-fcm-tpl-id').val();
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? `/admin/fcm/templates/${id}` : '/admin/fcm/templates';
+
+      const payload = {
+        groupCode: $f.find('#adm-fcm-tpl-group').val(),
+        title:     $f.find('#adm-fcm-tpl-title').val(),
+        body:      $f.find('#adm-fcm-tpl-body').val(),
+        cron:      $f.find('#adm-fcm-tpl-cron').val(),
+        active:    $f.find('#adm-fcm-tpl-active').is(':checked')
+      };
+
+      $.ajax({
+        url,
+        type: method,
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function(){
+          fetchAdmFcmTemplates();
+          $('#adm-fcm-template-form')[0].reset();
+          $('#adm-fcm-tpl-id').val(''); // 수정모드 -> 신규모드 전환
+        },
+        error: function(xhr){ alert(`❌ 저장 실패: ${xhr.status}`); }
+      });
+    });
+
+    $('#adm-fcm-tpl-clear-btn').on('click', function(){
+      $('#adm-fcm-template-form')[0].reset();
+      $('#adm-fcm-tpl-id').val('');
+      $('#adm-fcm-tpl-title').focus();
+    });
+  });
+
+  function fetchAdmFcmTemplates(){
+    $.get('/admin/fcm/templates', function(templates){
+      const $list = $('#adm-fcm-template-list');
+      $list.empty();
+
+      (templates || []).forEach(function(t){
+        const li = $(`
+          <li data-id="${t.id}">
+            <div>
+              <b>${escapeHtml(t.title || '')}</b>
+              <div class="adm-fcm-row-meta">[${escapeHtml(t.groupCode || '')}] · ${escapeHtml(t.body || '')}</div>
+              <div class="adm-fcm-row-meta">cron: ${escapeHtml(t.cron || '-')} · active: ${t.active ? 'Y' : 'N'}</div>
+            </div>
+            <div class="adm-fcm-row-actions">
+              <button class="adm-fcm-tpl-edit-btn">수정</button>
+              <button class="adm-fcm-tpl-del-btn">삭제</button>
+            </div>
+          </li>
+        `);
+        li.find('.adm-fcm-tpl-edit-btn').on('click', () => editAdmFcmTemplate(t.id));
+        li.find('.adm-fcm-tpl-del-btn').on('click', () => deleteAdmFcmTemplate(t.id));
+        $list.append(li);
+      });
+
+      $('#adm-fcm-tpl-count').text(templates ? `(${templates.length}건)` : '(0건)');
+    });
+  }
+
+  function editAdmFcmTemplate(id){
+    $.get(`/admin/fcm/templates/${id}`, function(t){
+      $('#adm-fcm-tpl-id').val(t.id);
+      $('#adm-fcm-tpl-group').val(t.groupCode);
+      $('#adm-fcm-tpl-title').val(t.title);
+      $('#adm-fcm-tpl-body').val(t.body);
+      $('#adm-fcm-tpl-cron').val(t.cron || '');
+      $('#adm-fcm-tpl-active').prop('checked', !!t.active);
+      document.getElementById('adm-fcm-tpl-title').focus();
+    });
+  }
+
+  function deleteAdmFcmTemplate(id){
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    $.ajax({
+      url: `/admin/fcm/templates/${id}`,
+      type: 'DELETE',
+      success: fetchAdmFcmTemplates,
+      error: function(xhr){ alert(`❌ 삭제 실패: ${xhr.status}`); }
+    });
+  }
+
+  // XSS 방지용 간단 이스케이프
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+  }
+
+  // ===== (Android 전용) 미리보기 기능 =====
+  $(function(){
+    function setAdmFcmMode(mode){ // 'collapsed' | 'expanded'
+      const isCollapsed = mode === 'collapsed';
+      $('#adm-fcm-android-card')
+        .removeClass('is-collapsed is-expanded')
+        .addClass(isCollapsed ? 'is-collapsed' : 'is-expanded');
+
+      $('#adm-fcm-mode-collapsed').toggleClass('is-active', isCollapsed);
+      $('#adm-fcm-mode-expanded').toggleClass('is-active', !isCollapsed);
+    }
+
+    // 미리보기 열기
+    $('#adm-fcm-preview-btn').on('click', function(){
+      const title = ($('#adm-fcm-title').val() || '').trim();
+      const body  = ($('#adm-fcm-body').val()  || '').trim();
+      if (!title && !body){
+        alert('미리보기 전에 제목 또는 내용을 입력하세요.');
+        return;
+      }
+
+      // 제목/본문 적용
+      $('#adm-fcm-preview-title').text(title || '(제목없음)');
+      $('#adm-fcm-preview-body').text(body || '(내용없음)');
+
+      // 글자수
+      $('#adm-fcm-preview-meta-title').text(`제목 ${title.length}자`);
+      $('#adm-fcm-preview-meta-body').text(`본문 ${body.length}자`);
+
+      // 기본은 접힘
+      setAdmFcmMode('collapsed');
+      $('#adm-fcm-preview').addClass('is-open').attr('aria-hidden','false');
+    });
+
+    // 모드 토글
+    $('#adm-fcm-mode-collapsed').on('click', () => setAdmFcmMode('collapsed'));
+    $('#adm-fcm-mode-expanded').on('click',  () => setAdmFcmMode('expanded'));
+
+    // 닫기
+    function closeAdmFcmPreview(){
+      $('#adm-fcm-preview').removeClass('is-open').attr('aria-hidden','true');
+    }
+    $('#adm-fcm-preview-close').on('click', closeAdmFcmPreview);
+    $('#adm-fcm-preview').on('click', function(e){
+      if (e.target.id === 'adm-fcm-preview') closeAdmFcmPreview(); // 백드롭 클릭
+    });
+    $(document).on('keydown', function(e){
+      if (e.key === 'Escape') { closeAdmFcmPreview(); }
+    });
+  });
+</script>
+</body>
+</html>
