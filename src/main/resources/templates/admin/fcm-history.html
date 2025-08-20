@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>푸시 알림 발송 내역</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<h2>푸시 알림 발송 내역 (최신순)</h2>
+
+<table border="1" width="100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>제목</th>
+            <th>내용</th>
+            <th>대상 그룹</th>
+            <th>발송 수</th>
+            <th>발송 시각</th>
+        </tr>
+    </thead>
+    <tbody id="historyTableBody">
+        <!-- 데이터가 여기에 채워짐 -->
+    </tbody>
+</table>
+
+<script>
+$(document).ready(function() {
+    loadFcmHistory();
+});
+
+function loadFcmHistory() {
+    $.ajax({
+        url: "/admin/fcm/fcm-history",
+        type: "GET",
+        success: function(data) {
+            $("#historyTableBody").empty();
+
+            data.forEach(function(item) {
+                let row = `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.title}</td>
+                        <td>${item.body}</td>
+                        <td>${item.targetGroup}</td>
+                        <td>${item.sentCount}</td>
+                        <td>${formatDateTime(item.createdAt)}</td>
+                    </tr>
+                `;
+                $("#historyTableBody").append(row);
+            });
+        },
+        error: function() {
+            alert("데이터를 불러오는 중 오류가 발생했습니다.");
+        }
+    });
+}
+
+function formatDateTime(dateTime) {
+    // LocalDateTime을 보기 좋게 변환
+    if (!dateTime) return "";
+    return dateTime.replace("T", " ");
+}
+</script>
+
+</body>
+</html>

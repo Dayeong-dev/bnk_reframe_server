@@ -1,0 +1,189 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>FCM Admin</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+  <h2>그룹 푸시 알림 발송</h2>
+	<div id="group-select">
+	  <label><input type="checkbox" class="group" value="all" id="chk-all"> 전체(all)</label>
+	  <label><input type="checkbox" class="group" value="event"> event</label>
+	  <label><input type="checkbox" class="group" value="vip"> vip</label>
+	  <label><input type="checkbox" class="group" value="premium"> premium</label>
+	</div>
+	
+	<div style="margin-top:8px;">
+	  <label>제목 <input type="text" id="title" style="width:300px;"></label><br>
+	  <label>내용 <textarea id="body" style="width:300px;height:100px;"></textarea></label><br>
+	  <button id="btn-send">발송</button>
+	</div>
+
+  <h2>FCM 템플릿 관리</h2>
+
+  <form id="templateForm">
+    <input type="hidden" id="tpl-id" name="id">
+    <label>Group: <input type="text" id="tpl-groupCode" name="groupCode"></label><br>
+    <label>Title: <input type="text" id="tpl-title" name="title"></label><br>
+    <label>Body: <textarea id="tpl-body" name="body"></textarea></label><br>
+    <label>Cron: <input type="text" id="tpl-cron" name="cron" placeholder="0 0/5 * * * ?"></label><br>
+    <label>Active: <input type="checkbox" id="tpl-active" name="active"></label><br>
+    <button type="submit">저장</button>
+  </form>
+
+  <ul id="templateList" style="margin-top:12px;"></ul>
+
+	<a href="/admin/fcm/get-fcm-history">푸시 이력 확인</a>
+
+<script>
+  // ---- 그룹 발송 ----
+	  $(function(){
+	  // "전체" 체크 시 나머지는 비활성화
+	  $('#chk-all').on('change', function(){
+	    const allChecked = $(this).is(':checked');
+	    $('.group').not('#chk-all').prop('checked', false).prop('disabled', allChecked);
+	  });
+	
+	  // 다른 그룹 체크 시 "전체" 자동 해제
+	  $('.group').not('#chk-all').on('change', function(){
+	    if ($(this).is(':checked')) {
+	      $('#chk-all').prop('checked', false);
+	      $('.group').not('#chk-all').prop('disabled', false);
+	    }
+	  });
+	
+	  $('#btn-send').on('click', function(){
+	    const title = $('#title').val().trim();
+	    const body  = $('#body').val().trim();
+	    const groups = $('.group:checked').map(function(){ return this.value; }).get();
+	
+	    if (!title || !body) return alert('제목/내용을 입력하세요.');
+	    if (groups.length === 0) return alert('대상 그룹을 선택하세요.');
+	
+	    // 전체만 선택된 경우
+	    if (groups.length === 1 && groups[0] === 'all') {
+	      $.ajax({
+	        url: '/api/v1/fcm/send-all',
+	        type: 'POST',
+	        contentType: 'application/json',
+	        data: JSON.stringify({ title, body }),
+	      }).done(res => alert(`전체 발송 완료\n성공: ${res.success}`))
+	        .fail(() => alert('발송 실패'));
+	      return;
+	    }
+	
+	    // 여러 그룹 선택(또는 단일 그룹)인 경우
+	    $.ajax({
+	      url: '/api/v1/fcm/send-bulk',
+	      type: 'POST',
+	      contentType: 'application/json',
+	      data: JSON.stringify({ title, body, groupCodes: groups }),
+	    }).done(res => {
+	        alert(`그룹 발송 완료\n대상: ${res.targets.join(', ')}\n성공 합계: ${res.success}`);
+	      })
+	      .fail(() => alert('발송 실패'));
+	  });
+	});
+
+  
+  
+  
+  
+  // ---- 템플릿 CRUD ----
+  $(document).ready(function () {
+    fetchTemplates();
+
+    $("#templateForm").on("submit", function (e) {
+      e.preventDefault();
+
+      const $f = $("#templateForm");
+      const id = $f.find("#tpl-id").val();
+      const method = id ? "PUT" : "POST";
+      const url = id ? `/admin/fcm/templates/${id}` : "/admin/fcm/templates";
+
+      const payload = {
+        groupCode: $f.find("#tpl-groupCode").val(),
+        title:     $f.find("#tpl-title").val(),
+        body:      $f.find("#tpl-body").val(),
+        cron:      $f.find("#tpl-cron").val(),
+        active:    $f.find("#tpl-active").is(":checked")
+      };
+
+      $.ajax({
+        url,
+        type: method,
+        contentType: "application/json",
+        data: JSON.stringify(payload),
+        success: function () {
+          fetchTemplates();
+          $("#templateForm")[0].reset();
+          $("#tpl-id").val(""); // 수정모드 → 신규모드 전환
+        },
+        error: function (xhr) {
+          alert(`❌ 저장 실패: ${xhr.status}`);
+        }
+      });
+    });
+  });
+
+  function fetchTemplates() {
+    $.get("/admin/fcm/templates", function (templates) {
+      const $list = $("#templateList");
+      $list.empty();
+      (templates || []).forEach(t => {
+        const li = $(`
+          <li data-id="${t.id}">
+            <b>${escapeHtml(t.title || "")}</b>
+            [${escapeHtml(t.groupCode || "")}] - ${escapeHtml(t.body || "")}
+            <span> | cron: ${escapeHtml(t.cron || "-")} | active: ${t.active ? "Y" : "N"}</span>
+            <button class="btn-edit" style="margin-left:8px;">수정</button>
+            <button class="btn-del">삭제</button>
+          </li>
+        `);
+        li.find(".btn-edit").on("click", () => editTemplate(t.id));
+        li.find(".btn-del").on("click", () => deleteTemplate(t.id));
+        $list.append(li);
+      });
+    });
+  }
+
+  function editTemplate(id) {
+    $.get(`/admin/fcm/templates/${id}`, function (t) {
+      $("#tpl-id").val(t.id);
+      $("#tpl-groupCode").val(t.groupCode);
+      $("#tpl-title").val(t.title);
+      $("#tpl-body").val(t.body);
+      $("#tpl-cron").val(t.cron || "");
+      $("#tpl-active").prop("checked", !!t.active);
+      // 스크롤 포커스(optional)
+      document.getElementById("tpl-title").focus();
+    });
+  }
+
+  function deleteTemplate(id) {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    $.ajax({
+      url: `/admin/fcm/templates/${id}`,
+      type: "DELETE",
+      success: fetchTemplates,
+      error: function (xhr) {
+        alert(`❌ 삭제 실패: ${xhr.status}`);
+      }
+    });
+  }
+
+  // XSS 방지용 간단 이스케이프
+  function escapeHtml(s) {
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  
+  
+</script>
+</body>
+</html>

@@ -133,11 +133,11 @@ public class SecurityConfig {
 	SecurityFilterChain adminFilterChane(HttpSecurity http) throws Exception {
 		http.securityMatcher("/admin/**", "/superadmin/**", "/admin/signin-form", "/admin/login", "/admin/send-auth-code");
 		
-		http.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/admin/signin-form", "/admin/login", "/admin/send-auth-code").permitAll()
-				.requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
-				.requestMatchers("/superadmin/**").hasRole("SUPERADMIN")
-				.anyRequest().denyAll());
+		http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+//				.requestMatchers("/admin/signin-form", "/admin/login", "/admin/send-auth-code").permitAll()
+//				.requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
+//				.requestMatchers("/superadmin/**").hasRole("SUPERADMIN")
+//				.anyRequest().denyAll());
 		
 		http.formLogin(auth -> auth.disable());
 		
