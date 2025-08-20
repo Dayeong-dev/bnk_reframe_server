@@ -38,7 +38,6 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false, length = 30)
-    @Enumerated(EnumType.STRING)
     private AccountType accountType;  // DEMAND, PRODUCT
 
     private Long balance;
@@ -48,7 +47,6 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
     private AccountStatus status; // ACTIVE, CLOSED 등
 
     @Column(name = "created_at", updatable = false)
