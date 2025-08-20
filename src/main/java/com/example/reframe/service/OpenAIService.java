@@ -91,5 +91,34 @@ public class OpenAIService {
                        .getContent();
     }
     
+    public String askChatGPT2WithSystem(String system, String user) {
+        RestTemplate restTemplate = new RestTemplate();
+        String fineTunedModel = "ft:gpt-4.1-2025-04-14:green:bnk123:Bt6Iw477";
+
+        ChatRequest.Message systemMessage = new ChatRequest.Message("system", system);
+        ChatRequest.Message userMessageObj = new ChatRequest.Message("user", user);
+
+        ChatRequest request = new ChatRequest(fineTunedModel, List.of(systemMessage, userMessageObj));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+        HttpEntity<ChatRequest> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<ChatResponse> response = restTemplate.exchange(
+            API_URL,
+            HttpMethod.POST,
+            entity,
+            ChatResponse.class
+        );
+
+        return response.getBody()
+                       .getChoices()
+                       .get(0)
+                       .getMessage()
+                       .getContent();
+    }
+
+    
     
 }

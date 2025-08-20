@@ -19,7 +19,7 @@ public class AdminController {
 
 	@GetMapping("/product-main")
 	public String root() {
-		return "admin/product-main";
+		return "admin/product-main-test1";
 	}
 
 	@GetMapping("/sidebar")
@@ -81,8 +81,7 @@ public class AdminController {
 	}
 	
 	@GetMapping("product-applications")
-    public String page(Model model) {
-        model.addAttribute("products", service.getProductListWithCounts());
+    public String page() {
         return "admin/product-applications"; 
     }
 
