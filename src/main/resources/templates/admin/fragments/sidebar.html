@@ -3,17 +3,39 @@
 <body>
 	<div th:fragment="sidebar"  class="sidebar">
 		<ul id="li-header">
+		
 			<li class="sidebar-list">
-				<a href="/admin/product-main" class="sidebar-a">상품관리</a>
+				<a href="/admin/product-main-test1" class="sidebar-a">상품 관리</a>
 				<ul class="dropdown">
-					<li><a href="/admin/product-main">예/적금</a></li>
+					<li><a href="/admin/product-main-test1">예/적금</a></li>
 					<li><a href="/admin/card-main">카드</a></li>
 				</ul>
+			</li>
+			
+			<li class="sidebar-list">
+				<a href="/admin/product-applications" class="sidebar-a">상품 가입 내역</a>
+				<ul class="dropdown">
+					<!-- 
+						<li><a href="/admin/product-main-test1">예/적금</a></li>
+						<li><a href="/admin/card-main">카드</a></li>
+					 -->
+				</ul>
+			</li>
 
 			
 			
 			<li class="sidebar-list">
-				<a href="/admin/index2" class="sidebar-a">문의관리</a>
+				<a href="/admin/fcm-send" class="sidebar-a">푸시알림 관리</a>
+				<ul class="dropdown">
+					<!-- 
+						<li><a href="/admin/index2"> FAQ 관리</a></li>
+						<li><a href="/admin/index3"> 1:1 문의사항 관리 </a></li>
+					 -->
+				</ul>
+			</li>
+			
+			<li class="sidebar-list">
+				<a href="/admin/index2" class="sidebar-a">문의 관리</a>
 				<ul class="dropdown">
 					<li><a href="/admin/index2"> FAQ 관리</a></li>
 					<li><a href="/admin/index3"> 1:1 문의사항 관리 </a></li>
@@ -85,7 +107,7 @@
 			
 			<!-- 상위관리자 전용 메뉴 -->
 			<li th:if="${session.role == 'ROLE_SUPERADMIN'}" class="sidebar-list">
-				<a href="/superadmin/admin-manage" class="sidebar-a">관리자관리</a>
+				<a href="/superadmin/admin-manage" class="sidebar-a">관리자 관리</a>
 				<!-- <ul class="dropdown">
 					<li><a href=""> 통계1 </a></li>
 					<li><a href="/admin/chart/2"> 통계2 </a></li>
