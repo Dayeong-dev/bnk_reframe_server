@@ -14,6 +14,19 @@ public class TopicHub {
 
     private final Map<String, ChannelGroup> topics = new ConcurrentHashMap<>();
     public static final AttributeKey<Set<String>> ATTR_TOPICS = AttributeKey.valueOf("SUB_TOPICS");
+    
+    public int sizeOf(String topic) {
+        ChannelGroup g = topics.get(topic);
+        return g == null ? 0 : g.size();
+    }
+    
+    private void notifyPresence(String topic) {
+        if (!topic.endsWith(".presence")) return;
+        ChannelGroup g = topics.get(topic);
+        if (g == null) return;
+        String msg = "{\"type\":\"presence\",\"count\":" + g.size() + "}";
+        g.writeAndFlush(new TextWebSocketFrame(msg));
+    }
 
     public void subscribe(Channel ch, String topic) {
         topics.computeIfAbsent(topic, t -> new DefaultChannelGroup(GlobalEventExecutor.INSTANCE))
@@ -24,7 +37,9 @@ public class TopicHub {
             ch.attr(ATTR_TOPICS).set(set);
         }
         set.add(topic);
-        System.out.println("[WS] SUB topic=" + topic + " size=" + topics.get(topic).size());
+
+        // ✅ presence 토픽이면 현재 인원 브로드캐스트
+        notifyPresence(topic);
     }
 
     public Map<String,Integer> stats() {
@@ -36,12 +51,18 @@ public class TopicHub {
     public void unsubscribe(Channel ch, String topic) {
         Optional.ofNullable(topics.get(topic)).ifPresent(g -> g.remove(ch));
         Optional.ofNullable(ch.attr(ATTR_TOPICS).get()).ifPresent(s -> s.remove(topic));
+
+        // ✅ presence 토픽이면 현재 인원 브로드캐스트
+        notifyPresence(topic);
     }
 
     public void unsubscribeAll(Channel ch) {
         Set<String> set = ch.attr(ATTR_TOPICS).get();
         if (set != null) {
-            for (String t : set) Optional.ofNullable(topics.get(t)).ifPresent(g -> g.remove(ch));
+            for (String t : set) {
+                Optional.ofNullable(topics.get(t)).ifPresent(g -> g.remove(ch));
+                notifyPresence(t); // ✅ presence 업데이트
+            }
             set.clear();
         }
     }

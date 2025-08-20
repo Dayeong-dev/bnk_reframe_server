@@ -30,6 +30,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	private ResponseEntity<TokenResponse> signin(@RequestBody UserDTO userDTO) {		
 		try {
+			System.out.println(userDTO);
 			TokenResponse tokenResponse = userService.signin(userDTO);
 			
 			String accessToken = tokenResponse.getAccessToken();
