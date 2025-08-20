@@ -1,8 +1,7 @@
-package com.example.reframe.entity.enroll;
+package com.example.reframe.entity;
 
 import java.time.LocalDateTime;
 
-import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.auth.User;
 
@@ -19,16 +18,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-enum ApplicationStatus {
-   STARTED, CLOSED, CANCELED
-}
 
 @Entity
 @Table(name = "product_application")
 @Data
 public class ProductApplication {
 
-    @Id
+	public enum ApplicationStatus {
+		STARTED, CLOSED, CANCELED
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 상품 가입 ID
 

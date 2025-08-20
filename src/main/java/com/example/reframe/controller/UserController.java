@@ -56,6 +56,8 @@ public class UserController {
 	@GetMapping("/username/check")
 	@CrossOrigin(origins = "*")
 	public @ResponseBody ResponseEntity<String> checkUsername(@RequestParam("username") String username) {
+		System.out.println(username);
+		
 		boolean result = userService.checkUsername(username);
 		
 		if(!result) {
