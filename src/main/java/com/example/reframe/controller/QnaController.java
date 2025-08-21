@@ -41,7 +41,7 @@ public class QnaController {
 	
 	@GetMapping("/qna")
 	public String qna(Model model,@AuthenticationPrincipal CustomUserDetails user) {
-		List<Qna> qnalist = qnaRepository.findByUser_id(user.getId());
+		List<Qna> qnalist = qnaRepository.findByUserId(user.getId());
 		System.out.println(qnalist);
 		model.addAttribute("qnalist", qnalist);
 		return "user/qna";
