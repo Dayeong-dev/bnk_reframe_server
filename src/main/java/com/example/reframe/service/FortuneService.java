@@ -35,17 +35,18 @@ public class FortuneService {
 
         String system = """
         너는 은행 앱의 '오늘의 운세' 생성기야.
-        반드시 JSON만 출력해. 다른 텍스트, 설명, 코드블록, 접두/접미 문장 금지.
+        반드시 JSON만 출력해. 다른 텍스트, 설명, 코드블록, '오늘은'으로 시작하는 문장 금지, 접두/접미 문장 금지.
         출력 스키마:
         {
-          "fortune": "<한 문장, 반드시 '~하기 좋은 하루' 형식으로 끝>",
+          "fortune": "<한 문장, 반드시 '~하기 좋은 하루' 형식으로 끝,>",
           "keyword": "<하나의 단어>"
+          "content": "<3문장, fortune에 대한 부가 설명으로 운세 풀이>"
         }
         keyword 는 다음 중 반드시 하나: %s
         """.formatted(allowed);
 
         String user = String.format(
-            "나는 %s에 태어났어. 이걸 기준으로 %s 운세를 '~하기 좋은 하루' 형식의 한 문장으로 말해줘. 그리고 운세의 요약을 위 목록 중 한 단어(keyword)로 골라줘. 응답은 JSON만.",
+            "나는 %s에 태어났어. 이걸 기준으로 %s 운세를 '~하기 좋은 하루' 형식의 한 문장으로 말해줘. 그리고 운세의 요약을 위 목록 중 한 단어(keyword)로 골라줘. 이 한 문장에 대한 부가설명을 세 문장으로 말해줘. 응답은 JSON만.",
             birth, dateIso
         );
 
@@ -55,12 +56,21 @@ public class FortuneService {
         try {
             map = om.readValue(raw, Map.class);
         } catch (Exception e) {
-            map = Map.of("fortune", "계획을 정리하기 좋은 하루예요.", "keyword", "안정");
+            // ✅ content 기본값도 함께 준비
+            map = Map.of(
+              "fortune", "계획을 정리하기 좋은 하루예요.",
+              "keyword", "안정",
+              "content", "마음이 분주했다면 오늘은 호흡을 고르기에 좋아요. 작은 일부터 정리하면 성취감이 쌓여요. 과한 일정은 줄이고 루틴을 다듬어 보세요."
+            );
         }
 
         String fortune = String.valueOf(map.getOrDefault("fortune", "습관을 다듬기 좋은 하루예요."));
         String keywordLabel = String.valueOf(map.getOrDefault("keyword", "안정")).trim();
-
+        // ✅ 새로 추가
+        String content = String.valueOf(map.getOrDefault(
+            "content",
+            "마음가짐을 다잡기 좋은 때예요. 오늘은 작은 계획부터 차근히 실행해 보세요. 꾸준함이 결과를 만들어 줍니다."
+        ));
         // 한국어 라벨 -> enum 상수로 안전 변환
         FortuneKeyword keyword = FortuneKeyword.fromLabel(keywordLabel).orElse(FortuneKeyword.ANJEONG);
 
@@ -72,24 +82,25 @@ public class FortuneService {
         DepositProduct p2 = kr.getProduct2();
 
         List<ProductBrief> briefs = List.of(
-            ProductBrief.builder()
-                .productId(p1.getProductId())
-                .name(p1.getName())
-                .category(p1.getCategory())
-                .summary(StringUtils.hasText(p1.getSummary()) ? p1.getSummary() : "")
-                .build(),
-            ProductBrief.builder()
-                .productId(p2.getProductId())
-                .name(p2.getName())
-                .category(p2.getCategory())
-                .summary(StringUtils.hasText(p2.getSummary()) ? p2.getSummary() : "")
-                .build()
-        );
+                ProductBrief.builder()
+                    .productId(p1.getProductId())
+                    .name(p1.getName())
+                    .category(p1.getCategory())
+                    .summary(StringUtils.hasText(p1.getSummary()) ? p1.getSummary() : "")
+                    .build(),
+                ProductBrief.builder()
+                    .productId(p2.getProductId())
+                    .name(p2.getName())
+                    .category(p2.getCategory())
+                    .summary(StringUtils.hasText(p2.getSummary()) ? p2.getSummary() : "")
+                    .build()
+            );
 
         // 응답의 keyword는 한국어 라벨로 반환
         return FortuneResponse.builder()
                 .fortune(fortune)
                 .keyword(keyword.label())
+                .content(content) // ✅ 추가
                 .products(briefs)
                 .build();
     }
