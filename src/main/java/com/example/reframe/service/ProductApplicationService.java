@@ -1,5 +1,6 @@
 package com.example.reframe.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +21,14 @@ import com.example.reframe.entity.account.AccountStatus;
 import com.example.reframe.entity.account.AccountType;
 import com.example.reframe.entity.account.TransactionType;
 import com.example.reframe.entity.auth.User;
+import com.example.reframe.entity.deposit.DepositPaymentLog;
+import com.example.reframe.entity.deposit.PaymentCycle;
+import com.example.reframe.entity.deposit.PaymentStatus;
 import com.example.reframe.entity.enroll.ProductApplicationInput;
 import com.example.reframe.repository.AccountRepository;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.repository.ProductApplicationRepository;
+import com.example.reframe.repository.deposit.DepositPaymentLogRepository;
 import com.example.reframe.repository.enroll.ProductApplicationInputRepository;
 import com.example.reframe.service.account.TransactionService;
 import com.example.reframe.util.AccountNumberGenerator;
@@ -34,6 +39,7 @@ public class ProductApplicationService {
 	private final DepositProductRepository depositProductRepository;
 	private final ProductApplicationRepository applicationRepository;
 	private final ProductApplicationInputRepository applicationInputRepository;
+	private final DepositPaymentLogRepository depositPaymentLogRepository;
 	private final AccountRepository accountRepository;
 	private final TransactionService transactionService;
 	private final CurrentUser currentUser;
@@ -43,12 +49,14 @@ public class ProductApplicationService {
 	public ProductApplicationService(DepositProductRepository depositProductRepository, 
 									 ProductApplicationRepository applicationRepository, 
 									 ProductApplicationInputRepository applicationInputRepository, 
+									 DepositPaymentLogRepository depositPaymentLogRepository,
 									 AccountRepository accountRepository, 
 									 TransactionService transactionService, 
 									 CurrentUser currentUser) {
 		this.depositProductRepository = depositProductRepository;
 		this.applicationRepository = applicationRepository;
 		this.applicationInputRepository = applicationInputRepository;
+		this.depositPaymentLogRepository = depositPaymentLogRepository;
 		this.accountRepository = accountRepository;
 		this.transactionService = transactionService;
 		this.currentUser = currentUser;
@@ -150,7 +158,7 @@ public class ProductApplicationService {
 		try {
 			Long periodMonths = enrollForm.getPeriodMonths();	// 납입 기간
 			Long paymentAmount = enrollForm.getPaymentAmount();	// 납입 금액
-			Long transferDate = enrollForm.getTransferDate();	// 이체일
+			Integer transferDate = enrollForm.getTransferDate();	// 이체일
 			String groupName = enrollForm.getGroupName();		// 모임명
 			String groupType = enrollForm.getGroupType();		// 모임 구분
 
@@ -170,8 +178,7 @@ public class ProductApplicationService {
 			throw new IllegalStateException("사용자 입력 내역 등록 중 문제가 발생했습니다.");
 		}
 		
-		// 예금 상품
-		if(depositProduct.getCategory().equals("예금")) {
+		if(depositProduct.getCategory().equals("예금")) {				// 예금 상품
 			Long fromAccountId = enrollForm.getFromAccountId();
 			Long amount = enrollForm.getPaymentAmount();
 			LocalDateTime occurredAt = LocalDateTime.now();
@@ -191,14 +198,73 @@ public class ProductApplicationService {
 			
 			// 거래 처리(잔액 처리 및 로그 관리)
 			transactionService.postTransfer(transferCommand);
-		}
-		
-		// 적금 상품
-		if(depositProduct.getCategory().equals("적금")) {
+			
+		} else if(depositProduct.getCategory().equals("적금")) {		// 적금 상품
+			
+			PaymentCycle cycle = depositProduct.getPaymentCycle(); // 'MONTHLY' or 'DAILY'
+
+		    if (cycle == PaymentCycle.MONTHLY) {
+		        generateMonthlySchedule(result, enrollForm);     // 회차(월) UNPAID 생성
+		    } else if (cycle == PaymentCycle.DAILY) {
+		        // 일일형은 스케줄 미생성(지연 생성). 아무 것도 안함.
+		    } else {
+		        throw new IllegalStateException("지원하지 않는 납입 주기입니다: " + cycle);
+		    }
 			
 		}
 		
 		return result;
+	}
+	
+	@Transactional
+	public void attendAndDeposit(Long applicationId, long amountFixed1000) {
+	    ProductApplication app = applicationRepository.findById(applicationId)
+	        .orElseThrow(() -> new IllegalArgumentException("가입 정보를 찾을 수 없습니다."));
+
+	    // 가입 기간 내인지 체크(종료일 = startAt + period 개월 - 1일 23:59:59)
+	    int periodMonths = extractPeriodMonths(app); // ProductApplicationInput 또는 form 저장분에서 가져오기
+	    LocalDateTime start = app.getStartAt();
+	    LocalDateTime endInclusive = start.plusMonths(periodMonths).minusNanos(1);
+	    LocalDateTime now = LocalDateTime.now();
+	    if (now.isAfter(endInclusive)) {
+	        throw new IllegalStateException("가입 기간이 종료되었습니다.");
+	    }
+
+	    // 오늘의 round 계산 = 가입일 0시 기준 경과 '일' + 1
+	    int round = computeDailyRound(start.toLocalDate(), now.toLocalDate());
+
+	    // 1일 1회 중복 방지
+	    if (depositPaymentLogRepository.existsByApplication_IdAndRound(applicationId, round)) {
+	        throw new IllegalStateException("오늘은 이미 납입을 완료했습니다.");
+	    }
+
+	    // (선택) 커트오프/영업시간 제한이 있다면 여기서 체크
+
+	    // 로그 생성(실제 납입 시각 기록)
+	    DepositPaymentLog log = new DepositPaymentLog();
+	    log.setApplication(app);
+	    log.setRound(round);
+	    log.setAmount(amountFixed1000);      // 73번 상품: 1,000원 고정
+	    log.setPaidAt(now);
+	    log.setStatus(PaymentStatus.PAID);
+	    depositPaymentLogRepository.save(log);
+
+	    // (선택) 출석 연속일 계산 → 리워드 발급 훅 호출
+	    // rewardService.tryIssueStreakRewards(app.getId(), round);
+	}
+
+	private int computeDailyRound(LocalDate startDate, LocalDate today) {
+	    long days = java.time.temporal.ChronoUnit.DAYS.between(startDate, today);
+	    if (days < 0) throw new IllegalStateException("시스템 시간 오류");
+	    return (int) days + 1; // 1일차부터 시작
+	}
+
+	private int extractPeriodMonths(ProductApplication application) {
+	    return applicationInputRepository.findByApplication_Id(application.getId())
+	            .map(ProductApplicationInput::getBizMap1)
+	            .filter(s -> s != null && !s.isBlank())   // null/빈문자열 방어
+	            .map(Integer::parseInt)
+	            .orElse(6);
 	}
 	
 	private String generateUniqueAccountNumber() {
@@ -208,5 +274,52 @@ public class ProductApplicationService {
 	    	return n;
 	  }
 	  throw new IllegalStateException("계좌번호 발급 실패");
+	}
+	
+	private void generateMonthlySchedule(ProductApplication application, EnrollForm enrollForm) {
+		Long periodMonths  = enrollForm.getPeriodMonths();   // 총 납입 개월 수
+	    Long paymentAmount = enrollForm.getPaymentAmount();  // 회차별 납입 금액
+	    Integer transferDate = enrollForm.getTransferDate(); // 매월 납입일(1~31)
+
+	    if (periodMonths == null || paymentAmount == null || transferDate == null) {
+	        throw new IllegalStateException("잘못된 요청입니다.");
+	    }
+
+	    // 가입 기준 시각
+	    LocalDateTime base = application.getStartAt();
+	    int startDay = base.getDayOfMonth();
+	    int dueDay   = transferDate;
+
+	    // 같은 날 커트오프(예: 17:00 이후면 다음 달로 미룸)
+	    LocalDateTime cutoff = base.withHour(17).withMinute(0).withSecond(0).withNano(0);
+	    boolean passedCutoffSameDay = (startDay == dueDay) && base.isAfter(cutoff);
+
+	    // 이번 달 납입은 0, 다음 달 납입은 1
+	    int firstOffset = (startDay < dueDay) ? 0 : (startDay > dueDay) ? 1 : (passedCutoffSameDay ? 1 : 0);
+
+	    List<DepositPaymentLog> logs = new ArrayList<>();
+	    
+	    for (int i = 1; i <= periodMonths; i++) {
+	        int monthOffset = firstOffset + (i - 1);
+
+	        LocalDateTime targetMonth = base.plusMonths(monthOffset);
+	        int dom = Math.min(dueDay, targetMonth.toLocalDate().lengthOfMonth());
+
+	        // 납입 예정 시각 9시 고정
+	        LocalDateTime dueDate = targetMonth.withDayOfMonth(dom)
+	                                           .withHour(9).withMinute(0).withSecond(0).withNano(0);
+
+	        DepositPaymentLog log = new DepositPaymentLog();
+	        
+	        log.setApplication(application);
+	        log.setRound(i);
+	        log.setAmount(paymentAmount);
+	        log.setPaidAt(dueDate);                 // 예정일자
+	        log.setStatus(PaymentStatus.UNPAID);    // 가입 시점엔 미납
+
+	        logs.add(log);
+	    }
+
+	    depositPaymentLogRepository.saveAll(logs);
 	}
 }

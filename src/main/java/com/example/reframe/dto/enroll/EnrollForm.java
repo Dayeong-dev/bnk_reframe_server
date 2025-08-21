@@ -6,7 +6,7 @@ import lombok.Data;
 public class EnrollForm {
 	private Long periodMonths;
 	private Long paymentAmount;
-	private Long transferDate;
+	private Integer transferDate;
 	
 	private String groupName;
 	private String groupType;
