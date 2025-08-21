@@ -1,6 +1,7 @@
 package com.example.reframe.service;
 
 import com.example.reframe.dto.DepositProductDTO;
+import com.example.reframe.dto.deposit.ProductInputFormatDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -50,5 +51,5 @@ public interface DepositProductService {
     
     List<String> findSuggestions(String keyword);
     
-    
+    ProductInputFormatDTO getProductInputFormat(Long productId);
 }

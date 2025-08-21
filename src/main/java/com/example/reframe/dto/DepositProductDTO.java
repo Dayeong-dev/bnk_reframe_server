@@ -3,11 +3,9 @@ package com.example.reframe.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.example.reframe.entity.Document;
 import com.example.reframe.entity.deposit.PaymentCycle;
 import com.example.reframe.entity.deposit.TermMode;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +27,8 @@ public class DepositProductDTO {
     private String modalRate;	  // 모달용 금리 안내 (MarkDown)
 	private Integer termId;		  // 약관 아이디
 	private Integer manualId;	  // 상품설명서 아이디
+	private DocumentDTO term;		  // 약관
+	private DocumentDTO manual;	  // 상품설명서
     private BigDecimal maxRate;   // 최고 금리
     private BigDecimal minRate;   // 최소 금리
     private Integer period;       // 가입 기간 (개월 수)

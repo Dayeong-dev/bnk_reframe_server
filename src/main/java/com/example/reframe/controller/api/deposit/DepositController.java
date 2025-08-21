@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.dto.DepositProductDTO;
+import com.example.reframe.dto.deposit.ProductInputFormatDTO;
 import com.example.reframe.service.DepositProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -59,5 +60,11 @@ public class DepositController {
     @ResponseBody
     public List<DepositProductDTO> getProductsByCategoryAPI(@RequestParam("category") String category) {
         return depositProductService.getAllProducts("S", category);
+    }
+    
+    @GetMapping("/format/{productId}")
+    @ResponseBody
+    public ProductInputFormatDTO getProductInputFormat(@PathVariable("productId") Long productId) {
+    	return depositProductService.getProductInputFormat(productId);
     }
 }

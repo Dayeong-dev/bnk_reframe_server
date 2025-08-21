@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -13,9 +14,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.reframe.dto.DepositProductDTO;
+import com.example.reframe.dto.deposit.ProductInputFormatDTO;
 import com.example.reframe.entity.DepositProduct;
+import com.example.reframe.entity.deposit.ProductInputFormat;
 import com.example.reframe.repository.DepositProductRepository;
+import com.example.reframe.repository.deposit.ProductInputFormatRepository;
+import com.example.reframe.util.DocumentMapper;
 import com.example.reframe.util.MarkdownUtil;
+import com.example.reframe.util.ProductInputFormatMapper;
 import com.example.reframe.util.SetProductContent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -30,10 +36,14 @@ import lombok.RequiredArgsConstructor;
 public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
+    private final ProductInputFormatRepository productInputFormatRepository;
+    
     private final DocumentService documentService;
     private final EntityManager em;
     
     private SetProductContent setProductContent = new SetProductContent();
+    private DocumentMapper documentMapper = new DocumentMapper();
+    private ProductInputFormatMapper productInputFormatMapper = new ProductInputFormatMapper();
 
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -261,6 +271,13 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .imageUrl(product.getImageUrl())
                 .termImages(termImages)
                 .manualImages(manualImages)
+                .term(documentMapper.toDTO(product.getTerm()))
+                .manual(documentMapper.toDTO(product.getManual()))
+                .paymentCycle(product.getPaymentCycle())
+                .minPeriodMonths(product.getMinPeriodMonths())
+                .maxPeriodMonths(product.getMaxPeriodMonths())
+                .termList(product.getTermList())
+                .termMode(product.getTermMode())
                 .build();
     }
     
@@ -326,6 +343,18 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .limit(10)
                 .toList();
     }
+
+	@Override
+	public ProductInputFormatDTO getProductInputFormat(Long productId) {
+		Optional<ProductInputFormat> optional = productInputFormatRepository.findById(productId);
+		
+		if(optional.isEmpty())
+			return null;
+		
+		ProductInputFormat inputFormat = optional.get();
+		
+		return productInputFormatMapper.toDTO(inputFormat);
+	}
 	
 	
 }

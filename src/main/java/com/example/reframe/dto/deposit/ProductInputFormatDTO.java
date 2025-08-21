@@ -1,5 +1,6 @@
 package com.example.reframe.dto.deposit;
 
+import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.entity.DepositProduct;
 
 import lombok.Data;
@@ -8,7 +9,7 @@ import lombok.Data;
 public class ProductInputFormatDTO {
 	private Long productId;		// 상품 ID
 
-    private DepositProduct product;
+    private DepositProductDTO product;
 
     private Integer input1;		// 납입 기간 입력 여부
     
