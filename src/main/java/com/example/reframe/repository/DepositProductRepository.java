@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.reframe.entity.DepositProduct;
@@ -69,4 +70,18 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
     @Query("select p from DepositProduct p where p.status = 'S'")
     List<DepositProduct> findActive();
    
+    // 누적 조회수 TOP N (viewCount 컬럼 기반)
+    @Query("""
+        select p.productId, coalesce(p.viewCount, 0)
+          from DepositProduct p
+         order by coalesce(p.viewCount, 0) desc
+    """)
+    List<Object[]> topViewedAll();
+
+    // 특정 productId -> name
+    @Query("""
+        select p.name from DepositProduct p
+         where p.productId = :pid
+    """)
+    String findNameById(@Param("pid") Long productId);
 }
