@@ -49,35 +49,41 @@ public class ExcelReportWriter {
       autosizeSafe(s1, 4);
 
       /* ===== 2) 판매/조회 현황 ===== */
-      String title2 = "최근 한 달 가입건수 TOP5 / 조회수 TOP5"; // 내부 표시용(슬래시 허용)
-      Sheet s2 = wb.createSheet(safeSheetName("2. 판매/조회 현황")); // ✅ "/" → "-" 등 안전 시트명
+      String title2 = "최근 한 달 가입 건수 전체 순위 / 누적 조회수 전체 순위";
+      Sheet s2 = wb.createSheet(safeSheetName("2. 상품 판매 현황"));
       rIdx = 0;
       addTitleRow(s2, rIdx++, title2, wb);
       rIdx++;
 
-      // 왼쪽: 가입 TOP5
+      // 왼쪽: 가입 "전체" 순위
       int startL = rIdx;
       Row h1 = row(s2, rIdx++);
       set(h1,0,"순위",head); set(h1,1,"상품명",head); set(h1,2,"가입건수",head);
-      int rank=1;
-      for (TopItem t : padTo5(r.top5Joined)) {
+
+      int rank = 1;
+      for (TopItem t : (r.joinedRanking == null ? List.<TopItem>of() : r.joinedRanking)) {
         Row rr = row(s2, rIdx++);
         set(rr,0,rank++,cell);
         set(rr,1,str(t.name),cell);
         set(rr,2,num(t.count),cell);
       }
 
-      // 오른쪽: 조회 TOP5 (같은 행에 4열부터)
-      rIdx = startL;
-      Row h2 = row(s2, rIdx++);
+      // 오른쪽: 조회 "전체" 순위 (같은 행에 4열부터)
+      int rIdxRight = startL;
+      Row h2 = row(s2, rIdxRight++);
       set(h2,4,"순위",head); set(h2,5,"상품명",head); set(h2,6,"조회수",head);
-      rank=1;
-      for (TopItem t : padTo5(r.top5Viewed)) {
-        Row rr = row(s2, rIdx++);
-        set(rr,4,rank++,cell);
-        set(rr,5,str(t.name),cell);
-        set(rr,6,num(t.count),cell);
+
+      rank = 1;
+      if (r.viewedRanking != null) {
+        for (TopItem t : r.viewedRanking) {
+          Row rr = row(s2, rIdxRight++);
+          set(rr,4,rank++,cell);
+          set(rr,5,str(t.name),cell);
+          set(rr,6,num(t.count),cell);
+        }
       }
+
+      // 열 폭 자동 조정
       autosizeSafe(s2, 7);
 
       /* ===== 3) 리뷰 ===== */

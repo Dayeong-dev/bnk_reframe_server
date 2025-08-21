@@ -91,8 +91,12 @@ public class ReportService {
     r.subscriberTable = List.of(); // TODO
 
     // ===== 9) 엑셀 2번 표 (Top5) =====
-    r.top5Joined = toTopItemsByReviewCount(reviewRepo.topProductsByReviewIn(from, to), 5);
-    r.top5Viewed = toTopItemsByViewCount(productRepo.topViewedAll(), 5);
+//    r.top5Joined = toTopItemsByReviewCount(reviewRepo.topProductsByReviewIn(from, to), 5);
+//    r.top5Viewed = toTopItemsByViewCount(productRepo.topViewedAll(), 5);
+    
+    //===== 9) 엑셀 2번 표 (전체 순위 (limit 없이)) =====
+    r.joinedRanking = toTopItemsByReviewCount(reviewRepo.topProductsByReviewIn(from, to), Integer.MAX_VALUE);
+    r.viewedRanking = toTopItemsByViewCount(productRepo.topViewedAll(), Integer.MAX_VALUE);
 
     return r;
   }

@@ -33,10 +33,14 @@ public class AdminReport {
   }
   public List<AgeGenderRow> subscriberTable = new ArrayList<>(); // 화면처럼 “10대/20대/…/전체”
 
-  // 판매/조회 Top5
-  public List<TopItem> top5Joined = new ArrayList<>();
-  public List<TopItem> top5Viewed = new ArrayList<>();
+//  // 판매/조회 Top5
+//  public List<TopItem> top5Joined = new ArrayList<>();
+//  public List<TopItem> top5Viewed = new ArrayList<>();
 
+  //전체 순위표
+  public List<TopItem> joinedRanking = new ArrayList<>(); // 최근 한 달 가입 건수 전체
+  public List<TopItem> viewedRanking = new ArrayList<>(); // 누적 조회수 전체
+  
   // 월별 별점 분포 (최근 3개월 × 1~5점)
   // 예: ratingsByMonth.get("1월").get(5) = 45
   public Map<String, Map<Integer, Integer>> ratingsByMonth = new LinkedHashMap<>();
