@@ -5,6 +5,8 @@ import com.example.reframe.entity.auth.User;
 
 public class UserMapper {
 	public User toEntity(UserDTO userDTO) {
+		if(userDTO == null) return null;
+		
 		User userEntity = new User();
 		
 		userEntity.setId(userDTO.getId());
@@ -22,6 +24,8 @@ public class UserMapper {
 	}
 	
 	public UserDTO toDTO(User userEntity) {
+		if(userEntity == null) return null;
+		
 		UserDTO userDTO = new UserDTO();
 		
 		userDTO.setId(userEntity.getId());

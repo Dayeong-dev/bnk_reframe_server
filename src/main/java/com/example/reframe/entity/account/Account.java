@@ -41,6 +41,9 @@ public class Account {
     private AccountType accountType;  // DEMAND, PRODUCT
 
     private Long balance;
+    
+    @Column(name = "account_name", nullable = true)
+    private String accountName;
 
     @Column(name = "is_default", nullable = false)
     private int isDefault; // 0: 아니오, 1: 예

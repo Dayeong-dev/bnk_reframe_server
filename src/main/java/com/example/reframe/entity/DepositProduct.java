@@ -3,6 +3,9 @@ package com.example.reframe.entity;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import com.example.reframe.entity.deposit.PaymentCycle;
+import com.example.reframe.entity.deposit.TermMode;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -75,6 +78,23 @@ public class DepositProduct {
 
     @Column(name = "IMAGE_URL", nullable = true)
     private String imageUrl;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "PAYMENT_CYCLE", nullable = true)
+    private PaymentCycle paymentCycle;
+    
+    @Column(name = "min_period_months")
+    private Integer minPeriodMonths;
+    
+    @Column(name = "max_period_months")
+    private Integer maxPeriodMonths;
+    
+    @Column(name = "term_list", nullable = true)
+    private String termList;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "term_mode")
+    private TermMode termMode;
 
     @PrePersist
     protected void onCreate() {
