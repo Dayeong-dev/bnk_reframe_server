@@ -4,12 +4,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.auth.CurrentUser;
+import com.example.reframe.domain.TransferCommand;
 import com.example.reframe.dto.enroll.EnrollForm;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.ProductApplication;
@@ -17,12 +18,14 @@ import com.example.reframe.entity.ProductApplication.ApplicationStatus;
 import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.account.AccountStatus;
 import com.example.reframe.entity.account.AccountType;
+import com.example.reframe.entity.account.TransactionType;
 import com.example.reframe.entity.auth.User;
 import com.example.reframe.entity.enroll.ProductApplicationInput;
 import com.example.reframe.repository.AccountRepository;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.repository.ProductApplicationRepository;
 import com.example.reframe.repository.enroll.ProductApplicationInputRepository;
+import com.example.reframe.service.account.TransactionService;
 import com.example.reframe.util.AccountNumberGenerator;
 
 @Service
@@ -32,18 +35,22 @@ public class ProductApplicationService {
 	private final ProductApplicationRepository applicationRepository;
 	private final ProductApplicationInputRepository applicationInputRepository;
 	private final AccountRepository accountRepository;
+	private final TransactionService transactionService;
 	private final CurrentUser currentUser;
+	
 	private final AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
 	
 	public ProductApplicationService(DepositProductRepository depositProductRepository, 
 									 ProductApplicationRepository applicationRepository, 
 									 ProductApplicationInputRepository applicationInputRepository, 
 									 AccountRepository accountRepository, 
+									 TransactionService transactionService, 
 									 CurrentUser currentUser) {
 		this.depositProductRepository = depositProductRepository;
 		this.applicationRepository = applicationRepository;
 		this.applicationInputRepository = applicationInputRepository;
 		this.accountRepository = accountRepository;
+		this.transactionService = transactionService;
 		this.currentUser = currentUser;
 	}
 	
@@ -51,6 +58,11 @@ public class ProductApplicationService {
 	// 상품 가입
 	@Transactional
 	public ProductApplication addApplication(Long productId, EnrollForm enrollForm) {
+		
+		// 비즈니스 거래 식별자 생성
+		String correlationId = UUID.randomUUID().toString();
+		
+		
 		Optional<DepositProduct> optionalProduct = depositProductRepository.findById(productId);
 		
 		if(optionalProduct.isEmpty()) throw new IllegalStateException("해당 상품이 존재하지 않습니다.");
@@ -76,10 +88,10 @@ public class ProductApplicationService {
 		Account account = new Account();
 		
 		try {
-			account.setUser(user);											// 계좌 사용자 정보
+			account.setUser(user);		// 계좌 사용자 정보
 			account.setAccountNumber(generateUniqueAccountNumber());		// 임시 계좌번호 값
 			account.setAccountType(AccountType.PRODUCT);	// 계좌 종류(입출금, 상품)
-			account.setBalance(0L);							// 잔액
+			account.setBalance(0L);		// 잔액
 			
 			String groupName = enrollForm.getGroupName();
 			if(groupName != null && !groupName.isBlank()) {
@@ -95,7 +107,7 @@ public class ProductApplicationService {
 			
 			accountRepository.save(account);
 		} catch(Exception e) {
-			throw new RuntimeException("계좌 개설 중 문제가 발생했습니다.");
+			throw new IllegalStateException("계좌 개설 중 문제가 발생했습니다.");
 		}
 	
 		// 생성한 상품 계좌 등록 
@@ -154,16 +166,46 @@ public class ProductApplicationService {
 			
 			applicationInputRepository.save(productApplicationInput);
 			
-			return result;
 		} catch(Exception e) {
-			throw new RuntimeException("사용자 입력 내역 등록 중 문제가 발생했습니다. ");
+			throw new IllegalStateException("사용자 입력 내역 등록 중 문제가 발생했습니다.");
 		}
+		
+		// 예금 상품
+		if(depositProduct.getCategory().equals("예금")) {
+			Long fromAccountId = enrollForm.getFromAccountId();
+			Long amount = enrollForm.getPaymentAmount();
+			LocalDateTime occurredAt = LocalDateTime.now();
+			
+			if(fromAccountId == null || amount == null) {
+				throw new IllegalStateException("잘못된 요청입니다.");
+			}
+			
+			TransferCommand transferCommand = new TransferCommand();
+			
+			transferCommand.setCorrelationId(correlationId);	// 비즈니스 거래 식별자
+			transferCommand.setToAccountId(account.getId());	// 상품 계좌
+			transferCommand.setFromAccountId(fromAccountId);	// 납입 계좌
+			transferCommand.setTransactionType(TransactionType.DEPOSIT_PAYMENT);	// 거래 종류
+			transferCommand.setAmount(amount);			// 납입 금액
+			transferCommand.setOccurredAt(occurredAt);	// 거래 일시
+			
+			// 거래 처리(잔액 처리 및 로그 관리)
+			transactionService.postTransfer(transferCommand);
+		}
+		
+		// 적금 상품
+		if(depositProduct.getCategory().equals("적금")) {
+			
+		}
+		
+		return result;
 	}
 	
 	private String generateUniqueAccountNumber() {
-	  for (int i=0; i<5; i++) {
+	  for (int i = 0; i < 5; i++) {
 	    String n = accountNumberGenerator.newNumber();
-	    if (!accountRepository.existsByAccountNumber(n)) return n;
+	    if (!accountRepository.existsByAccountNumber(n))
+	    	return n;
 	  }
 	  throw new IllegalStateException("계좌번호 발급 실패");
 	}
