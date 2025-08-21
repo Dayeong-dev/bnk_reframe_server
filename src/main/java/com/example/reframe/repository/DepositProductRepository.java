@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.reframe.dto.AdminProductListItemDto;
 import com.example.reframe.entity.DepositProduct;
 
 @Repository
@@ -69,6 +70,22 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
     
     @Query("select p from DepositProduct p where p.status = 'S'")
     List<DepositProduct> findActive();
+    
+    @Query("""
+    		select new com.example.reframe.dto.AdminProductListItemDto(
+    		  dp.id, dp.name, dp.purpose, dp.category, dp.period,
+    		  count(pa.id),
+    		  sum(case when upper(pa.status) in ('IN_PROGRESS','STARTED') then 1 else 0 end),                         
+    		  sum(case when upper(pa.status) in ('DONE','COMPLETED','COMPLETE','CLOSED') then 1 else 0 end),          
+    		  sum(case when upper(pa.status) in ('CANCEL','CANCELED','CANCELLED','CANCLED') then 1 else 0 end)        
+    		)
+    		from DepositProduct dp
+    		left join ProductApplication pa on pa.product.id = dp.id
+    		where dp.status = 'S'
+    		group by dp.id, dp.name, dp.purpose, dp.category, dp.period
+    		order by max(dp.createdAt) desc
+    		""")
+        List<AdminProductListItemDto> findProductsWithCounts();
    
     // 누적 조회수 TOP N (viewCount 컬럼 기반)
     @Query("""
