@@ -260,6 +260,7 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .productId(product.getProductId())
                 .name(product.getName())
                 .summary(product.getSummary())
+                .category(product.getCategory())
                 .detail(product.getDetail())
                 .modalDetail(modalDetail)
                 .modalRate(modalRate)
