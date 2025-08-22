@@ -84,6 +84,10 @@ public class AdminController {
     public String page() {
         return "admin/product-applications"; 
     }
+	@GetMapping("chart-2")
+	public String chart2() {
+		return "admin/chart/chart-2"; 
+	}
 
 	
 //	@PostMapping("/login")
