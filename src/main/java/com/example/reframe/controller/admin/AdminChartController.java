@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.reframe.dto.DailyVisitDTO;
+import com.example.reframe.dto.GenderRatioResponseDTO;
 import com.example.reframe.dto.ProductViewDTO;
 import com.example.reframe.service.AccessLogService;
+import com.example.reframe.service.AnalyticsService;
 import com.example.reframe.service.ProductService;
 import com.example.reframe.service.ReviewService;
 import com.example.reframe.service.TestResultService;
@@ -29,7 +31,8 @@ public class AdminChartController {
 	private ReviewService reviewService;
 	@Autowired
 	private TestResultService testResultService;
-	
+	@Autowired
+	private AnalyticsService analyticsService;
 	
 	// 차트
 	@GetMapping("/chart-main")
@@ -69,6 +72,12 @@ public class AdminChartController {
         model.addAttribute("testResultLabels", testResultStats.keySet());
         model.addAttribute("testResultCounts", testResultStats.values());
 		
+        // 상품가입자 성별 비율
+        GenderRatioResponseDTO gender = analyticsService.getProductJoinerGenderRatio();
+        model.addAttribute("genderLabels",      gender.getLabels());     
+        model.addAttribute("genderCounts",      gender.getData());         
+        model.addAttribute("genderPercentages", gender.getPercentages());  
+        model.addAttribute("genderTotal",       gender.getTotal());        
 		return "admin/chart/chart-main";
 	}
 	

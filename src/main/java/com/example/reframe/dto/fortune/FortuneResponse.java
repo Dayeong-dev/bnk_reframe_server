@@ -8,5 +8,6 @@ import lombok.*;
 public class FortuneResponse {
     private String fortune;    // 한 문장 "~하기 좋은 하루"
     private String keyword;    // Enum 문자열
+    private String content;    // ✅ 부가설명 3문장 (서버가 그대로 전달)
     private List<ProductBrief> products; // 정확히 2개
 }
