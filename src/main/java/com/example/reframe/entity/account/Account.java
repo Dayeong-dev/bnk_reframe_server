@@ -30,7 +30,7 @@ public class Account {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "account_number", nullable = false, unique = true, length = 13)
+    @Column(name = "account_number", nullable = false, unique = true, length = 16)
     private String accountNumber;
 
     @Column(name = "bank_name", nullable = false, length = 50)

@@ -16,6 +16,6 @@ public class AccountNumberGenerator {
         String last = String.format("%02d", (int)(Math.random() * 100));
 
         // 최종 조합
-        return bankCode + first + middle + last; // "1121234567810"
+        return bankCode + "-" + first + "-" + middle + "-" + last; // "112-1234-5678-10"
     }
 }
