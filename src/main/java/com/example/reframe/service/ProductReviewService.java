@@ -1,7 +1,13 @@
 package com.example.reframe.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.reframe.dto.ReviewCreateDTO;
 import com.example.reframe.dto.ReviewResponseDTO;
+import com.example.reframe.dto.ReviewUpdateDTO;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.ProductReview;
 import com.example.reframe.entity.auth.User;
@@ -9,11 +15,9 @@ import com.example.reframe.netty.NettyPublisher;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.repository.ProductReviewRepository;
 import com.example.reframe.repository.auth.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +69,32 @@ public class ProductReviewService {
         }
 
         return review.getId();
+    }
+    
+    @Transactional
+    public void update(Long userId, Long reviewId, ReviewUpdateDTO dto) {
+        ProductReview r = productReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("review not found"));
+        if (!r.getUser().getId().equals(userId)) {
+            throw new SecurityException("forbidden");
+        }
+        if (dto.getContent() != null && !dto.getContent().trim().isEmpty()) {
+            r.setContent(dto.getContent().trim());
+        }
+        if (dto.getRating() != null) {
+            r.setRating(dto.getRating());
+        }
+        // JPA dirty checking 로 자동 반영
+    }
+    
+    @Transactional
+    public void delete(Long userId, Long reviewId) {
+        ProductReview r = productReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("review not found"));
+        if (!r.getUser().getId().equals(userId)) {
+            throw new SecurityException("forbidden");
+        }
+        productReviewRepository.delete(r);
     }
 
     @Transactional(readOnly = true)

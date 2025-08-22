@@ -1,8 +1,10 @@
+// src/main/java/com/example/reframe/controller/ReviewApiController.java
 package com.example.reframe.controller;
 
 import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.dto.ReviewCreateDTO;
 import com.example.reframe.dto.ReviewResponseDTO;
+import com.example.reframe.dto.ReviewUpdateDTO;
 import com.example.reframe.service.ProductReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,23 @@ public class ReviewApiController {
         Long uid = requireUser();
         Long id = productReviewService.create(uid, dto);
         return ResponseEntity.created(URI.create("/mobile/reviews/" + id)).build();
+    }
+
+    // ★ 수정
+    @PutMapping("/reviews/{id}")
+    public ResponseEntity<Void> update(@PathVariable("id") Long id,
+                                       @RequestBody ReviewUpdateDTO dto) {
+        Long uid = requireUser();
+        productReviewService.update(uid, id, dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ★ 삭제
+    @DeleteMapping("/reviews/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        Long uid = requireUser();
+        productReviewService.delete(uid, id);
+        return ResponseEntity.noContent().build();
     }
 
     private Long requireUser() {
