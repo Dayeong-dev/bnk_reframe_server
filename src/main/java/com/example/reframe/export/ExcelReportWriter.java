@@ -14,7 +14,7 @@ import java.util.Map;
 public class ExcelReportWriter {
 
   public void write(AdminReport r, OutputStream os) throws Exception {
-    try (Workbook wb = new XSSFWorkbook()) { // ✅ XSSF 사용 (autoSizeColumn 안정)
+    try (Workbook wb = new XSSFWorkbook()) {
       // 공통 스타일
       CellStyle head = wb.createCellStyle();
       Font bold = wb.createFont(); bold.setBold(true);
@@ -29,22 +29,38 @@ public class ExcelReportWriter {
       cell.setBorderBottom(BorderStyle.THIN); cell.setBorderTop(BorderStyle.THIN);
       cell.setBorderLeft(BorderStyle.THIN);   cell.setBorderRight(BorderStyle.THIN);
 
-      /* ===== 1) 가입자 현황 ===== */
-      String title1 = "최근 한달 가입자 수 / 전체 가입자 수 / 연령대/성별"; // 내부 표시용(슬래시 허용)
-      Sheet s1 = wb.createSheet(safeSheetName("1. 가입자 현황"));            // 시트명은 금지문자 치환
+      /* === 1) 가입자 현황 시트 === */
+      Sheet s1 = wb.createSheet(safeSheetName("1. 가입자 현황"));
       int rIdx = 0;
-      addTitleRow(s1, rIdx++, title1, wb); // 내부 첫 행에 원래 제목 그대로 기록
-      rIdx++; // 빈 줄
+      addTitleRow(s1, rIdx++, "최근 한달 가입자 수 / 전체 가입자 수 / 연령대/성별", wb);
+      rIdx++;
 
       Row h = row(s1, rIdx++);
       set(h,0,"연령대",head); set(h,1,"성별",head); set(h,2,"총 가입자 수",head); set(h,3,"최근 1개월 가입자 수",head);
 
       for (AgeGenderRow ag : safe(r.subscriberTable)) {
-        Row rr = row(s1, rIdx++);
-        set(rr,0,ag.ageBand,cell);
-        set(rr,1,"-", cell);
-        set(rr,2,num(ag.total),cell);
-        set(rr,3,num(ag.recentMonth),cell);
+        boolean hasGenderSplit = (ag.male != null || ag.female != null);
+
+        if (hasGenderSplit) {
+          // (A) 남/여 두 줄
+          Row m = row(s1, rIdx++);
+          set(m,0,ag.ageBand,cell); set(m,1,"남",cell);
+          set(m,2,num(ag.male),cell); set(m,3,"",cell); // 최근 1개월 성별 분해가 없으면 공란
+
+          Row f = row(s1, rIdx++);
+          set(f,0,ag.ageBand,cell); set(f,1,"여",cell);
+          set(f,2,num(ag.female),cell); set(f,3,"",cell);
+
+          // 합계 라인(선택): 한 줄로 총계/최근 1개월 표시
+          Row sum = row(s1, rIdx++);
+          set(sum,0,ag.ageBand,cell); set(sum,1,"-",cell);
+          set(sum,2,num(ag.total),cell); set(sum,3,num(ag.recentMonth),cell);
+        } else {
+          // (B) 성별 집계가 없으면 한 줄
+          Row rr = row(s1, rIdx++);
+          set(rr,0,ag.ageBand,cell); set(rr,1,"-",cell);
+          set(rr,2,num(ag.total),cell); set(rr,3,num(ag.recentMonth),cell);
+        }
       }
       autosizeSafe(s1, 4);
 
@@ -86,26 +102,27 @@ public class ExcelReportWriter {
       // 열 폭 자동 조정
       autosizeSafe(s2, 7);
 
-      /* ===== 3) 리뷰 ===== */
-      String title3 = "평균 평점 (최근 3개월, 1~5점 분포)";
-      Sheet s3 = wb.createSheet(safeSheetName("3. 리뷰"));
+      /* === 3) 상품 가입 리뷰 시트 === */
+      Sheet s3 = wb.createSheet(safeSheetName("3. 상품가입 리뷰"));
       rIdx = 0;
-      addTitleRow(s3, rIdx++, title3, wb);
+      addTitleRow(s3, rIdx++, "평균 평점 / 최근 3개월 별점 분포 / 긍정·부정 비율", wb);
       rIdx++;
 
-      // 헤더: 등급/월
+      // 월별 별점 분포 표
       Row h3 = row(s3, rIdx++);
       set(h3,0,"등급",head);
-      int c=1; for (String m : r.ratingsByMonth.keySet()) set(h3,c++, m, head);
+      int c=1; for (String mKey : r.ratingsByMonth.keySet()) set(h3,c++, mKey, head);
 
       for (int star=1; star<=5; star++){
         Row rr = row(s3, rIdx++);
-        set(rr,0, star, cell);
+        set(rr,0, star+"점", cell);
         c=1;
         for (Map<Integer,Integer> dist : r.ratingsByMonth.values()) {
           set(rr,c++, num(dist.getOrDefault(star,0)), cell);
         }
       }
+
+      // 긍/부정 비율
       rIdx += 1;
       Row sentiTitle = row(s3, rIdx++); set(sentiTitle,0, "긍정/부정 비율", null);
       Row sentiHead  = row(s3, rIdx++); set(sentiHead,0,"긍정",head); set(sentiHead,1,"부정",head);
@@ -116,19 +133,14 @@ public class ExcelReportWriter {
     }
   }
 
-  /* ================= helpers ================= */
-
-  private static Row row(Sheet s, int idx){
-    return s.getRow(idx)==null? s.createRow(idx): s.getRow(idx);
-  }
-
+  /* ===== helpers ===== */
+  private static Row row(Sheet s, int idx){ return s.getRow(idx)==null? s.createRow(idx): s.getRow(idx); }
   private static void set(Row r, int c, Object v, CellStyle st){
     Cell cell = r.createCell(c);
     if (v instanceof Number n) cell.setCellValue(n.doubleValue());
     else cell.setCellValue(v==null? "" : String.valueOf(v));
     if (st != null) cell.setCellStyle(st);
   }
-
   private static Integer num(Integer v){ return v==null? 0: v; }
   private static String  str(String v){ return v==null? "": v; }
 
@@ -141,38 +153,22 @@ public class ExcelReportWriter {
     }
     return copy;
   }
+  private static List<AgeGenderRow> safe(List<AgeGenderRow> v){ return v==null? List.of(): v; }
 
-  private static List<AgeGenderRow> safe(List<AgeGenderRow> v){
-    return v==null? List.of(): v;
-  }
-
-  // 시트 이름을 엑셀 제약에 맞게 정리 (금지문자 치환 + 길이 제한 + 트림)
+  // 시트명 금지문자 치환 + 길이 제한
   private static String safeSheetName(String name){
     if (name == null) return "Sheet";
-    String s = name
-      .replaceAll("[\\\\/?*\\[\\]:]", "-") // 금지문자 → "-"
-      .replaceAll("\\p{Cntrl}", "")        // 제어문자 제거
-      .trim();
+    String s = name.replaceAll("[\\\\/?*\\[\\]:]", "-").replaceAll("\\p{Cntrl}", "").trim();
     if (s.isEmpty()) s = "Sheet";
-    if (s.length() > 31) s = s.substring(0, 31); // 엑셀 시트명 최대 31자
+    if (s.length() > 31) s = s.substring(0, 31);
     return s;
   }
-
-  // 제목행(원래 텍스트)을 시트 내부에 기록 (슬래시 그대로 표시)
   private static void addTitleRow(Sheet s, int rowIdx, String title, Workbook wb){
-    Row r = row(s, rowIdx);
-    Cell c = r.createCell(0);
-    c.setCellValue(title == null ? "" : title);
-    // 굵게 스타일(선택)
-    CellStyle st = wb.createCellStyle();
-    Font ft = wb.createFont(); ft.setBold(true); st.setFont(ft);
-    r.getCell(0).setCellStyle(st);
+    Row r = row(s, rowIdx); Cell c = r.createCell(0); c.setCellValue(title == null ? "" : title);
+    CellStyle st = wb.createCellStyle(); Font ft = wb.createFont(); ft.setBold(true); st.setFont(ft);
+    c.setCellStyle(st);
   }
-
   private static void autosizeSafe(Sheet s, int cols){
-    for(int i=0;i<cols;i++){
-      try { s.autoSizeColumn(i); }
-      catch (Exception e) { s.setColumnWidth(i, 5000); } // 실패 시 기본폭
-    }
+    for(int i=0;i<cols;i++){ try { s.autoSizeColumn(i); } catch (Exception e) { s.setColumnWidth(i, 5000); } }
   }
 }
