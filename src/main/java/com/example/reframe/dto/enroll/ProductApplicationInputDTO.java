@@ -8,8 +8,6 @@ import lombok.Data;
 public class ProductApplicationInputDTO {
 	private Long applicationId;		// 상품 ID
 
-    private ProductApplication application;
-
 	private String bizMap1;
 
 	private String bizMap2;

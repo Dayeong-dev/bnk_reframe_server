@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.dto.account.AccountDTO;
+import com.example.reframe.dto.account.ProductAccountDetail;
 import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.account.AccountStatus;
 import com.example.reframe.entity.account.AccountType;
 import com.example.reframe.repository.AccountRepository;
+import com.example.reframe.service.account.ProductAccountService;
 import com.example.reframe.util.AccountMapper;
 
 @RestController
@@ -28,6 +30,9 @@ public class AccountController {
 	
 	@Autowired
 	AccountRepository accountRepository;
+	
+	@Autowired
+	ProductAccountService productAccountService;
 	
 	AccountMapper accountMapper = new AccountMapper();
 	
@@ -50,5 +55,15 @@ public class AccountController {
 	    System.out.println(result);
 	        
 	    return ResponseEntity.ok(result);
+	}
+	
+	@GetMapping("/detail/{id}")
+	public ResponseEntity<ProductAccountDetail> getAccountList(@PathVariable("id") Long accountId) {
+
+		ProductAccountDetail productAccountDetail = productAccountService.getProductAccountDetail(accountId);
+		
+		System.out.println(productAccountDetail);
+	        
+	    return ResponseEntity.ok(productAccountDetail);
 	}
 }

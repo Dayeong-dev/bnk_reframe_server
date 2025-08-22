@@ -2,15 +2,13 @@ package com.example.reframe.dto.deposit;
 
 import java.time.LocalDate;
 
-import com.example.reframe.entity.DepositProduct;
-
 import lombok.Data;
 
 @Data
 public class DepositProductRateDTO {
 	private Long id;		// 금리 ID
 	
-	private DepositProduct productId;		// 예적금 상품 ID (deposit_product)
+	private Long productId;		// 예적금 상품 ID (deposit_product)
 	
 	private Integer fromMonth;		// 금리 적용 시작 개월
 	

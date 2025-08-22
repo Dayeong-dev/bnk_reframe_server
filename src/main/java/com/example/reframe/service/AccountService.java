@@ -34,7 +34,7 @@ public class AccountService {
 		
 		acc.setUser(user); 
 		acc.setAccountNumber(newNumber); 
-		acc.setBankName("BNK 부산은행");
+		acc.setBankName("부산은행");
 		acc.setAccountName(user.getName() + "님의 통장");
 		acc.setAccountType(AccountType.DEMAND); // 입출금 기본 계좌 
 		acc.setBalance(10_000_000L); // 초기 잔액 더미 (예: 1000만 원) 

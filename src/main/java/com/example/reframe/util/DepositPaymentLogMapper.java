@@ -19,7 +19,7 @@ public class DepositPaymentLogMapper {
 		return paymentLog;
 	}
 	
-	public DepositPaymentLogDTO toEntity(DepositPaymentLog paymentLog) {
+	public DepositPaymentLogDTO toDTO(DepositPaymentLog paymentLog) {
 		DepositPaymentLogDTO paymentLogDTO = new DepositPaymentLogDTO();
 		
 		paymentLogDTO.setId(paymentLog.getId());

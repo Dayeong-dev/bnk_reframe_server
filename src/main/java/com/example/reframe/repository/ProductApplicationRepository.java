@@ -64,4 +64,6 @@ public interface ProductApplicationRepository extends JpaRepository<ProductAppli
     		order by pa.startAt desc
     		""")
         List<Map<String, Object>> findByProductIdForAdmin(@Param("productId")Long productId);
+
+	ProductApplication findByProductAccount_Id(Long accountId);
 }
