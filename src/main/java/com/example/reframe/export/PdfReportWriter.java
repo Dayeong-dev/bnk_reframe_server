@@ -36,7 +36,7 @@ public class PdfReportWriter {
   private Paragraph kvLine(String label, String value) {
     Phrase ph = new Phrase();
     ph.add(new Chunk(label + ": ", font(12, Font.NORMAL)));             // ← 일반체
-    ph.add(new Chunk(value == null ? "" : value, font(12, Font.NORMAL))); // ← 일반체 + 파란색
+    ph.add(new Chunk(value == null ? "" : value, font(12, Font.NORMAL))); // ← 일반체
     Paragraph p = new Paragraph(ph);
     p.setSpacingAfter(4f);
     return p;
@@ -89,7 +89,7 @@ public class PdfReportWriter {
   /** 값만 크게(일반체) 파란색으로 단독 출력 (예: 4:6, 7:3) */
   private void addBigValue(Document doc, String sectionTitle, String value) throws Exception {
     doc.add(section(sectionTitle));
-    Paragraph p = new Paragraph(value == null ? "" : value, font(16, Font.NORMAL)); // ← 일반체 + 파란색
+    Paragraph p = new Paragraph(value == null ? "" : value, font(16, Font.NORMAL)); // ← 일반체
     p.setSpacingAfter(8f);
     doc.add(p);
   }

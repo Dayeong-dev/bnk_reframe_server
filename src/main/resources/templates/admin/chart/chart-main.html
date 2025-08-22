@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>관리자 메인</title>
-<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
-<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
-<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
-<script th:src="@{/admin/sidebar.js}"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>관리자 메인</title>
+  <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+  <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+  <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+  <script th:src="@{/admin/sidebar.js}"></script>
+  <!-- Chart.js 버전 고정 (UMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
-<style>
-.chart-grid{
-  display:grid; grid-template-columns:repeat(2,1fr); gap:24px; padding:24px;
-}
-.chart-box{
-  background:#fff; border:1px solid #ddd; border-radius:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.05); padding:20px; position:relative; height:300px;
-}
-.chart-box canvas{ width:100% !important; height:100% !important; }
-.report-actions{ padding:16px 24px 0 24px; display:flex; gap:12px; align-items:center; }
-.report-actions input{ height:36px; padding:0 8px; }
-.report-actions button{
-  padding:8px 16px; border-radius:8px; border:1px solid #ddd; background:#f5f5f5; cursor:pointer;
-}
-.report-actions button:hover{ background:#e0e0e0; }
-</style>
+  <style>
+    .chart-grid{
+      display:grid; grid-template-columns:repeat(2,1fr); gap:24px; padding:24px;
+    }
+    .chart-box{
+      background:#fff; border:1px solid #ddd; border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,.05); padding:20px; position:relative; height:300px;
+    }
+    .chart-box canvas{ width:100% !important; height:100% !important; }
+    .report-actions{ padding:16px 24px 0 24px; display:flex; gap:12px; align-items:center; }
+    .report-actions input{ height:36px; padding:0 8px; }
+    .report-actions button{
+      padding:8px 16px; border-radius:8px; border:1px solid #ddd; background:#f5f5f5; cursor:pointer;
+    }
+    .report-actions button:hover{ background:#e0e0e0; }
+  </style>
 </head>
 <body>
 
@@ -37,8 +38,7 @@
 
     <!-- 본문 -->
     <div class="content">
-
-      <!-- ✅ 리포트 다운로드 (컨트롤러 경로 /admin/reports 에 맞춤) -->
+      <!-- 리포트 다운로드 (컨트롤러: /admin/reports) -->
       <div class="report-actions">
         <input id="reportYear" type="number" min="2000" max="2100" style="width:90px;">
         <input id="reportMonth" type="number" min="1" max="12" style="width:70px;">
@@ -51,139 +51,169 @@
         <div class="chart-box"><canvas id="productChart"></canvas></div>
         <div class="chart-box"><canvas id="sentimentChart"></canvas></div>
         <div class="chart-box"><canvas id="testResultChart"></canvas></div>
-        <!-- ✅ 추가: 성별 비율 도넛 -->
+        <!-- 추가: 성별 비율 도넛 -->
         <div class="chart-box"><canvas id="genderChart"></canvas></div>
       </div>
     </div>
   </div>
-<script th:inline="javascript">
-(function(){
-  // 공통: 안전 실행 래퍼
-  function safe(fn){ try{ fn(); } catch(e){ console.error(e); } }
-  function byId(id){ return document.getElementById(id); }
-  function isArr(a){ return Array.isArray(a); }
 
-  // Chart.js 로드 확인
-  if (typeof Chart === 'undefined') {
-    console.error('Chart.js not loaded');
-    return;
-  }
+  <script th:inline="javascript">
+  (function(){
+    /* ==================== 다운로드: 최우선 연결 ==================== */
+    function byId(id){ return document.getElementById(id); }
 
-  /* -------------------- 1) 방문자 수 -------------------- */
-  safe(function(){
-    var el = byId('visitChart'); if(!el) return;
-    var labels = /*[[${visitLabels}]]*/ [];
-    var counts = /*[[${visitCounts}]]*/ [];
-    if (!isArr(labels) || !isArr(counts) || labels.length === 0) return;
+    // 컨트롤러 매핑 (Thymeleaf 인라인 + 폴백)
+    const XLSX_BASE = /*[[@{/admin/reports/monthly.xlsx}]]*/ '/admin/reports/monthly.xlsx';
+    const PDF_BASE  = /*[[@{/admin/reports/monthly.pdf}]]*/  '/admin/reports/monthly.pdf';
 
-    var ctx = el.getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: { labels: labels, datasets: [{ label: '방문자 수', data: counts,
-        backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
-      options: { responsive:true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    const $y = byId('reportYear');
+    const $m = byId('reportMonth');
+    const $btnX = byId('btn-xlsx');
+    const $btnP = byId('btn-pdf');
+
+    // 기본값: 오늘 날짜
+    (function setTodayDefaults(){
+      if(!$y || !$m) return;
+      const now = new Date();
+      if(!$y.value) $y.value = now.getFullYear();
+      if(!$m.value) $m.value = now.getMonth() + 1; // 1~12
+    })();
+
+    function buildUrl(base){
+      const now = new Date();
+      const y = parseInt($y && $y.value, 10) || now.getFullYear();
+      const m = parseInt($m && $m.value, 10) || (now.getMonth()+1);
+      return `${base}?year=${encodeURIComponent(y)}&month=${encodeURIComponent(m)}`;
+    }
+
+    // 팝업 차단 고려: window.open 대신 location.href
+    if ($btnX) $btnX.addEventListener('click', function(){ location.href = buildUrl(XLSX_BASE); });
+    if ($btnP) $btnP.addEventListener('click', function(){ location.href = buildUrl(PDF_BASE); });
+
+    /* ==================== 차트들 ==================== */
+    function safe(fn){ try{ fn(); } catch(e){ console.error(e); } }
+    function isArr(a){ return Array.isArray(a); }
+
+    if (typeof Chart === 'undefined') {
+      console.warn('Chart.js not loaded — charts skipped, downloads still work.');
+      return; // 다운로드는 위에서 이미 연결됨
+    }
+
+    /* ---- 1) 방문자 수 ---- */
+    safe(function(){
+      var el = byId('visitChart'); if(!el) return;
+      var labels = /*[[${visitLabels}]]*/ [];
+      var counts = /*[[${visitCounts}]]*/ [];
+      if (!isArr(labels) || !isArr(counts) || labels.length === 0) return;
+
+      var ctx = el.getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: '방문자 수', data: counts,
+          backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
+        options: { responsive:true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      });
     });
-  });
 
-  /* -------------------- 2) 상품 조회수 -------------------- */
-  safe(function(){
-    var el = byId('productChart'); if(!el) return;
-    var pLabels = /*[[${labels}]]*/ [];
-    var pCounts = /*[[${counts}]]*/ [];
-    if (!isArr(pLabels) || !isArr(pCounts) || pLabels.length === 0) return;
+    /* ---- 2) 상품 조회수 ---- */
+    safe(function(){
+      var el = byId('productChart'); if(!el) return;
+      var pLabels = /*[[${labels}]]*/ [];
+      var pCounts = /*[[${counts}]]*/ [];
+      if (!isArr(pLabels) || !isArr(pCounts) || pLabels.length === 0) return;
 
-    var ctx = el.getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: { labels: pLabels, datasets: [{ label: '상품별 조회수', data: pCounts,
-        backgroundColor: 'rgba(254,80,79,0.5)', borderColor: 'rgba(254,80,79,1)', borderWidth: 1 }] },
-      options: {
-        indexAxis: 'x', responsive: true,
-        scales: { x: { beginAtZero: true }, y: { title: { display: true, text: '상품명' } } },
-        plugins: { legend: { display: false }, title: { display: true, text: '인기 상품 TOP 10 (조회수 기준)' } }
-      }
+      var ctx = el.getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: { labels: pLabels, datasets: [{ label: '상품별 조회수', data: pCounts,
+          backgroundColor: 'rgba(254,80,79,0.5)', borderColor: 'rgba(254,80,79,1)', borderWidth: 1 }] },
+        options: {
+          indexAxis: 'x', responsive: true,
+          scales: { x: { beginAtZero: true }, y: { title: { display: true, text: '상품명' } } },
+          plugins: { legend: { display: false }, title: { display: true, text: '인기 상품 TOP 10 (조회수 기준)' } }
+        }
+      });
     });
-  });
 
-  /* -------------------- 3) 리뷰 감정(도넛) -------------------- */
-  safe(function(){
-    var el = byId('sentimentChart'); if(!el) return;
-    var sLabels = /*[[${sentimentLabels}]]*/ [];
-    var sCounts = /*[[${sentimentCounts}]]*/ [];
-    if (!isArr(sLabels) || !isArr(sCounts) || sLabels.length === 0) return;
+    /* ---- 3) 리뷰 감정(도넛) ---- */
+    safe(function(){
+      var el = byId('sentimentChart'); if(!el) return;
+      var sLabels = /*[[${sentimentLabels}]]*/ [];
+      var sCounts = /*[[${sentimentCounts}]]*/ [];
+      if (!isArr(sLabels) || !isArr(sCounts) || sLabels.length === 0) return;
 
-    var ctx = el.getContext('2d');
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: { labels: sLabels, datasets: [{ label: '리뷰 감정 통계', data: sCounts,
-        backgroundColor: ['rgba(254,80,79,0.6)','rgba(60,129,247,0.6)'],
-        borderColor:     ['rgba(254,80,79,1)','rgba(60,129,247,1)'], borderWidth: 1 }] },
-      options: { responsive:true, maintainAspectRatio:false,
-        plugins: { legend: { position: 'top' }, title: { display: true, text: '리뷰 감정 통계 (긍정/부정)' } } }
+      var ctx = el.getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: sLabels, datasets: [{ label: '리뷰 감정 통계', data: sCounts,
+          backgroundColor: ['rgba(254,80,79,0.6)','rgba(60,129,247,0.6)'],
+          borderColor:     ['rgba(254,80,79,1)','rgba(60,129,247,1)'], borderWidth: 1 }] },
+        options: { responsive:true, maintainAspectRatio:false,
+          plugins: { legend: { position: 'top' }, title: { display: true, text: '리뷰 감정 통계 (긍정/부정)' } } }
+      });
     });
-  });
 
-  /* -------------------- 4) 소비유형/MBTI 결과 -------------------- */
-  safe(function(){
-    var el = byId('testResultChart'); if(!el) return;
-    var tLabels = /*[[${testResultLabels}]]*/ [];
-    var tCounts = /*[[${testResultCounts}]]*/ [];
-    if (!isArr(tLabels) || !isArr(tCounts) || tLabels.length === 0) return;
+    /* ---- 4) 소비유형/MBTI 결과 ---- */
+    safe(function(){
+      var el = byId('testResultChart'); if(!el) return;
+      var tLabels = /*[[${testResultLabels}]]*/ [];
+      var tCounts = /*[[${testResultCounts}]]*/ [];
+      if (!isArr(tLabels) || !isArr(tCounts) || tLabels.length === 0) return;
 
-    var ctx = el.getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: { labels: tLabels, datasets: [{ label: '테스트 결과 분포', data: tCounts,
-        backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
-      options: {
-        responsive:true,
-        scales:{ y:{ beginAtZero:true, title:{ display:true, text:'응답 수' }, ticks:{ stepSize:5 } },
-                 x:{ title:{ display:true, text:'테스트 유형' } } },
-        plugins:{ legend:{ display:false }, title:{ display:true, text:'테스트 결과 통계' } }
-      }
+      var ctx = el.getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: { labels: tLabels, datasets: [{ label: '테스트 결과 분포', data: tCounts,
+          backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
+        options: {
+          responsive:true,
+          scales:{ y:{ beginAtZero:true, title:{ display:true, text:'응답 수' }, ticks:{ stepSize:5 } },
+                   x:{ title:{ display:true, text:'테스트 유형' } } },
+          plugins:{ legend:{ display:false }, title:{ display:true, text:'테스트 결과 통계' } }
+        }
+      });
     });
-  });
 
-  /* -------------------- 5) 성별 비율(도넛) -------------------- */
-  safe(function(){
-    var el = byId('genderChart'); if(!el) return;
-    var gLabels = /*[[${genderLabels}]]*/ [];
-    var gCounts = /*[[${genderCounts}]]*/ [];
-    var gPerc   = /*[[${genderPercentages}]]*/ [];
-    var gTotal  = /*[[${genderTotal}]]*/ 0;
-    if (!isArr(gLabels) || !isArr(gCounts) || gLabels.length === 0) return;
+    /* ---- 5) 성별 비율(도넛) ---- */
+    safe(function(){
+      var el = byId('genderChart'); if(!el) return;
+      var gLabels = /*[[${genderLabels}]]*/ [];
+      var gCounts = /*[[${genderCounts}]]*/ [];
+      var gPerc   = /*[[${genderPercentages}]]*/ [];
+      var gTotal  = /*[[${genderTotal}]]*/ 0;
+      if (!isArr(gLabels) || !isArr(gCounts) || gLabels.length === 0) return;
 
-    var ctx = el.getContext('2d');
-    var centerText = {
-      id:'centerText', afterDraw:function(chart){
-        var a = chart.chartArea; if(!a) return;
-        var c = chart.ctx, x=(a.left+a.right)/2, y=(a.top+a.bottom)/2;
-        c.save(); c.textAlign='center'; c.textBaseline='middle';
-        c.font='600 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
-        c.fillStyle='#333'; c.fillText('총 ' + gTotal + '명', x, y); c.restore();
-      }
-    };
-    new Chart(ctx, {
-      type:'doughnut',
-      data:{ labels:gLabels, datasets:[{ label:'성별 비율', data:gCounts,
-        backgroundColor:['rgba(60,129,247,0.6)','rgba(254,80,79,0.6)','rgba(130,130,130,0.4)'],
-        borderColor:    ['rgba(60,129,247,1)','rgba(254,80,79,1)','rgba(130,130,130,0.8)'],
-        borderWidth:1 }]},
-      options:{
-        responsive:true, maintainAspectRatio:false, cutout:'65%',
-        plugins:{ legend:{ position:'top' }, title:{ display:true, text:'상품가입자 성별 비율' },
-          tooltip:{ callbacks:{ label:function(it){
-            var i=it.dataIndex, name=gLabels[i]||'', cnt=gCounts[i]||0;
-            var pct = (gPerc && gPerc[i]!=null) ? gPerc[i] : (gTotal ? Math.round(cnt*1000/gTotal)/10 : 0);
-            return name + ': ' + cnt + '명 (' + pct + '%)';
-          } } } }
-      },
-      plugins:[centerText]
+      var ctx = el.getContext('2d');
+      var centerText = {
+        id:'centerText', afterDraw:function(chart){
+          var a = chart.chartArea; if(!a) return;
+          var c = chart.ctx, x=(a.left+a.right)/2, y=(a.top+a.bottom)/2;
+          c.save(); c.textAlign='center'; c.textBaseline='middle';
+          c.font='600 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+          c.fillStyle='#333'; c.fillText('총 ' + gTotal + '명', x, y); c.restore();
+        }
+      };
+      new Chart(ctx, {
+        type:'doughnut',
+        data:{ labels:gLabels, datasets:[{ label:'성별 비율', data:gCounts,
+          backgroundColor:['rgba(60,129,247,0.6)','rgba(254,80,79,0.6)','rgba(130,130,130,0.4)'],
+          borderColor:    ['rgba(60,129,247,1)','rgba(254,80,79,1)','rgba(130,130,130,0.8)'],
+          borderWidth:1 }]},
+        options:{
+          responsive:true, maintainAspectRatio:false, cutout:'65%',
+          plugins:{ legend:{ position:'top' }, title:{ display:true, text:'상품가입자 성별 비율' },
+            tooltip:{ callbacks:{ label:function(it){
+              var i=it.dataIndex, name=gLabels[i]||'', cnt=gCounts[i]||0;
+              var pct = (gPerc && gPerc[i]!=null) ? gPerc[i] : (gTotal ? Math.round(cnt*1000/gTotal)/10 : 0);
+              return name + ': ' + cnt + '명 (' + pct + '%)';
+            } } } }
+        },
+        plugins:[centerText]
+      });
     });
-  });
 
-})();
-</script>
+  })();
+  </script>
 
 </body>
 </html>

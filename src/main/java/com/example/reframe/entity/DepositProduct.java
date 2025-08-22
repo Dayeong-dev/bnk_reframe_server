@@ -100,5 +100,6 @@ public class DepositProduct {
     protected void onCreate() {
         this.createdAt = new Date();
     }
+
 }
 	

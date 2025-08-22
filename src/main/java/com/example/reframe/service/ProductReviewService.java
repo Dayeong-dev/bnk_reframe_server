@@ -7,14 +7,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.dto.ReviewCreateDTO;
 import com.example.reframe.dto.ReviewResponseDTO;
+import com.example.reframe.dto.ReviewUpdateDTO;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.ProductReview;
-import com.example.reframe.entity.auth.User;          // ← ProductUser면 변경
+import com.example.reframe.entity.auth.User;
 import com.example.reframe.netty.NettyPublisher;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.repository.ProductReviewRepository;
 import com.example.reframe.repository.auth.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,8 +26,8 @@ public class ProductReviewService {
     private final ProductReviewRepository productReviewRepository;
     private final DepositProductRepository depositProductRepository;
     private final UserRepository userRepository;
-    private final OpenAIService openAIService;        // 네가 이미 사용하던 서비스
-    private final NettyPublisher nettyPublisher;      // 내장 Netty 브로커 퍼블리셔
+    private final OpenAIService openAIService;
+    private final NettyPublisher nettyPublisher;
 
     @Transactional
     public Long create(Long userId, ReviewCreateDTO dto) {
@@ -42,12 +44,13 @@ public class ProductReviewService {
                 .product(product)
                 .user(user)
                 .content(dto.getContent())
-                .rating(dto.getRating())   // ★ 평점 저장
+                .rating(dto.getRating())
                 .negative(isNegative)
                 .build();
+
         productReviewRepository.save(review);
 
-        // ★ 모두에게 브로드캐스트 (마스킹/요약 포함)
+        // 실시간 브로드캐스트(요약/마스킹 포함)
         nettyPublisher.publish("product." + dto.getProductId() + ".reviews",
                 new PublicEvent(
                         "review_created",
@@ -55,10 +58,10 @@ public class ProductReviewService {
                         review.getId(),
                         review.getRating(),
                         maskName(user.getName()),
-                        snippet(review.getContent(), 20)   // ‘금리 혜택 만족해요’ 같은 요약
+                        snippet(review.getContent(), 20)
                 ));
 
-        // 부정 리뷰는 관리자 알림
+        // 부정 리뷰 관리자 알림
         if (isNegative) {
             nettyPublisher.publish("admin.alerts",
                     new AdminEvent("review_negative", dto.getProductId(), review.getId(),
@@ -68,36 +71,61 @@ public class ProductReviewService {
         return review.getId();
     }
     
+    @Transactional
+    public void update(Long userId, Long reviewId, ReviewUpdateDTO dto) {
+        ProductReview r = productReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("review not found"));
+        if (!r.getUser().getId().equals(userId)) {
+            throw new SecurityException("forbidden");
+        }
+        if (dto.getContent() != null && !dto.getContent().trim().isEmpty()) {
+            r.setContent(dto.getContent().trim());
+        }
+        if (dto.getRating() != null) {
+            r.setRating(dto.getRating());
+        }
+        // JPA dirty checking 로 자동 반영
+    }
+    
+    @Transactional
+    public void delete(Long userId, Long reviewId) {
+        ProductReview r = productReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("review not found"));
+        if (!r.getUser().getId().equals(userId)) {
+            throw new SecurityException("forbidden");
+        }
+        productReviewRepository.delete(r);
+    }
+
     @Transactional(readOnly = true)
-    public List<ReviewResponseDTO> listByProduct(Long productId) {
+    public List<ReviewResponseDTO> listByProduct(Long productId, Long currentUserId) {
         return productReviewRepository
                 .findByProduct_ProductIdOrderByIdDesc(productId)
                 .stream()
-                .map(this::toDto)
+                .map(r -> toDto(r, currentUserId))
                 .toList();
     }
 
-    // 필요하면 컨트롤러와 이름을 맞추기 위한 위임 메서드(선택)
-    public List<ReviewResponseDTO> list(Long productId) {
-        return listByProduct(productId);
-    }
+    // 기존 단독 toDto는 필요시 유지
+    private ReviewResponseDTO toDto(ProductReview r, Long currentUserId) {
+        final Long authorId = (r.getUser() != null ? r.getUser().getId() : null);
+        final boolean mine = (currentUserId != null && authorId != null && currentUserId.equals(authorId));
 
-    private ReviewResponseDTO toDto(ProductReview r) {
         return ReviewResponseDTO.builder()
                 .id(r.getId())
-                .productId(r.getProduct().getProductId()) // ✅ Long 그대로
+                .productId(r.getProduct().getProductId())
+                .authorId(authorId)                                  // ★ 추가
+                .authorName(r.getUser() != null ? r.getUser().getName() : "익명")
                 .content(r.getContent())
                 .rating(r.getRating())
-                .authorName(r.getUser() != null ? r.getUser().getName() : "익명")
                 .createdAt(r.getCreatedAt())
+                .mine(mine)                                           // ★ 추가
                 .build();
     }
-
 
     // === 헬퍼 & 이벤트 DTO ===
     private static String maskName(String name) {
         if (name == null || name.isBlank()) return "고객";
-        // 한글 이름: 첫 글자 + ** (예: 박**)
         final String first = name.substring(0, 1);
         return first + "**";
     }
