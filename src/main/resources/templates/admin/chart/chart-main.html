@@ -44,6 +44,7 @@
         <input id="reportMonth" type="number" min="1" max="12" style="width:70px;">
         <button id="btn-xlsx" type="button">엑셀 다운</button>
         <button id="btn-pdf"  type="button">PDF 다운</button>
+        
       </div>
 
       <div class="chart-grid">
@@ -57,163 +58,227 @@
     </div>
   </div>
 
-  <script th:inline="javascript">
-  (function(){
-    /* ==================== 다운로드: 최우선 연결 ==================== */
-    function byId(id){ return document.getElementById(id); }
+<script th:inline="javascript">
+/* <![CDATA[ */
+(function(){
+  /* ==================== 유틸 ==================== */
+  function byId(id){ return document.getElementById(id); }
+  function isArr(a){ return Array.isArray(a); }
+  function todayYM(){
+    const now = new Date();
+    return { y: now.getFullYear(), m: now.getMonth() + 1 };
+  }
+  function buildUrl(base, y, m){
+    return base + '?year=' + encodeURIComponent(y) + '&month=' + encodeURIComponent(m);
+  }
 
-    // 컨트롤러 매핑 (Thymeleaf 인라인 + 폴백)
-    const XLSX_BASE = /*[[@{/admin/reports/monthly.xlsx}]]*/ '/admin/reports/monthly.xlsx';
-    const PDF_BASE  = /*[[@{/admin/reports/monthly.pdf}]]*/  '/admin/reports/monthly.pdf';
+  /* ==================== 라우트 ==================== */
+  const XLSX_BASE = /*[[@{/admin/reports/monthly.xlsx}]]*/ '/admin/reports/monthly.xlsx';
+  const PDF_BASE  = /*[[@{/admin/reports/monthly.pdf}]]*/  '/admin/reports/monthly.pdf';
 
-    const $y = byId('reportYear');
-    const $m = byId('reportMonth');
-    const $btnX = byId('btn-xlsx');
-    const $btnP = byId('btn-pdf');
+  /* ==================== CSRF (있을 때만 사용) ==================== */
+  // Spring Security를 쓰지 않으면 token이 null로 내려옴
+  const CSRF_HEADER = /*[[${_csrf} != null ? '${_csrf.headerName}' : null]]*/ null;
+  const CSRF_TOKEN  = /*[[${_csrf} != null ? '${_csrf.token}'      : null]]*/ null;
 
-    // 기본값: 오늘 날짜
-    (function setTodayDefaults(){
-      if(!$y || !$m) return;
-      const now = new Date();
-      if(!$y.value) $y.value = now.getFullYear();
-      if(!$m.value) $m.value = now.getMonth() + 1; // 1~12
-    })();
+  /* ==================== 폼/버튼 ==================== */
+  const $y   = byId('reportYear');
+  const $m   = byId('reportMonth');
+  const $btnX = byId('btn-xlsx');
+  const $btnP = byId('btn-pdf');
 
-    function buildUrl(base){
-      const now = new Date();
-      const y = parseInt($y && $y.value, 10) || now.getFullYear();
-      const m = parseInt($m && $m.value, 10) || (now.getMonth()+1);
-      return `${base}?year=${encodeURIComponent(y)}&month=${encodeURIComponent(m)}`;
-    }
-
-    // 팝업 차단 고려: window.open 대신 location.href
-    if ($btnX) $btnX.addEventListener('click', function(){ location.href = buildUrl(XLSX_BASE); });
-    if ($btnP) $btnP.addEventListener('click', function(){ location.href = buildUrl(PDF_BASE); });
-
-    /* ==================== 차트들 ==================== */
-    function safe(fn){ try{ fn(); } catch(e){ console.error(e); } }
-    function isArr(a){ return Array.isArray(a); }
-
-    if (typeof Chart === 'undefined') {
-      console.warn('Chart.js not loaded — charts skipped, downloads still work.');
-      return; // 다운로드는 위에서 이미 연결됨
-    }
-
-    /* ---- 1) 방문자 수 ---- */
-    safe(function(){
-      var el = byId('visitChart'); if(!el) return;
-      var labels = /*[[${visitLabels}]]*/ [];
-      var counts = /*[[${visitCounts}]]*/ [];
-      if (!isArr(labels) || !isArr(counts) || labels.length === 0) return;
-
-      var ctx = el.getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: { labels, datasets: [{ label: '방문자 수', data: counts,
-          backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
-        options: { responsive:true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-      });
-    });
-
-    /* ---- 2) 상품 조회수 ---- */
-    safe(function(){
-      var el = byId('productChart'); if(!el) return;
-      var pLabels = /*[[${labels}]]*/ [];
-      var pCounts = /*[[${counts}]]*/ [];
-      if (!isArr(pLabels) || !isArr(pCounts) || pLabels.length === 0) return;
-
-      var ctx = el.getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: { labels: pLabels, datasets: [{ label: '상품별 조회수', data: pCounts,
-          backgroundColor: 'rgba(254,80,79,0.5)', borderColor: 'rgba(254,80,79,1)', borderWidth: 1 }] },
-        options: {
-          indexAxis: 'x', responsive: true,
-          scales: { x: { beginAtZero: true }, y: { title: { display: true, text: '상품명' } } },
-          plugins: { legend: { display: false }, title: { display: true, text: '인기 상품 TOP 10 (조회수 기준)' } }
-        }
-      });
-    });
-
-    /* ---- 3) 리뷰 감정(도넛) ---- */
-    safe(function(){
-      var el = byId('sentimentChart'); if(!el) return;
-      var sLabels = /*[[${sentimentLabels}]]*/ [];
-      var sCounts = /*[[${sentimentCounts}]]*/ [];
-      if (!isArr(sLabels) || !isArr(sCounts) || sLabels.length === 0) return;
-
-      var ctx = el.getContext('2d');
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels: sLabels, datasets: [{ label: '리뷰 감정 통계', data: sCounts,
-          backgroundColor: ['rgba(254,80,79,0.6)','rgba(60,129,247,0.6)'],
-          borderColor:     ['rgba(254,80,79,1)','rgba(60,129,247,1)'], borderWidth: 1 }] },
-        options: { responsive:true, maintainAspectRatio:false,
-          plugins: { legend: { position: 'top' }, title: { display: true, text: '리뷰 감정 통계 (긍정/부정)' } } }
-      });
-    });
-
-    /* ---- 4) 소비유형/MBTI 결과 ---- */
-    safe(function(){
-      var el = byId('testResultChart'); if(!el) return;
-      var tLabels = /*[[${testResultLabels}]]*/ [];
-      var tCounts = /*[[${testResultCounts}]]*/ [];
-      if (!isArr(tLabels) || !isArr(tCounts) || tLabels.length === 0) return;
-
-      var ctx = el.getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: { labels: tLabels, datasets: [{ label: '테스트 결과 분포', data: tCounts,
-          backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
-        options: {
-          responsive:true,
-          scales:{ y:{ beginAtZero:true, title:{ display:true, text:'응답 수' }, ticks:{ stepSize:5 } },
-                   x:{ title:{ display:true, text:'테스트 유형' } } },
-          plugins:{ legend:{ display:false }, title:{ display:true, text:'테스트 결과 통계' } }
-        }
-      });
-    });
-
-    /* ---- 5) 성별 비율(도넛) ---- */
-    safe(function(){
-      var el = byId('genderChart'); if(!el) return;
-      var gLabels = /*[[${genderLabels}]]*/ [];
-      var gCounts = /*[[${genderCounts}]]*/ [];
-      var gPerc   = /*[[${genderPercentages}]]*/ [];
-      var gTotal  = /*[[${genderTotal}]]*/ 0;
-      if (!isArr(gLabels) || !isArr(gCounts) || gLabels.length === 0) return;
-
-      var ctx = el.getContext('2d');
-      var centerText = {
-        id:'centerText', afterDraw:function(chart){
-          var a = chart.chartArea; if(!a) return;
-          var c = chart.ctx, x=(a.left+a.right)/2, y=(a.top+a.bottom)/2;
-          c.save(); c.textAlign='center'; c.textBaseline='middle';
-          c.font='600 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
-          c.fillStyle='#333'; c.fillText('총 ' + gTotal + '명', x, y); c.restore();
-        }
-      };
-      new Chart(ctx, {
-        type:'doughnut',
-        data:{ labels:gLabels, datasets:[{ label:'성별 비율', data:gCounts,
-          backgroundColor:['rgba(60,129,247,0.6)','rgba(254,80,79,0.6)','rgba(130,130,130,0.4)'],
-          borderColor:    ['rgba(60,129,247,1)','rgba(254,80,79,1)','rgba(130,130,130,0.8)'],
-          borderWidth:1 }]},
-        options:{
-          responsive:true, maintainAspectRatio:false, cutout:'65%',
-          plugins:{ legend:{ position:'top' }, title:{ display:true, text:'상품가입자 성별 비율' },
-            tooltip:{ callbacks:{ label:function(it){
-              var i=it.dataIndex, name=gLabels[i]||'', cnt=gCounts[i]||0;
-              var pct = (gPerc && gPerc[i]!=null) ? gPerc[i] : (gTotal ? Math.round(cnt*1000/gTotal)/10 : 0);
-              return name + ': ' + cnt + '명 (' + pct + '%)';
-            } } } }
-        },
-        plugins:[centerText]
-      });
-    });
-
+  // 기본값: 오늘 날짜
+  (function setTodayDefaults(){
+    if(!$y || !$m) return;
+    const t = todayYM();
+    if(!$y.value) $y.value = t.y;
+    if(!$m.value) $m.value = t.m;
   })();
-  </script>
+
+  /* ==================== 다운로드 이벤트 ==================== */
+  if ($btnX) $btnX.addEventListener('click', function(){
+    const t = todayYM();
+    const y = parseInt($y && $y.value, 10) || t.y;
+    const m = parseInt($m && $m.value, 10) || t.m;
+    location.href = buildUrl(XLSX_BASE, y, m);
+  });
+
+  // PDF: 두 차트만 캡처 → 같은 경로로 POST(JSON) → 실패 시 GET 폴백
+  if ($btnP) $btnP.addEventListener('click', async function(){
+    const t = todayYM();
+    const y = parseInt($y && $y.value, 10) || t.y;
+    const m = parseInt($m && $m.value, 10) || t.m;
+
+    // 대상 차트 캔버스
+    const ids = ['sentimentChart', 'genderChart'];
+    const images = {};
+    let captured = 0;
+    for (var i=0;i<ids.length;i++){
+      var el = byId(ids[i]);
+      if (!el || !el.toDataURL) continue;
+      try {
+        var b64 = el.toDataURL('image/png').split(',')[1];
+        if (b64 && b64.length > 0) { images[ids[i]] = b64; captured++; }
+      } catch (e) { console.warn('canvas capture failed:', ids[i], e); }
+    }
+
+    // 헤더 구성
+    const headers = { 'Content-Type': 'application/json' };
+    if (CSRF_HEADER && CSRF_TOKEN) headers[CSRF_HEADER] = CSRF_TOKEN;
+
+    // 캡처 성공 시 POST 시도, 실패/에러면 GET 폴백
+    if (captured > 0) {
+      try {
+        const res = await fetch(PDF_BASE, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ year: y, month: m, images: images })
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = '월간리포트_' + y + '-' + String(m).padStart(2,'0') + '.pdf';
+          document.body.appendChild(a); a.click(); a.remove();
+          URL.revokeObjectURL(url);
+          return;
+        }
+        console.warn('POST /monthly.pdf failed, fallback to GET. status=', res.status);
+      } catch (e) {
+        console.warn('POST /monthly.pdf error, fallback to GET.', e);
+      }
+    } else {
+      console.warn('No charts captured, fallback to GET.');
+    }
+    // 폴백: 기존 GET
+    location.href = buildUrl(PDF_BASE, y, m);
+  });
+
+  /* ==================== 차트 렌더 ==================== */
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js not loaded — charts skipped, downloads still work.');
+    return;
+  }
+  function safe(fn){ try{ fn(); } catch(e){ console.error(e); } }
+
+  /* ---- 1) 방문자 수 ---- */
+  safe(function(){
+    var el = byId('visitChart'); if(!el) return;
+    var labels = /*[[${visitLabels}]]*/ [];
+    var counts = /*[[${visitCounts}]]*/ [];
+    if (!isArr(labels) || !isArr(counts) || labels.length === 0) return;
+
+    var ctx = el.getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: '방문자 수', data: counts,
+        backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
+      options: { responsive:true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+  });
+
+  /* ---- 2) 상품 조회수 ---- */
+  safe(function(){
+    var el = byId('productChart'); if(!el) return;
+    var pLabels = /*[[${labels}]]*/ [];
+    var pCounts = /*[[${counts}]]*/ [];
+    if (!isArr(pLabels) || !isArr(pCounts) || pLabels.length === 0) return;
+
+    var ctx = el.getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: pLabels, datasets: [{ label: '상품별 조회수', data: pCounts,
+        backgroundColor: 'rgba(254,80,79,0.5)', borderColor: 'rgba(254,80,79,1)', borderWidth: 1 }] },
+      options: {
+        indexAxis: 'x', responsive: true,
+        scales: { x: { beginAtZero: true }, y: { title: { display: true, text: '상품명' } } },
+        plugins: { legend: { display: false }, title: { display: true, text: '인기 상품 TOP 10 (조회수 기준)' } }
+      }
+    });
+  });
+
+  /* ---- 3) 리뷰 감정(도넛) ---- */
+  safe(function(){
+    var el = byId('sentimentChart'); if(!el) return;
+    var sLabels = /*[[${sentimentLabels}]]*/ [];
+    var sCounts = /*[[${sentimentCounts}]]*/ [];
+    if (!isArr(sLabels) || !isArr(sCounts) || sLabels.length === 0) return;
+
+    var ctx = el.getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels: sLabels, datasets: [{ label: '리뷰 감정 통계', data: sCounts,
+        backgroundColor: ['rgba(254,80,79,0.6)','rgba(60,129,247,0.6)'],
+        borderColor:     ['rgba(254,80,79,1)','rgba(60,129,247,1)'], borderWidth: 1 }] },
+      options: { responsive:true, maintainAspectRatio:false,
+        plugins: { legend: { position: 'top' }, title: { display: true, text: '리뷰 감정 통계 (긍정/부정)' } } }
+    });
+  });
+
+  /* ---- 4) 소비유형/MBTI 결과 ---- */
+  safe(function(){
+    var el = byId('testResultChart'); if(!el) return;
+    var tLabels = /*[[${testResultLabels}]]*/ [];
+    var tCounts = /*[[${testResultCounts}]]*/ [];
+    if (!isArr(tLabels) || !isArr(tCounts) || tLabels.length === 0) return;
+
+    var ctx = el.getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: tLabels, datasets: [{ label: '테스트 결과 분포', data: tCounts,
+        backgroundColor: 'rgba(47,235,97,0.5)', borderColor: 'rgba(47,235,97,1)', borderWidth: 1 }] },
+      options: {
+        responsive:true,
+        scales:{ y:{ beginAtZero:true, title:{ display:true, text:'응답 수' }, ticks:{ stepSize:5 } },
+                 x:{ title:{ display:true, text:'테스트 유형' } } },
+        plugins:{ legend:{ display:false }, title:{ display:true, text:'테스트 결과 통계' } }
+      }
+    });
+  });
+
+  /* ---- 5) 성별 비율(도넛) ---- */
+  safe(function(){
+    var el = byId('genderChart'); if(!el) return;
+    var gLabels = /*[[${genderLabels}]]*/ [];
+    var gCounts = /*[[${genderCounts}]]*/ [];
+    var gPerc   = /*[[${genderPercentages}]]*/ [];
+    var gTotal  = /*[[${genderTotal}]]*/ 0;
+    if (!isArr(gLabels) || !isArr(gCounts) || gLabels.length === 0) return;
+
+    var ctx = el.getContext('2d');
+    var centerText = {
+      id:'centerText', afterDraw:function(chart){
+        var a = chart.chartArea; if(!a) return;
+        var c = chart.ctx, x=(a.left+a.right)/2, y=(a.top+a.bottom)/2;
+        c.save(); c.textAlign='center'; c.textBaseline='middle';
+        c.font='600 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+        c.fillStyle='#333'; c.fillText('총 ' + gTotal + '명', x, y); c.restore();
+      }
+    };
+    new Chart(ctx, {
+      type:'doughnut',
+      data:{ labels:gLabels, datasets:[{ label:'성별 비율', data:gCounts,
+        backgroundColor:['rgba(60,129,247,0.6)','rgba(254,80,79,0.6)','rgba(130,130,130,0.4)'],
+        borderColor:    ['rgba(60,129,247,1)','rgba(254,80,79,1)','rgba(130,130,130,0.8)'],
+        borderWidth:1 }]},
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'65%',
+        plugins:{ legend:{ position:'top' }, title:{ display:true, text:'상품가입자 성별 비율' },
+          tooltip:{ callbacks:{ label:function(it){
+            var i=it.dataIndex, name=gLabels[i]||'', cnt=gCounts[i]||0;
+            var pct = (gPerc && gPerc[i]!=null) ? gPerc[i] : (gTotal ? Math.round(cnt*1000/gTotal)/10 : 0);
+            return name + ': ' + cnt + '명 (' + pct + '%)';
+          } } } }
+      },
+      plugins:[centerText]
+    });
+  });
+
+})();
+/* ]]> */
+</script>
+
 
 </body>
 </html>
