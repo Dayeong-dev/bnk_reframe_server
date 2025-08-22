@@ -41,7 +41,7 @@ public class DepositProductRate {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-	private DepositProduct productId;	// 예적금 상품 ID (deposit_product)
+	private DepositProduct product;	// 예적금 상품 ID (deposit_product)
 	
 	@NotNull
 	@Column(name = "from_month")

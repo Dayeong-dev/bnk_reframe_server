@@ -14,6 +14,7 @@ public class ProductApplicationMapper {
 		
 		ProductApplication application = new ProductApplication();
 		
+		application.setId(applicationDTO.getId());
 		application.setProduct(depositProductMapper.toEntity(applicationDTO.getProduct()));
 		application.setUser(userMapper.toEntity(applicationDTO.getUser()));
 		application.setProductAccount(accountMapper.toEntity(applicationDTO.getProductAccount()));
@@ -32,6 +33,7 @@ public class ProductApplicationMapper {
 		
 		ProductApplicationDTO applicationDTO = new ProductApplicationDTO();
 		
+		applicationDTO.setId(application.getId());
 		applicationDTO.setProduct(depositProductMapper.toDTO(application.getProduct()));
 		applicationDTO.setUser(userMapper.toDTO(application.getUser()));
 		applicationDTO.setProductAccount(accountMapper.toDTO(application.getProductAccount()));

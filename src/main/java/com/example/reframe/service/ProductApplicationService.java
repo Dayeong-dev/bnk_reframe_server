@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.domain.TransferCommand;
+import com.example.reframe.dto.account.ProductAccountDetail;
 import com.example.reframe.dto.enroll.EnrollForm;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.ProductApplication;
