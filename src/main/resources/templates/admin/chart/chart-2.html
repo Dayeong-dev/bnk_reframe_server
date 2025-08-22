@@ -1,26 +1,161 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>관리자 메인</title>
-    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
-    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
-    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+  <meta charset="utf-8" />
+  <title>가입 퍼널 이탈율 도넛</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    :root { --fg:#111; --muted:#666; --border:#e8e8e8; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif; margin: 0; color: var(--fg); background: #fafafa; }
+    header { padding: 20px 16px; border-bottom:1px solid var(--border); background:white; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .wrap { padding: 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .card { background:white; border:1px solid var(--border); border-radius:12px; padding:16px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+    .title { font-weight: 700; margin: 0 0 8px; font-size: 16px; }
+    .meta { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+    .row { display:flex; gap:8px; align-items:center; justify-content:space-between; font-size: 13px; color:var(--muted); margin-top:10px; }
+    .err { color:#b00020; background:#fff3f3; border:1px solid #ffd6d6; padding:10px; border-radius:8px; }
+    footer { padding: 10px 16px 24px; color: var(--muted); font-size: 12px; }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>가입 퍼널 — 단계별 이탈율</h1>
+    <div class="hint">데이터 소스: GCS NDJSON → BigQuery Export</div>
+  </header>
 
-    <!-- 공통 헤더 -->
-    <div th:replace="admin/fragments/header :: header" class="header"></div>
+  <section id="app" class="wrap">
+    <!-- JS가 카드(도넛)들을 동적으로 채웁니다 -->
+  </section>
 
-    <div id="body">
-        <!-- 사이드바 -->
-        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+  <footer>
+    파일 경로: <code id="filePath"></code>
+  </footer>
 
-        <!-- 본문 -->
-        <div class="content">
-            <h1>관리자 인덱스 페이지</h1>
-        </div>
-    </div>
+  <script>
+    // ▼ 여기를 네 버킷 경로로 세팅하세요
+    const base = 'https://storage.googleapis.com/bnk-analytics-static/charts/step_drop_rates/latest-000000000000.ndjson';
+	const NDJSON_URL = `${base}?nocache=${Date.now()}`;  // ← 추가
 
+
+
+    document.getElementById('filePath').textContent = NDJSON_URL;
+
+    async function fetchNdjson(url) {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      return text.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+    }
+
+    function formatPct(v) {
+      return (v ?? 0).toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + '%';
+    }
+
+    function makeCard({ step_index, step_name, label, drop_rate_pct, conv_rate_pct, from_users, next_users, drop_users }, idx) {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      // 제목/메타
+      const title = document.createElement('h2');
+      title.className = 'title';
+      title.textContent = `${label} · ${step_name}`;
+      card.appendChild(title);
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = `이탈율 ${formatPct(drop_rate_pct)} · 유지율 ${formatPct(conv_rate_pct)}  |  모수 ${from_users.toLocaleString()}명`;
+      card.appendChild(meta);
+
+      // 캔버스
+      const canvas = document.createElement('canvas');
+      canvas.width = 320; canvas.height = 320;
+      canvas.id = `chart-${step_index}-${idx}`;
+      card.appendChild(canvas);
+
+      // 상세 수치
+      const r1 = document.createElement('div');
+      r1.className = 'row';
+      r1.innerHTML = `<span>다음 단계 도달</span><strong>${next_users.toLocaleString()}명 (${formatPct(conv_rate_pct)})</strong>`;
+      const r2 = document.createElement('div');
+      r2.className = 'row';
+      r2.innerHTML = `<span>이탈</span><strong>${drop_users.toLocaleString()}명 (${formatPct(drop_rate_pct)})</strong>`;
+      card.appendChild(r1);
+      card.appendChild(r2);
+
+      return { card, canvas };
+    }
+
+    function renderDoughnut(canvas, { drop_rate_pct, conv_rate_pct, label }) {
+      const ctx = canvas.getContext('2d');
+      // Chart.js 도넛 (두 조각: 이탈/유지)
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['이탈', '유지'],
+          datasets: [{
+            data: [drop_rate_pct, conv_rate_pct],
+            // 색상은 Chart.js 기본 팔레트를 사용 (원하면 지정 가능)
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: false
+            },
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: (item) => {
+                  const v = item.parsed;
+                  return `${item.label}: ${v.toLocaleString('ko-KR', { maximumFractionDigits: 1 })}%`;
+                }
+              }
+            }
+          },
+          cutout: '65%',
+          animation: { duration: 500 }
+        }
+      });
+    }
+
+    async function main() {
+      const container = document.getElementById('app');
+
+      try {
+        const rows = await fetchNdjson(NDJSON_URL);
+        if (!rows.length) {
+          const warn = document.createElement('div');
+          warn.className = 'err';
+          warn.textContent = 'NDJSON에 행이 없습니다. (쿼리 결과가 0건)';
+          container.appendChild(warn);
+          return;
+        }
+
+        rows.forEach((row, i) => {
+          // row에는 drop_rate_pct/conv_rate_pct 등 이미 들어있습니다.
+          const { card, canvas } = makeCard(row, i);
+          container.appendChild(card);
+          renderDoughnut(canvas, row);
+        });
+
+      } catch (err) {
+        const div = document.createElement('div');
+        div.className = 'err';
+        div.innerHTML = `<strong>불러오기 실패:</strong> ${String(err)}<br/>` +
+                        `CORS 또는 공개 읽기 권한을 확인하세요 (버킷: bnk-analytics-static).`;
+        container.appendChild(div);
+      }
+    }
+
+    main();
+  </script>
 </body>
 </html>
