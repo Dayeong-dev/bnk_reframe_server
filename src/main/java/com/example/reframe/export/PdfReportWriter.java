@@ -146,8 +146,8 @@ public class PdfReportWriter {
     // 이번달 가입 TOP3
     addRankItems(doc, "이번달 가입", r.top3Joined, "건");
 
-    // 총 조회수 TOP3
-    addRankItems(doc, "총 조회수", r.top3Viewed, "건");
+    // 월간 조회수 TOP3
+    addRankItems(doc, "월간 조회수 TOP", r.top3Viewed, "건");
 
     // 평균 별점
     doc.add(section("평균 별점"));
@@ -197,9 +197,9 @@ public class PdfReportWriter {
       }
     }
 
-    // 이번달 가입 TOP3 / 총 조회수 TOP3
+    // 이번달 가입 TOP3 / 월간 조회수 TOP3
     addRankItems(doc, "이번달 가입", r.top3Joined, "건");
-    addRankItems(doc, "총 조회수", r.top3Viewed, "건");
+    addRankItems(doc, "월간 조회수 TOP", r.top3Viewed, "건");
 
     // 평균 별점
     doc.add(section("평균 별점"));

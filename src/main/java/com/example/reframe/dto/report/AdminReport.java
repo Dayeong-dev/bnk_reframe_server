@@ -5,46 +5,61 @@ import java.time.YearMonth;
 import java.util.*;
 
 public class AdminReport {
+  /** 리포트 대상 연-월 (예: 2025-05) */
   public YearMonth ym;
 
   // ===== PDF 요약 =====
-  public long newJoiners;                 // 신규 가입자 수
-  public String momChangeText;            // "(전월 대비 +12%)" 형식의 문구
-  public long totalJoiners;               // 총 가입자 수
+  /** 신규 가입자 수 (해당 월) */
+  public long newJoiners;
+  /** 증감 문구 (예: "(전월 대비 +12%)") */
+  public String momChangeText;
+  /** 총 가입자 수 (월말 기준 누적) */
+  public long totalJoiners;
 
-  // 연령대/성별 Top3 (예: "30대 여성")
+  /** 연령대/성별 Top3 (예: "30대 여성") — 현재 스키마 제약 시 빈 리스트 */
   public List<String> top3AgeGender = new ArrayList<>();
 
-  // 전체 남녀 비율 (예: "4:6")
+  /** 전체 남녀 비율 텍스트 (예: "4:6") — 현재 스키마 제약 시 기본값 */
   public String genderRatioText;
 
-  // 가입 Top3 상품
-  public static class TopItem { public String name; public int count; }
+  /** 가입 Top3 상품 (해당 월 기준) */
+  public static class TopItem {
+    public String name;
+    public int count;
+  }
+  /** (월간) 가입 Top3 */
   public List<TopItem> top3Joined = new ArrayList<>();
+  /** (월간) 조회수 Top3 — 로그 기반 월간 집계 */
   public List<TopItem> top3Viewed = new ArrayList<>();
 
-  public double avgRating;                // 평균 별점 (예: 4.3)
-  public String sentimentRatioText;       // "긍정 부정 비율 7:3"
+  /** 평균 별점 (해당 월) */
+  public double avgRating;
+  /** 긍정/부정 비율 텍스트 (예: "7:3") — 해당 월 */
+  public String sentimentRatioText;
 
   // ===== 엑셀 표 =====
-  // 가입자 현황 (연령대 x 성별)
+  /** 가입자 현황 (연령대 x 성별) — 화면처럼 “10대/20대/…/전체” */
   public static class AgeGenderRow {
-    public String ageBand; public Integer male; public Integer female; public Integer total; public Integer recentMonth;
+    public String ageBand;
+    public Integer male;
+    public Integer female;
+    public Integer total;
+    /** 최근월 값 등 필요 시 사용 */
+    public Integer recentMonth;
   }
-  public List<AgeGenderRow> subscriberTable = new ArrayList<>(); // 화면처럼 “10대/20대/…/전체”
+  public List<AgeGenderRow> subscriberTable = new ArrayList<>();
 
-//  // 판매/조회 Top5
-//  public List<TopItem> top5Joined = new ArrayList<>();
-//  public List<TopItem> top5Viewed = new ArrayList<>();
+  // ===== 전체 순위표 (엑셀) =====
+  /** (월간) 가입 건수 전체 순위 */
+  public List<TopItem> joinedRanking = new ArrayList<>();
+  /** (월간) 조회수 전체 순위 — 반드시 로그 기반 집계 사용 */
+  public List<TopItem> viewedRanking = new ArrayList<>();
 
-  //전체 순위표
-  public List<TopItem> joinedRanking = new ArrayList<>(); // 최근 한 달 가입 건수 전체
-  public List<TopItem> viewedRanking = new ArrayList<>(); // 누적 조회수 전체
-  
-  // 월별 별점 분포 (최근 3개월 × 1~5점)
-  // 예: ratingsByMonth.get("1월").get(5) = 45
+  // ===== 최근 3개월 별점 분포 =====
+  /** 월별(키: "1월"/"2월" 등) × 별점(1~5) → 건수 */
   public Map<String, Map<Integer, Integer>> ratingsByMonth = new LinkedHashMap<>();
 
-  // 긍/부정 비율
-  public int positivePercent; public int negativePercent;
+  // ===== 긍/부정 비율 (수치) =====
+  public int positivePercent;
+  public int negativePercent;
 }
