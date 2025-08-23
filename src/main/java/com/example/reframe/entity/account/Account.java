@@ -54,6 +54,10 @@ public class Account {
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "product_type", nullable = true)
+    private ProductType productType;
 
     @PrePersist
     void prePersist() {

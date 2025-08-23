@@ -1,5 +1,6 @@
 package com.example.reframe.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.reframe.entity.account.Account;
@@ -69,4 +70,12 @@ public class ProductApplication {
     // 가입 만기일
     @Column(name = "close_at")
     private LocalDateTime closeAt;
+    
+    // 가입 시 약정 기본 금리
+    @Column(name="base_rate_at_enroll", precision=5, scale=3)
+    private BigDecimal baseRateAtEnroll;
+
+    // 약정 기간(개월)
+    @Column(name="term_months_at_enroll")
+    private Integer termMonthsAtEnroll;
 }

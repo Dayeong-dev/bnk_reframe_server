@@ -11,8 +11,8 @@ import lombok.Data;
 
 @Data
 public class ProductAccountDetail {
+	private AccountDTO accountDTO;
 	private ProductApplicationDTO applicationDTO;
 	private List<DepositPaymentLogDTO> depositPaymentLogDTOList;
 	private List<DepositProductRateDTO> productRateDTOList;
-	private ProductApplicationInputDTO applicationInputDTO;
 }

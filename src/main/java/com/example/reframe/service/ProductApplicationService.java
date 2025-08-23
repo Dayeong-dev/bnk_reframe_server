@@ -1,5 +1,6 @@
 package com.example.reframe.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.domain.TransferCommand;
-import com.example.reframe.dto.account.ProductAccountDetail;
 import com.example.reframe.dto.enroll.EnrollForm;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.ProductApplication;
@@ -20,9 +20,11 @@ import com.example.reframe.entity.ProductApplication.ApplicationStatus;
 import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.account.AccountStatus;
 import com.example.reframe.entity.account.AccountType;
+import com.example.reframe.entity.account.ProductType;
 import com.example.reframe.entity.account.TransactionType;
 import com.example.reframe.entity.auth.User;
 import com.example.reframe.entity.deposit.DepositPaymentLog;
+import com.example.reframe.entity.deposit.DepositProductRate;
 import com.example.reframe.entity.deposit.PaymentCycle;
 import com.example.reframe.entity.deposit.PaymentStatus;
 import com.example.reframe.entity.enroll.ProductApplicationInput;
@@ -30,6 +32,7 @@ import com.example.reframe.repository.AccountRepository;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.repository.ProductApplicationRepository;
 import com.example.reframe.repository.deposit.DepositPaymentLogRepository;
+import com.example.reframe.repository.deposit.DepositProductRateRepository;
 import com.example.reframe.repository.enroll.ProductApplicationInputRepository;
 import com.example.reframe.service.account.TransactionService;
 import com.example.reframe.util.AccountNumberGenerator;
@@ -41,6 +44,7 @@ public class ProductApplicationService {
 	private final ProductApplicationRepository applicationRepository;
 	private final ProductApplicationInputRepository applicationInputRepository;
 	private final DepositPaymentLogRepository depositPaymentLogRepository;
+	private final DepositProductRateRepository depositProductRateRepository;
 	private final AccountRepository accountRepository;
 	private final TransactionService transactionService;
 	private final CurrentUser currentUser;
@@ -51,6 +55,7 @@ public class ProductApplicationService {
 									 ProductApplicationRepository applicationRepository, 
 									 ProductApplicationInputRepository applicationInputRepository, 
 									 DepositPaymentLogRepository depositPaymentLogRepository,
+									 DepositProductRateRepository depositProductRateRepository, 
 									 AccountRepository accountRepository, 
 									 TransactionService transactionService, 
 									 CurrentUser currentUser) {
@@ -58,6 +63,7 @@ public class ProductApplicationService {
 		this.applicationRepository = applicationRepository;
 		this.applicationInputRepository = applicationInputRepository;
 		this.depositPaymentLogRepository = depositPaymentLogRepository;
+		this.depositProductRateRepository = depositProductRateRepository;
 		this.accountRepository = accountRepository;
 		this.transactionService = transactionService;
 		this.currentUser = currentUser;
@@ -113,6 +119,11 @@ public class ProductApplicationService {
 			account.setIsDefault(0);					// 기본계좌 X
 			account.setStatus(AccountStatus.ACTIVE);	// 계좌 상태(활성화)
 			account.setCreatedAt(LocalDateTime.now());	// 계좌 생성 날짜(현재 시간)
+			account.setProductType(
+			    account.getAccountType() == AccountType.PRODUCT
+			        ? ProductType.fromCategory(depositProduct.getCategory())
+			        : null
+			);
 			
 			accountRepository.save(account);
 		} catch(Exception e) {
@@ -146,7 +157,8 @@ public class ProductApplicationService {
 		productApplication.setStatus(ApplicationStatus.STARTED);
 		
 		// 가입 시작일 저장
-		productApplication.setStartAt(LocalDateTime.now());
+		LocalDateTime now = LocalDateTime.now();
+		productApplication.setStartAt(now);
 		
 		// 상품 가입 
 		ProductApplication result = applicationRepository.save(productApplication);
@@ -154,7 +166,31 @@ public class ProductApplicationService {
 		// 사용자 입력 데이터
 		ProductApplicationInput productApplicationInput = new ProductApplicationInput();
 
-		productApplicationInput.setApplication(result);	
+		productApplicationInput.setApplication(result);
+		
+		// 기간(개월) 추출
+		Integer months = Optional.ofNullable(enrollForm.getPeriodMonths())
+		                         .map(Long::intValue).orElse(null);
+		
+		// (예금/월적금) 해당 기간 구간의 기본금리 조회
+		BigDecimal baseRate = BigDecimal.ZERO;
+		if (months != null) {
+		    // 예: from<=months<=to 인 구간 1건
+		    Optional<DepositProductRate> tier = depositProductRateRepository
+		        .findTopByProduct_ProductIdAndFromMonthLessThanEqualAndToMonthGreaterThanEqualOrderByFromMonthDesc(
+		            depositProduct.getProductId(), months, months);
+		    if (tier.isPresent()) baseRate = BigDecimal.valueOf(tier.get().getRate());
+		}
+
+		
+		productApplication.setBaseRateAtEnroll(baseRate);	// 기본 금리 저장
+		productApplication.setTermMonthsAtEnroll(months);	// 가입 기간 저장
+		
+		// 만기일(closeAt) 저장
+		if (months != null) {
+		    productApplication.setCloseAt(now.plusMonths(months).minusNanos(1));
+		}
+
 		
 		try {
 			Long periodMonths = enrollForm.getPeriodMonths();	// 납입 기간

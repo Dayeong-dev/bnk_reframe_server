@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.dto.account.ProductAccountDetail;
 import com.example.reframe.entity.ProductApplication;
+import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.deposit.DepositPaymentLog;
 import com.example.reframe.entity.deposit.DepositProductRate;
 import com.example.reframe.entity.enroll.ProductApplicationInput;
@@ -27,21 +28,17 @@ public class ProductAccountService {
     private final ProductApplicationRepository productApplicationRepository;
     private final DepositPaymentLogRepository depositPaymentLogRepository;
     private final DepositProductRateRepository depositProductRateRepository;
-    private final ProductApplicationInputRepository productApplicationInputRepository;
 
     private final ProductApplicationMapper applicationMapper = new ProductApplicationMapper();
     private final DepositPaymentLogMapper paymentLogMapper = new DepositPaymentLogMapper();
     private final DepositProductRateMapper productRateMapper = new DepositProductRateMapper();
-    private final ProductApplicationInputMapper applicationInputMapper = new ProductApplicationInputMapper();
 
     public ProductAccountService(ProductApplicationRepository productApplicationRepository,
                                  DepositPaymentLogRepository depositPaymentLogRepository,
-                                 DepositProductRateRepository depositProductRateRepository,
-                                 ProductApplicationInputRepository productApplicationInputRepository) {
+                                 DepositProductRateRepository depositProductRateRepository) {
         this.productApplicationRepository = productApplicationRepository;
         this.depositPaymentLogRepository = depositPaymentLogRepository;
         this.depositProductRateRepository = depositProductRateRepository;
-        this.productApplicationInputRepository = productApplicationInputRepository;
     }
 
     public ProductAccountDetail getProductAccountDetail(Long accountId) {
@@ -57,12 +54,9 @@ public class ProductAccountService {
                         application.getProduct().getProductId()
                 );
 
-        
-        ProductApplicationInput applicationInput = productApplicationInputRepository
-                .findByApplication_Id(application.getId())
-                .orElse(null);
 
         ProductAccountDetail detail = new ProductAccountDetail();
+        
         detail.setApplicationDTO(applicationMapper.toDTO(application));
         detail.setDepositPaymentLogDTOList(
                 paymentLogs.stream().map(paymentLogMapper::toDTO).toList()
@@ -70,9 +64,7 @@ public class ProductAccountService {
         detail.setProductRateDTOList(
                 productRates.stream().map(productRateMapper::toDTO).toList()
         );
-        detail.setApplicationInputDTO(
-                applicationInput != null ? applicationInputMapper.toDTO(applicationInput) : null
-        );
+        
         return detail;
     }
 }

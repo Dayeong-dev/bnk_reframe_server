@@ -1,5 +1,6 @@
 package com.example.reframe.dto.enroll;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.reframe.dto.DepositProductDTO;
@@ -36,4 +37,10 @@ public class ProductApplicationDTO {
 
     // 가입 만기일
     private LocalDateTime closeAt;
+    
+    // 가입 시 약정 기본 금리
+    private BigDecimal baseRateAtEnroll;
+
+    // 약정 기간(개월)
+    private Integer termMonthsAtEnroll;
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.example.reframe.dto.auth.UserDTO;
 import com.example.reframe.entity.account.AccountStatus;
 import com.example.reframe.entity.account.AccountType;
+import com.example.reframe.entity.account.ProductType;
 
 import lombok.Data;
 
@@ -29,4 +30,6 @@ public class AccountDTO {
     private AccountStatus status; // ACTIVE, CLOSED 등
 
     private LocalDateTime createdAt;
+    
+    private ProductType productType;
 }
