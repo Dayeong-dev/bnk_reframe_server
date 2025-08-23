@@ -156,41 +156,47 @@ public class ProductApplicationService {
 		// 가입 상태 저장(현재 시작 상태)
 		productApplication.setStatus(ApplicationStatus.STARTED);
 		
-		// 가입 시작일 저장
+		// 가입 시작일
 		LocalDateTime now = LocalDateTime.now();
 		productApplication.setStartAt(now);
-		
-		// 상품 가입 
-		ProductApplication result = applicationRepository.save(productApplication);
-		
-		// 사용자 입력 데이터
-		ProductApplicationInput productApplicationInput = new ProductApplicationInput();
 
-		productApplicationInput.setApplication(result);
-		
-		// 기간(개월) 추출
+		// 기간(개월)
 		Integer months = Optional.ofNullable(enrollForm.getPeriodMonths())
 		                         .map(Long::intValue).orElse(null);
-		
-		// (예금/월적금) 해당 기간 구간의 기본금리 조회
-		BigDecimal baseRate = BigDecimal.ZERO;
+		productApplication.setTermMonthsAtEnroll(months);
+
+		// 기본금리(기간 구간 매칭)
+		BigDecimal base = BigDecimal.ZERO;
 		if (months != null) {
-		    // 예: from<=months<=to 인 구간 1건
-		    Optional<DepositProductRate> tier = depositProductRateRepository
+		    var tier = depositProductRateRepository
 		        .findTopByProduct_ProductIdAndFromMonthLessThanEqualAndToMonthGreaterThanEqualOrderByFromMonthDesc(
 		            depositProduct.getProductId(), months, months);
-		    if (tier.isPresent()) baseRate = BigDecimal.valueOf(tier.get().getRate());
+		    if (tier.isPresent()) base = BigDecimal.valueOf(tier.get().getRate());
+		}
+		base = base.setScale(3, java.math.RoundingMode.HALF_UP);
+		productApplication.setBaseRateAtEnroll(base);
+
+		// 우대=0, 적용=기본
+		BigDecimal pref = BigDecimal.ZERO.setScale(3, java.math.RoundingMode.HALF_UP);
+		productApplication.setPreferentialRateAnnual(pref);
+		productApplication.setEffectiveRateAnnual(base);
+
+		// 만기일
+		if (months != null) {
+		    productApplication.setCloseAt(now.plusMonths(months).minusNanos(1));
 		}
 
-		
-		productApplication.setBaseRateAtEnroll(baseRate);	// 기본 금리 저장
-		productApplication.setTermMonthsAtEnroll(months);	// 가입 기간 저장
+		ProductApplication result = applicationRepository.save(productApplication);
 		
 		// 만기일(closeAt) 저장
 		if (months != null) {
 		    productApplication.setCloseAt(now.plusMonths(months).minusNanos(1));
 		}
+		
+		// 사용자 입력 데이터
+		ProductApplicationInput productApplicationInput = new ProductApplicationInput();
 
+		productApplicationInput.setApplication(result);
 		
 		try {
 			Long periodMonths = enrollForm.getPeriodMonths();	// 납입 기간

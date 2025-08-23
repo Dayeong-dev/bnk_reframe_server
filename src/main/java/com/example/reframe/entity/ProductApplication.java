@@ -78,4 +78,12 @@ public class ProductApplication {
     // 약정 기간(개월)
     @Column(name="term_months_at_enroll")
     private Integer termMonthsAtEnroll;
+    
+	// 우대금리 합산값(없으면 0)
+    @Column(name="preferential_rate_annual", precision=5, scale=3)
+    private BigDecimal preferentialRateAnnual;
+    
+	// 실제 적용 연이율 = 기본 + 우대
+    @Column(name="effective_rate_annual", precision=5, scale=3)
+    private BigDecimal effectiveRateAnnual;
 }
