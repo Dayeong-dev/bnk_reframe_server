@@ -1,6 +1,7 @@
 package com.example.reframe.service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;                      // ✅ 추가
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageRequest;    // ✅ (기존 사용 중이면 유지)
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,10 @@ import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.deposit.ProductInputFormatDTO;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.deposit.ProductInputFormat;
+import com.example.reframe.entity.deposit.ProductViewLog;                  // ✅ 추가
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.repository.deposit.ProductInputFormatRepository;
+import com.example.reframe.repository.deposit.ProductViewLogRepository;    // ✅ 추가
 import com.example.reframe.util.DocumentMapper;
 import com.example.reframe.util.MarkdownUtil;
 import com.example.reframe.util.ProductInputFormatMapper;
@@ -37,10 +40,11 @@ public class DepositProductServiceImpl implements DepositProductService {
 
     private final DepositProductRepository depositProductRepository;
     private final ProductInputFormatRepository productInputFormatRepository;
-    
+    private final ProductViewLogRepository productViewLogRepository;   // ✅ 추가
+
     private final DocumentService documentService;
     private final EntityManager em;
-    
+
     private SetProductContent setProductContent = new SetProductContent();
     private DocumentMapper documentMapper = new DocumentMapper();
     private ProductInputFormatMapper productInputFormatMapper = new ProductInputFormatMapper();
@@ -74,8 +78,6 @@ public class DepositProductServiceImpl implements DepositProductService {
         List<DepositProduct> products = depositProductRepository.findByNameContaining(keyword);
         return products.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
-
-    
 
     @Override
     public Long saveProduct(DepositProductDTO dto) {
@@ -128,7 +130,6 @@ public class DepositProductServiceImpl implements DepositProductService {
 
         if ("rate".equals(sort)) {
             pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "maxRate"));
-      
         } else { // 기본 추천순
             pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "viewCount"));
         }
@@ -149,11 +150,7 @@ public class DepositProductServiceImpl implements DepositProductService {
     }
 
     // ===== DTO 변환 유틸 =====
-
     private DepositProductDTO convertToDTO(DepositProduct p) {
-      
-      
-
         return DepositProductDTO.builder()
                 .productId(p.getProductId())
                 .name(p.getName())
@@ -168,7 +165,6 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .status(p.getStatus())
                 .createdAt(formatDate(p.getCreatedAt()))
                 .viewCount(p.getViewCount())
-               
                 .build();
     }
 
@@ -189,30 +185,33 @@ public class DepositProductServiceImpl implements DepositProductService {
         return p;
     }
 
-    
     @Override
     @Transactional
     public DepositProductDTO getProductDetail(Long productId) throws JsonMappingException, JsonProcessingException {
         DepositProduct product = depositProductRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
 
-        String detail = setProductContent.setDepositDetail(product.getDetail());	// Json → HTML
-        String modalDetail = MarkdownUtil.toHtml(product.getModalDetail());		// MarkDown → HTML
-        String modalRate = MarkdownUtil.toHtml(product.getModalRate());			// MarkDown → HTML
-        
+        String detail = setProductContent.setDepositDetail(product.getDetail()); // Json → HTML
+        String modalDetail = MarkdownUtil.toHtml(product.getModalDetail());      // MarkDown → HTML
+        String modalRate = MarkdownUtil.toHtml(product.getModalRate());          // MarkDown → HTML
+
         List<String> termImages = new ArrayList<>();
         List<String> manualImages = new ArrayList<>();
-        
-        if(product.getTerm() != null) {
-        	termImages = documentService.getImages(product.getTerm().getDocumentId());	// 약관 이미지 조회
+
+        if (product.getTerm() != null) {
+            termImages = documentService.getImages(product.getTerm().getDocumentId());   // 약관 이미지 조회
         }
-        if(product.getManual() != null) {
-        	manualImages = documentService.getImages(product.getManual().getDocumentId());	// 상품설명서 이미지 조회
+        if (product.getManual() != null) {
+            manualImages = documentService.getImages(product.getManual().getDocumentId());// 상품설명서 이미지 조회
         }
-        
-        // 조회수 증가
-        product.setViewCount(product.getViewCount() + 1);
+
+        // ✅ 조회수 증가 (null-safe)
+        Long vc = product.getViewCount() == null ? 0L : product.getViewCount();
+        product.setViewCount(vc + 1);
         depositProductRepository.save(product);
+
+        // ✅ 조회 로그 적재
+        logProductView(product, /*userId*/ null);
 
         // Entity → DTO 변환
         return DepositProductDTO.builder()
@@ -232,28 +231,33 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .manualImages(manualImages)
                 .build();
     }
-    
+
+    @Override
+    @Transactional
     public DepositProductDTO getProductDetail2(Long productId) throws JsonMappingException, JsonProcessingException {
         DepositProduct product = depositProductRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
-        
-        String modalDetail = MarkdownUtil.toHtml(product.getModalDetail());		// MarkDown → HTML
-        String modalRate = MarkdownUtil.toHtml(product.getModalRate());			// MarkDown → HTML
-        
-        
+
+        String modalDetail = MarkdownUtil.toHtml(product.getModalDetail()); // MarkDown → HTML
+        String modalRate = MarkdownUtil.toHtml(product.getModalRate());     // MarkDown → HTML
+
         List<String> termImages = new ArrayList<>();
         List<String> manualImages = new ArrayList<>();
-        
-        if(product.getTerm() != null) {
-        	termImages = documentService.getImages(product.getTerm().getDocumentId());	// 약관 이미지 조회
+
+        if (product.getTerm() != null) {
+            termImages = documentService.getImages(product.getTerm().getDocumentId());
         }
-        if(product.getManual() != null) {
-        	manualImages = documentService.getImages(product.getManual().getDocumentId());	// 상품설명서 이미지 조회
+        if (product.getManual() != null) {
+            manualImages = documentService.getImages(product.getManual().getDocumentId());
         }
-        
-        // 조회수 증가
-        product.setViewCount(product.getViewCount() + 1);
+
+        // ✅ 조회수 증가 (null-safe)
+        Long vc = product.getViewCount() == null ? 0L : product.getViewCount();
+        product.setViewCount(vc + 1);
         depositProductRepository.save(product);
+
+        // ✅ 조회 로그 적재
+        logProductView(product, /*userId*/ null);
 
         // Entity → DTO 변환
         return DepositProductDTO.builder()
@@ -281,14 +285,13 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .termMode(product.getTermMode())
                 .build();
     }
-    
+
     @Override
     public List<DepositProductDTO> getProductsByCategory(String category) {
         List<DepositProduct> products = depositProductRepository.findByCategoryAndStatus(category, "S");
         return products.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    
     @Override
     public List<DepositProductDTO> getThemeRecommended(String theme) {
         List<String> purposes = new ArrayList<>();
@@ -300,18 +303,17 @@ public class DepositProductServiceImpl implements DepositProductService {
         }
 
         List<DepositProduct> result = depositProductRepository
-            .findByPurposeInAndStatus(purposes, "S");
+                .findByPurposeInAndStatus(purposes, "S");
 
         return result.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public List<DepositProductDTO> getTopFiveByViewCount() {
-    	List<DepositProduct> depositList = depositProductRepository.findTopFiveByViewCount();
-    	
-    	return depositList.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<DepositProduct> depositList = depositProductRepository.findTopFiveByViewCount();
+        return depositList.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
-    
-	@Transactional
+
+    @Transactional
     public List<DepositProductDTO> searchByKeywords(String keywords) {
         String[] words = keywords.split(" ");
         StringBuilder sql = new StringBuilder("SELECT * FROM deposit_product WHERE 1=1 ");
@@ -326,15 +328,14 @@ public class DepositProductServiceImpl implements DepositProductService {
         for (int i = 0; i < words.length; i++) {
             query.setParameter("word" + i, "%" + words[i] + "%");
         }
-        
+
         @SuppressWarnings("unchecked")
-		List<DepositProduct> result = query.getResultList();
+        List<DepositProduct> result = query.getResultList();
 
         return result.stream().map(this::convertToDTO).collect(Collectors.toList());
-        
     }
-	
-	@Override
+
+    @Override
     public List<String> findSuggestions(String keyword) {
         List<String> allNames = depositProductRepository.findAllNames();
         String lowerKeyword = keyword.toLowerCase();
@@ -345,17 +346,26 @@ public class DepositProductServiceImpl implements DepositProductService {
                 .toList();
     }
 
-	@Override
-	public ProductInputFormatDTO getProductInputFormat(Long productId) {
-		Optional<ProductInputFormat> optional = productInputFormatRepository.findById(productId);
-		
-		if(optional.isEmpty())
-			return null;
-		
-		ProductInputFormat inputFormat = optional.get();
-		
-		return productInputFormatMapper.toDTO(inputFormat);
-	}
-	
-	
+    @Override
+    public ProductInputFormatDTO getProductInputFormat(Long productId) {
+        Optional<ProductInputFormat> optional = productInputFormatRepository.findById(productId);
+
+        if (optional.isEmpty())
+            return null;
+
+        ProductInputFormat inputFormat = optional.get();
+
+        return productInputFormatMapper.toDTO(inputFormat);
+    }
+
+    /* ====================== 내부 유틸 ====================== */
+
+    /** 조회 로그 적재 (필요시 userId 주입) */
+    private void logProductView(DepositProduct product, Long userId) {
+        ProductViewLog log = new ProductViewLog();
+        log.setProduct(product);                 // FK 연관
+        log.setViewedAt(LocalDateTime.now());    // 필요하면 Asia/Seoul 기준으로 조정
+        log.setUserId(userId);                   // 로그인 사용자 ID가 있으면 전달
+        productViewLogRepository.save(log);
+    }
 }

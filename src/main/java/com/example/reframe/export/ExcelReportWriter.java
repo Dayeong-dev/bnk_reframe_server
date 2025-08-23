@@ -36,7 +36,10 @@ public class ExcelReportWriter {
       rIdx++;
 
       Row h = row(s1, rIdx++);
-      set(h,0,"연령대",head); set(h,1,"성별",head); set(h,2,"총 가입자 수",head); set(h,3,"최근 1개월 가입자 수",head);
+      set(h,0,"연령대",head);
+      set(h,1,"성별",head);
+      set(h,2,"총 가입자 수",head);
+      set(h,3,"최근 1개월 가입자 수",head);
 
       for (AgeGenderRow ag : safe(r.subscriberTable)) {
         boolean hasGenderSplit = (ag.male != null || ag.female != null);
@@ -51,7 +54,7 @@ public class ExcelReportWriter {
           set(f,0,ag.ageBand,cell); set(f,1,"여",cell);
           set(f,2,num(ag.female),cell); set(f,3,"",cell);
 
-          // 합계 라인(선택): 한 줄로 총계/최근 1개월 표시
+          // 합계 라인
           Row sum = row(s1, rIdx++);
           set(sum,0,ag.ageBand,cell); set(sum,1,"-",cell);
           set(sum,2,num(ag.total),cell); set(sum,3,num(ag.recentMonth),cell);
@@ -62,16 +65,19 @@ public class ExcelReportWriter {
           set(rr,2,num(ag.total),cell); set(rr,3,num(ag.recentMonth),cell);
         }
       }
-      autosizeSafe(s1, 4);
+      // ✅ 헤더가 긴 시트1은 최소 폭 보장 + 정확 자동조정
+      autosizeWithMin(s1,
+          new int[]{0,1,2,3},                // 컬럼 인덱스
+          new int[]{4000,3500,5000,8000});   // 최소 폭(단위: 1/256 char) ≈ 15~31자 느낌
 
       /* ===== 2) 판매/조회 현황 ===== */
-      String title2 = "최근 한 달 가입 건수 전체 순위 / 누적 조회수 전체 순위";
-      Sheet s2 = wb.createSheet(safeSheetName("2. 상품 판매 현황"));
+      String title2 = "최근 한 달 가입 건수 전체 순위 / 최근 한 달 조회수 전체 순위";
+      Sheet s2 = wb.createSheet(safeSheetName("2. 상품 현황"));
       rIdx = 0;
       addTitleRow(s2, rIdx++, title2, wb);
       rIdx++;
 
-      // 왼쪽: 가입 "전체" 순위
+      // 왼쪽: 가입 "전체" 순위 (월간)
       int startL = rIdx;
       Row h1 = row(s2, rIdx++);
       set(h1,0,"순위",head); set(h1,1,"상품명",head); set(h1,2,"가입건수",head);
@@ -84,10 +90,11 @@ public class ExcelReportWriter {
         set(rr,2,num(t.count),cell);
       }
 
-      // 오른쪽: 조회 "전체" 순위 (같은 행에 4열부터)
+      // 오른쪽: 조회 "전체" 순위 (월간)
       int rIdxRight = startL;
       Row h2 = row(s2, rIdxRight++);
-      set(h2,4,"순위",head); set(h2,5,"상품명",head); set(h2,6,"조회수",head);
+      set(h2,4,"순위",head); set(h2,5,"상품명",head);
+      set(h2,6,"월간 조회수",head);
 
       rank = 1;
       if (r.viewedRanking != null) {
@@ -98,9 +105,7 @@ public class ExcelReportWriter {
           set(rr,6,num(t.count),cell);
         }
       }
-
-      // 열 폭 자동 조정
-      autosizeSafe(s2, 7);
+      autosizeSafe(s2, 7); // 정확 자동조정
 
       /* === 3) 상품 가입 리뷰 시트 === */
       Sheet s3 = wb.createSheet(safeSheetName("3. 상품가입 리뷰"));
@@ -142,17 +147,8 @@ public class ExcelReportWriter {
     if (st != null) cell.setCellStyle(st);
   }
   private static Integer num(Integer v){ return v==null? 0: v; }
+  private static Integer num(int v){ return v; }
   private static String  str(String v){ return v==null? "": v; }
-
-  private static List<AdminReport.TopItem> padTo5(List<AdminReport.TopItem> src){
-    if (src == null) return List.of();
-    if (src.size() >= 5) return src;
-    var copy = new java.util.ArrayList<AdminReport.TopItem>(src);
-    for (int i=src.size(); i<5; i++){
-      var t = new AdminReport.TopItem(); t.name=""; t.count=0; copy.add(t);
-    }
-    return copy;
-  }
   private static List<AgeGenderRow> safe(List<AgeGenderRow> v){ return v==null? List.of(): v; }
 
   // 시트명 금지문자 치환 + 길이 제한
@@ -168,7 +164,27 @@ public class ExcelReportWriter {
     CellStyle st = wb.createCellStyle(); Font ft = wb.createFont(); ft.setBold(true); st.setFont(ft);
     c.setCellStyle(st);
   }
+
+  /** 모든 열: rich text/merge 고려한 정확 자동조정 */
   private static void autosizeSafe(Sheet s, int cols){
-    for(int i=0;i<cols;i++){ try { s.autoSizeColumn(i); } catch (Exception e) { s.setColumnWidth(i, 5000); } }
+    for(int i=0;i<cols;i++){
+      try { s.autoSizeColumn(i, true); } // ✅ 핵심: true
+      catch (Exception e) { s.setColumnWidth(i, 5000); }
+    }
+  }
+
+  /** 특정 열들: autoSize 후 최소 폭 보장 (헤더가 긴 시트1 대응) */
+  private static void autosizeWithMin(Sheet s, int[] columns, int[] minWidths){
+    for (int i = 0; i < columns.length; i++){
+      int col = columns[i];
+      int min = (i < minWidths.length ? minWidths[i] : 5000);
+      try {
+        s.autoSizeColumn(col, true);                  // 우선 정확 자동조정
+        int w = s.getColumnWidth(col);
+        if (w < min) s.setColumnWidth(col, min);      // 최소폭 보정
+      } catch (Exception e){
+        s.setColumnWidth(col, min);
+      }
+    }
   }
 }
