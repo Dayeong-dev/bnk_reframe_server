@@ -88,6 +88,10 @@ public class AdminController {
 	public String chart2() {
 		return "admin/chart/chart-2"; 
 	}
+	@GetMapping("dashboard")
+	public String dashboard() {
+		return "admin/dashboard";
+	}
 
 	
 //	@PostMapping("/login")

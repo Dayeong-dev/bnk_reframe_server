@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 메인</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+</head>
+<style>
+	:root { --fg:#111; --muted:#666; --border:#e8e8e8; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif; margin: 0; color: var(--fg); background: #fafafa; }
+    header { padding: 20px 16px; border-bottom:1px solid var(--border); background:white; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .wrap { padding: 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); grid-template-rows: 100%; }
+    .card { background:white; border:1px solid var(--border); border-radius:12px; padding:16px; box-shadow: 0 1px 2px rgba(0,0,0,.03);}
+    .title { font-weight: 700; margin: 0 0 8px; font-size: 13px; }
+    .meta { color: var(--muted); font-size: 10px; margin-bottom: 12px; }
+    .row { display:flex; gap:8px; align-items:center; justify-content:space-between; font-size: 13px; color:var(--muted); margin-top:10px; }
+    .err { color:#b00020; background:#fff3f3; border:1px solid #ffd6d6; padding:10px; border-radius:8px; }
+    .card canvas {
+	  width: 50% !important;
+	  height: 70% !important;
+   	  margin: auto; 
+	}
+    footer { padding: 10px 16px 24px; color: var(--muted); font-size: 12px; }
+	
+	.d-flex { display:flex; }
+	.w_100p { width : 100% !important; }
+	.border_detail { border:1px solid var(--border); border-radius:12px; background: white; box-shadow: 0 1px 2px rgba(0,0,0,.03); padding: 10px; margin: 10px 0; }
+	.content { min-height: 100vh; }
+	.blockLeft { display : block; width : 70% !important; height : 100% !important; }
+	.bounceRateDiv { justify-content: space-between;}
+	.bounceRatioDetailDiv { width : 33%; height : 100% !important; }
+	.bounceRatioCanvas { width : 45%; height : 65%; }
+	.enrollTrendDiv { height : 45% !important; }
+	.bottomDiv { height : 30% !important; justify-content: space-between;}
+	.dailyVisitorDiv { width : 49% !important; height : 100%;}
+	.reviewDiv { width : 49% !important; height : 100%;}
+	
+	.blockRight {display:block; width:30%; margin-left:10px;}
+	.confirmDiv, .fcmDiv {height:30%!important;}
+	
+	.calendar {height : 38%!important;}
+	.calendar-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+	.calendar-header h2 { margin: 0; font-size: 18px; font-weight: bold; }
+    .calendar-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; }
+    .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 12px; font-weight: bold; color: #999; margin-bottom: 8px; }
+  	.calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 4px; }
+  	.calendar-days div { width: 38px; height: 38px; display: flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 50%; transition: background 0.3s, color 0.3s;}
+  	.calendar-days div:hover { background: #f5f5f5; }
+  	.today { background: #ff5722; color: #fff !important; font-weight: bold; }
+  	.other-month { color: #ccc; }
+</style>
+<script>
+	var arrDailyVisitorData = [];
+	var arrDailyVisitorLabel = [];
+	
+	window.onload = function() {
+		setDataBounceRatio();
+		setDataDailyVisitor();
+	}
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/admin/sidebar.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<body>
+
+
+    <!-- 공통 헤더 -->
+    <div th:replace="admin/fragments/header :: header" class="header"></div>
+
+    <div id="body">
+        <!-- 사이드바 -->
+        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+        <!-- 본문 -->
+        <div class="content d-flex w_100p">
+            
+            <div class="blockLeft">
+            	<div class="bounceRateDiv d-flex w_100p">
+            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_1" class="bounceRatioCanvas"></canvas></div>
+            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_2" class="bounceRatioCanvas"></canvas></div>
+            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_3" class="bounceRatioCanvas"></canvas></div>
+            	</div>
+            	<div class="enrollTrendDiv border_detail w_100p">
+            		<canvas id="enrollLineChart"></canvas>
+            	</div>
+            	<div class="bottomDiv d-flex w_100p">
+	            	<div class="dailyVisitorDiv border_detail">
+            			<canvas id="dailyVisitorCanvas" class="w_100p"></canvas>
+		           	</div>
+		           	<div class="reviewDiv border_detail">
+		           		<canvas id="reviewCanvas" style="margin:auto"></canvas>
+		           	</div>
+            	</div>
+            </div>
+            <div class="blockRight">
+	            <div class="border_detail confirmDiv">
+	            	<h2>결재목록</h2>
+	            	<div style="margin-top:15px;">
+	            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
+	            		<div class="d-flex">
+	            			<div style="width:15%">미결재</div>|
+	            			<div style="width:15%">김법진</div>|
+	            			<div style="width:70%">부산은행 로고디자인 변경 결재요청</div>
+	            		</div>
+	            	</div>
+	            	<div style="margin-top:15px;">
+	            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
+	            		<div class="d-flex">
+	            			<div style="width:15%">반려</div>|
+	            			<div style="width:15%">김법진</div>|
+	            			<div style="width:70%">하계 휴가 결재요청</div>
+	            		</div>
+	            	</div>
+	            	<div style="margin-top:15px;">
+	            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
+	            		<div class="d-flex">
+	            			<div style="width:15%">상신</div>|
+	            			<div style="width:15%">김법진</div>|
+	            			<div style="width:70%">공문 올립니다.</div>
+	            		</div>
+	            	</div>
+	            </div>
+	            <div class="border_detail fcmDiv"></div>
+	            <div class="border_detail calendar">
+	            	<div class="calendar-header">
+						<button id="prev">&#10094;</button>
+					  	<h2 id="monthYear"></h2>
+					  	<button id="next">&#10095;</button>
+					</div>
+					<div class="calendar-weekdays">
+					  	<div>MON</div><div>TUE</div><div>WED</div>
+					  	<div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+					</div>
+					<div class="calendar-days" id="calendarDays"></div>
+	            </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+	//json parse
+	async function fetchNdjson(url) {
+	  const res = await fetch(url, { cache: 'no-cache' });
+	  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+	  const text = await res.text();
+	  return text.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+	}
+		
+    // 이탈율 - 도넛차트
+    const base = 'https://storage.googleapis.com/bnk-analytics-static/charts/step_drop_rates/latest-000000000000.ndjson';
+	const NDJSON_URL = `${base}?nocache=${Date.now()}`;
+	
+	// 이탈율 데이터 가져오기
+	async function setDataBounceRatio() {
+		try {
+			var arrBounceRatio = await fetchNdjson(NDJSON_URL);
+			for(var i=0; i<arrBounceRatio.length; i++) {
+				setBounceRatioChart( (i+1), arrBounceRatio[i] );
+			}
+		} catch(err) {
+			console.log("err");
+		}
+	}
+	
+	// 이탈율 차트 그리기
+	function setBounceRatioChart(idx, arr) {
+		var ctx = document.getElementById('bounceRate_' + idx);
+		var myChart = new Chart(ctx, {
+			type : 'doughnut',
+			data : {
+				labels : ['이탈', '유지'],
+				datasets : [
+					{
+						data : [arr["drop_rate_pct"], 100 - arr["drop_rate_pct"]],
+						backgroundColor: ['#f87171', '#e5e7eb'], 
+						borderWidth: 0,
+						radius: '95%',
+				        cutout: '70%',
+				        rotation: -90 * Math.PI / 180,
+				        borderRadius: 30
+					}
+				]
+			},
+			options : {
+				responsive : false,
+				maintainAspectRatio : false,
+				animation: { duration: 800 },
+			},
+			plugins: [baseRingPlugin]
+		});
+	}
+	
+	// 도넛차트 겹치기
+	const baseRingPlugin = {
+	    id: 'baseRing',
+	    beforeDatasetsDraw(chart, args, pluginOpts) {
+	      const meta = chart.getDatasetMeta(0);   // 첫 데이터셋의 지오메트리
+	      if (!meta?.data?.length) return;
+	      const arc = meta.data[0];               // 첫 번째 호(arc)에서 중심/반지름 참조
+	      const ctx = chart.ctx;
+
+	      ctx.save();
+	      ctx.fillStyle = '#e5e7eb';              // 베이스 링 색상
+	      ctx.beginPath();
+	      // 외곽 원 (시계 방향)
+	      ctx.arc(arc.x, arc.y, arc.outerRadius, 0, Math.PI * 2);
+	      // 내곽 원 (반시계 방향) — 도넛 속을 파냄
+	      ctx.arc(arc.x, arc.y, arc.innerRadius, Math.PI * 2, 0, true);
+	      ctx.closePath();
+	      ctx.fill();
+	      ctx.restore();
+	    }
+	};
+	
+    
+    // 상품가입추세 - 라인차트
+  	var ctx = document.getElementById('enrollLineChart');
+	var myChart = new Chart(ctx, {
+		type : 'line',
+		data : {
+			labels : ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+			datasets : [{
+				label : '상품가입추세',
+				data : [510,200,350,40,500,62,721,822,955,100,111,12],
+				fill : true,
+				tension: 0.4,
+				borderColor : '#FF9595',
+				backgroundColor : areaGradient
+			}]
+		},
+		options : {
+			responsive : true,
+			maintainAspectRatio : false,
+			devicePixelRatio: 2,
+			scales : {
+				x : { grid : { drawOnChartArea: false } },
+				y : {
+					min : 0,
+					beginAtZero : true,
+					grid : { drawOnChartArea: false }
+				}
+			}
+		
+		}
+	});
+	
+	//
+	function areaGradient(context) {
+	  const {chart} = context;
+	  const {ctx, chartArea} = chart;
+	  if (!chartArea) return 'rgba(179,107,255,0)'; // 초기 렌더 보호
+	  const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+	  g.addColorStop(0, 'rgba(255,167,167,0.1)');   // 아래쪽 투명
+	  g.addColorStop(1, 'rgba(255,167,167,0.75)'); // 위쪽 연보라
+	  return g;
+	}
+	// 일일방문자수 - 막대차트
+    var dailyBase = "https://storage.googleapis.com/bnk-analytics-bangmun/bq-results-20250824-203907-1756035831694";
+	var dailyUrl = `${dailyBase}?nocache=${Date.now()}`;
+	
+	
+	async function setDataDailyVisitor() {
+		try{
+			var arrDailyVisitor = await fetchNdjson(dailyUrl);
+			for(var i=0; i<arrDailyVisitor.length; i++) {
+			 	arrDailyVisitorLabel.push(arrDailyVisitor[i]["event_date"]);
+			 	arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["f0_"]));
+			}
+			
+		} catch (err) {
+			console.log("err");
+		}
+		
+		setDailyVisitorChart(arrDailyVisitorLabel, arrDailyVisitorData);
+	}
+	
+	// 일일방문자수 차트 그리기
+	function setDailyVisitorChart(dailyLabel, dailyData) {
+		var ctx2 = document.getElementById('dailyVisitorCanvas');
+		var myChart2 = new Chart(ctx2, {
+			type : 'bar',
+			data : {
+				labels : dailyLabel,
+				datasets : [{
+					label : '일일방문자수',
+					data : dailyData,
+					backgroundColor:'#FF9595',
+					borderRadius : 10
+				}]
+			},
+			options : {
+				responsive : true,
+				maintainAspectRatio : false,
+				devicePixelRatio: 2,
+				scales : {
+					x : { grid : { drawOnChartArea: false} },
+					y : {
+						beginAtZero : true
+					}
+				}
+			}
+		});
+	}
+	
+	
+	// 반원 베이스링 플러그인
+	const baseHalfRingPlugin = {
+    id: 'baseHalfRing',
+    beforeDraw(chart, args, pluginOpts) {
+        const meta = chart.getDatasetMeta(0);
+        if (!meta?.data?.length) return;
+        const arc = meta.data[0];
+        const ctx = chart.ctx;
+
+        ctx.save();
+        ctx.fillStyle = '#e5e7eb';  // 회색 베이스링
+        ctx.beginPath();
+        // 외곽 반원
+        ctx.arc(arc.x, arc.y, arc.outerRadius, -Math.PI, 0);
+        // 내곽 반원 (속 파내기)
+        ctx.arc(arc.x, arc.y, arc.innerRadius, 0, -Math.PI, true);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+};
+	
+	// 리뷰 - 도넛차트
+	var ctx = document.getElementById('reviewCanvas');
+	var myChart = new Chart(ctx, {
+		type : 'doughnut',
+		data : {
+			labels : ['긍정', '부정'],
+			datasets : [{
+				data : [29.1, 100-29.1],
+				backgroundColor: ['#f87171', '#e5e7eb'],
+				borderRadius : 10,
+				radius: '95%',
+		        cutout: '70%',
+			}]
+		},
+		options : {
+			responsive : false,
+			maintainAspectRatio : false,
+			rotation: -90,  
+			circumference: 180,
+			
+		}
+	});
+	
+	
+	// 달력
+	const monthYear = document.getElementById("monthYear");
+    const calendarDays = document.getElementById("calendarDays");
+	  const prevBtn = document.getElementById("prev");
+	  const nextBtn = document.getElementById("next");
+	
+	  let today = new Date();
+	  let currentMonth = today.getMonth();
+	  let currentYear = today.getFullYear();
+	
+	  function renderCalendar(month, year) {
+	    const monthNames = [
+	      "January","February","March","April","May","June",
+	      "July","August","September","October","November","December"
+	    ];
+	    monthYear.textContent = `${monthNames[month]}, ${year}`;
+	
+	    calendarDays.innerHTML = "";
+	
+	    // 첫 날 요일 (월요일 시작)
+	    let firstDay = new Date(year, month, 1).getDay();
+	    if (firstDay === 0) firstDay = 7; // Sunday → 7로 보정
+	    let daysInMonth = new Date(year, month+1, 0).getDate();
+	    let prevDays = new Date(year, month, 0).getDate();
+	
+	    // 지난 달
+	    for (let i = firstDay-1; i > 0; i--) {
+	      let div = document.createElement("div");
+	      div.classList.add("other-month");
+	      div.textContent = prevDays - i + 1;
+	      calendarDays.appendChild(div);
+	    }
+	
+	    // 이번 달
+	    for (let i = 1; i <= daysInMonth; i++) {
+	      let div = document.createElement("div");
+	      div.textContent = i;
+	      if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+	        div.classList.add("today");
+	      }
+	      calendarDays.appendChild(div);
+	    }
+	
+	    // 다음 달
+	    let totalCells = (firstDay-1) + daysInMonth;
+	    let nextDays = 42 - totalCells; // 6주 맞추기
+	    for (let i = 1; i <= nextDays; i++) {
+	      let div = document.createElement("div");
+	      div.classList.add("other-month");
+	      div.textContent = i;
+	      calendarDays.appendChild(div);
+	    }
+	  }
+	
+	  prevBtn.addEventListener("click", () => {
+	    currentMonth--;
+	    if (currentMonth < 0) {
+	      currentMonth = 11;
+	      currentYear--;
+	    }
+	    renderCalendar(currentMonth, currentYear);
+	  });
+	
+	  nextBtn.addEventListener("click", () => {
+	    currentMonth++;
+	    if (currentMonth > 11) {
+	      currentMonth = 0;
+	      currentYear++;
+	    }
+	    renderCalendar(currentMonth, currentYear);
+	  });
+	
+	  renderCalendar(currentMonth, currentYear);
+    </script>
+
+</body>
+</html>
