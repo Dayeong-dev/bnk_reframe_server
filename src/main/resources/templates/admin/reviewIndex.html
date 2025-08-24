@@ -8,7 +8,7 @@
 <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
 <script th:src="@{/admin/sidebar.js}"></script>
 <style>
-    /* 테이블 스타일 통일 */
+    /* 공통 테이블 */
     table {
         border-collapse: collapse;
         width: 100%;
@@ -17,137 +17,40 @@
         border-radius: 6px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+    table th, table td { border: 1px solid #dee2e6; padding: 12px 16px; text-align: left; }
+    table th { background-color: #f8f9fa; font-weight: 600; color: #495057; }
 
-    table th,
-    table td {
-        border: 1px solid #dee2e6;
-        padding: 12px 16px;
-        text-align: left;
-    }
+    h1 { color: #212529; font-size: 24px; font-weight: 600; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #dee2e6; }
+    h2 { font-size: 18px; font-weight: 700; margin: 26px 0 12px; }
 
-    table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        color: #495057;
+    /* 중간 메뉴/검색바 */
+    .middle-menu {
+        display: flex; align-items: center; gap: 8px;
+        margin-bottom: 16px; padding: 12px;
+        background-color: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;
+        flex-wrap: wrap;
     }
-	
-	.middle-menu {
-	    display: flex;
-	    align-items: center;
-	    margin-bottom: 20px;
-	    padding: 15px;
-	    background-color: #f8f9fa;
-	    border-radius: 6px;
-	    border: 1px solid #dee2e6;
-	}
-	
-	.middle-menu input[type="text"] {
-	    height: 36px;
-	    padding: 0 12px;
-	    font-size: 14px;
-	    border: 1px solid #ced4da;
-	    border-radius: 4px;
-	    background-color: white;
-	    min-width: 200px;
-	    flex: 1;
-	}
-	
-	.search-btn {
-	    height: 36px;
-	    padding: 0 16px;
-	    background-color: #007bff;
-	    color: white;
-	    border: none;
-	    border-radius: 4px;
-	    font-size: 14px;
-	    font-weight: 500;
-	    cursor: pointer;
-	    transition: all 0.2s ease;
-	}
-	
-	.search-btn:hover {
-	    background-color: #0056b3;
-	}
-	
-    /* 페이지네이션 버튼 스타일 */
-    .pagination {
-        margin-top: 15px;
-        text-align: center;
+    .middle-menu input[type="text"], .middle-menu select {
+        height: 36px; padding: 0 12px; font-size: 14px; border: 1px solid #ced4da; border-radius: 4px; background-color: white; min-width: 200px;
     }
+    .search-btn {
+        height: 36px; padding: 0 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+    }
+    .search-btn:hover { background-color: #0056b3; }
 
-    .pagination button {
-        margin: 0 5px;
-        padding: 6px 12px;
-        background-color: #ffffff;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-    }
+    /* 페이지네이션 */
+    .pagination { margin-top: 12px; text-align: center; }
+    .pagination button { margin: 0 4px; padding: 6px 12px; background-color: #fff; border: 1px solid #dee2e6; border-radius: 4px; font-size: 14px; cursor: pointer; }
+    .pagination button.active { background-color: #007bff; color: #fff; border-color: #007bff; }
 
-    .pagination button:hover {
-        background-color: #e9ecef;
-    }
-
-    /* 필터 버튼 스타일 */
-    #filter-buttons {
-        display: flex;
-        margin-bottom: 20px;
-    }
-
-    .filter-btn {
-        background-color: #f8f9fa;
-		color: #495057;
-		padding: 8px 16px;
-		border: 1px solid #dee2e6;
-		border-right: none;
-		font-size: 14px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		height: 40px;
-    }
-	.filter-btn:last-child {
-		border-right: 1px solid #dee2e6;
-	}
-	
-	.filter-btn:first-child {
-		border-top-left-radius: 6px;
-		border-bottom-left-radius: 6px;
-	}
-	
-	.filter-btn:last-child {
-		border-top-right-radius: 6px;
-		border-bottom-right-radius: 6px;
-	}
-    .filter-btn.active {
-       background-color: #007bff;
-		color: white;
-		border-color: #007bff;
-		z-index: 1;
-		position: relative;
-    }
-
-    .filter-btn:hover {
-        background-color: #0056b3;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    h1 {
-        color: #212529;
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 24px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #dee2e6;
-    }
+    /* 필터 버튼 */
+    .filter-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .filter-btn { background-color: #f8f9fa; color: #495057; padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 6px; font-size: 13px; cursor: pointer; }
+    .filter-btn.active { background-color: #007bff; color: #fff; border-color: #007bff; }
+    .hidden { display: none; }
 </style>
 </head>
 <body>
-
     <!-- 공통 헤더 -->
     <div th:replace="admin/fragments/header :: header" class="header"></div>
 
@@ -159,18 +62,20 @@
         <div class="content" id="main-content">
             <h1>리뷰 관리</h1>
 
-            <!-- 필터 버튼 영역 -->
-            <div id="filter-buttons">
-                <button class="filter-btn active" data-filter="전체">전체</button>
-                <button class="filter-btn" data-filter="긍정">긍정</button>
-                <button class="filter-btn" data-filter="부정">부정</button>
+            <!-- ========== 섹션 A: 사이트 리뷰(기존) ========== -->
+            <h2>사이트 리뷰</h2>
+
+            <div class="filter-row" id="site-filter-row">
+                <button class="filter-btn active" data-target="site" data-filter="전체">전체</button>
+                <button class="filter-btn" data-target="site" data-filter="긍정">긍정</button>
+                <button class="filter-btn" data-target="site" data-filter="부정">부정</button>
             </div>
-			
-			<div class="middle-menu">
-			    <input type="text" id="searchInput" placeholder="리뷰 내용을 입력하세요">
-			    <button class="search-btn" onclick="">검색</button>
-			</div>
-			
+
+            <div class="middle-menu">
+                <input type="text" id="siteSearchInput" placeholder="리뷰 내용을 입력하세요">
+                <button class="search-btn" id="siteSearchBtn">검색</button>
+            </div>
+
             <div id="review-list" th:if="${reviewlist != null}">
                 <table id="review-table">
                     <thead>
@@ -192,59 +97,181 @@
                         </tr>
                     </tbody>
                 </table>
-
-                <!-- 페이지네이션 -->
-                <div class="pagination" id="pagination"></div>
+                <div class="pagination" id="site-pagination"></div>
             </div>
+
+            <!-- ========== 섹션 B: 상품 리뷰(상품별) — 신규 ========== -->
+            <h2>상품 리뷰</h2>
+
+            <div class="middle-menu">
+                <label for="productSelect"><strong>상품 선택</strong></label>
+                <select id="productSelect">
+                    <option value="">상품을 선택하세요</option>
+                    <option th:each="p : ${products}"
+                            th:value="${p.productId}"
+                            th:text="${p.name}">예금 상품</option>
+                </select>
+
+                <input type="text" id="prodSearchInput" placeholder="리뷰 내용 검색(선택)">
+                <button class="search-btn" id="prodSearchBtn">검색</button>
+            </div>
+
+            <div class="filter-row" id="prod-filter-row">
+                <button class="filter-btn active" data-target="prod" data-filter="전체">전체</button>
+                <button class="filter-btn" data-target="prod" data-filter="긍정">긍정</button>
+                <button class="filter-btn" data-target="prod" data-filter="부정">부정</button>
+            </div>
+
+            <table id="prod-review-table">
+                <thead>
+                    <tr>
+                        <th>리뷰 ID</th>
+                        <th>상품</th>
+                        <th>작성자</th>
+                        <th>별점</th>
+                        <th>내용</th>
+                        <th>작성일</th>
+                        <th>부정 여부</th>
+                    </tr>
+                </thead>
+                <tbody id="prod-review-tbody">
+                    <!-- JS로 채움 -->
+                </tbody>
+            </table>
+            <div class="pagination" id="prod-pagination"></div>
         </div>
     </div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const rowsPerPage = 5;
-        const rows = Array.from(document.querySelectorAll("#review-tbody tr"));
-        const pagination = document.getElementById("pagination");
-        let currentFilter = "전체";
-        let filteredRows = [...rows];
-
-        function showPage(page) {
-            rows.forEach(row => row.classList.add("hidden"));
-            filteredRows.forEach((row, index) => {
-                row.classList.toggle("hidden", index < page * rowsPerPage || index >= (page + 1) * rowsPerPage);
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    /* ===== 공통 유틸 ===== */
+    const fmtDate = (s) => {
+        if (!s) return '';
+        // s가 epoch(ms) 또는 ISO 문자열일 수 있음
+        try {
+            const d = (typeof s === 'number') ? new Date(s) : new Date(String(s));
+            const pad = n => String(n).padStart(2,'0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        } catch { return String(s); }
+    };
+    const paginate = (rows, perPage, container, onShow) => {
+        container.innerHTML = "";
+        const pageCount = Math.max(1, Math.ceil(rows.length / perPage));
+        let current = 0;
+        const render = () => {
+            rows.forEach((r,i) => r.classList.toggle("hidden", i < current*perPage || i >= (current+1)*perPage));
+            Array.from(container.children).forEach((b,idx) => {
+                b.classList.toggle("active", idx === current);
             });
+            onShow && onShow(current);
         }
-
-        function renderPagination() {
-            pagination.innerHTML = "";
-            const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
-            for (let i = 0; i < pageCount; i++) {
-                const btn = document.createElement("button");
-                btn.textContent = i + 1;
-                btn.addEventListener("click", () => showPage(i));
-                pagination.appendChild(btn);
-            }
-            showPage(0);
+        for (let i=0;i<pageCount;i++){
+            const btn = document.createElement("button");
+            btn.textContent = (i+1);
+            btn.addEventListener("click", ()=>{ current=i; render(); });
+            container.appendChild(btn);
         }
+        render();
+    };
 
-        function applyFilter() {
-            filteredRows = rows.filter(row => {
-                const sentiment = row.querySelector("td:nth-child(5)").textContent.trim();
-                return currentFilter === "전체" || sentiment === currentFilter;
-            });
-            renderPagination();
-        }
-
-        document.querySelectorAll(".filter-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-                currentFilter = btn.dataset.filter;
-                applyFilter();
-            });
+    /* ===== A. 사이트 리뷰(기존 테이블에 필터/검색/페이지네이션) ===== */
+    const siteRows = Array.from(document.querySelectorAll("#review-tbody tr"));
+    const sitePag = document.getElementById("site-pagination");
+    let siteFilter = "전체";
+    const applySite = () => {
+        const q = document.getElementById("siteSearchInput").value.trim();
+        const filtered = siteRows.filter(row => {
+            const sentiment = row.querySelector("td:nth-child(5)").textContent.trim();
+            const content = row.querySelector("td:nth-child(3)").textContent.trim();
+            const passSent = (siteFilter === "전체" || sentiment === siteFilter);
+            const passText = (!q || content.includes(q));
+            row.classList.toggle("hidden", !(passSent && passText));
+            return passSent && passText;
         });
-
-        applyFilter();
+        paginate(filtered, 5, sitePag);
+    };
+    document.getElementById("siteSearchBtn").addEventListener("click", applySite);
+    document.getElementById("siteSearchInput").addEventListener("keydown", e => { if(e.key==='Enter') applySite(); });
+    document.querySelectorAll('#site-filter-row .filter-btn').forEach(b=>{
+        b.addEventListener("click", ()=>{
+            document.querySelectorAll('#site-filter-row .filter-btn').forEach(x=>x.classList.remove("active"));
+            b.classList.add("active");
+            siteFilter = b.dataset.filter;
+            applySite();
+        });
     });
-    </script>
+    applySite();
+
+    /* ===== B. 상품 리뷰(동적 로드) ===== */
+    const prodTbody = document.getElementById("prod-review-tbody");
+    const prodPag = document.getElementById("prod-pagination");
+    let prodFilter = "전체";
+    let prodRowsCache = []; // <tr> 배열 캐시
+
+    const renderProdRows = (list) => {
+        prodTbody.innerHTML = "";
+        prodRowsCache = list.map(r => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${r.id}</td>
+                <td>[${r.productId}] ${r.productName ?? ''}</td>
+                <td>${r.username ?? '익명'}</td>
+                <td>${r.rating ?? '-'}</td>
+                <td>${r.content ?? ''}</td>
+                <td>${fmtDate(r.createdAt)}</td>
+                <td>${r.negative ? '부정' : '긍정'}</td>
+            `;
+            prodTbody.appendChild(tr);
+            return tr;
+        });
+        applyProdFilters();
+    };
+
+    const applyProdFilters = () => {
+        const q = document.getElementById("prodSearchInput").value.trim();
+        const filtered = prodRowsCache.filter(row => {
+            const sentiment = row.querySelector("td:last-child").textContent.trim();
+            const content = row.querySelector("td:nth-child(5)").textContent.trim();
+            const passSent = (prodFilter === "전체" || sentiment === prodFilter);
+            const passText = (!q || content.includes(q));
+            row.classList.toggle("hidden", !(passSent && passText));
+            return passSent && passText;
+        });
+        paginate(filtered, 5, prodPag);
+    };
+
+    document.querySelectorAll('#prod-filter-row .filter-btn').forEach(b=>{
+        b.addEventListener("click", ()=>{
+            document.querySelectorAll('#prod-filter-row .filter-btn').forEach(x=>x.classList.remove("active"));
+            b.classList.add("active");
+            prodFilter = b.dataset.filter;
+            applyProdFilters();
+        });
+    });
+    document.getElementById("prodSearchBtn").addEventListener("click", applyProdFilters);
+    document.getElementById("prodSearchInput").addEventListener("keydown", e => { if(e.key==='Enter') applyProdFilters(); });
+
+    const loadProductReviews = async (productId) => {
+        if (!productId) { prodTbody.innerHTML = ""; prodPag.innerHTML=""; return; }
+        try {
+            const res = await fetch(`/admin/product-reviews?productId=${encodeURIComponent(productId)}`);
+            if (!res.ok) throw new Error('failed');
+            const json = await res.json();
+            renderProdRows(json || []);
+        } catch (e) {
+            prodTbody.innerHTML = `<tr><td colspan="7">불러오기에 실패했습니다.</td></tr>`;
+            prodPag.innerHTML = "";
+        }
+    };
+
+    document.getElementById("productSelect").addEventListener("change", (e)=>{
+        loadProductReviews(e.target.value);
+    });
+
+    // 첫 로드 시 선택돼 있으면 불러오기
+    const firstVal = document.getElementById("productSelect").value;
+    if (firstVal) loadProductReviews(firstVal);
+});
+</script>
 </body>
 </html>
