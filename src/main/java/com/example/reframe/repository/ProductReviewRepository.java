@@ -23,6 +23,16 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, Lo
     """)
     List<ProductReview> findAllByProductIdWithUser(@Param("productId") Long productId);
 
+    // ✅ 내 리뷰 목록 (user + product 함께 로딩)
+    @Query("""
+        select r from ProductReview r
+        join fetch r.product p
+        join fetch r.user u
+        where u.id = :userId
+        order by r.id desc
+    """)
+    List<ProductReview> findAllByUserIdWithProduct(@Param("userId") Long userId);
+
     // 기간 평균 별점 (rating not null)
     @Query("""
         select avg(r.rating)
