@@ -51,26 +51,28 @@ public class ProductReviewService {
         productReviewRepository.save(review);
 
         // 실시간 브로드캐스트(요약/마스킹 포함)
-        nettyPublisher.publish("product." + dto.getProductId() + ".reviews",
-                new PublicEvent(
-                        "review_created",
-                        dto.getProductId(),
-                        review.getId(),
-                        review.getRating(),
-                        maskName(user.getName()),
-                        snippet(review.getContent(), 20)
-                ));
+        nettyPublisher.publish(
+            "product." + dto.getProductId() + ".reviews",
+            new PublicEvent(
+                "review_created",
+                dto.getProductId(),
+                review.getId(),
+                review.getRating(),
+                maskName(user.getName()),
+                snippet(review.getContent(), 20)
+            )
+        );
 
         // 부정 리뷰 관리자 알림
         if (isNegative) {
             nettyPublisher.publish("admin.alerts",
-                    new AdminEvent("review_negative", dto.getProductId(), review.getId(),
-                            review.getContent(), user.getUsername()));
+                new AdminEvent("review_negative", dto.getProductId(), review.getId(),
+                    review.getContent(), user.getUsername()));
         }
 
         return review.getId();
     }
-    
+
     @Transactional
     public void update(Long userId, Long reviewId, ReviewUpdateDTO dto) {
         ProductReview r = productReviewRepository.findById(reviewId)
@@ -84,9 +86,9 @@ public class ProductReviewService {
         if (dto.getRating() != null) {
             r.setRating(dto.getRating());
         }
-        // JPA dirty checking 로 자동 반영
+        // JPA dirty checking 자동 반영
     }
-    
+
     @Transactional
     public void delete(Long userId, Long reviewId) {
         ProductReview r = productReviewRepository.findById(reviewId)
@@ -100,13 +102,22 @@ public class ProductReviewService {
     @Transactional(readOnly = true)
     public List<ReviewResponseDTO> listByProduct(Long productId, Long currentUserId) {
         return productReviewRepository
-                .findByProduct_ProductIdOrderByIdDesc(productId)
+                .findAllByProductIdWithUser(productId)
                 .stream()
                 .map(r -> toDto(r, currentUserId))
                 .toList();
     }
 
-    // 기존 단독 toDto는 필요시 유지
+    // ✅ “내 리뷰” 목록
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDTO> listMyReviews(Long userId) {
+        return productReviewRepository.findAllByUserIdWithProduct(userId)
+                .stream()
+                .map(r -> toDtoWithProduct(r, userId))   // productName 포함 버전
+                .toList();
+    }
+
+    // === DTO 매핑 ===
     private ReviewResponseDTO toDto(ProductReview r, Long currentUserId) {
         final Long authorId = (r.getUser() != null ? r.getUser().getId() : null);
         final boolean mine = (currentUserId != null && authorId != null && currentUserId.equals(authorId));
@@ -114,12 +125,29 @@ public class ProductReviewService {
         return ReviewResponseDTO.builder()
                 .id(r.getId())
                 .productId(r.getProduct().getProductId())
-                .authorId(authorId)                                  // ★ 추가
+                .authorId(authorId) // 프론트에서 toString() 처리 가능
                 .authorName(r.getUser() != null ? r.getUser().getName() : "익명")
                 .content(r.getContent())
                 .rating(r.getRating())
                 .createdAt(r.getCreatedAt())
-                .mine(mine)                                           // ★ 추가
+                .mine(mine)
+                .build();
+    }
+
+    private ReviewResponseDTO toDtoWithProduct(ProductReview r, Long currentUserId) {
+        final Long authorId = (r.getUser() != null ? r.getUser().getId() : null);
+        final boolean mine = (currentUserId != null && authorId != null && currentUserId.equals(authorId));
+
+        return ReviewResponseDTO.builder()
+                .id(r.getId())
+                .productId(r.getProduct().getProductId())
+                .productName(r.getProduct() != null ? r.getProduct().getName() : null) // 선택 필드
+                .authorId(authorId)
+                .authorName(r.getUser() != null ? r.getUser().getName() : "익명")
+                .content(r.getContent())
+                .rating(r.getRating())
+                .createdAt(r.getCreatedAt())
+                .mine(mine)
                 .build();
     }
 
