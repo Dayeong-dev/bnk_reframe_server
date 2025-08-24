@@ -1,6 +1,10 @@
 package com.example.reframe.controller.api.deposit;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +35,24 @@ public class WalkController {
                 r.threshold(),
                 r.confirmedThisMonth(),
                 r.preferentialRate(),
-                r.effectiveRate()
+                r.effectiveRate(), 
+                r.todayStepsLastSynced(), 
+                r.lastSyncDate()
+        ));
+    }
+    
+    @GetMapping("/summary/{appId}")
+    public ResponseEntity<WalkSyncResponse> summary(@PathVariable("appId") Long appId) {
+        Result r = walkSyncService.summary(appId);
+        
+        return ResponseEntity.ok(new WalkSyncResponse(
+            r.stepsThisMonth(),
+            r.threshold(),
+            r.confirmedThisMonth(),
+            r.preferentialRate(),
+            r.effectiveRate(), 
+            r.todayStepsLastSynced(), 
+            r.lastSyncDate()
         ));
     }
 
@@ -45,7 +66,9 @@ public class WalkController {
             long   stepsThisMonth,      // 이달 누적 걸음
             long   threshold,           // 임계치(10만/5만)
             boolean confirmedThisMonth, // 이달 우대 확정 여부
-            java.math.BigDecimal preferentialRate, // 우대금리(연) 합계
-            java.math.BigDecimal effectiveRate     // 최종 적용금리(연)
+            BigDecimal preferentialRate,	// 우대금리(연) 합계
+            BigDecimal effectiveRate,		// 최종 적용금리(연)
+            long todaySteps,
+            LocalDateTime lastSyncDate     
     ) {}
 }

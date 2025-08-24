@@ -32,33 +32,37 @@ public class WalkSyncService {
      */
     @Transactional
     public Result sync(long appId, long stepsTodayTotal) {
-    	
-        // 1) 가입건 조회
         ProductApplication app = appRepo.findById(appId)
-                .orElseThrow(() -> new IllegalArgumentException("application not found: " + appId));
-
+            .orElseThrow(() -> new IllegalArgumentException("application not found: " + appId));
         if (app.getStartAt() == null) throw new IllegalStateException("가입 시작일이 지정되지 않았습니다.");
-    	if (app.getTermMonthsAtEnroll() == null) throw new IllegalStateException("가입 개월이 지정되지 않았습니다.");
-    	
-        
-        // 2) 오늘 날짜가 속한 회차(1..term) 계산 (가입일 기준, 다음달 같은 날 이전까지)
-        LocalDate today = LocalDate.now();
+        if (app.getTermMonthsAtEnroll() == null) throw new IllegalStateException("가입 개월이 지정되지 않았습니다.");
+
+        // 타임존 일관화
+        ZoneId KST = ZoneId.of("Asia/Seoul");
+        LocalDateTime nowTs = LocalDateTime.now(KST);
+        LocalDate today = nowTs.toLocalDate();
+
+        // 회차 계산
         int round = resolveRound(app.getStartAt().toLocalDate(), today, app.getTermMonthsAtEnroll());
 
-        // 3) 회차 로그 락 획득
+        // 회차 로그 잠금
         DepositPaymentLog log = logRepo.findByApplicationIdAndRoundForUpdate(appId, round)
-                .orElseThrow(() -> new IllegalStateException("payment log not found: round=" + round));
+            .orElseThrow(() -> new IllegalStateException("payment log not found: round=" + round));
 
-        // 4) 증분 반영 (같은 날 반복 클릭은 diff만)
-        long delta = today.equals(log.getWalkLastSyncDate())
-                ? Math.max(0, stepsTodayTotal - nvlLong(log.getWalkLastSyncSteps()))
-                : Math.max(0, stepsTodayTotal);
+        // 같은 '날짜'인지 비교 (시간 비교 X)
+        LocalDate lastSyncDay = (log.getWalkLastSyncDate() != null) ? log.getWalkLastSyncDate().toLocalDate() : null;
+        boolean sameDay = (lastSyncDay != null && lastSyncDay.equals(today));
 
+        // 같은 날이면 캐시를 기준으로 증분, 하루가 바뀌었으면 0에서 시작
+        long lastTodayCache = sameDay ? nvlLong(log.getWalkLastSyncSteps()) : 0L;
+        long delta = Math.max(0, stepsTodayTotal - lastTodayCache);
+
+        // 누적 반영 + 캐시 갱신
         log.setWalkStepsTotal(nvlLong(log.getWalkStepsTotal()) + delta);
-        log.setWalkLastSyncDate(today);
         log.setWalkLastSyncSteps(stepsTodayTotal);
+        log.setWalkLastSyncDate(nowTs);  // LocalDateTime로 저장 유지
 
-        // 5) 임계치 산정(사이클 종료일 기준 나이)
+        // 임계치(없으면 세팅)
         long threshold = nvlLong(log.getWalkThresholdSteps());
         if (threshold == 0) {
             LocalDate cycleEnd = cycleEndOf(app.getStartAt().toLocalDate(), round);
@@ -67,43 +71,87 @@ public class WalkSyncService {
             log.setWalkThresholdSteps(threshold);
         }
 
-        // 6) 달성 시 우대 확정(1회만)
+        // 우대 확정
         if (!"Y".equals(log.getWalkConfirmedYn()) && nvlLong(log.getWalkStepsTotal()) >= threshold) {
             log.setWalkBonusApplied(MONTHLY_BONUS);
             log.setWalkConfirmedYn("Y");
-            log.setWalkConfirmedAt(LocalDateTime.now());
+            log.setWalkConfirmedAt(nowTs);
         }
 
-        // 7) 금리 갱신 (둘 다!)
+        // 금리 계산
         BigDecimal base     = nvl(app.getBaseRateAtEnroll());
         BigDecimal minRate  = nvl(app.getProduct().getMinRate());
         BigDecimal maxRate  = nvl(app.getProduct().getMaxRate());
-        BigDecimal sumBonus = nvl(logRepo.sumConfirmedBonus(appId)); // 확정된 월들의 보너스 합(0.83씩)
-
-        // 우대금리는 '최대금리 - 기준금리'를 초과할 수 없음
+        BigDecimal sumBonus = nvl(logRepo.sumConfirmedBonus(appId));
         BigDecimal roomToMax = maxRate.subtract(base);
         if (roomToMax.signum() < 0) roomToMax = BigDecimal.ZERO;
 
         BigDecimal pref = sumBonus.min(roomToMax).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal eff  = base.add(pref)
-                              .max(minRate)
-                              .min(maxRate)
-                              .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal eff  = base.add(pref).max(minRate).min(maxRate).setScale(2, RoundingMode.HALF_UP);
 
         app.setPreferentialRateAnnual(pref);
         app.setEffectiveRateAnnual(eff);
-        // @Transactional 이므로 flush 시 자동 반영
 
+        // 응답: 오늘값은 방금 받은 누적값 그대로 반환
         return new Result(
-                appId,
-                round,
-                nvlLong(log.getWalkStepsTotal()),
-                threshold,
-                "Y".equals(log.getWalkConfirmedYn()),
-                monthYearOf(app.getStartAt().toLocalDate(), round),
-                pref,
-                eff
+            appId, round,
+            nvlLong(log.getWalkStepsTotal()),
+            threshold,
+            "Y".equals(log.getWalkConfirmedYn()),
+            monthYearOf(app.getStartAt().toLocalDate(), round),
+            pref, eff,
+            stepsTodayTotal,
+            nowTs
         );
+    }
+
+    
+    @Transactional(readOnly = true)
+    public Result summary(long appId) {
+        ProductApplication app = appRepo.findById(appId)
+            .orElseThrow(() -> new IllegalArgumentException("application not found: " + appId));
+        if (app.getStartAt() == null) throw new IllegalStateException("가입 시작일이 지정되지 않았습니다.");
+        if (app.getTermMonthsAtEnroll() == null) throw new IllegalStateException("가입 개월이 지정되지 않았습니다.");
+
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        int round = resolveRound(app.getStartAt().toLocalDate(), today, app.getTermMonthsAtEnroll());
+
+        // FOR UPDATE 없이 조회 전용
+        DepositPaymentLog log = logRepo.findByApplicationIdAndRound(appId, round)
+            .orElse(null);
+
+        long steps = (log != null && log.getWalkStepsTotal() != null) ? log.getWalkStepsTotal() : 0L;
+
+        long threshold = 0L;
+        if (log != null && log.getWalkThresholdSteps() != null) {
+            threshold = log.getWalkThresholdSteps();
+        } else {
+            // 회차 로그에 없으면 앱 스냅샷(가입 시 저장) 또는 기본값
+            Long snap = app.getWalkThresholdSteps();
+            threshold = (snap != null && snap > 0) ? snap : 100_000L;
+        }
+
+        boolean confirmed = (log != null && "Y".equals(log.getWalkConfirmedYn()));
+        String yyyymm = monthYearOf(app.getStartAt().toLocalDate(), round);
+        
+        // 오늘 걸음(서버가 마지막으로 동기화한 오늘 누적값)
+        long todayStepsLastSynced =
+                (log != null && today.equals(log.getWalkLastSyncDate().toLocalDate()))
+                    ? nvlLong(log.getWalkLastSyncSteps())
+                    : 0L; // 다른 날이면 0으로 초기화
+
+        // 금리: 확정 보너스 합만 기준으로 계산(쓰기 없음)
+        BigDecimal base     = nvl(app.getBaseRateAtEnroll());
+        BigDecimal minRate  = nvl(app.getProduct().getMinRate());
+        BigDecimal maxRate  = nvl(app.getProduct().getMaxRate());
+        BigDecimal sumBonus = nvl(logRepo.sumConfirmedBonus(appId));
+        BigDecimal roomToMax = maxRate.subtract(base);
+        if (roomToMax.signum() < 0) roomToMax = BigDecimal.ZERO;
+
+        BigDecimal pref = sumBonus.min(roomToMax).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal eff  = base.add(pref).max(minRate).min(maxRate).setScale(2, RoundingMode.HALF_UP);
+
+        return new Result(appId, round, steps, threshold, confirmed, yyyymm, pref, eff, todayStepsLastSynced, (log != null ? log.getWalkLastSyncDate() : null));
     }
 
     // ---------- Helpers ----------
@@ -155,6 +203,8 @@ public class WalkSyncService {
             Boolean confirmedThisMonth,
             String yyyymm,
             BigDecimal preferentialRate,
-            BigDecimal effectiveRate
+            BigDecimal effectiveRate, 
+            Long todayStepsLastSynced,
+            LocalDateTime lastSyncDate	// (선택) 마지막 동기화 일자
     ) {}
 }

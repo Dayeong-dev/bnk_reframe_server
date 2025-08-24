@@ -81,7 +81,7 @@ public class DepositPaymentLog {
     private LocalDateTime walkConfirmedAt;        // 확정 시각
 
     @Column(name = "walk_last_sync_date")
-    private LocalDate walkLastSyncDate;           // 마지막 처리 '그 날' (DATE → LocalDate 매핑)
+    private LocalDateTime walkLastSyncDate;       // 마지막 처리 '그 날' (DATE → LocalDate 매핑)
 
     @Column(name = "walk_last_sync_steps", nullable = false)
     private Long walkLastSyncSteps = 0L;          // 마지막 처리 시 그 날의 누적값 (DB: DEFAULT 0 NOT NULL)
