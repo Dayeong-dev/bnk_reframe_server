@@ -1,5 +1,7 @@
 package com.example.reframe.entity.deposit;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.example.reframe.entity.ProductApplication;
@@ -55,4 +57,32 @@ public class DepositPaymentLog {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private PaymentStatus status;                 // PAID / UNPAID
+    
+    // ------------------ [추가: 걷기 우대 스냅샷/동기화] ------------------
+
+    @Column(name = "walk_steps_total", nullable = false)
+    private Long walkStepsTotal = 0L;             // 해당 월 누적 걸음 (DB: DEFAULT 0 NOT NULL)
+
+    @Column(name = "walk_threshold_steps")
+    private Long walkThresholdSteps;              // 임계치(100,000 or 50,000)
+
+    @Column(
+        name = "walk_bonus_applied",
+        nullable = false,
+        precision = 5,  // NUMBER(5,2)
+        scale = 2
+    )
+    private BigDecimal walkBonusApplied = BigDecimal.ZERO; // 0.00 or 0.83
+
+    @Column(name = "walk_confirmed_yn", nullable = false, length = 1)
+    private String walkConfirmedYn = "N";         // 'Y' / 'N'  (DB CHECK 제약)
+
+    @Column(name = "walk_confirmed_at")
+    private LocalDateTime walkConfirmedAt;        // 확정 시각
+
+    @Column(name = "walk_last_sync_date")
+    private LocalDate walkLastSyncDate;           // 마지막 처리 '그 날' (DATE → LocalDate 매핑)
+
+    @Column(name = "walk_last_sync_steps", nullable = false)
+    private Long walkLastSyncSteps = 0L;          // 마지막 처리 시 그 날의 누적값 (DB: DEFAULT 0 NOT NULL)
 }
