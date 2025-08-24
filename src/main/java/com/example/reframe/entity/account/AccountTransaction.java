@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-// 출금/입금 2행을 같은 transfer_group_id로 기록
-// 잔액 업데이트는 account 테이블에서 수행(+ FOR UPDATE 잠금)
-// 수정/삭제 금지(리버설 시 반대 분개 2행으로 되돌림)
 
 @Entity
 @Table(name = "account_transaction",

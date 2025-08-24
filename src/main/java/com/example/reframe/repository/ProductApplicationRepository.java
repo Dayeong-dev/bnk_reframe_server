@@ -2,6 +2,7 @@ package com.example.reframe.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -66,4 +67,6 @@ public interface ProductApplicationRepository extends JpaRepository<ProductAppli
         List<Map<String, Object>> findByProductIdForAdmin(@Param("productId")Long productId);
 
 	ProductApplication findByProductAccount_Id(Long accountId);
+
+	ProductApplication findByProductAccount_IdAndUser_Id(Long accountId, Long uid);
 }

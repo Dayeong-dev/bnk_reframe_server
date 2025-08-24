@@ -72,7 +72,7 @@ public class ProductApplication {
     private LocalDateTime closeAt;
     
     // 가입 시 약정 기본 금리
-    @Column(name="base_rate_at_enroll", precision=5, scale=3)
+    @Column(name="base_rate_at_enroll", precision=5, scale=2)
     private BigDecimal baseRateAtEnroll;
 
     // 약정 기간(개월)
@@ -80,10 +80,10 @@ public class ProductApplication {
     private Integer termMonthsAtEnroll;
     
 	// 우대금리 합산값(없으면 0)
-    @Column(name="preferential_rate_annual", precision=5, scale=3)
+    @Column(name="preferential_rate_annual", precision=5, scale=2)
     private BigDecimal preferentialRateAnnual;
     
 	// 실제 적용 연이율 = 기본 + 우대
-    @Column(name="effective_rate_annual", precision=5, scale=3)
+    @Column(name="effective_rate_annual", precision=5, scale=2)
     private BigDecimal effectiveRateAnnual;
 }

@@ -24,6 +24,10 @@ public class ProductApplicationMapper {
 		application.setStatus(applicationDTO.getStatus());
 		application.setStartAt(applicationDTO.getStartAt());
 		application.setCloseAt(applicationDTO.getCloseAt());
+		application.setBaseRateAtEnroll(applicationDTO.getBaseRateAtEnroll());
+		application.setTermMonthsAtEnroll(applicationDTO.getTermMonthsAtEnroll());
+		application.setPreferentialRateAnnual(applicationDTO.getPreferentialRateAnnual());
+		application.setEffectiveRateAnnual(applicationDTO.getEffectiveRateAnnual());
 		
 		return application;
 	}
@@ -43,6 +47,10 @@ public class ProductApplicationMapper {
 		applicationDTO.setStatus(application.getStatus());
 		applicationDTO.setStartAt(application.getStartAt());
 		applicationDTO.setCloseAt(application.getCloseAt());
+		applicationDTO.setBaseRateAtEnroll(application.getBaseRateAtEnroll());
+		applicationDTO.setTermMonthsAtEnroll(application.getTermMonthsAtEnroll());
+		applicationDTO.setPreferentialRateAnnual(application.getPreferentialRateAnnual());
+		applicationDTO.setEffectiveRateAnnual(application.getEffectiveRateAnnual());
 		
 		return applicationDTO;
 	}

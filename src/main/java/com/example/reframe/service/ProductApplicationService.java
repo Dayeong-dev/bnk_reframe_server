@@ -167,17 +167,25 @@ public class ProductApplicationService {
 
 		// 기본금리(기간 구간 매칭)
 		BigDecimal base = BigDecimal.ZERO;
+		
 		if (months != null) {
-		    var tier = depositProductRateRepository
-		        .findTopByProduct_ProductIdAndFromMonthLessThanEqualAndToMonthGreaterThanEqualOrderByFromMonthDesc(
-		            depositProduct.getProductId(), months, months);
-		    if (tier.isPresent()) base = BigDecimal.valueOf(tier.get().getRate());
+		    base = depositProductRateRepository.findBestTierForMonths(depositProduct.getProductId(), months)
+		            .map(r -> BigDecimal.valueOf(r.getRate()))
+		            .orElse(BigDecimal.ZERO);
+		} else {
+		    // 만기 없는 상품(모임통장/입출금자유 등)
+		    base = depositProductRateRepository
+		            .findTopByProduct_ProductIdAndToMonthIsNullOrderByFromMonthDesc(depositProduct.getProductId())
+		            .map(r -> BigDecimal.valueOf(r.getRate()))
+		            .orElse(BigDecimal.ZERO);
 		}
-		base = base.setScale(3, java.math.RoundingMode.HALF_UP);
+
+		
+		base = base.setScale(2, java.math.RoundingMode.HALF_UP);
 		productApplication.setBaseRateAtEnroll(base);
 
 		// 우대=0, 적용=기본
-		BigDecimal pref = BigDecimal.ZERO.setScale(3, java.math.RoundingMode.HALF_UP);
+		BigDecimal pref = BigDecimal.ZERO.setScale(2, java.math.RoundingMode.HALF_UP);
 		productApplication.setPreferentialRateAnnual(pref);
 		productApplication.setEffectiveRateAnnual(base);
 
