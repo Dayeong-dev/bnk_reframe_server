@@ -34,7 +34,6 @@ public class ReviewApiController {
         return ResponseEntity.created(URI.create("/mobile/reviews/" + id)).build();
     }
 
-    // ★ 수정
     @PutMapping("/reviews/{id}")
     public ResponseEntity<Void> update(@PathVariable("id") Long id,
                                        @RequestBody ReviewUpdateDTO dto) {
@@ -43,12 +42,18 @@ public class ReviewApiController {
         return ResponseEntity.noContent().build();
     }
 
-    // ★ 삭제
     @DeleteMapping("/reviews/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         Long uid = requireUser();
         productReviewService.delete(uid, id);
         return ResponseEntity.noContent().build();
+    }
+
+    // ✅ 내 리뷰 목록
+    @GetMapping("/reviews/me")
+    public ResponseEntity<List<ReviewResponseDTO>> myReviews() {
+        Long uid = requireUser();
+        return ResponseEntity.ok(productReviewService.listMyReviews(uid));
     }
 
     private Long requireUser() {
