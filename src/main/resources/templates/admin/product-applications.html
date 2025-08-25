@@ -85,7 +85,7 @@
            th:data-applications-url="@{/admin/api/products}"
            th:data-summary-url="@{/admin/api/products/summary}">
 
-        <div class="pa-title">상품 신청 관리</div>
+        <div class="pa-title">상품 가입 내역</div>
 
         <!-- 요약지표 -->
         <div class="pa-summary" id="pa-summary">
@@ -245,6 +245,38 @@
         fetchApplications(selectedProductId);
       });
 
+	   // YYYY-MM-DD로 포맷 (문자열 우선 절단 → 실패 시 안전 파싱)
+	      function formatDateYMD(v) {
+	        if (!v) return '-';
+	
+	        // 1) 이미 ISO/하이픈 형태면 앞 10자만
+	        if (typeof v === 'string') {
+	          const m = v.match(/^(\d{4}-\d{2}-\d{2})/);
+	          if (m) return m[1]; // 예: "2025-08-23T06:27:30.242" → "2025-08-23"
+	
+	          // 2) 2025/08/23, 2025.08.23 같은 경우
+	          const m2 = v.match(/^(\d{4})[./\/](\d{2})[./\/](\d{2})/);
+	          if (m2) return `${m2[1]}-${m2[2]}-${m2[3]}`;
+	        }
+	
+	        // 3) 숫자(epoch) 등은 로컬 시간 기준으로 안전 포맷
+	        let t = (typeof v === 'number') ? v : Date.parse(v);
+	        if (!isNaN(t)) {
+	          // 초 단위로 온 경우 보정
+	          if (t < 1e12) t *= 1000;
+	          const d = new Date(t);
+	          if (!isNaN(d.getTime())) {
+	            const y = d.getFullYear();
+	            const m = String(d.getMonth() + 1).padStart(2, '0');
+	            const day = String(d.getDate()).padStart(2, '0');
+	            return `${y}-${m}-${day}`;
+	          }
+	        }
+	        return String(v);
+	      }
+      
+      
+      
       // ===== 우측: 가입 내역 =====
       function fetchApplications(productId) {
         if (!productId) { return; }
@@ -296,7 +328,7 @@
 
           var $tr = $('<tr>');
           $tr.append($('<td>').text(userName));
-          $tr.append($('<td>').addClass('pa-col-date').text(startAt));
+          $tr.append($('<td>').addClass('pa-col-date').text(formatDateYMD(startAt)));
           $tr.append($('<td>').append(statusToBadge(a.status)));
           $tb.append($tr);
         });
