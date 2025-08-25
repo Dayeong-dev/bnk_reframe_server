@@ -21,6 +21,7 @@ public class AccountMapper {
 		account.setIsDefault(accountDTO.getIsDefault());
 		account.setStatus(accountDTO.getStatus());
 		account.setCreatedAt(accountDTO.getCreatedAt());
+		account.setProductType(accountDTO.getProductType());
 		
 		return account;
 	}
@@ -40,6 +41,7 @@ public class AccountMapper {
 		accountDTO.setIsDefault(account.getIsDefault());
 		accountDTO.setStatus(account.getStatus());
 		accountDTO.setCreatedAt(account.getCreatedAt());
+		accountDTO.setProductType(account.getProductType());
 		
 		return accountDTO;
 	}

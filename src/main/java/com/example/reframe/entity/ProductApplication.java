@@ -86,4 +86,8 @@ public class ProductApplication {
 	// 실제 적용 연이율 = 기본 + 우대
     @Column(name="effective_rate_annual", precision=5, scale=2)
     private BigDecimal effectiveRateAnnual;
+    
+    // 월 목표 걸음수
+    @Column(name="walk_threshold_steps", length=10)
+    private Long walkThresholdSteps;
 }

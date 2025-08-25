@@ -31,6 +31,7 @@ import com.example.reframe.entity.enroll.ProductApplicationInput;
 import com.example.reframe.repository.AccountRepository;
 import com.example.reframe.repository.DepositProductRepository;
 import com.example.reframe.repository.ProductApplicationRepository;
+import com.example.reframe.repository.auth.UserRepository;
 import com.example.reframe.repository.deposit.DepositPaymentLogRepository;
 import com.example.reframe.repository.deposit.DepositProductRateRepository;
 import com.example.reframe.repository.enroll.ProductApplicationInputRepository;
@@ -46,6 +47,7 @@ public class ProductApplicationService {
 	private final DepositPaymentLogRepository depositPaymentLogRepository;
 	private final DepositProductRateRepository depositProductRateRepository;
 	private final AccountRepository accountRepository;
+	private final UserRepository userRepository;
 	private final TransactionService transactionService;
 	private final CurrentUser currentUser;
 	
@@ -57,6 +59,7 @@ public class ProductApplicationService {
 									 DepositPaymentLogRepository depositPaymentLogRepository,
 									 DepositProductRateRepository depositProductRateRepository, 
 									 AccountRepository accountRepository, 
+									 UserRepository userRepository, 
 									 TransactionService transactionService, 
 									 CurrentUser currentUser) {
 		this.depositProductRepository = depositProductRepository;
@@ -65,6 +68,7 @@ public class ProductApplicationService {
 		this.depositPaymentLogRepository = depositPaymentLogRepository;
 		this.depositProductRateRepository = depositProductRateRepository;
 		this.accountRepository = accountRepository;
+		this.userRepository = userRepository;
 		this.transactionService = transactionService;
 		this.currentUser = currentUser;
 	}
@@ -98,6 +102,18 @@ public class ProductApplicationService {
 		
 		productApplication.setUser(user);
 		productApplication.setProduct(depositProduct);
+		
+		
+		// 함께 걷는 적음이면 걸음 수 저장
+		if (depositProduct.getProductId() == 74) {
+	        // 출생일 가져오기 (없으면 기본 100,000)
+	        LocalDate birth = userRepository.findById(uid)
+	                .map(User::getBirth)     // LocalDate 타입 가정
+	                .orElse(null);
+
+	        long threshold = resolveWalkThreshold(birth, LocalDate.now()); // 만 60 기준
+	        productApplication.setWalkThresholdSteps(threshold);
+	    }
 		
 		// 새로 생성할 상품 계좌 생성
 		Account account = new Account();
@@ -372,5 +388,12 @@ public class ProductApplicationService {
 	    }
 
 	    depositPaymentLogRepository.saveAll(logs);
+	}
+	
+	// 60세 넘으면 5만 걸음, 그 외엔 10만 걸음
+	private static long resolveWalkThreshold(LocalDate birth, LocalDate onDate) {
+	    if (birth == null) return 100_000L;
+	    int age = java.time.Period.between(birth, onDate).getYears();
+	    return (age >= 60) ? 50_000L : 100_000L;
 	}
 }

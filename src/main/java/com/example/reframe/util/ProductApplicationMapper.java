@@ -29,6 +29,8 @@ public class ProductApplicationMapper {
 		application.setPreferentialRateAnnual(applicationDTO.getPreferentialRateAnnual());
 		application.setEffectiveRateAnnual(applicationDTO.getEffectiveRateAnnual());
 		
+		application.setWalkThresholdSteps(applicationDTO.getWalkThresholdSteps());
+		
 		return application;
 	}
 	
@@ -51,6 +53,8 @@ public class ProductApplicationMapper {
 		applicationDTO.setTermMonthsAtEnroll(application.getTermMonthsAtEnroll());
 		applicationDTO.setPreferentialRateAnnual(application.getPreferentialRateAnnual());
 		applicationDTO.setEffectiveRateAnnual(application.getEffectiveRateAnnual());
+		
+		applicationDTO.setWalkThresholdSteps(application.getWalkThresholdSteps());
 		
 		return applicationDTO;
 	}

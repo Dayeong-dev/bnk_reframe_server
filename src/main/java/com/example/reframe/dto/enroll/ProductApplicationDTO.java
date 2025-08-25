@@ -44,9 +44,12 @@ public class ProductApplicationDTO {
     // 약정 기간(개월)
     private Integer termMonthsAtEnroll;
     
- // 우대금리 합산값
+    // 우대금리 합산값
     private BigDecimal preferentialRateAnnual;
     
 	// 실제 적용 연이율 = 기본 + 우대
     private BigDecimal effectiveRateAnnual;
+    
+	// 월 목표 걸음수
+    private Long walkThresholdSteps;
 }
