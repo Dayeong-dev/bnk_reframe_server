@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.reframe.dto.DailyCountDTO;
 import com.example.reframe.dto.account.AccountDTO;
 import com.example.reframe.dto.account.AccountTransactionDTO;
 import com.example.reframe.dto.account.ProductAccountDetail;
@@ -95,4 +96,9 @@ public class AccountController {
 
     public record DepositReq(Long fromAccountId, Long amount) {}
 
+    @GetMapping("/api/stats/signups/7d")
+    public List<DailyCountDTO> getSignups7d() {
+        return accountService.getProductSignupsLast7Days();
+    }
+    
 }

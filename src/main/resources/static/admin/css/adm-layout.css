@@ -1,0 +1,100 @@
+/* === Collapsible Sidebar (namespaced: adm-) === */
+
+/* id+class로 명시도 ↑ : base.css에 #body 규칙이 있어도 이게 이김 */
+#body.adm-layout {
+  display: flex !important;
+  min-height: 100vh;
+}
+
+/* 사이드바 래퍼: 펼침 기준 폭 */
+#body.adm-layout .adm-sidebar {
+  width: 260px;
+  flex: 0 0 260px;
+  overflow: hidden;                 /* 접힐 때 내부 잘림 */
+  transition: width .25s ease, flex-basis .25s ease;
+  /* 혹시 배경이 남아 보이면 다음 줄을 해제 */
+  /* background: transparent !important; */
+}
+
+/* 본문은 나머지 공간 */
+#body.adm-layout .adm-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 접힘 상태: 완전 숨김(폭 0 + 내부 display:none) */
+#body.adm-layout.adm-collapsed .adm-sidebar {
+  width: 0 !important;
+  flex-basis: 0 !important;
+  border: none !important;
+  padding: 0 !important;
+}
+#body.adm-layout.adm-collapsed .adm-sidebar > * { 
+  display: none !important;         /* .sidebar(회색 배경) 포함 전부 숨김 */
+}
+
+/* 접힘 상태에서 드롭다운 hover 깜빡임 방지 */
+#body.adm-layout.adm-collapsed .sidebar-list:hover .dropdown {
+  display: none !important;
+}
+
+/* ❶ 사이드바 폭을 변수로 관리(펼침/접힘에 따라 바뀜) */
+#body.adm-layout { 
+  --adm-sidebar-w: 260px;          /* 펼쳤을 때 폭 */
+  position: relative;
+}
+#body.adm-layout.adm-collapsed { 
+  --adm-sidebar-w: 0px;            /* 접힘 */
+}
+
+/* ❷ 사이드바 래퍼도 변수 기반으로 동기화(폭 불일치 방지) */
+#body.adm-layout .adm-sidebar {
+  width: var(--adm-sidebar-w) !important;
+  flex: 0 0 var(--adm-sidebar-w) !important;
+}
+
+/* ❸ 토글 버튼: 사이드바 오른쪽 엣지에 자동 도킹 */
+#body.adm-layout #adm-sidebar-toggle{
+  position: fixed; 
+  top: 14px;
+  left: calc(var(--adm-sidebar-w) + 14px);  /* ← 핵심 */
+  z-index: 9999;
+  width: 36px; height: 36px; border-radius: 8px;
+  background:#fff; border:1px solid #e5e7eb;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  cursor:pointer;
+  transition: left .25s ease;              /* 펼침/접힘 시 자연 이동 */
+}
+
+/* 버튼 바 모양(기존과 동일) */
+#adm-sidebar-toggle .bar{ width:18px; height:2px; background:#444; margin:2px 0; transition: transform .2s ease; }
+#adm-sidebar-toggle[aria-expanded="false"] .bar:nth-child(2){ transform: scaleX(.66); }
+
+
+/* === Expanded state hard fix === */
+#body.adm-layout:not(.adm-collapsed) .adm-sidebar{
+  width:260px !important;
+  flex-basis:260px !important;
+  background:#ABA5A5;                /* 회색 영역이 전체 폭에 보이도록 */
+}
+#body.adm-layout:not(.adm-collapsed) .adm-sidebar .sidebar{
+  display:block !important;
+  width:100% !important;              /* 내부 .sidebar 폭 강제 복원 */
+  min-width:100% !important;
+  height:100%;
+  background:transparent;             /* 배경은 래퍼에서 처리 */
+}
+
+/* 글자 세로쪼개짐 방지 */
+#body.adm-layout .sidebar,
+#body.adm-layout .sidebar *{
+  writing-mode: horizontal-tb !important;
+  white-space: nowrap;                /* 너무 좁게 잡혀도 줄바꿈 금지 */
+}
+
+/* 혹시 다른 파일에서 .sidebar 폭을 고정했다면 무력화 */
+#body.adm-layout .sidebar{
+  max-width:none !important;
+}
+

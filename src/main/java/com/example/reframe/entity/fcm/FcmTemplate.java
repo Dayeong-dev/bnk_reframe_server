@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "fcm_template")
 @Data
-@NoArgsConstructor
+@NoArgsConstructor	
 @AllArgsConstructor
 @Builder
 public class FcmTemplate {

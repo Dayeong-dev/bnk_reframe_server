@@ -8,4 +8,5 @@ import com.example.reframe.entity.fcm.FcmTemplate;
 
 public interface FcmTemplateRepository extends JpaRepository<FcmTemplate,Long>{
 	List<FcmTemplate> findByActiveTrue();
+	List<FcmTemplate> findByActiveTrueOrderByUpdatedAtDesc();
 }

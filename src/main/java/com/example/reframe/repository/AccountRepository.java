@@ -1,5 +1,6 @@
 package com.example.reframe.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,4 +34,10 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 	List<Account> findByUser_IdAndStatusOrderByIsDefaultDescCreatedAtDesc(
 	        Long userId, AccountStatus status);
 
+	 // 최근 7일 구간의 PRODUCT 계정들을 가져온 뒤 서비스에서 일자별로 집계
+    List<Account> findAllByAccountTypeAndCreatedAtBetween(
+            AccountType accountType,
+            LocalDateTime startInclusive,
+            LocalDateTime endExclusive
+    );
 }
