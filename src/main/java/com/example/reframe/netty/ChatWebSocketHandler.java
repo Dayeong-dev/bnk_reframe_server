@@ -34,6 +34,15 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
             String uri = hc.requestUri();
             System.out.println("[WS] handshake uri=" + uri + " remote=" + ctx.channel().remoteAddress());
             QueryStringDecoder q = new QueryStringDecoder(uri);
+
+            // ✅ uid 바인딩 (발급자 제외 브로드캐스트에 사용)
+            List<String> uids = q.parameters().get("uid");
+            if (uids != null && !uids.isEmpty()) {
+                String uid = uids.get(0);
+                ctx.channel().attr(TopicHub.ATTR_UID).set(uid);
+                System.out.println("[WS] bind uid=" + uid);
+            }
+
             int cnt = 0;
             for (Map.Entry<String, List<String>> e : q.parameters().entrySet()) {
                 if ("topic".equals(e.getKey())) {
@@ -45,14 +54,12 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
                 }
             }
             if (cnt == 0) {
-                // 자동 구독이 안 됐을 때 안내 메시지
                 ctx.writeAndFlush(new TextWebSocketFrame("{\"ok\":true,\"msg\":\"connected_no_topic\"}"));
             }
         } else if (evt instanceof IdleStateEvent) {
             ctx.writeAndFlush(new PingWebSocketFrame(Unpooled.copiedBuffer("ping", StandardCharsets.UTF_8)));
         }
     }
-
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame f) {
@@ -79,13 +86,36 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
             }
             case "publish" -> {
                 String token = root.path("token").asText("");
-                if (!props.checkSecret(token)) { err(ctx, "unauthorized"); return; }
+                boolean tokenOk = props.checkSecret(token);
+                if (!tokenOk) { err(ctx, "unauthorized"); return; }
+
                 String topic = root.path("topic").asText("");
                 JsonNode data = root.get("data");
                 if (topic.isEmpty() || data == null) { err(ctx, "invalid_publish"); return; }
+
+                // ✅ 발급자 제외 옵션 및 발급자 uid 확보(루트 or data 안)
+                boolean excludeSelf = root.path("excludeSelf").asBoolean(false);
+                String issuer = root.path("issuer").asText("");
+                if ((issuer == null || issuer.isEmpty()) && data.has("issuer")) {
+                    issuer = data.path("issuer").asText("");
+                }
+
                 int receivers;
-                try { receivers = hub.broadcast(topic, M.writeValueAsString(data)); }
-                catch (Exception ex) { err(ctx, "encode_error"); return; }
+                try {
+                    String payload = M.writeValueAsString(data);
+                    if (excludeSelf && issuer != null && !issuer.isEmpty()) {
+                        receivers = hub.broadcastExcept(topic, payload, issuer);
+                    } else {
+                        receivers = hub.broadcast(topic, payload);
+                    }
+                    // 디버그 로그(선택)
+                    System.out.println("[WS] published topic=" + topic +
+                            " excludeSelf=" + excludeSelf + " issuer=" + issuer +
+                            " receivers=" + receivers);
+                } catch (Exception ex) {
+                    err(ctx, "encode_error");
+                    return;
+                }
                 ack(ctx, "published", receivers);
             }
             default -> { /* no-op */ }
