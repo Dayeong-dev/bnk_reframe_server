@@ -96,6 +96,10 @@ public class AdminController {
 	public String dashboard2() {
 		return "admin/dashboard2";
 	}
+	@GetMapping("dashboard3")
+	public String dashboard3() {
+		return "admin/dashboard3";
+	}
 
 	
 //	@PostMapping("/login")

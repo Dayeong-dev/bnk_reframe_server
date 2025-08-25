@@ -156,7 +156,7 @@
       <div id="adm-fcm-root">
         <div class="adm-fcm-header-bar">
           <h1 class="adm-fcm-page-title">FCM 관리</h1>
-          <a class="adm-fcm-link-btn" id="adm-fcm-history-link" href="/admin/fcm/get-fcm-history">발송 이력 보기</a>
+          <a class="adm-fcm-link-btn" id="adm-fcm-history-link" href="/admin/fcm-history">발송 이력 보기</a>
         </div>
 
         <div class="adm-fcm-grid">
@@ -209,27 +209,27 @@
                   <input type="hidden" id="adm-fcm-tpl-id" name="id"/>
 
                   <div class="adm-fcm-row">
-                    <label class="adm-fcm-label" for="adm-fcm-tpl-group">Group</label>
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-group">대상 그룹</label>
                     <div><input type="text" id="adm-fcm-tpl-group" name="groupCode" class="adm-fcm-input" placeholder="예) event / vip / premium" /></div>
                   </div>
 
                   <div class="adm-fcm-row">
-                    <label class="adm-fcm-label" for="adm-fcm-tpl-title">Title</label>
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-title">제목</label>
                     <div><input type="text" id="adm-fcm-tpl-title" name="title" class="adm-fcm-input" placeholder="템플릿 제목" /></div>
                   </div>
 
                   <div class="adm-fcm-row">
-                    <label class="adm-fcm-label" for="adm-fcm-tpl-body">Body</label>
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-body">내용</label>
                     <div><textarea id="adm-fcm-tpl-body" name="body" class="adm-fcm-textarea" placeholder="템플릿 본문"></textarea></div>
                   </div>
 
                   <div class="adm-fcm-row">
-                    <label class="adm-fcm-label" for="adm-fcm-tpl-cron">Cron</label>
+                    <label class="adm-fcm-label" for="adm-fcm-tpl-cron">발송시간</label>
                     <div><input type="text" id="adm-fcm-tpl-cron" name="cron" class="adm-fcm-input" placeholder="예) 0 0 9 * * ?" /></div>
                   </div>
 
                   <div class="adm-fcm-row">
-                    <div class="adm-fcm-label">Active</div>
+                    <div class="adm-fcm-label">활성화</div>
                     <div style="display:flex; align-items:center; gap:8px;">
                       <input type="checkbox" id="adm-fcm-tpl-active" name="active"/>
                       <label for="adm-fcm-tpl-active" style="font-size:13px; color:#495057;">스케줄 활성화</label>
@@ -238,7 +238,7 @@
 
                   <div class="adm-fcm-btn-row">
                     <button type="submit" class="adm-fcm-btn">저장</button>
-                    <button type="button" class="adm-fcm-btn secondary" id="adm-fcm-tpl-clear-btn">새로 작성</button>
+                    <button type="button" class="adm-fcm-btn secondary" id="adm-fcm-tpl-clear-btn">초기화</button>
                   </div>
                 </form>
               </div>
@@ -278,7 +278,7 @@
                     <p id="adm-fcm-preview-title" class="adm-fcm-noti-title">(제목없음)</p>
                     <p id="adm-fcm-preview-body"  class="adm-fcm-noti-body">(내용없음)</p>
                   </div>
-                  <div class="adm-fcm-thumb">Img</div>
+                  <!-- <div class="adm-fcm-thumb">Img</div> -->
                 </div>
               </div>
             </div>
