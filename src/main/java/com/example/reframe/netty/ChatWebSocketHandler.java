@@ -32,15 +32,13 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete hc) {
             String uri = hc.requestUri();
-            System.out.println("[WS] handshake uri=" + uri + " remote=" + ctx.channel().remoteAddress());
             QueryStringDecoder q = new QueryStringDecoder(uri);
 
-            // ✅ uid 바인딩 (발급자 제외 브로드캐스트에 사용)
+            // uid 바인딩
             List<String> uids = q.parameters().get("uid");
             if (uids != null && !uids.isEmpty()) {
                 String uid = uids.get(0);
                 ctx.channel().attr(TopicHub.ATTR_UID).set(uid);
-                System.out.println("[WS] bind uid=" + uid);
             }
 
             int cnt = 0;
@@ -49,7 +47,6 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
                     for (String t : e.getValue()) {
                         hub.subscribe(ctx.channel(), t);
                         cnt++;
-                        System.out.println("[WS] auto-subscribed topic=" + t);
                     }
                 }
             }
@@ -93,7 +90,6 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
                 JsonNode data = root.get("data");
                 if (topic.isEmpty() || data == null) { err(ctx, "invalid_publish"); return; }
 
-                // ✅ 발급자 제외 옵션 및 발급자 uid 확보(루트 or data 안)
                 boolean excludeSelf = root.path("excludeSelf").asBoolean(false);
                 String issuer = root.path("issuer").asText("");
                 if ((issuer == null || issuer.isEmpty()) && data.has("issuer")) {
@@ -108,10 +104,6 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
                     } else {
                         receivers = hub.broadcast(topic, payload);
                     }
-                    // 디버그 로그(선택)
-                    System.out.println("[WS] published topic=" + topic +
-                            " excludeSelf=" + excludeSelf + " issuer=" + issuer +
-                            " receivers=" + receivers);
                 } catch (Exception ex) {
                     err(ctx, "encode_error");
                     return;
@@ -119,7 +111,7 @@ public class ChatWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
                 ack(ctx, "published", receivers);
             }
             default -> { /* no-op */ }
-        }
+        } 
     }
 
     private void ack(ChannelHandlerContext ctx, String msg) {
