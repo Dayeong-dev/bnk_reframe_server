@@ -7,6 +7,9 @@
     <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/adm-layout.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/dashboard.css}" />
+    
 </head>
 <style>
 	:root { --fg:#111; --muted:#666; --border:#e8e8e8; }
@@ -53,6 +56,16 @@
   	.calendar-days div:hover { background: #f5f5f5; }
   	.today { background: #ff5722; color: #fff !important; font-weight: bold; }
   	.other-month { color: #ccc; }
+    /* FCM List */
+  	#pub-fcm { padding: 8px 0; }
+	#pub-fcm .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:14px; }
+	#tpl-list { list-style:none; padding:0; margin:0; }
+	#tpl-list .tpl-item { padding:12px 14px; border:1px solid #e5e7eb; border-radius:10px; background:#fff; margin-bottom:8px; }
+	#tpl-list .tpl-title { font-size:12px; font-weight:600; color:#6b7280; }
+	#tpl-list .tpl-body { font-size:15px; font-weight:700; line-height:1.5; margin:6px 0 4px; word-break:break-word; }
+	#tpl-list .tpl-meta { font-size:12px; color:#6b7280; }
+	#tpl-list .tpl-meta span + span::before { content:"·"; margin:0 6px; color:#d1d5db; }
+	
 </style>
 <script>
 	var arrDailyVisitorData = [];
@@ -70,76 +83,97 @@
 
 
     <!-- 공통 헤더 -->
-    <div th:replace="admin/fragments/header :: header" class="header"></div>
-
-    <div id="body">
-        <!-- 사이드바 -->
-        <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
-
+    <!-- <div th:replace="admin/fragments/header :: header" class="header"></div> -->
+	
+    <div id="body" class="adm-layout">
+		<!-- 토글 버튼(페이지 아무 곳에나, 보통 상단 고정) -->
+		<button id="adm-sidebar-toggle" aria-label="사이드바 접기/펼치기" aria-expanded="true" title="메뉴">
+		  <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+		</button>
+	
+          <!-- 사이드바 -->
+		  <aside class="adm-sidebar">
+		    <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+		  </aside>
+		  
         <!-- 본문 -->
-        <div class="content d-flex w_100p">
-            
-            <div class="blockLeft">
-            	<div class="bounceRateDiv d-flex w_100p">
-            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_1" class="bounceRatioCanvas"></canvas></div>
-            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_2" class="bounceRatioCanvas"></canvas></div>
-            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_3" class="bounceRatioCanvas"></canvas></div>
-            	</div>
-            	<div class="enrollTrendDiv border_detail w_100p">
-            		<canvas id="enrollLineChart"></canvas>
-            	</div>
-            	<div class="bottomDiv d-flex w_100p">
-	            	<div class="dailyVisitorDiv border_detail">
-            			<canvas id="dailyVisitorCanvas" class="w_100p"></canvas>
-		           	</div>
-		           	<div class="reviewDiv border_detail">
-		           		<canvas id="reviewCanvas" style="margin:auto"></canvas>
-		           	</div>
-            	</div>
-            </div>
-            <div class="blockRight">
-	            <div class="border_detail confirmDiv">
-	            	<h2>결재목록</h2>
-	            	<div style="margin-top:15px;">
-	            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
-	            		<div class="d-flex">
-	            			<div style="width:15%">미결재</div>|
-	            			<div style="width:15%">김법진</div>|
-	            			<div style="width:70%">부산은행 로고디자인 변경 결재요청</div>
-	            		</div>
+        <main class="adm-content">
+	        <div class="content d-flex w_100p">
+	            
+	            <div class="blockLeft">
+	            	<div class="bounceRateDiv d-flex w_100p">
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_1" class="bounceRatioCanvas"></canvas></div>
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_2" class="bounceRatioCanvas"></canvas></div>
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_3" class="bounceRatioCanvas"></canvas></div>
 	            	</div>
-	            	<div style="margin-top:15px;">
-	            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
-	            		<div class="d-flex">
-	            			<div style="width:15%">반려</div>|
-	            			<div style="width:15%">김법진</div>|
-	            			<div style="width:70%">하계 휴가 결재요청</div>
-	            		</div>
+	            	<div class="enrollTrendDiv border_detail w_100p">
+	            		<canvas id="enrollLineChart"></canvas>
 	            	</div>
-	            	<div style="margin-top:15px;">
-	            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
-	            		<div class="d-flex">
-	            			<div style="width:15%">상신</div>|
-	            			<div style="width:15%">김법진</div>|
-	            			<div style="width:70%">공문 올립니다.</div>
-	            		</div>
+	            	<div class="bottomDiv d-flex w_100p">
+		            	<div class="dailyVisitorDiv border_detail">
+	            			<canvas id="dailyVisitorCanvas" class="w_100p"></canvas>
+			           	</div>
+			           	<div class="reviewDiv border_detail">
+			           		<canvas id="reviewCanvas" style="margin:auto"></canvas>
+			           	</div>
 	            	</div>
 	            </div>
-	            <div class="border_detail fcmDiv"></div>
-	            <div class="border_detail calendar">
-	            	<div class="calendar-header">
-						<button id="prev">&#10094;</button>
-					  	<h2 id="monthYear"></h2>
-					  	<button id="next">&#10095;</button>
-					</div>
-					<div class="calendar-weekdays">
-					  	<div>MON</div><div>TUE</div><div>WED</div>
-					  	<div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
-					</div>
-					<div class="calendar-days" id="calendarDays"></div>
+	            <div class="blockRight">
+		            <div class="border_detail confirmDiv">
+		            	<h2>결재목록</h2>
+		            	<div style="margin-top:15px;">
+		            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
+		            		<div class="d-flex">
+		            			<div style="width:15%">미결재</div>|
+		            			<div style="width:15%">김법진</div>|
+		            			<div style="width:70%">부산은행 로고디자인 변경 결재요청</div>
+		            		</div>
+		            	</div>
+		            	<div style="margin-top:15px;">
+		            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
+		            		<div class="d-flex">
+		            			<div style="width:15%">반려</div>|
+		            			<div style="width:15%">김법진</div>|
+		            			<div style="width:70%">하계 휴가 결재요청</div>
+		            		</div>
+		            	</div>
+		            	<div style="margin-top:15px;">
+		            		<div style="font-size:12px;">2025.08.25 12:22:45</div>
+		            		<div class="d-flex">
+		            			<div style="width:15%">상신</div>|
+		            			<div style="width:15%">김법진</div>|
+		            			<div style="width:70%">공문 올립니다.</div>
+		            		</div>
+		            	</div>
+		            </div>
+		            <div class="border_detail fcmDiv">
+		            	<div id="pub-fcm">
+						  <div class="head">
+						    <span>활성 템플릿</span>
+						    <span id="tpl-count">(0건)</span>
+						  </div>
+						
+						  <ul id="tpl-list"></ul>
+						
+						  <div id="tpl-empty" style="display:none">활성 템플릿이 없습니다.</div>
+						</div>
+		            </div>
+		            
+		            <div class="border_detail calendar">
+		            	<div class="calendar-header">
+							<button id="prev">&#10094;</button>
+						  	<h2 id="monthYear"></h2>
+						  	<button id="next">&#10095;</button>
+						</div>
+						<div class="calendar-weekdays">
+						  	<div>MON</div><div>TUE</div><div>WED</div>
+						  	<div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+						</div>
+						<div class="calendar-days" id="calendarDays"></div>
+		            </div>
 	            </div>
-            </div>
-        </div>
+	        </div>
+        </main>
     </div>
 
 <script>
@@ -260,7 +294,7 @@
 	  return g;
 	}
 	// 일일방문자수 - 막대차트
-    var dailyBase = "https://storage.googleapis.com/bnk-analytics-bangmun/bq-results-20250824-203907-1756035831694";
+    var dailyBase = "https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun";
 	var dailyUrl = `${dailyBase}?nocache=${Date.now()}`;
 	
 	
@@ -269,7 +303,7 @@
 			var arrDailyVisitor = await fetchNdjson(dailyUrl);
 			for(var i=0; i<arrDailyVisitor.length; i++) {
 			 	arrDailyVisitorLabel.push(arrDailyVisitor[i]["event_date"]);
-			 	arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["f0_"]));
+			 	arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["user_count"]));
 			}
 			
 		} catch (err) {
@@ -353,7 +387,40 @@
 		}
 	});
 	
-	
+	// FCM 목록
+	document.addEventListener('DOMContentLoaded', () => {
+		  const url   = '/admin/fcm/templates/active';
+		  const list  = document.getElementById('tpl-list');
+		  const count = document.getElementById('tpl-count');
+		  const empty = document.getElementById('tpl-empty');
+		
+		  fetch(url)
+		    .then(res => res.json())
+		    .then(items => {
+		      if (!items || items.length === 0) {
+		        count.textContent = '(0건)';
+		        empty.style.display = 'block';
+		        return;
+		      }
+		
+		      count.textContent = `(${items.length}건)`;
+		      list.innerHTML = items.map(t => `
+		        <li class="tpl-item">
+		          <div class="tpl-title">BNK Reframe</div>
+		          <div class="tpl-body">${t.body ?? ''}</div>
+		          <div class="tpl-meta">
+		            <span>[${t.groupCode ?? ''}]</span>
+		            <span>cron: ${t.cron || '-'}</span>
+		          </div>
+		        </li>
+		      `).join('');
+		    })
+		    .catch(() => {
+		      count.textContent = '(0건)';
+		      empty.style.display = 'block';
+		      empty.textContent = '불러오기 실패';
+		    });
+		});
 	// 달력
 	const monthYear = document.getElementById("monthYear");
     const calendarDays = document.getElementById("calendarDays");
@@ -427,6 +494,29 @@
 	  });
 	
 	  renderCalendar(currentMonth, currentYear);
+	  
+	  // 사이드바 닫힘
+	  document.addEventListener('DOMContentLoaded', function(){
+	    const layout = document.querySelector('.adm-layout');
+	    const btn    = document.getElementById('adm-sidebar-toggle');
+	    if (!layout || !btn) return;
+	
+	    const KEY = 'adm.sidebar.collapsed';
+	
+	    // 초기 상태 복원
+	    const isCollapsed = localStorage.getItem(KEY) === '1';
+	    if (isCollapsed) {
+	      layout.classList.add('adm-collapsed');
+	      btn.setAttribute('aria-expanded', 'false');
+	    }
+	
+	    // 클릭 토글
+	    btn.addEventListener('click', () => {
+	      const collapsedNow = layout.classList.toggle('adm-collapsed');
+	      btn.setAttribute('aria-expanded', String(!collapsedNow));
+	      localStorage.setItem(KEY, collapsedNow ? '1' : '0');
+	    });
+	  });
     </script>
 
 </body>

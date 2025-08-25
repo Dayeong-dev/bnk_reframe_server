@@ -76,5 +76,9 @@ public class FcmTemplateController {
         repository.deleteById(id);
         return ResponseEntity.ok().build();
     }
-	
+    
+    @GetMapping("/active")
+    public List<FcmTemplate> getActiveTemplates() {
+        return repository.findByActiveTrueOrderByUpdatedAtDesc();
+    }
 }

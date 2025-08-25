@@ -1,0 +1,42 @@
+:root{
+  --fg:#111; --muted:#6b7280; --brand:#35c2b1; --accent:#5fd0c6;
+  --border:#e5e7eb; --radius:12px; --gap:16px; --cardpad:16px;
+}
+
+.adm-dash{ display:grid; gap:var(--gap); grid-template-columns: 1.7fr 1.3fr; }
+.adm-dash-main{ display:grid; gap:var(--gap); }
+.adm-kpis{ display:grid; gap:var(--gap); grid-template-columns: repeat(4, 1fr); }
+.adm-charts{ display:grid; gap:var(--gap); grid-template-columns: 1fr 1fr; }
+.adm-side{ display:grid; gap:var(--gap); grid-auto-rows: minmax(260px, auto); }
+
+.adm-card{
+  background:#fff; border:1px solid var(--border); border-radius:var(--radius);
+  padding:var(--cardpad); box-shadow:0 1px 2px rgba(0,0,0,.03);
+}
+.adm-card--tall{ min-height: 360px; }
+.adm-card--medium{ min-height: 280px; }
+.adm-card--short{ min-height: 120px; }
+
+/* KPI 타일 */
+.kpi{ display:flex; flex-direction:column; gap:6px; }
+.kpi .kpi-label{ font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.3px; }
+.kpi .kpi-value{ font-size:28px; font-weight:800; }
+.kpi .kpi-sub{ font-size:12px; color:var(--muted); }
+.kpi .kpi-trend{ height:6px; background:#f3f4f6; border-radius:999px; overflow:hidden; }
+.kpi .kpi-trend > i{ display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand), var(--accent)); }
+
+/* 범위 토글 */
+.adm-range{ display:flex; gap:8px; }
+.adm-range .btn{
+  border:1px solid var(--border); background:#fff; padding:6px 10px; font-size:12px;
+  border-radius:8px; cursor:pointer;
+}
+.adm-range .btn.active{ color:#0f766e; background:#ecfeff; border-color:#a5f3fc; }
+
+/* 표/리스트 간격 통일 */
+.list-clean{ list-style:none; margin:0; padding:0; }
+.list-clean li{ padding:8px 0; border-bottom:1px dashed #eee; }
+.list-clean li:last-child{ border-bottom:none; }
+
+/* 캔버스는 부모 카드 높이에 꽉 차게 */
+.adm-card canvas{ width:100% !important; height:100% !important; }

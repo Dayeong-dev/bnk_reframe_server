@@ -3,17 +3,19 @@ package com.example.reframe.service.account;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.controller.api.account.AccountController.PayReq;
 import com.example.reframe.domain.TransferCommand;
+import com.example.reframe.dto.DailyCountDTO;
 import com.example.reframe.dto.account.AccountDTO;
-import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.ProductApplication;
 import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.account.AccountStatus;
@@ -40,6 +42,8 @@ public class AccountService {
 	private final DepositPaymentLogRepository logRepository;
 	private final TransactionService transactionService;
 	private final CurrentUser currentUser;
+	
+	private static final ZoneId ZONE_SEOUL = ZoneId.of("Asia/Seoul");
 	
 	private final AccountMapper accountMapper = new AccountMapper();
 	private final AccountNumberGenerator generator = new AccountNumberGenerator(); 
@@ -192,5 +196,46 @@ public class AccountService {
         transactionService.postTransfer(cmd);
     }
 
+    /**
+     * 최근 7일(오늘 포함) PRODUCT 가입자 수 일자별 집계
+     */
+    public List<DailyCountDTO> getProductSignupsLast7Days() {
+
+        // 오늘(KST) 기준 날짜 범위 계산
+        LocalDate today = LocalDate.now(ZONE_SEOUL);
+        LocalDate startDate = today.minusDays(6);                 // 6일 전 (총 7일)
+        LocalDateTime start = startDate.atStartOfDay();           // KST 00:00
+        LocalDateTime endExclusive = today.plusDays(1).atStartOfDay(); // 내일 00:00
+
+        // 1) 최근 7일 PRODUCT 행 조회
+        List<Account> rows = accountRepository.findAllByAccountTypeAndCreatedAtBetween(
+                AccountType.PRODUCT,
+                start,
+                endExclusive
+        );
+
+        // 2) 결과 버킷 초기화(날짜 오름차순, 0으로 채움)
+        Map<LocalDate, Long> bucket = new LinkedHashMap<>();
+        for (int i = 0; i < 7; i++) {
+            bucket.put(startDate.plusDays(i), 0L);
+        }
+
+        // 3) createdAt -> LocalDate로 매핑하여 카운트(+1)
+        for (Account a : rows) {
+            // createdAt은 서버 로컬타임 기준 저장. 7일 범위로 이미 필터됨.
+            LocalDate d = a.getCreatedAt().toLocalDate();
+            // 방어: 혹시라도 범위 밖이면 스킵
+            if (bucket.containsKey(d)) {
+                bucket.put(d, bucket.get(d) + 1);
+            }
+        }
+
+        // 4) DTO로 변환 (오름차순)
+        List<DailyCountDTO> result = new ArrayList<>(7);
+        bucket.forEach((d, c) -> result.add(new DailyCountDTO(d, c)));
+        return result;
+    }
+	
+	
 	
 }

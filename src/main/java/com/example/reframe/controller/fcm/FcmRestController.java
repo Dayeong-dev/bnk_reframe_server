@@ -102,6 +102,4 @@ public class FcmRestController {
         ));
     }
     
-    @GetMapping("/ping")
-    public String ping() { return "pong"; }
 }
