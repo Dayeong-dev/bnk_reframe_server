@@ -391,8 +391,8 @@ public class ProductApplicationService {
 		if(uid == null) {
 			throw new IllegalStateException("로그인이 필요합니다.");
 		}
-		
-		List<ProductApplication> applicationList = applicationRepository.findByUser_id(uid);
+
+		List<ProductApplication> applicationList = applicationRepository.findByUser_IdOrderByStartAtDesc(uid);
 		
 		return applicationList.stream().map(app -> applicationMapper.toDTO(app)).toList();
 	}
