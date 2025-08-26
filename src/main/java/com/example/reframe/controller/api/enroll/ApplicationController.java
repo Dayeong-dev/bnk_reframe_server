@@ -1,5 +1,7 @@
 package com.example.reframe.controller.api.enroll;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.reframe.dto.account.ProductAccountDetail;
 import com.example.reframe.dto.enroll.EnrollForm;
+import com.example.reframe.dto.enroll.ProductApplicationDTO;
 import com.example.reframe.entity.ProductApplication;
 import com.example.reframe.service.ProductApplicationDraftService;
 import com.example.reframe.service.ProductApplicationService;
@@ -83,4 +86,9 @@ public class ApplicationController {
 		
         return ResponseEntity.ok().build();
     }
+	
+	@GetMapping("/my")
+	public ResponseEntity<List<ProductApplicationDTO>> getMyApplications() {
+		return ResponseEntity.ok(applicationService.getApplicationList());
+	}
 }
