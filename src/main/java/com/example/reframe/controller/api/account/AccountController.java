@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.reframe.dto.DailyCountDTO;
 import com.example.reframe.dto.account.AccountDTO;
 import com.example.reframe.dto.account.AccountTransactionDTO;
+import com.example.reframe.dto.account.GlobalAvgResponse;
 import com.example.reframe.dto.account.ProductAccountDetail;
 import com.example.reframe.entity.account.AccountType;
 import com.example.reframe.service.account.AccountService;
@@ -99,6 +100,12 @@ public class AccountController {
     @GetMapping("/api/stats/signups/7d")
     public List<DailyCountDTO> getSignups7d() {
         return accountService.getProductSignupsLast7Days();
+    }
+    
+    /** 전체 사용자 평균 총자산 (집계값) */
+    @GetMapping("/global-avg")
+    public ResponseEntity<GlobalAvgResponse> globalAvg() {
+        return ResponseEntity.ok(accountService.getGlobalAverageForUsers());
     }
     
 }

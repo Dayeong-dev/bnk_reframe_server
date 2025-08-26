@@ -28,7 +28,7 @@ public class ProductApplicationDraftService {
         if (uid == null) throw new IllegalStateException("로그인이 필요합니다.");
         
         Optional<ProductApplicationDraft> optApp = 
-        		applicationDraftRepository.findByProduct_ProductId(productId);
+        		applicationDraftRepository.findByUser_IdAndProduct_ProductIdAndStatus(uid, productId, DraftStatus.IN_PROGRESS);
         
         if(optApp.isEmpty()) return null;
         

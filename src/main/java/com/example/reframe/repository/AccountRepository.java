@@ -1,5 +1,6 @@
 package com.example.reframe.repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,4 +41,23 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             LocalDateTime startInclusive,
             LocalDateTime endExclusive
     );
+
+    @Query(value = """
+        SELECT AVG(total_balance) AS avg_total
+          FROM (
+                SELECT COALESCE(SUM(a.balance), 0) AS total_balance
+                  FROM account a
+                 WHERE a.status = 'ACTIVE'
+                 GROUP BY a.user_id
+               ) t
+        """, nativeQuery = true)
+    BigDecimal findGlobalAvgUserTotal();
+
+    /** 평균 산출에 포함될 활성 사용자 수(표본 크기 체크용) */
+    @Query(value = """
+        SELECT COUNT(DISTINCT a.user_id)
+          FROM account a
+         WHERE a.status = 'ACTIVE'
+        """, nativeQuery = true)
+    long countActiveUsers();
 }
