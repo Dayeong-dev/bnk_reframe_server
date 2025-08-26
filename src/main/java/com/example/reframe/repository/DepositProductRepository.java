@@ -83,7 +83,7 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
     		left join ProductApplication pa on pa.product.id = dp.id
     		where dp.status = 'S'
     		group by dp.id, dp.name, dp.purpose, dp.category, dp.period
-    		order by max(dp.createdAt) desc
+    		order by dp.id asc
     		""")
         List<AdminProductListItemDto> findProductsWithCounts();
    

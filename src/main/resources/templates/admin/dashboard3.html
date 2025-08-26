@@ -242,7 +242,11 @@
 	  gap:4px;
 	  margin:0;                  /* 세로 배치 때 쓰던 여백 제거 */
 	}
-									
+	a{
+		text-decoration: none;
+		color:inherit;
+	}									
+	
 </style>
 <script>
 	var arrDailyVisitorData = [];
@@ -358,28 +362,34 @@
 		            <div class="border_detail confirmDiv">
 		            	<h2>결재목록</h2>
 		            	<div style="margin-top:15px;">
-		            		<div style="font-size:12px;">2025.08.22 12:22:45</div>
-		            		<div class="d-flex">
-		            			<div style="width:15%">반려</div>|
-		            			<div style="width:15%">관리자</div>|
-		            			<div style="width:70%">[긴급]부산은행 로고디자인 변경 결재요청</div>
-		            		</div>
+		            		<a href="">
+			            		<div style="font-size:12px;">2025.08.25 09:54</div>
+			            		<div class="d-flex">
+			            			<div style="width:15%">대기</div>|
+			            			<div style="width:15%">김법진</div>|
+			            			<div style="width:70%">관리자 대시보드 색상 및 디자인 수정요청</div>
+			            		</div>
+		            		</a>
 		            	</div>
 		            	<div style="margin-top:15px;">
-		            		<div style="font-size:12px;">2025.08.14 13:33:14</div>
-		            		<div class="d-flex">
-		            			<div style="width:15%">승인</div>|
-		            			<div style="width:15%">김법진</div>|
-		            			<div style="width:70%">광복 80주년 기념 특별 이벤트 행사 주최 결재요청</div>
-		            		</div>
+		            		<a href="">
+			            		<div style="font-size:12px;">2025.08.22 12:22</div>
+			            		<div class="d-flex">
+			            			<div style="width:15%">반려</div>|
+			            			<div style="width:15%">관리자</div>|
+			            			<div style="width:70%">[긴급]부산은행 로고디자인 변경 결재요청</div>
+			            		</div>
+		            		</a>
 		            	</div>
 		            	<div style="margin-top:15px;">
-		            		<div style="font-size:12px;">2025.08.25 09:54:</div>
-		            		<div class="d-flex">
-		            			<div style="width:15%">대기</div>|
-		            			<div style="width:15%">김법진</div>|
-		            			<div style="width:70%">관리자 대시보드 색상 및 디자인 수정요청</div>
-		            		</div>
+		            		<a href="">
+			            		<div style="font-size:12px;">2025.08.14 13:33</div>
+			            		<div class="d-flex">
+			            			<div style="width:15%">승인</div>|
+			            			<div style="width:15%">김법진</div>|
+			            			<div style="width:70%">광복 80주년 기념 특별 이벤트 행사 주최 결재요청</div>
+			            		</div>
+		            		</a>
 		            	</div>
 		            </div>
 		            <div class="border_detail2 fcmDiv">
@@ -388,12 +398,11 @@
 						    <span>활성 템플릿</span>
 						    <span id="tpl-count">(0건)</span>
 						  </div>
-						
 						  <ul id="tpl-list"></ul>
-						
 						  <div id="tpl-empty" style="display:none">활성 템플릿이 없습니다.</div>
 						</div>
 		            </div>
+		            <!-- 상품 조회수 TOP 5 -->
 		            <div class="product_top5">
 		            </div>
 	            </div>
@@ -714,12 +723,14 @@
 		      count.textContent = `(${items.length}건)`;
 		      list.innerHTML = items.map(t => `
 		        <li class="tpl-item">
+		      	  <a href="">
 		          <div class="tpl-title">BNK Reframe</div>
 		          <div class="tpl-body">${t.body ?? ''}</div>
 		          <div class="tpl-meta">
 		            <span>[${t.groupCode ?? ''}]</span>
 		            <span>cron: ${t.cron || '-'}</span>
 		          </div>
+		          </a>
 		        </li>
 		      `).join('');
 		    })
@@ -1036,7 +1047,6 @@
     host.appendChild(card);
 
     function toArray(rows){
-      // 안전 정규화: {product_id, detail_views}
       return rows.map(r => ({
         product_id: String(r.product_id ?? r.productId ?? r.id ?? ''),
         detail_views: Number(r.detail_views ?? r.detailView ?? r.views ?? r.count ?? 0)
@@ -1050,11 +1060,11 @@
       new Chart(canvas, {
         type: 'bar',
         data: {
-          labels,
+          labels: ['매일 출석 적금','함께 걷는 적금','오징어 모임 통장','BNK 내맘대로 예금','사장님 월급통장'],
           datasets: [{
             label: '상세조회수',
             data,
-            backgroundColor: '#f87171',   // 파랑 계열(기존 핑크와 구분)
+            backgroundColor: '#f87171',   
             borderRadius: 8,
             barThickness: 20
           }]
@@ -1063,7 +1073,7 @@
           responsive: true,
           maintainAspectRatio: false,
           devicePixelRatio: 2,
-          indexAxis: 'y',                 // ← 가로 막대
+          indexAxis: 'y',               // ← 가로 막대
           plugins: { legend: { display: false } },
           scales: {
             x: { beginAtZero: true, grid: { drawOnChartArea:false } },
