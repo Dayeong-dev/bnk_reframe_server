@@ -2,930 +2,1095 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>관리자 대시보드</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --dark: #1e293b;
-            --light: #f1f5f9;
-            --white: #ffffff;
-            --gray: #64748b;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
-            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Background Animation */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
-            z-index: -1;
-        }
-
-        /* Sidebar Toggle Button */
-        .sidebar-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background: var(--white);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-lg);
-            transition: var(--transition);
-        }
-
-        .sidebar-toggle:hover {
-            transform: scale(1.05);
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .sidebar-toggle i {
-            font-size: 20px;
-            transition: var(--transition);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 280px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-xl);
-            transition: var(--transition);
-            z-index: 1000;
-            overflow-y: auto;
-            transform: translateX(0);
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar-header {
-            padding: 80px 20px 30px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: var(--white);
-        }
-
-        .sidebar-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .sidebar-menu {
-            padding: 20px;
-        }
-
-        .sidebar-menu-item {
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--dark);
-        }
-
-        .sidebar-menu-item:hover {
-            background: var(--light);
-            transform: translateX(5px);
-        }
-
-        .sidebar-menu-item.active {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            padding: 30px;
-            transition: var(--transition);
-            min-height: 100vh;
-        }
-
-        .main-content.expanded {
-            margin-left: 0;
-        }
-
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px 30px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            animation: slideDown 0.5s ease;
-        }
-
-        .header h1 {
-            font-size: 32px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
-
-        .header-info {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .date-time {
-            padding: 10px 20px;
-            background: var(--light);
-            border-radius: 10px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.5s ease;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .stat-title {
-            font-size: 14px;
-            color: var(--gray);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .stat-icon.primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: var(--white);
-        }
-
-        .stat-icon.success {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: var(--white);
-        }
-
-        .stat-icon.warning {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: var(--white);
-        }
-
-        .stat-icon.danger {
-            background: linear-gradient(135deg, #ef4444, #f87171);
-            color: var(--white);
-        }
-
-        .stat-value {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-        }
-
-        .stat-value small {
-            font-size: 16px;
-            color: var(--gray);
-            font-weight: 400;
-        }
-
-        .stat-change {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .stat-change.up {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--secondary);
-        }
-
-        .stat-change.down {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .stat-footer {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid var(--light);
-            font-size: 13px;
-            color: var(--gray);
-        }
-
-        /* Charts Container */
-        .charts-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .chart-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: var(--shadow-md);
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .chart-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .chart-options {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chart-option {
-            padding: 8px 16px;
-            border: 1px solid var(--light);
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .chart-option:hover,
-        .chart-option.active {
-            background: var(--primary);
-            color: var(--white);
-            border-color: var(--primary);
-        }
-
-        /* Tables */
-        .table-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: var(--shadow-md);
-            animation: fadeInUp 0.7s ease;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-
-        thead th {
-            text-align: left;
-            padding: 12px;
-            color: var(--gray);
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        tbody tr {
-            background: var(--light);
-            transition: var(--transition);
-        }
-
-        tbody tr:hover {
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            transform: scale(1.02);
-        }
-
-        tbody td {
-            padding: 15px 12px;
-        }
-
-        tbody td:first-child {
-            border-radius: 10px 0 0 10px;
-        }
-
-        tbody td:last-child {
-            border-radius: 0 10px 10px 0;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-badge.pending {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
-        }
-
-        .status-badge.approved {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--secondary);
-        }
-
-        .status-badge.rejected {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        /* Push Notification Stats */
-        .push-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
-            border-radius: 15px;
-        }
-
-        .push-stat-item {
-            text-align: center;
-            padding: 15px;
-            background: var(--white);
-            border-radius: 12px;
-            transition: var(--transition);
-        }
-
-        .push-stat-item:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .push-stat-label {
-            font-size: 12px;
-            color: var(--gray);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .push-stat-value {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Animations */
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--light);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            transition: width 1s ease;
-            animation: progressAnimation 2s ease;
-        }
-
-        @keyframes progressAnimation {
-            from { width: 0; }
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <title>관리자 메인</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/adm-layout.css}" />
+    <link rel="stylesheet" th:href="@{/admin/css/dashboard.css}" />
+    
 </head>
+<style>
+	:root { --fg:#111; --muted:#666; --border:#e8e8e8; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple SD Gothic Neo, Noto Sans KR, sans-serif; margin: 0; color: var(--fg); background: #fafafa; }
+    header { padding: 20px 16px; border-bottom:1px solid var(--border); background:white; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .wrap { padding: 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); grid-template-rows: 100%; }
+    .card { background:white; border:1px solid var(--border); border-radius:12px; padding:16px; box-shadow: 0 1px 2px rgba(0,0,0,.03);}
+    .title { font-weight: 700; margin: 0 0 8px; font-size: 13px; }
+    .meta { color: var(--muted); font-size: 10px; margin-bottom: 12px; }
+    .row { display:flex; gap:8px; align-items:center; justify-content:space-between; font-size: 13px; color:var(--muted); margin-top:10px; }
+    .err { color:#b00020; background:#fff3f3; border:1px solid #ffd6d6; padding:10px; border-radius:8px; }
+    .card canvas {
+	  width: 50% !important;
+	  height: 70% !important;
+   	  margin: auto; 
+	}
+    footer { padding: 10px 16px 24px; color: var(--muted); font-size: 12px; }
+	
+	.d-flex { display:flex; }
+	.w_100p { width : 100% !important; }
+	.border_detail { border:1px solid var(--border); border-radius:12px; background: white; box-shadow: 0 1px 2px rgba(0,0,0,.03); padding: 10px; margin: 10px 0; }
+	.border_detail2{
+	border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+    padding: 5px 10px 0 10px;
+	}
+	.content { min-height: 100vh; }
+	.blockLeft { display : block; width : 70% !important; height : 100% !important; }
+	.bounceRateDiv { justify-content: space-between;}
+	.bounceRatioDetailDiv { width : 33%; height : 100% !important; }
+	.bounceRatioCanvas { width : 45%; height : 65%; }
+	.enrollTrendDiv { height : 45% !important; }
+	  /* ✅ 하단 두 카드(일일 방문자 / 리뷰) 영역: 고정높이 제거 + 간격 추가 */
+	  .bottomDiv { height: auto !important; justify-content: space-between; gap: 16px; align-items: stretch; }
+	
+	  .dailyVisitorDiv { width : 45% !important; }
+	
+	 /* ✅ 리뷰 카드 리레이아웃 */
+	  .reviewDiv { width:25% !important; }
+	  .reviewDiv.border_detail { padding:14px; }
+	  /* 차트(좌) | 텍스트(우) */
+	  .review-wrap { /*display:grid; grid-template-columns: 220px 1fr;*/ column-gap:16px; align-items:center; width:100%; }
+	  /* 캔버스 기본 크기 — JS에서 픽셀도 맞춤 */
+	  .review-chart canvas { width:250px !important; height:250px !important; margin: auto ; }
+	
+	  .review-text { display:flex; flex-direction:column; gap:6px; min-width:0; align-items:center; }
+	  .review-title { font-weight:700; font-size:14px; color:#111; }
+	  .review-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#6b7280; }
+	  .review-list li { display:flex; align-items:center; gap:8px; }
+	  .review-swatch { width:12px; height:12px; border-radius:3px; display:inline-block; }
+	  .review-pos { color:#16a34a; font-weight:700; }
+	  .review-neg { color:#ef4444; font-weight:700; }
+	
+	
+	.blockRight {display:block; width:30%; margin-left:10px; height: 100%; }
+	.confirmDiv{height:30%!important;}
+	.fcmDiv {height:26%!important;}
+	
+	/* ✅ 상품 Top5 카드 전용 (충돌 방지) */
+	.productTop5Card { }
+	.productTop5Card h2 { font-size:14px; font-weight:700; color:#111; margin:0 0 8px; }
+	#adm-product-top5-canvas { width:100% !important; height:260px !important; display:block; }
+
+	.calendar {width : 30%!important;}
+	.calendar-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+	.calendar-header h2 { margin: 0; font-size: 18px; font-weight: bold; }
+    .calendar-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; }
+    .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 12px; font-weight: bold; color: #999; margin-bottom: 8px; }
+  	.calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 4px; }
+  	.calendar-days div { width: 38px; height: 38px; display: flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 50%; transition: background 0.3s, color 0.3s;}
+  	.calendar-days div:hover { background: #f5f5f5; }
+  	.today { background: #ff5722; color: #fff !important; font-weight: bold; }
+  	.other-month { color: #ccc; }
+    /* FCM List */
+  	#pub-fcm { padding: 8px 0 0 0; }
+	#pub-fcm .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:14px; }
+	#tpl-list { list-style:none; padding:0; margin:0; }
+	#tpl-list .tpl-item { padding:12px 14px; border:1px solid #e5e7eb; border-radius:10px; background:#fff; margin-bottom:8px; }
+	#tpl-list .tpl-title { font-size:12px; font-weight:600; color:#6b7280; }
+	#tpl-list .tpl-body { font-size:15px; font-weight:700; line-height:1.5; margin:6px 0 4px; word-break:break-word; }
+	#tpl-list .tpl-meta { font-size:12px; color:#6b7280; }
+	#tpl-list .tpl-meta span + span::before { content:"·"; margin:0 6px; color:#d1d5db; }
+	
+	/* KPI 카드 */
+  .adm-kpis .adm-card.kpi {
+    display: flex; flex-direction: column; justify-content: center; gap: 6px;
+    padding: 16px 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.04); min-height: 96px;
+  }
+  .adm-kpis .kpi-label { font-size: 12px; color: #6b7280; letter-spacing: .2px; }
+  .adm-kpis .kpi-value { font-size: 28px; font-weight: 700; line-height: 1; }
+  .adm-kpis .kpi-sub   { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 6px; }
+  .adm-kpis .kpi-sub .trend.up   { color:#16a34a; }
+  .adm-kpis .kpi-sub .trend.down { color:#ef4444; }
+  .adm-kpis .kpi-sub .trend.flat { color:#6b7280; }
+
+  /* Step 이탈율 텍스트 + 가로 배치 */
+  .review-wrap { /*position: relative; display:flex;*/ align-items:center; gap:14px; padding:12px; }
+  .review-chart{ margin: auto; }
+  
+  .bounceRatioDetailDiv .bounceRatioCanvas { width:140px; height:140px; margin:0; flex:0 0 auto; }
+  .bounceRatioDetailDiv .bounceRatioText { margin:0; display:flex; flex-direction:column; gap:4px; flex:1 1 auto; min-width:0; }
+  .bounceRatioText .headline { font-size:13px; font-weight:700; color:#111; }
+  .bounceRatioText .headline .drop { color:#ef4444; font-weight:700; }
+  .bounceRatioText .headline .step-name { color:#6b7280; font-weight:600; }
+  .bounceRatioText .meta { font-size:12px; color:#6b7280; }
+  .bounceRatioText .keep { color:#16a34a; font-weight:700; }
+	
+	
+	/*-----------------*/
+	/* ===== 공통 톤: 카드 헤더, 리스트 아이템 스케일 맞추기 ===== */
+
+	/* 카드 헤더 정렬/타이포 */
+	.border_detail.confirmDiv h2,
+	#pub-fcm .head span:first-child {
+	  font-size: 14px;
+	  font-weight: 700;
+	  color: #111;
+	}
+	#pub-fcm .head {                 /* FCM 헤더를 결재목록 h2와 비슷하게 */
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  margin-bottom: 10px !important;
+	  padding: 0;
+	  font-size: 14px;
+	}
+	#pub-fcm .head span:last-child { /* (0건) 카운터는 서브톤 */
+	  font-size: 12px;
+	  color: #6b7280;
+	  font-weight: 400;
+	}
+	
+	/* 리스트 아이템 카드화 (FCM과 동일한 박스 스케일) */
+	.border_detail.confirmDiv > div {
+	  margin-top: 8px !important;       /* 기존 inline 15px → 8px */
+	  padding: 12px 14px !important;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 10px;
+	  background: #fff;
+	}
+	
+	/* 날짜 라인 (서브톤) */
+	.border_detail.confirmDiv > div > div:first-child {
+	  font-size: 12px !important;
+	  color: #6b7280;
+	  margin-bottom: 6px !important;
+	}
+	
+	/* 본문 1줄 레이아웃: 파이프(|) 숨기고, 칩/이름/제목 정돈 */
+	.border_detail.confirmDiv .d-flex {
+	  display: flex;
+	  align-items: center;
+	  gap: 10px;
+	  /* 텍스트 노드(파이프 “|”) 숨기기 트릭 */
+	  font-size: 0;                     /* 부모 0 → 파이프 안 보임 */
+	}
+	.border_detail.confirmDiv .d-flex > div {
+	  font-size: 13px !important;       /* 자식만 원래 크기 복구 */
+	  line-height: 1.4;
+	  color: #111;
+	}
+	
+	/* 상태 배지(미결재/반려/상신) – 중립 칩 톤 */
+	.border_detail.confirmDiv .d-flex > div:first-child {
+	  flex: 0 0 auto !important;
+	  width: auto !important;           /* inline width 무시 */
+	  padding: 2px 8px;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 9999px;
+	  background: #f8fafc;
+	  color: #374151;
+	  font-weight: 700;
+	}
+	
+	/* 이름 */
+	.border_detail.confirmDiv .d-flex > div:nth-child(2) {
+	  flex: 0 0 auto !important;
+	  width: auto !important;           /* inline width 무시 */
+	  color: #6b7280;
+	}
+	
+	/* 제목(우측 가변) */
+	.border_detail.confirmDiv .d-flex > div:nth-child(3) {
+	  flex: 1 1 auto !important;
+	  width: auto !important;           /* inline width 무시 */
+	  min-width: 0;
+	  white-space: nowrap;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	}
+	
+	/* FCM 리스트 아이템도 동일 스케일 유지(이미 유사하지만 확실히 고정) */
+	#tpl-list { list-style: none; padding: 0; margin: 0; }
+	#tpl-list .tpl-item {
+	  padding: 12px 14px;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 10px;
+	  background: #fff;
+	  margin-bottom: 8px;
+	}
+	#tpl-list .tpl-title { font-size: 12px; font-weight: 600; color: #6b7280; }
+	#tpl-list .tpl-body  { font-size: 15px; font-weight: 700; line-height: 1.5; margin: 6px 0 4px; word-break: break-word; }
+	#tpl-list .tpl-meta  { font-size: 12px; color: #6b7280; }
+	#tpl-list .tpl-meta span + span::before { content: "·"; margin: 0 6px; color: #d1d5db; }
+	
+	/* Step 이탈율: 차트(좌) + 텍스트(우) */
+	.bounceRatioDetailDiv{
+	  display:flex;              /* ← 이 한 줄이 핵심 */
+	  align-items:center;
+	  gap:14px;
+	  padding:12px;
+	}
+	
+	.bounceRatioDetailDiv .bounceRatioCanvas{
+	  flex:0 0 auto;
+	  width:140px;               /* 필요시 120~160px 조절 */
+	  height:140px;
+	  margin:0;
+	}
+	
+	.bounceRatioDetailDiv .bounceRatioText{
+	  flex:1 1 auto;
+	  min-width:0;
+	  display:flex;
+	  flex-direction:column;
+	  gap:4px;
+	  margin:0;                  /* 세로 배치 때 쓰던 여백 제거 */
+	}
+									
+</style>
+<script>
+	var arrDailyVisitorData = [];
+	var arrDailyVisitorLabel = [];
+	
+	window.onload = function() {
+		setDataBounceRatio();
+		setDataDailyVisitor();
+	}
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/admin/sidebar.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <body>
-    <!-- Sidebar Toggle Button -->
-    <button class="sidebar-toggle" id="sidebarToggle">
-        <i class="fas fa-bars"></i>
-    </button>
 
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h2>BNK Admin</h2>
-            <p style="opacity: 0.8; font-size: 14px;">관리자 대시보드</p>
-        </div>
-        <div class="sidebar-menu">
-            <div class="sidebar-menu-item active">
-                <i class="fas fa-home"></i>
-                <span>대시보드</span>
-            </div>
-            <div class="sidebar-menu-item">
-                <i class="fas fa-users"></i>
-                <span>사용자 관리</span>
-            </div>
-            <div class="sidebar-menu-item">
-                <i class="fas fa-chart-line"></i>
-                <span>분석 리포트</span>
-            </div>
-            <div class="sidebar-menu-item">
-                <i class="fas fa-bell"></i>
-                <span>푸시 알림</span>
-            </div>
-            <div class="sidebar-menu-item">
-                <i class="fas fa-file-alt"></i>
-                <span>결재 관리</span>
-            </div>
-            <div class="sidebar-menu-item">
-                <i class="fas fa-cog"></i>
-                <span>설정</span>
-            </div>
-        </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="main-content" id="mainContent">
-        <!-- Header -->
-        <div class="header">
-            <h1>Dashboard Overview</h1>
-            <div class="header-info">
-                <div class="date-time" id="dateTime">2025년 8월 25일 월요일</div>
-            </div>
-        </div>
+    <!-- 공통 헤더 -->
+    <!-- <div th:replace="admin/fragments/header :: header" class="header"></div> -->
+	
+    <div id="body" class="adm-layout">
+		<!-- 토글 버튼(페이지 아무 곳에나, 보통 상단 고정) -->
+		<button id="adm-sidebar-toggle" aria-label="사이드바 접기/펼치기" aria-expanded="true" title="메뉴">
+		  <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+		</button>
+	
+          <!-- 사이드바 -->
+		  <aside class="adm-sidebar">
+		    <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+		  </aside>
+		  
+        <!-- 본문 -->
+        <main class="adm-content">
+	        <div class="content d-flex w_100p">
+	            
+	            <div class="blockLeft">
+	            	<div class="bounceRateDiv d-flex w_100p">
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_1" class="bounceRatioCanvas"></canvas></div>
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_2" class="bounceRatioCanvas"></canvas></div>
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_3" class="bounceRatioCanvas"></canvas></div>
+	            	</div>
+	            	<!-- KPI 4개 -->
+					<div class="adm-kpis">
+					  <div class="adm-card adm-card--short kpi" id="kpi-today">
+					    <div class="kpi-label">금일 방문자 수</div>
+					    <div class="kpi-value" id="kpiTodayVisitors">—</div>
+					    <div class="kpi-sub" id="kpiTodayVisitorsSub">어제 대비 —</div>
+					  </div>
+					
+					  <div class="adm-card adm-card--short kpi">
+					    <div class="kpi-label">푸시 알림 클릭율</div>
+					    <div class="kpi-value"><span id="kpiPushCtr">72</span>%</div>
+					    <!-- <div class="kpi-trend"><i id="kpiPushCtrBar"></i></div> -->
+					    <div class="kpi-sub">최근 캠페인 평균</div>
+					  </div>	
+					
+					  <div class="adm-card adm-card--short kpi">
+					    <div class="kpi-label"><span id="kpiEnrollLabel">최근 7일 가입</span></div>
+					    <div class="kpi-value" id="kpiEnrollCount">66</div>
+					    <div class="kpi-sub" id="kpiEnrollSub">전 기간 대비 —</div>
+					  </div>
+					
+					  <div class="adm-card adm-card--short kpi">
+					    <div class="kpi-label">활성 FCM 템플릿</div>
+					    <div class="kpi-value" id="kpiActiveTpl">2</div>
+					    <div class="kpi-sub" id="kpiActiveTplSub">자동 발송 설정</div>
+					  </div>
+					</div>
+						            	
+	            	<div class="enrollTrendDiv border_detail w_100p">
+	            		<canvas id="enrollLineChart"></canvas>
+	            	</div>
+	            	<div class="bottomDiv d-flex w_100p">
+		            	<div class="dailyVisitorDiv border_detail">
+	            			<canvas id="dailyVisitorCanvas" class="w_100p"></canvas>
+			           	</div>
+			           	
+			           	<!-- ✅ 리뷰 카드 (그리드 레이아웃) -->
+			            <div class="reviewDiv border_detail">
+			              <div class="review-wrap">
+			                <div class="review-chart">
+			                  <canvas id="reviewCanvas"></canvas>
+			                </div>
+			                <div class="review-text">
+			                  <div class="review-title">리뷰 긍정/부정 비율</div>
+			                  <ul class="review-list">
+			                    <li>
+			                      <span class="review-swatch" style="background:#f87171"></span>
+			                      긍정 <span id="reviewPosPct" class="review-pos">—%</span>
+			                    </li>
+			                    <li>
+			                      <span class="review-swatch" style="background:#e5e7eb"></span>
+			                      부정 <span id="reviewNegPct" class="review-neg">—%</span>
+			                    </li>
+			                  </ul>
+			                </div>
+			              </div>
+			            </div>
+			            <div class="border_detail calendar">
+			            	<div class="calendar-header">
+								<button id="prev">&#10094;</button>
+							  	<h2 id="monthYear"></h2>
+							  	<button id="next">&#10095;</button>
+							</div>
+							<div class="calendar-weekdays">
+							  	<div>MON</div><div>TUE</div><div>WED</div>
+							  	<div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+							</div>
+							<div class="calendar-days" id="calendarDays"></div>
+			            </div>
+	            	</div>
+	            </div>
+	            <div class="blockRight">
+		            <div class="border_detail confirmDiv">
+		            	<h2>결재목록</h2>
+		            	<div style="margin-top:15px;">
+		            		<div style="font-size:12px;">2025.08.22 12:22:45</div>
+		            		<div class="d-flex">
+		            			<div style="width:15%">반려</div>|
+		            			<div style="width:15%">관리자</div>|
+		            			<div style="width:70%">[긴급]부산은행 로고디자인 변경 결재요청</div>
+		            		</div>
+		            	</div>
+		            	<div style="margin-top:15px;">
+		            		<div style="font-size:12px;">2025.08.14 13:33:14</div>
+		            		<div class="d-flex">
+		            			<div style="width:15%">승인</div>|
+		            			<div style="width:15%">김법진</div>|
+		            			<div style="width:70%">광복 80주년 기념 특별 이벤트 행사 주최 결재요청</div>
+		            		</div>
+		            	</div>
+		            	<div style="margin-top:15px;">
+		            		<div style="font-size:12px;">2025.08.25 09:54:</div>
+		            		<div class="d-flex">
+		            			<div style="width:15%">대기</div>|
+		            			<div style="width:15%">김법진</div>|
+		            			<div style="width:70%">관리자 대시보드 색상 및 디자인 수정요청</div>
+		            		</div>
+		            	</div>
+		            </div>
+		            <div class="border_detail2 fcmDiv">
+		            	<div id="pub-fcm">
+						  <div class="head">
+						    <span>활성 템플릿</span>
+						    <span id="tpl-count">(0건)</span>
+						  </div>
+						
+						  <ul id="tpl-list"></ul>
+						
+						  <div id="tpl-empty" style="display:none">활성 템플릿이 없습니다.</div>
+						</div>
+		            </div>
+		            <div class="product_top5">
+		            </div>
+	            </div>
+	        </div>
+        </main>
+    </div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <!-- Today's Visitors -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title">금일 방문자</span>
-                    <div class="stat-icon primary">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-                <div class="stat-value">
-                    12,486
-                    <span class="stat-change up">
-                        <i class="fas fa-arrow-up"></i>
-                        12.5%
-                    </span>
-                </div>
-                <div class="stat-footer">
-                    어제 대비 <strong>+1,382명</strong> 증가
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 78%"></div>
-                </div>
-            </div>
+<script>
+	//json parse
+	async function fetchNdjson(url) {
+	  const res = await fetch(url, { cache: 'no-cache' });
+	  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+	  const text = await res.text();
+	  return text.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+	}
+	// ✅ JSON 배열 또는 NDJSON 모두 허용하는 유틸
+	async function fetchJsonFlexible(url){
+	  const res = await fetch(url, {cache:'no-cache'});
+	  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+	  const txt = await res.text();
+	  try{
+	    const j = JSON.parse(txt);
+	    return Array.isArray(j) ? j : [j];
+	  }catch(_){
+	    return txt.trim().split('\n').filter(Boolean).map(JSON.parse);
+	  }
+	}
+		
+    // 이탈율 - 도넛차트
+    const base = 'https://storage.googleapis.com/bnk-analytics-static/charts/step_drop_rates/latest-000000000000.ndjson';
+	const NDJSON_URL = `${base}?nocache=${Date.now()}`;
+	
+	// 이탈율 데이터 가져오기
+	async function setDataBounceRatio() {
+	  try {
+	    var arrBounceRatio = await fetchNdjson(NDJSON_URL);
+	    for (var i = 0; i < arrBounceRatio.length; i++) {
+	      setBounceRatioChart((i + 1), arrBounceRatio[i]);   // 기존
+	      setBounceRatioText((i + 1), arrBounceRatio[i]);    // ★ 추가: 텍스트 생성
+	    }
+	  } catch (err) {
+	    console.log("err");
+	  }
+	}
+	
+	// 이탈율 차트 그리기
+	function setBounceRatioChart(idx, arr) {
+		var ctx = document.getElementById('bounceRate_' + idx);
+		var myChart = new Chart(ctx, {
+			type : 'doughnut',
+			data : {
+				labels : ['이탈', '유지'],
+				datasets : [
+					{
+						data : [arr["drop_rate_pct"], 100 - arr["drop_rate_pct"]],
+						backgroundColor: ['#e5e7eb', '#f87171'], 
+						borderWidth: 0,
+						radius: '95%',
+				        cutout: '70%',
+				        rotation: -90 * Math.PI / 180,
+				        borderRadius: 30
+					}
+				]
+			},
+			options : {
+				responsive : false,
+				maintainAspectRatio : false,
+				animation: { duration: 800 },
+			},
+			plugins: [baseRingPlugin]
+		});
+	}
+	
+	// 도넛차트 겹치기
+	const baseRingPlugin = {
+	    id: 'baseRing',
+	    beforeDatasetsDraw(chart, args, pluginOpts) {
+	      const meta = chart.getDatasetMeta(0);   // 첫 데이터셋의 지오메트리
+	      if (!meta?.data?.length) return;
+	      const arc = meta.data[0];               // 첫 번째 호(arc)에서 중심/반지름 참조
+	      const ctx = chart.ctx;
 
-            <!-- Push Click Rate -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title">푸시 알림 클릭율</span>
-                    <div class="stat-icon success">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                </div>
-                <div class="stat-value">
-                    68.4%
-                    <span class="stat-change up">
-                        <i class="fas fa-arrow-up"></i>
-                        5.2%
-                    </span>
-                </div>
-                <div class="push-stats">
-                    <div class="push-stat-item">
-                        <div class="push-stat-label">발송</div>
-                        <div class="push-stat-value">24.5K</div>
-                    </div>
-                    <div class="push-stat-item">
-                        <div class="push-stat-label">도달</div>
-                        <div class="push-stat-value">23.8K</div>
-                    </div>
-                    <div class="push-stat-item">
-                        <div class="push-stat-label">클릭</div>
-                        <div class="push-stat-value">16.3K</div>
-                    </div>
-                </div>
-            </div>
+	      ctx.save();
+	      ctx.fillStyle = '#e5e7eb';              // 베이스 링 색상
+	      ctx.beginPath();
+	      // 외곽 원 (시계 방향)
+	      ctx.arc(arc.x, arc.y, arc.outerRadius, 0, Math.PI * 2);
+	      // 내곽 원 (반시계 방향) — 도넛 속을 파냄
+	      ctx.arc(arc.x, arc.y, arc.innerRadius, Math.PI * 2, 0, true);
+	      ctx.closePath();
+	      ctx.fill();
+	      ctx.restore();
+	    }
+	};
+	
+	/* Step 이탈율 텍스트 생성 */
+	function setBounceRatioText(idx, row) {
+	  const canvas = document.getElementById('bounceRate_' + idx);
+	  if (!canvas) return;
+	  const box = canvas.parentElement;
+	
+	  // 컨테이너 준비
+	  let wrap = box.querySelector('.bounceRatioText');
+	  if (!wrap) {
+	    wrap = document.createElement('div');
+	    wrap.className = 'bounceRatioText';
+	    box.appendChild(wrap);
+	  }
+	  wrap.textContent = ''; // 초기화
+	
+	  // 안전 파싱
+	  const stepIndex = String(row.step_index ?? idx);
+	  const stepName  = String(row.step_name ?? '');
+	  const dropPct   = Number(row.drop_rate_pct ?? row.value ?? 0);
+	  const keepPct   = Number(row.conv_rate_pct ?? (100 - dropPct));
+	
+	  // 1) 헤드라인: "Step 1. 이탈율 21.9% (약관동의)"
+	  const head = document.createElement('div');
+	  head.className = 'headline';
+	  const s1 = document.createElement('span');
+	  s1.textContent = `Step ${stepIndex}. `;
+	  const s2 = document.createElement('span');
+	  s2.className = 'drop';
+	  s2.textContent = `이탈율 ${dropPct.toFixed(1)}%`;
+	  const s3 = document.createElement('span');
+	  s3.className = 'step-name';
+	  s3.textContent = ` (${stepName})`;
+	  head.appendChild(s1); head.appendChild(s2); head.appendChild(s3);
+	
+	  // 2) 유지율: "유지율 78.1%"
+	  const meta2 = document.createElement('div');
+	  meta2.className = 'meta';
+	  const keepLabel = document.createElement('span');
+	  keepLabel.textContent = '유지율 ';
+	  const keepVal = document.createElement('span');
+	  keepVal.className = 'keep';
+	  keepVal.textContent = `${keepPct.toFixed(1)}%`;
+	  meta2.appendChild(keepLabel); 
+	  meta2.appendChild(keepVal);
+	
+	  wrap.appendChild(head);
+	  wrap.appendChild(meta2);
+	}
+	
+	
+    
+    // 상품가입추세 - 라인차트
+  	var ctx = document.getElementById('enrollLineChart');
+	var myChart = new Chart(ctx, {
+		type : 'line',
+		data : {
+			labels : ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+			datasets : [{
+				label : '상품가입추세',
+				data : [510,200,350,40,500,62,721,822,955,100,111,12],
+				fill : true,
+				tension: 0.4,
+				borderColor : '#FF9595',
+				backgroundColor : areaGradient
+			}]
+		},
+		options : {
+			responsive : true,
+			maintainAspectRatio : false,
+			devicePixelRatio: 2,
+			scales : {
+				x : { grid : { drawOnChartArea: false } },
+				y : {
+					min : 0,
+					beginAtZero : true,
+					grid : { drawOnChartArea: false }
+				}
+			}
+		
+		}
+	});
+	
+	//
+	function areaGradient(context) {
+	  const {chart} = context;
+	  const {ctx, chartArea} = chart;
+	  if (!chartArea) return 'rgba(179,107,255,0)'; // 초기 렌더 보호
+	  const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+	  g.addColorStop(0, 'rgba(255,167,167,0.1)');   // 아래쪽 투명
+	  g.addColorStop(1, 'rgba(255,167,167,0.75)'); // 위쪽 연보라
+	  return g;
+	}
+	// 일일방문자수 - 막대차트
+    var dailyBase = "https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun";
+	var dailyUrl = `${dailyBase}?nocache=${Date.now()}`;
+	
+	
+	async function setDataDailyVisitor() {
+		try{
+			var arrDailyVisitor = await fetchNdjson(dailyUrl);
+			for(var i=0; i<arrDailyVisitor.length; i++) {
+			 	arrDailyVisitorLabel.push(arrDailyVisitor[i]["event_date"]);
+			 	arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["user_count"]));
+			}
+			
+		} catch (err) {
+			console.log("err");
+		}
+		
+		setDailyVisitorChart(arrDailyVisitorLabel, arrDailyVisitorData);
+	}
+	
+	// 일일방문자수 차트 그리기
+	function setDailyVisitorChart(dailyLabel, dailyData) {
+		var ctx2 = document.getElementById('dailyVisitorCanvas');
+		var myChart2 = new Chart(ctx2, {
+			type : 'bar',
+			data : {
+				labels : dailyLabel,
+				datasets : [{
+					label : '일일방문자수',
+					data : dailyData,
+					backgroundColor:'#FF9595',
+					borderRadius : 10
+				}]
+			},
+			options : {
+				responsive : true,
+				maintainAspectRatio : false,
+				devicePixelRatio: 2,
+				scales : {
+					x : { grid : { drawOnChartArea: false} },
+					y : {
+						beginAtZero : true
+					}
+				}
+			}
+		});
+	}
+	
+	
+	// 반원 베이스링 플러그인
+	const baseHalfRingPlugin = {
+	    id: 'baseHalfRing',
+	    beforeDraw(chart) {
+	      const meta = chart.getDatasetMeta(0);
+	      if (!meta?.data?.length) return;
+	      const arc = meta.data[0], ctx = chart.ctx;
+	      ctx.save();
+	      ctx.fillStyle = '#e5e7eb';
+	      ctx.beginPath();
+	      ctx.arc(arc.x, arc.y, arc.outerRadius, -Math.PI, 0);
+	      ctx.arc(arc.x, arc.y, arc.innerRadius, 0, -Math.PI, true);
+	      ctx.closePath();
+	      ctx.fill();
+	      ctx.restore();
+	    }
+	  };
+	
+	// 리뷰 - 도넛차트
+	(function () {
+    const canvas = document.getElementById('reviewCanvas');
+    const posEl = document.getElementById('reviewPosPct');
+    const negEl = document.getElementById('reviewNegPct');
 
-            <!-- Active Users -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title">실시간 접속자</span>
-                    <div class="stat-icon warning">
-                        <i class="fas fa-circle"></i>
-                    </div>
-                </div>
-                <div class="stat-value">
-                    1,842
-                    <small>users</small>
-                </div>
-                <div class="stat-footer">
-                    최근 5분간 활동 사용자
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 45%"></div>
-                </div>
-            </div>
+    const POS = 67.1;               // 긍정 %
+    const NEG = 100 - POS;          // 부정 %
+    const COLORS = ['#f87171', '#e5e7eb'];
 
-            <!-- Bounce Rate -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title">이탈율</span>
-                    <div class="stat-icon danger">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </div>
-                </div>
-                <div class="stat-value">
-                    29.1%
-                    <span class="stat-change down">
-                        <i class="fas fa-arrow-down"></i>
-                        3.1%
-                    </span>
-                </div>
-                <div class="stat-footer">
-                    지난주 대비 개선됨
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 29.1%"></div>
-                </div>
-            </div>
-        </div>
+    // 픽셀 크기 선택
+    function pickSize() {
+      const w = window.innerWidth;
+      if (w >= 1200) return 220;
+      if (w >= 960)  return 200;
+      if (w >= 640)  return 180;
+      return 150;
+    }
+    let SIZE = pickSize();
+    // CSS와 일치하도록 실제 픽셀 지정
+    canvas.width = SIZE; canvas.height = SIZE;
+    canvas.style.width  = SIZE + 'px';
+    canvas.style.height = SIZE + 'px';
 
-        <!-- Charts Container -->
-        <div class="charts-container">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">상품 가입 추세</h3>
-                    <div class="chart-options">
-                        <button class="chart-option active">일간</button>
-                        <button class="chart-option">주간</button>
-                        <button class="chart-option">월간</button>
-                    </div>
-                </div>
-                <canvas id="enrollChart" height="100"></canvas>
-            </div>
+    const chart = new Chart(canvas, {
+      type: 'doughnut',
+      data: { labels:['긍정','부정'], datasets:[{ data:[POS,NEG], backgroundColor:COLORS, borderRadius:10, radius:'95%', cutout:'70%' }] },
+      options: { responsive:false, maintainAspectRatio:false, rotation:-90, circumference:180, plugins:{ legend:{ display:false } } },
+     /*  plugins: [baseHalfRingPlugin] */
+    });
 
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">리뷰 분석</h3>
-                </div>
-                <canvas id="reviewChart" height="100"></canvas>
-            </div>
-        </div>
+    if (posEl) posEl.textContent = `${POS.toFixed(1)}%`;
+    if (negEl) negEl.textContent = `${NEG.toFixed(1)}%`;
 
-        <!-- Tables -->
-        <div class="table-container">
-            <div class="table-header">
-                <h3 class="chart-title">최근 결재 목록</h3>
-                <button class="chart-option">전체보기</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>상태</th>
-                        <th>요청자</th>
-                        <th>제목</th>
-                        <th>요청일시</th>
-                        <th>액션</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="status-badge pending">대기중</span></td>
-                        <td>김법진</td>
-                        <td>부산은행 로고디자인 변경 결재요청</td>
-                        <td>2025.08.25 12:22:45</td>
-                        <td><button class="chart-option">상세보기</button></td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge rejected">반려</span></td>
-                        <td>이영희</td>
-                        <td>하계 휴가 결재요청</td>
-                        <td>2025.08.25 11:15:22</td>
-                        <td><button class="chart-option">상세보기</button></td>
-                    </tr>
-                    <tr>
-                        <td><span class="status-badge approved">승인</span></td>
-                        <td>박철수</td>
-                        <td>공문 올립니다</td>
-                        <td>2025.08.25 09:30:11</td>
-                        <td><button class="chart-option">상세보기</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
+    // 윈도우 크기 변할 때 재지정
+    window.addEventListener('resize', () => {
+      const s = pickSize();
+      if (s !== SIZE) {
+        SIZE = s;
+        canvas.width = SIZE; canvas.height = SIZE;
+        canvas.style.width  = SIZE + 'px';
+        canvas.style.height = SIZE + 'px';
+        chart.resize();
+      }
+    });
+  })();
+	
+	// FCM 목록
+	document.addEventListener('DOMContentLoaded', () => {
+		  const url   = '/admin/fcm/templates/active';
+		  const list  = document.getElementById('tpl-list');
+		  const count = document.getElementById('tpl-count');
+		  const empty = document.getElementById('tpl-empty');
+		
+		  fetch(url)
+		    .then(res => res.json())
+		    .then(items => {
+		      if (!items || items.length === 0) {
+		        count.textContent = '(0건)';
+		        empty.style.display = 'block';
+		        return;
+		      }
+		
+		      count.textContent = `(${items.length}건)`;
+		      list.innerHTML = items.map(t => `
+		        <li class="tpl-item">
+		          <div class="tpl-title">BNK Reframe</div>
+		          <div class="tpl-body">${t.body ?? ''}</div>
+		          <div class="tpl-meta">
+		            <span>[${t.groupCode ?? ''}]</span>
+		            <span>cron: ${t.cron || '-'}</span>
+		          </div>
+		        </li>
+		      `).join('');
+		    })
+		    .catch(() => {
+		      count.textContent = '(0건)';
+		      empty.style.display = 'block';
+		      empty.textContent = '불러오기 실패';
+		    });
+		});
+	// 달력
+	const monthYear = document.getElementById("monthYear");
+    const calendarDays = document.getElementById("calendarDays");
+	  const prevBtn = document.getElementById("prev");
+	  const nextBtn = document.getElementById("next");
+	
+	  let today = new Date();
+	  let currentMonth = today.getMonth();
+	  let currentYear = today.getFullYear();
+	
+	  function renderCalendar(month, year) {
+	    const monthNames = [
+	      "January","February","March","April","May","June",
+	      "July","August","September","October","November","December"
+	    ];
+	    monthYear.textContent = `${monthNames[month]}, ${year}`;
+	
+	    calendarDays.innerHTML = "";
+	
+	    // 첫 날 요일 (월요일 시작)
+	    let firstDay = new Date(year, month, 1).getDay();
+	    if (firstDay === 0) firstDay = 7; // Sunday → 7로 보정
+	    let daysInMonth = new Date(year, month+1, 0).getDate();
+	    let prevDays = new Date(year, month, 0).getDate();
+	
+	    // 지난 달
+	    for (let i = firstDay-1; i > 0; i--) {
+	      let div = document.createElement("div");
+	      div.classList.add("other-month");
+	      div.textContent = prevDays - i + 1;
+	      calendarDays.appendChild(div);
+	    }
+	
+	    // 이번 달
+	    for (let i = 1; i <= daysInMonth; i++) {
+	      let div = document.createElement("div");
+	      div.textContent = i;
+	      if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+	        div.classList.add("today");
+	      }
+	      calendarDays.appendChild(div);
+	    }
+	
+	    // 다음 달
+	    let totalCells = (firstDay-1) + daysInMonth;
+	    let nextDays = 42 - totalCells; // 6주 맞추기
+	    for (let i = 1; i <= nextDays; i++) {
+	      let div = document.createElement("div");
+	      div.classList.add("other-month");
+	      div.textContent = i;
+	      calendarDays.appendChild(div);
+	    }
+	  }
+	
+	  prevBtn.addEventListener("click", () => {
+	    currentMonth--;
+	    if (currentMonth < 0) {
+	      currentMonth = 11;
+	      currentYear--;
+	    }
+	    renderCalendar(currentMonth, currentYear);
+	  });
+	
+	  nextBtn.addEventListener("click", () => {
+	    currentMonth++;
+	    if (currentMonth > 11) {
+	      currentMonth = 0;
+	      currentYear++;
+	    }
+	    renderCalendar(currentMonth, currentYear);
+	  });
+	
+	  renderCalendar(currentMonth, currentYear);
+	  
+	  // 사이드바 닫힘
+	  document.addEventListener('DOMContentLoaded', function(){
+	    const layout = document.querySelector('.adm-layout');
+	    const btn    = document.getElementById('adm-sidebar-toggle');
+	    if (!layout || !btn) return;
+	
+	    const KEY = 'adm.sidebar.collapsed';
+	
+	    // 초기 상태 복원
+	    const isCollapsed = localStorage.getItem(KEY) === '1';
+	    if (isCollapsed) {
+	      layout.classList.add('adm-collapsed');
+	      btn.setAttribute('aria-expanded', 'false');
+	    }
+	
+	    // 클릭 토글
+	    btn.addEventListener('click', () => {
+	      const collapsedNow = layout.classList.toggle('adm-collapsed');
+	      btn.setAttribute('aria-expanded', String(!collapsedNow));
+	      localStorage.setItem(KEY, collapsedNow ? '1' : '0');
+	    });
+	  });
+	// 금일 방문자 수
+	  (function () {
+    const SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun';
+    const $label = document.querySelector('#kpi-today .kpi-label');
+    const $value = document.getElementById('kpiTodayVisitors');
+    const $sub   = document.getElementById('kpiTodayVisitorsSub');
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-    <script>
-        // Sidebar Toggle
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        const toggleIcon = sidebarToggle.querySelector('i');
-        
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            
-            // Change icon
-            if (sidebar.classList.contains('collapsed')) {
-                toggleIcon.classList.remove('fa-bars');
-                toggleIcon.classList.add('fa-arrow-right');
-            } else {
-                toggleIcon.classList.remove('fa-arrow-right');
-                toggleIcon.classList.add('fa-bars');
-            }
-        });
+    const ymd = (d)=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('');
+    const ymdDot = (d)=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('.');
+    const today = new Date(), yesterday = new Date(Date.now()-86400000);
 
-        // Update DateTime
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric', 
-                weekday: 'long',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            document.getElementById('dateTime').textContent = 
-                now.toLocaleDateString('ko-KR', options);
+    function render(rows){
+      const tKey = ymd(today), yKey = ymd(yesterday);
+      const tRow = rows.find(r=>String(r.event_date)===tKey);
+      const yRow = rows.find(r=>String(r.event_date)===yKey);
+      const tCnt = tRow ? (+tRow.user_count||0) : 0;
+      const yCnt = yRow ? (+yRow.user_count||0) : 0;
+      const diff = tCnt - yCnt;
+
+      if ($label) $label.textContent = `금일 방문자 수 (${ymdDot(today)})`;
+      if ($value) $value.textContent = tCnt.toLocaleString();
+
+      if ($sub) {
+        // "어제 대비 " + <span class="trend up|down|flat">…</span>
+        $sub.textContent = '';
+        const prefix = document.createElement('span');
+        prefix.textContent = '어제 대비 ';
+        const trend = document.createElement('span');
+
+        let dir = 'flat', arrow = '—', body = '—';
+        if (diff > 0) {
+          dir = 'up'; arrow = '▲';
+          // yCnt가 0이면 % 대신 수치만 표기
+          body = yCnt > 0 ? `${arrow} ${diff.toLocaleString()} (${((diff/yCnt)*100).toFixed(1)}%)`
+                          : `${arrow} ${diff.toLocaleString()}`;
+        } else if (diff < 0) {
+          dir = 'down'; arrow = '▼';
+          const abs = Math.abs(diff);
+          body = yCnt > 0 ? `${arrow} ${abs.toLocaleString()} (${((abs/yCnt)*100).toFixed(1)}%)`
+                          : `${arrow} ${abs.toLocaleString()}`;
         }
-        
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
+        trend.className = 'trend ' + dir;
+        trend.textContent = body;
 
-        // Chart.js Configuration
-        Chart.defaults.font.family = "'Segoe UI', system-ui, -apple-system, sans-serif";
-        
-        // Enrollment Trend Chart
-        const enrollCtx = document.getElementById('enrollChart').getContext('2d');
-        const enrollGradient = enrollCtx.createLinearGradient(0, 0, 0, 300);
-        enrollGradient.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
-        enrollGradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
-        
-        new Chart(enrollCtx, {
-            type: 'line',
-            data: {
-                labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월'],
-                datasets: [{
-                    label: '가입자 수',
-                    data: [510, 820, 1350, 1240, 1500, 1762, 2021, 2422],
-                    fill: true,
-                    backgroundColor: enrollGradient,
-                    borderColor: '#6366f1',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#6366f1',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 7,
-                    pointHoverBackgroundColor: '#6366f1',
-                    pointHoverBorderColor: '#fff',
-                    pointHoverBorderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        padding: 12,
-                        borderRadius: 8,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ' + context.parsed + '%';
-                            }
-                        } {
-                            label: function(context) {
-                                return '가입자: ' + context.parsed.y.toLocaleString() + '명';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#64748b'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(100, 116, 139, 0.1)'
-                        },
-                        ticks: {
-                            color: '#64748b',
-                            callback: function(value) {
-                                return value.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                animation: {
-                    duration: 2000,
-                    easing: 'easeInOutQuart'
-                }
-            }
-        });
+        $sub.appendChild(prefix);
+        $sub.appendChild(trend);
+      }
+    }
 
-        // Review Chart (Doughnut)
-        const reviewCtx = document.getElementById('reviewChart').getContext('2d');
-        new Chart(reviewCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['긍정', '부정', '중립'],
-                datasets: [{
-                    data: [68, 22, 10],
-                    backgroundColor: [
-                        '#10b981',
-                        '#ef4444',
-                        '#f59e0b'
-                    ],
-                    borderWidth: 0,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        padding: 12,
-                        borderRadius: 8,
-                        displayColors: false,
-                        callbacks:
+    // 차후 Controller 연동 시 이 함수로 그대로 주입 가능: window.updateTodayVisitors(serverRows)
+    window.updateTodayVisitors = render;
+
+    fetch(SRC,{cache:'no-cache'})
+      .then(r=>r.text())
+      .then(t=>{
+        // JSON 배열 또는 NDJSON 모두 허용
+        let rows; try{ rows = JSON.parse(t); }catch{ rows = t.trim().split('\n').filter(Boolean).map(JSON.parse); }
+        render(rows);
+      })
+      .catch(()=>{
+        if ($label) $label.textContent = '금일 방문자 수';
+        if ($value) $value.textContent = '—';
+        if ($sub)   $sub.textContent   = '데이터 오류';
+      });
+  })();
+	
+		// 7일 가입자 수 
+	  (function () {
+		  const $count = document.getElementById('kpiEnrollCount');
+		  const $sub   = document.getElementById('kpiEnrollSub');
+
+		  if (!$count || !$sub) return;
+
+		  fetch('/mobile/account/api/stats/signups/7d', { headers: { 'Accept': 'application/json' } })
+		    .then(res => res.ok ? res.json() : Promise.reject(res))
+		    .then(list => {
+		      if (!Array.isArray(list) || list.length === 0) return;
+
+		      // 7일 합계
+		      const total = list.reduce((sum, it) => sum + (Number(it.count) || 0), 0);
+		      $count.textContent = String(total);
+
+		      // 전일 대비 (마지막 일자 vs 그 전날)
+		      const last = Number(list[list.length - 1]?.count) || 0;
+		      const prev = Number(list[list.length - 2]?.count) || 0;
+
+		      $sub.textContent = ''; // 초기화
+
+		      const label = document.createElement('span');
+		      label.textContent = '전일 대비 ';
+
+		      const trend = document.createElement('span');
+		      if (prev > 0) {
+		        const diff = last - prev;
+		        const pct  = Math.abs((diff / prev) * 100);
+		        let dir = 'flat', arrow = '—';
+		        if (diff > 0) { dir = 'up';   arrow = '▲'; }
+		        if (diff < 0) { dir = 'down'; arrow = '▼'; }
+
+		        trend.className = 'trend ' + dir;
+		        trend.textContent = `${arrow} ${Math.abs(diff)} (${pct.toFixed(1)}%)`;
+		      } else {
+		        trend.className = 'trend flat';
+		        trend.textContent = '—';
+		      }
+
+		      $sub.appendChild(label);
+		      $sub.appendChild(trend);
+		    })
+		    .catch(() => { /* 실패 시 화면 침묵 (원하면 콘솔 로그 추가) */ });
+		})();
+		
+		// 7일 가입자 수 - 전월 대비 표시
+	  (function () {
+		  const subEl = document.getElementById('kpiEnrollSub');
+		  if (!subEl) return;
+
+		  // ===== 하드코딩 영역 (필요할 때 숫자/상태만 바꿔줘) =====
+		  const STATE = 'up';     // 'up' | 'down' | 'flat'
+		  const DIFF  = 12;       // 증감 수치 (정수)
+		  const PCT   = 18.2;     // 증감률(%)  소수 1자리까지만 표시됨
+		  // =======================================================
+
+		  // 초기화
+		  subEl.textContent = '';
+
+		  // "전일 대비 " 라벨
+		  const label = document.createElement('span');
+		  label.textContent = '전일 대비 ';
+		  subEl.appendChild(label);
+
+		  // 트렌드 값
+		  const trend = document.createElement('span');
+		  trend.className = 'trend ' + (STATE === 'up' ? 'up' : STATE === 'down' ? 'down' : 'flat');
+
+		  if (STATE === 'flat') {
+		    trend.textContent = '—';
+		  } else {
+		    const arrow = STATE === 'up' ? '▲' : '▼';
+		    trend.textContent = `${arrow} ${Math.abs(DIFF)} (${Math.abs(PCT).toFixed(1)}%)`;
+		  }
+
+		  subEl.appendChild(trend);
+		})();
+		
+	  // 푸시 알림 - 전월 대비 표시
+	  (function () {
+	    // ====== 하드코딩 전월 CTR(%) ======
+	    const PREV_MONTH_CTR = 65.3;  // ← 필요 시 숫자만 바꿔줘
+	    // =================================
+
+	    const currEl = document.getElementById('kpiPushCtr'); // 현재 CTR 숫자(span)
+	    if (!currEl) return;
+
+	    const curr = parseFloat((currEl.textContent || '').replace(',', '.')) || 0;
+	    const card = currEl.closest('.adm-card');
+	    const subEl = card ? card.querySelector('.kpi-sub') : null;
+	    if (!subEl) return;
+
+	    // 전월 대비 계산
+	    const diff = curr - PREV_MONTH_CTR;
+	    const dir  = diff === 0 ? 'flat' : (diff > 0 ? 'up' : 'down');
+	    const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '—';
+
+	    // 상대 변화율(%) – 전월 대비 증감률
+	    let body = '—';
+	    if (dir !== 'flat') {
+	      if (PREV_MONTH_CTR > 0) {
+	        const rel = Math.abs((diff / PREV_MONTH_CTR) * 100);
+	        body = `${arrow} ${rel.toFixed(1)}%`;
+	      } else {
+	        // 전월이 0%라면 상대비 교란 → 절대 차이로 표기
+	        body = `${arrow} ${Math.abs(diff).toFixed(1)}%`;
+	      }
+	    }
+
+	    // UI 업데이트 (XSS 안전: textContent)
+	    subEl.textContent = '';
+	    const prefix = document.createElement('span');
+	    prefix.textContent = '전월 대비 ';
+	    const trend = document.createElement('span');
+	    trend.className = 'trend ' + dir;  // up / down / flat → 색상 포인트
+	    trend.textContent = body;
+
+	    subEl.appendChild(prefix);
+	    subEl.appendChild(trend);
+	  })();
+
+
+  /* ===========================
+     ✅ 상품 조회수 TOP 5 (가로 막대)
+     =========================== */
+  (function(){
+    // ⛳️ 여기에 GCS 경로를 넣어주세요.
+    const PRODUCT_TOP5_SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/topviewproduct'; // ← 교체!
+
+    const host = document.querySelector('.product_top5');
+    if (!host) return;
+
+    // 카드/캔버스 구성
+    const card = document.createElement('div');
+    card.className = 'border_detail productTop5Card';
+    const title = document.createElement('h2');
+    title.textContent = '상품 조회수 TOP 5';
+    const canvas = document.createElement('canvas');
+    canvas.id = 'adm-product-top5-canvas';
+    card.appendChild(title);
+    card.appendChild(canvas);
+    host.appendChild(card);
+
+    function toArray(rows){
+      // 안전 정규화: {product_id, detail_views}
+      return rows.map(r => ({
+        product_id: String(r.product_id ?? r.productId ?? r.id ?? ''),
+        detail_views: Number(r.detail_views ?? r.detailView ?? r.views ?? r.count ?? 0)
+      })).filter(x => x.product_id !== '' && !Number.isNaN(x.detail_views));
+    }
+
+    function drawChart(top5){
+      const labels = top5.map(r => `ID ${r.product_id}`);
+      const data   = top5.map(r => r.detail_views);
+
+      new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: '상세조회수',
+            data,
+            backgroundColor: '#f87171',   // 파랑 계열(기존 핑크와 구분)
+            borderRadius: 8,
+            barThickness: 20
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: 2,
+          indexAxis: 'y',                 // ← 가로 막대
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { drawOnChartArea:false } },
+            y: { grid: { display:false } }
+          }
+        }
+      });
+    }
+
+    function showError(msg){
+      const err = document.createElement('div');
+      err.className = 'err';
+      err.textContent = msg || '상품 조회수 데이터를 불러오지 못했습니다.';
+      card.appendChild(err);
+    }
+
+    fetchJsonFlexible(`${PRODUCT_TOP5_SRC}?nocache=${Date.now()}`)
+      .then(rows => {
+        const arr = toArray(rows);
+        if (arr.length === 0) return showError('데이터가 없습니다.');
+        arr.sort((a,b) => b.detail_views - a.detail_views);
+        drawChart(arr.slice(0,5));
+      })
+      .catch(() => showError());
+  })();
+
+    </script>
+
+</body>
+</html>

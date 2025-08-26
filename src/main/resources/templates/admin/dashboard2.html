@@ -42,17 +42,17 @@
 	  /* ✅ 하단 두 카드(일일 방문자 / 리뷰) 영역: 고정높이 제거 + 간격 추가 */
 	  .bottomDiv { height: auto !important; justify-content: space-between; gap: 16px; align-items: stretch; }
 	
-	  .dailyVisitorDiv { width : 49% !important; }
+	  .dailyVisitorDiv { width : 45% !important; }
 	
 	 /* ✅ 리뷰 카드 리레이아웃 */
-	  .reviewDiv { width:49% !important; }
+	  .reviewDiv { width:25% !important; }
 	  .reviewDiv.border_detail { padding:14px; }
 	  /* 차트(좌) | 텍스트(우) */
-	  .review-wrap { display:grid; grid-template-columns: 220px 1fr; column-gap:16px; align-items:center; width:100%; }
+	  .review-wrap { /*display:grid; grid-template-columns: 220px 1fr;*/ column-gap:16px; align-items:center; width:100%; }
 	  /* 캔버스 기본 크기 — JS에서 픽셀도 맞춤 */
-	  .review-chart canvas { width:250px !important; height:250px !important; margin:0 !important; }
+	  .review-chart canvas { width:250px !important; height:250px !important; margin: auto ; }
 	
-	  .review-text { display:flex; flex-direction:column; gap:6px; min-width:0; margin-left: 100px; }
+	  .review-text { display:flex; flex-direction:column; gap:6px; min-width:0; align-items:center; }
 	  .review-title { font-weight:700; font-size:14px; color:#111; }
 	  .review-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#6b7280; }
 	  .review-list li { display:flex; align-items:center; gap:8px; }
@@ -65,7 +65,7 @@
 	.confirmDiv{height:30%!important;}
 	.fcmDiv {height:26%!important;}
 	
-	.calendar {height : 35%!important;}
+	.calendar {width : 30%!important;}
 	.calendar-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 	.calendar-header h2 { margin: 0; font-size: 18px; font-weight: bold; }
     .calendar-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; }
@@ -98,14 +98,16 @@
   .adm-kpis .kpi-sub .trend.flat { color:#6b7280; }
 
   /* Step 이탈율 텍스트 + 가로 배치 */
-  .review-wrap { position: relative; display:flex; align-items:center; gap:14px; padding:12px; }
+  .review-wrap { /*position: relative; display:flex;*/ align-items:center; gap:14px; padding:12px; }
+  .review-chart{ margin: auto; }
+  
   .bounceRatioDetailDiv .bounceRatioCanvas { width:140px; height:140px; margin:0; flex:0 0 auto; }
-  .bounceRatioDetailDiv .bounceRatioText { margin:0; display:flex; flex-direction:column; gap:4px; flex:1 1 auto; min-width:0; }
-  .bounceRatioText .headline { font-size:13px; font-weight:700; color:#111; }
-  .bounceRatioText .headline .drop { color:#ef4444; font-weight:700; }
-  .bounceRatioText .headline .step-name { color:#6b7280; font-weight:600; }
+  .bounceRatioDetailDiv .bounceRatioText { margin:0; display:flex; flex-direction:column; gap:4px; flex:1 1 auto; min-width:0;  font-size: 18px;}
+  .bounceRatioText .headline { font-size:13px; font-weight:700; color:#111; font-size: 18px; }
+  .bounceRatioText .headline .step-name { color:#6b7280; font-weight:700;  }
+  .bounceRatioText .headline .drop{ color:#ef4444; font-weight:600; }
   .bounceRatioText .meta { font-size:12px; color:#6b7280; }
-  .bounceRatioText .keep { color:#16a34a; font-weight:700; }
+  .bounceRatioText .keep { color:#6b7280; font-weight:700; }
 	
 	
 	/*-----------------*/
@@ -326,6 +328,18 @@
 			                </div>
 			              </div>
 			            </div>
+			            <div class="border_detail calendar">
+			            	<div class="calendar-header">
+								<button id="prev">&#10094;</button>
+							  	<h2 id="monthYear"></h2>
+							  	<button id="next">&#10095;</button>
+							</div>
+							<div class="calendar-weekdays">
+							  	<div>MON</div><div>TUE</div><div>WED</div>
+							  	<div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+							</div>
+							<div class="calendar-days" id="calendarDays"></div>
+			            </div>
 	            	</div>
 	            </div>
 	            <div class="blockRight">
@@ -368,18 +382,7 @@
 						  <div id="tpl-empty" style="display:none">활성 템플릿이 없습니다.</div>
 						</div>
 		            </div>
-		            
-		            <div class="border_detail calendar">
-		            	<div class="calendar-header">
-							<button id="prev">&#10094;</button>
-						  	<h2 id="monthYear"></h2>
-						  	<button id="next">&#10095;</button>
-						</div>
-						<div class="calendar-weekdays">
-						  	<div>MON</div><div>TUE</div><div>WED</div>
-						  	<div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
-						</div>
-						<div class="calendar-days" id="calendarDays"></div>
+		            <div class="product_top5">
 		            </div>
 	            </div>
 	        </div>
@@ -422,7 +425,7 @@
 				datasets : [
 					{
 						data : [arr["drop_rate_pct"], 100 - arr["drop_rate_pct"]],
-						backgroundColor: ['#e5e7eb', '#f87171'], 
+						backgroundColor: ['#f87171', '#e5e7eb'], 
 						borderWidth: 0,
 						radius: '95%',
 				        cutout: '70%',
@@ -488,13 +491,28 @@
 	  head.className = 'headline';
 	  const s1 = document.createElement('span');
 	  s1.textContent = `Step ${stepIndex}. `;
+	  
+	  const s2 = document.createElement('span');
+	  s2.className = 'step-name';
+	  s2.textContent = ` ${stepName}`;
+	  
+	  const s3 = document.createElement('div');
+	  s3.className = 'drop';
+	  s3.textContent = `이탈율 ${dropPct.toFixed(1)}%`;
+	  head.appendChild(s1); head.appendChild(s2); head.appendChild(s3);
+	  
+	  /* // 1) 헤드라인: "Step 1. 이탈율 21.9% (약관동의)"
+	  const head = document.createElement('div');
+	  head.className = 'headline';
+	  const s1 = document.createElement('span');
+	  s1.textContent = `Step ${stepIndex}. `;
 	  const s2 = document.createElement('span');
 	  s2.className = 'drop';
 	  s2.textContent = `이탈율 ${dropPct.toFixed(1)}%`;
 	  const s3 = document.createElement('span');
 	  s3.className = 'step-name';
 	  s3.textContent = ` (${stepName})`;
-	  head.appendChild(s1); head.appendChild(s2); head.appendChild(s3);
+	  head.appendChild(s1); head.appendChild(s2); head.appendChild(s3); */
 	
 	  // 2) 유지율: "유지율 78.1%"
 	  const meta2 = document.createElement('div');
@@ -649,7 +667,7 @@
       type: 'doughnut',
       data: { labels:['긍정','부정'], datasets:[{ data:[POS,NEG], backgroundColor:COLORS, borderRadius:10, radius:'95%', cutout:'70%' }] },
       options: { responsive:false, maintainAspectRatio:false, rotation:-90, circumference:180, plugins:{ legend:{ display:false } } },
-      plugins: [baseHalfRingPlugin]
+     /*  plugins: [baseHalfRingPlugin] */
     });
 
     if (posEl) posEl.textContent = `${POS.toFixed(1)}%`;
