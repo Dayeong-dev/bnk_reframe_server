@@ -1,5 +1,7 @@
 package com.example.reframe.service.account;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import com.example.reframe.controller.api.account.AccountController.PayReq;
 import com.example.reframe.domain.TransferCommand;
 import com.example.reframe.dto.DailyCountDTO;
 import com.example.reframe.dto.account.AccountDTO;
+import com.example.reframe.dto.account.GlobalAvgResponse;
 import com.example.reframe.entity.ProductApplication;
 import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.account.AccountStatus;
@@ -235,7 +239,19 @@ public class AccountService {
         bucket.forEach((d, c) -> result.add(new DailyCountDTO(d, c)));
         return result;
     }
+    
+    private static final BigDecimal UNIT = new BigDecimal("10000");
 	
-	
+    public GlobalAvgResponse getGlobalAverageForUsers() {
+    	long users = accountRepository.countActiveUsers();
+    	
+        BigDecimal avg = accountRepository.findGlobalAvgUserTotal();
+        if (avg == null) avg = BigDecimal.ZERO;
+
+        // 만원 단위 반올림 (원하면 내림/올림으로 변경 가능)
+        BigDecimal rounded = avg.divide(UNIT, 0, RoundingMode.HALF_UP).multiply(UNIT);
+
+        return new GlobalAvgResponse(rounded, users);
+    }
 	
 }

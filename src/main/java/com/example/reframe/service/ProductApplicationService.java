@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.domain.TransferCommand;
 import com.example.reframe.dto.enroll.EnrollForm;
+import com.example.reframe.dto.enroll.ProductApplicationDTO;
 import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.ProductApplication;
 import com.example.reframe.entity.ProductApplication.ApplicationStatus;
@@ -37,8 +38,12 @@ import com.example.reframe.repository.deposit.DepositProductRateRepository;
 import com.example.reframe.repository.enroll.ProductApplicationInputRepository;
 import com.example.reframe.service.account.TransactionService;
 import com.example.reframe.util.AccountNumberGenerator;
+import com.example.reframe.util.ProductApplicationMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ProductApplicationService {
 	
 	private final DepositProductRepository depositProductRepository;
@@ -51,27 +56,9 @@ public class ProductApplicationService {
 	private final TransactionService transactionService;
 	private final CurrentUser currentUser;
 	
-	private final AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
+	private final ProductApplicationMapper applicationMapper = new ProductApplicationMapper();
 	
-	public ProductApplicationService(DepositProductRepository depositProductRepository, 
-									 ProductApplicationRepository applicationRepository, 
-									 ProductApplicationInputRepository applicationInputRepository, 
-									 DepositPaymentLogRepository depositPaymentLogRepository,
-									 DepositProductRateRepository depositProductRateRepository, 
-									 AccountRepository accountRepository, 
-									 UserRepository userRepository, 
-									 TransactionService transactionService, 
-									 CurrentUser currentUser) {
-		this.depositProductRepository = depositProductRepository;
-		this.applicationRepository = applicationRepository;
-		this.applicationInputRepository = applicationInputRepository;
-		this.depositPaymentLogRepository = depositPaymentLogRepository;
-		this.depositProductRateRepository = depositProductRateRepository;
-		this.accountRepository = accountRepository;
-		this.userRepository = userRepository;
-		this.transactionService = transactionService;
-		this.currentUser = currentUser;
-	}
+	private final AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
 	
 	
 	// 상품 가입
@@ -396,4 +383,18 @@ public class ProductApplicationService {
 	    int age = java.time.Period.between(birth, onDate).getYears();
 	    return (age >= 60) ? 50_000L : 100_000L;
 	}
+	
+	@Transactional(readOnly = true)
+	public List<ProductApplicationDTO> getApplicationList() {
+		Long uid = currentUser.id();
+		
+		if(uid == null) {
+			throw new IllegalStateException("로그인이 필요합니다.");
+		}
+		
+		List<ProductApplication> applicationList = applicationRepository.findByUser_id(uid);
+		
+		return applicationList.stream().map(app -> applicationMapper.toDTO(app)).toList();
+	}
+	
 }
