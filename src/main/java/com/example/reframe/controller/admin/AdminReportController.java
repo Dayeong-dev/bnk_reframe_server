@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.YearMonth;
 
 @Controller
-@RequestMapping("/admin/reports")
+@RequestMapping({"/admin/reports", "/admin/dashboard3"}) // ✅ 두 경로 모두 지원
 public class AdminReportController {
 
     private final ReportService reportService;
@@ -34,7 +34,7 @@ public class AdminReportController {
         AdminReport r = reportService.buildMonthly(ym);
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(32 * 1024)) {
-            pdfWriter.write(r, baos); // 기존 텍스트-only 버전
+            pdfWriter.write(r, baos); // 텍스트-only 버전
             byte[] bytes = baos.toByteArray();
 
             String filename = enc(String.format("관리자리포트_%d-%02d.pdf", year, month));
@@ -59,17 +59,17 @@ public class AdminReportController {
     public ResponseEntity<byte[]> monthlyPdfWithCharts(@RequestBody ChartPdfRequest req) {
         try {
             YearMonth ym = YearMonth.of(req.getYear(), req.getMonth());
-            AdminReport r = reportService.buildMonthly(ym); // ✅ 올바른 서비스 사용
+            AdminReport r = reportService.buildMonthly(ym);
 
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024)) {
-                // 프론트에서 보낸 base64 PNG 맵을 사용하는 오버로드
-                pdfWriter.write(r, req.getImages(), baos);
+                pdfWriter.write(r, req.getImages(), baos); // 프론트 전달 base64 PNG 맵 사용
                 byte[] bytes = baos.toByteArray();
 
                 String filename = enc(String.format("관리자리포트_%d-%02d.pdf", req.getYear(), req.getMonth()));
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + filename)
                         .contentType(MediaType.APPLICATION_PDF)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + filename)
+                        .contentLength(bytes.length) // ✔ content-length도 넣기(선택)
                         .body(bytes);
             }
         } catch (Exception e) {
