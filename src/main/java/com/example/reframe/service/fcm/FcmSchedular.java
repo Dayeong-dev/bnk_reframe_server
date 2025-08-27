@@ -18,7 +18,7 @@ public class FcmSchedular {
     private final FcmService fcmService;
 
     // 매 1분마다 실행하여 활성화된 템플릿 조회
-    @Scheduled(cron = "0 0 9 * * *")	
+    @Scheduled(cron = "0 0 9 * * * ")	
     public void sendScheduledPush() {
         List<FcmTemplate> activeTemplates = templateRepo.findByActiveTrue();
 

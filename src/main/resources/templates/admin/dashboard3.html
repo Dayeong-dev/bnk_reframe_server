@@ -309,7 +309,7 @@
 					  </div>
 					
 					  <div class="adm-card adm-card--short kpi">
-					    <div class="kpi-label">활성 FCM 템플릿</div>
+					    <div class="kpi-label">자동발송 앱푸시 건</div>
 					    <div class="kpi-value" id="kpiActiveTpl">2</div>
 					    <div class="kpi-sub" id="kpiActiveTplSub">자동 발송 설정</div>
 					  </div>
@@ -592,6 +592,7 @@
 	}
 	// 일일방문자수 - 막대차트
     var dailyBase = "https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun";
+	
 	var dailyUrl = `${dailyBase}?nocache=${Date.now()}`;
 	
 	
@@ -600,7 +601,7 @@
 			var arrDailyVisitor = await fetchNdjson(dailyUrl);
 			for(var i=0; i<arrDailyVisitor.length; i++) {
 			 	arrDailyVisitorLabel.push(arrDailyVisitor[i]["event_date"]);
-			 	arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["user_count"]));
+			 	arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["f0_"]));
 			}
 			
 		} catch (err) {
@@ -727,8 +728,8 @@
 		          <div class="tpl-title">BNK Reframe</div>
 		          <div class="tpl-body">${t.body ?? ''}</div>
 		          <div class="tpl-meta">
-		            <span>[${t.groupCode ?? ''}]</span>
-		            <span>cron: ${t.cron || '-'}</span>
+		            <span>발송대상: [${t.groupCode ?? ''}]  / </span>  
+		            <span>발송시간: ${t.cron || '-'}</span>
 		          </div>
 		          </a>
 		        </li>
@@ -838,69 +839,102 @@
 	  });
 	// 금일 방문자 수
 	  (function () {
-    const SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun';
-    const $label = document.querySelector('#kpi-today .kpi-label');
-    const $value = document.getElementById('kpiTodayVisitors');
-    const $sub   = document.getElementById('kpiTodayVisitorsSub');
-
-    const ymd = (d)=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('');
-    const ymdDot = (d)=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('.');
-    const today = new Date(), yesterday = new Date(Date.now()-86400000);
-
-    function render(rows){
-      const tKey = ymd(today), yKey = ymd(yesterday);
-      const tRow = rows.find(r=>String(r.event_date)===tKey);
-      const yRow = rows.find(r=>String(r.event_date)===yKey);
-      const tCnt = tRow ? (+tRow.user_count||0) : 0;
-      const yCnt = yRow ? (+yRow.user_count||0) : 0;
-      const diff = tCnt - yCnt;
-
-      if ($label) $label.textContent = `금일 방문자 수 (${ymdDot(today)})`;
-      if ($value) $value.textContent = tCnt.toLocaleString();
-
-      if ($sub) {
-        // "어제 대비 " + <span class="trend up|down|flat">…</span>
-        $sub.textContent = '';
-        const prefix = document.createElement('span');
-        prefix.textContent = '어제 대비 ';
-        const trend = document.createElement('span');
-
-        let dir = 'flat', arrow = '—', body = '—';
-        if (diff > 0) {
-          dir = 'up'; arrow = '▲';
-          // yCnt가 0이면 % 대신 수치만 표기
-          body = yCnt > 0 ? `${arrow} ${diff.toLocaleString()} (${((diff/yCnt)*100).toFixed(1)}%)`
-                          : `${arrow} ${diff.toLocaleString()}`;
-        } else if (diff < 0) {
-          dir = 'down'; arrow = '▼';
-          const abs = Math.abs(diff);
-          body = yCnt > 0 ? `${arrow} ${abs.toLocaleString()} (${((abs/yCnt)*100).toFixed(1)}%)`
-                          : `${arrow} ${abs.toLocaleString()}`;
-        }
-        trend.className = 'trend ' + dir;
-        trend.textContent = body;
-
-        $sub.appendChild(prefix);
-        $sub.appendChild(trend);
-      }
-    }
-
-    // 차후 Controller 연동 시 이 함수로 그대로 주입 가능: window.updateTodayVisitors(serverRows)
-    window.updateTodayVisitors = render;
-
-    fetch(SRC,{cache:'no-cache'})
-      .then(r=>r.text())
-      .then(t=>{
-        // JSON 배열 또는 NDJSON 모두 허용
-        let rows; try{ rows = JSON.parse(t); }catch{ rows = t.trim().split('\n').filter(Boolean).map(JSON.parse); }
-        render(rows);
-      })
-      .catch(()=>{
-        if ($label) $label.textContent = '금일 방문자 수';
-        if ($value) $value.textContent = '—';
-        if ($sub)   $sub.textContent   = '데이터 오류';
-      });
-  })();
+	  const SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun';
+	  const $label = document.querySelector('#kpi-today .kpi-label');
+	  const $value = document.getElementById('kpiTodayVisitors');
+	  const $sub   = document.getElementById('kpiTodayVisitorsSub');
+	
+	  // 유틸
+	  const ymd = (d)=>[d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('');
+	  const ymdDot = (d)=>[d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('.');
+	  const parseYmd = (s)=> new Date(Number(s.slice(0,4)), Number(s.slice(4,6))-1, Number(s.slice(6,8)));
+	  const addDays = (d, n)=> new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+	
+	  // 컬럼명 변화 대응: user_count | count | value | f0_ 등 다양한 키 지원
+	  const getCount = (row) => {
+	    const v = row?.user_count ?? row?.count ?? row?.value ?? row?.f0_;
+	    const n = Number(v);
+	    return Number.isFinite(n) ? n : 0;
+	  };
+	
+	  function render(rows){
+	    if (!Array.isArray(rows)) rows = [];
+	    // event_date가 숫자/문자 혼재 가능 → 문자열 8자리로 통일
+	    const keyed = rows
+	      .filter(r => r && r.event_date)
+	      .map(r => ({ key: String(r.event_date), cnt: getCount(r) }));
+	
+	    if (keyed.length === 0) {
+	      if ($label) $label.textContent = '금일 방문자 수';
+	      if ($value) $value.textContent = '—';
+	      if ($sub)   $sub.textContent   = '데이터 없음';
+	      return;
+	    }
+	
+	    const todayLocal = new Date();
+	    // 기본 타겟은 "오늘", 없으면 최신 날짜로 폴백
+	    const todayKey = ymd(todayLocal);
+	    const latestKey = keyed.map(x => x.key).sort().at(-1);
+	    const useKey = keyed.some(x => x.key === todayKey) ? todayKey : latestKey;
+	    const useDate = (useKey === todayKey) ? todayLocal : parseYmd(useKey);
+	
+	    // 당일/전일 찾기(전일은 기준 useDate-1일)
+	    const yKey = ymd(addDays(useDate, -1));
+	    const tRow = keyed.find(x => x.key === useKey);
+	    const yRow = keyed.find(x => x.key === yKey);
+	    const tCnt = tRow ? tRow.cnt : 0;
+	    const yCnt = yRow ? yRow.cnt : 0;
+	    const diff = tCnt - yCnt;
+	
+	    if ($label) $label.textContent = `금일 방문자 수 (${ymdDot(useDate)})`;
+	    if ($value) $value.textContent = tCnt.toLocaleString();
+	
+	    if ($sub) {
+	      $sub.textContent = '';
+	      const prefix = document.createElement('span');
+	      prefix.textContent = '어제 대비 ';
+	      const trend = document.createElement('span');
+	
+	      let dir = 'flat', arrow = '—', body = '—';
+	      if (diff > 0) {
+	        dir = 'up'; arrow = '▲';
+	        body = yCnt > 0 ? `${arrow} ${diff.toLocaleString()} (${((diff / yCnt) * 100).toFixed(1)}%)`
+	                        : `${arrow} ${diff.toLocaleString()}`;
+	      } else if (diff < 0) {
+	        dir = 'down'; arrow = '▼';
+	        const abs = Math.abs(diff);
+	        body = yCnt > 0 ? `${arrow} ${abs.toLocaleString()} (${((abs / yCnt) * 100).toFixed(1)}%)`
+	                        : `${arrow} ${abs.toLocaleString()}`;
+	      }
+	      trend.className = 'trend ' + dir;
+	      trend.textContent = body;
+	
+	      $sub.appendChild(prefix);
+	      $sub.appendChild(trend);
+	    }
+	  }
+	
+	  // 서버 연동용 훅 유지
+	  window.updateTodayVisitors = render;
+	
+	  fetch(SRC, { cache: 'no-cache', mode: 'cors' })
+	    .then(r => r.text())
+	    .then(t => {
+	      // JSON 배열 or NDJSON 모두 허용
+	      let rows;
+	      try {
+	        rows = JSON.parse(t);
+	      } catch {
+	        rows = t.trim().split('\n').filter(Boolean).map(JSON.parse);
+	      }
+	      render(rows);
+	    })
+	    .catch(() => {
+	      if ($label) $label.textContent = '금일 방문자 수';
+	      if ($value) $value.textContent = '—';
+	      if ($sub)   $sub.textContent   = '데이터 오류';
+	    });
+	})();
 	
 		// 7일 가입자 수 
 	  (function () {
