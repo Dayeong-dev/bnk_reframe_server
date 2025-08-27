@@ -113,7 +113,7 @@ public class AdminSignInController {
 			    session.setAttribute("role", user.getRole());
 			    session.setAttribute("loginInfo", user);
 			    
-				return "redirect:/admin/product-main-test1"; // 로그인 완료
+				return "redirect:/admin/dashboard3"; // 로그인 완료
 				
 			} else {
 				model.addAttribute("step3", true);

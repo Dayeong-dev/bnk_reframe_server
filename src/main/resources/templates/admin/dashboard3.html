@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>관리자 메인</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" th:href="@{/admin/css/header.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/base.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/adm-layout.css}" />
     <link rel="stylesheet" th:href="@{/admin/css/dashboard.css}" />
+    
 </head>
 <style>
 	:root { --fg:#111; --muted:#666; --border:#e8e8e8; }
@@ -22,39 +23,56 @@
     .meta { color: var(--muted); font-size: 10px; margin-bottom: 12px; }
     .row { display:flex; gap:8px; align-items:center; justify-content:space-between; font-size: 13px; color:var(--muted); margin-top:10px; }
     .err { color:#b00020; background:#fff3f3; border:1px solid #ffd6d6; padding:10px; border-radius:8px; }
-    .card canvas { width: 50% !important; height: 70% !important; margin: auto; }
+    .card canvas {
+	  width: 50% !important;
+	  height: 70% !important;
+   	  margin: auto; 
+	}
     footer { padding: 10px 16px 24px; color: var(--muted); font-size: 12px; }
-
+	
 	.d-flex { display:flex; }
 	.w_100p { width : 100% !important; }
 	.border_detail { border:1px solid var(--border); border-radius:12px; background: white; box-shadow: 0 1px 2px rgba(0,0,0,.03); padding: 10px; margin: 10px 0; }
-	.border_detail2{ border: 1px solid var(--border); border-radius: 12px; background: white; box-shadow: 0 1px 2px rgba(0, 0, 0, .03); padding: 5px 10px 0 10px; }
+	.border_detail2{
+	border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+    padding: 5px 10px 0 10px;
+	}
 	.content { min-height: 100vh; }
 	.blockLeft { display : block; width : 70% !important; height : 100% !important; }
 	.bounceRateDiv { justify-content: space-between;}
 	.bounceRatioDetailDiv { width : 33%; height : 100% !important; }
 	.bounceRatioCanvas { width : 45%; height : 65%; }
 	.enrollTrendDiv { height : 45% !important; }
-	.bottomDiv { height: auto !important; justify-content: space-between; gap: 16px; align-items: stretch; }
-	.dailyVisitorDiv { width : 45% !important; }
-
-	.reviewDiv { width:25% !important; }
-	.reviewDiv.border_detail { padding:14px; }
-	.review-wrap { column-gap:16px; align-items:center; width:100%; }
-	.review-chart canvas { width:250px !important; height:250px !important; margin: auto; }
-
-	.review-text { display:flex; flex-direction:column; gap:6px; min-width:0; align-items:center; }
-	.review-title { font-weight:700; font-size:14px; color:#111; }
-	.review-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#6b7280; }
-	.review-list li { display:flex; align-items:center; gap:8px; }
-	.review-swatch { width:12px; height:12px; border-radius:3px; display:inline-block; }
-	.review-pos { color:#16a34a; font-weight:700; }
-	.review-neg { color:#ef4444; font-weight:700; }
-
+	  /* ✅ 하단 두 카드(일일 방문자 / 리뷰) 영역: 고정높이 제거 + 간격 추가 */
+	  .bottomDiv { height: auto !important; justify-content: space-between; gap: 16px; align-items: stretch; }
+	
+	  .dailyVisitorDiv { width : 45% !important; }
+	
+	 /* ✅ 리뷰 카드 리레이아웃 */
+	  .reviewDiv { width:25% !important; }
+	  .reviewDiv.border_detail { padding:14px; }
+	  /* 차트(좌) | 텍스트(우) */
+	  .review-wrap { /*display:grid; grid-template-columns: 220px 1fr;*/ column-gap:16px; align-items:center; width:100%; }
+	  /* 캔버스 기본 크기 — JS에서 픽셀도 맞춤 */
+	  .review-chart canvas { width:250px !important; height:250px !important; margin: auto ; }
+	
+	  .review-text { display:flex; flex-direction:column; gap:6px; min-width:0; align-items:center; }
+	  .review-title { font-weight:700; font-size:14px; color:#111; }
+	  .review-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#6b7280; }
+	  .review-list li { display:flex; align-items:center; gap:8px; }
+	  .review-swatch { width:12px; height:12px; border-radius:3px; display:inline-block; }
+	  .review-pos { color:#16a34a; font-weight:700; }
+	  .review-neg { color:#ef4444; font-weight:700; }
+	
+	
 	.blockRight {display:block; width:30%; margin-left:10px; height: 100%; }
 	.confirmDiv{height:30%!important;}
 	.fcmDiv {height:26%!important;}
-
+	
+	/* ✅ 상품 Top5 카드 전용 (충돌 방지) */
 	.productTop5Card { }
 	.productTop5Card h2 { font-size:14px; font-weight:700; color:#111; margin:0 0 8px; }
 	#adm-product-top5-canvas { width:100% !important; height:260px !important; display:block; }
@@ -69,7 +87,7 @@
   	.calendar-days div:hover { background: #f5f5f5; }
   	.today { background: #ff5722; color: #fff !important; font-weight: bold; }
   	.other-month { color: #ccc; }
-
+    /* FCM List */
   	#pub-fcm { padding: 8px 0 0 0; }
 	#pub-fcm .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:14px; }
 	#tpl-list { list-style:none; padding:0; margin:0; }
@@ -78,31 +96,162 @@
 	#tpl-list .tpl-body { font-size:15px; font-weight:700; line-height:1.5; margin:6px 0 4px; word-break:break-word; }
 	#tpl-list .tpl-meta { font-size:12px; color:#6b7280; }
 	#tpl-list .tpl-meta span + span::before { content:"·"; margin:0 6px; color:#d1d5db; }
+	
+	/* KPI 카드 */
+  .adm-kpis .adm-card.kpi {
+    display: flex; flex-direction: column; justify-content: center; gap: 6px;
+    padding: 16px 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.04); min-height: 96px;
+  }
+  .adm-kpis .kpi-label { font-size: 12px; color: #6b7280; letter-spacing: .2px; }
+  .adm-kpis .kpi-value { font-size: 28px; font-weight: 700; line-height: 1; }
+  .adm-kpis .kpi-sub   { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 6px; }
+  .adm-kpis .kpi-sub .trend.up   { color:#16a34a; }
+  .adm-kpis .kpi-sub .trend.down { color:#ef4444; }
+  .adm-kpis .kpi-sub .trend.flat { color:#6b7280; }
 
-	.adm-kpis .adm-card.kpi { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 16px 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.04); min-height: 96px; }
-	.adm-kpis .kpi-label { font-size: 12px; color: #6b7280; letter-spacing: .2px; }
-	.adm-kpis .kpi-value { font-size: 28px; font-weight: 700; line-height: 1; }
-	.adm-kpis .kpi-sub   { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 6px; }
-	.adm-kpis .kpi-sub .trend.up   { color:#16a34a; }
-	.adm-kpis .kpi-sub .trend.down { color:#ef4444; }
-	.adm-kpis .kpi-sub .trend.flat { color:#6b7280; }
+  /* Step 이탈율 텍스트 + 가로 배치 */
+  .review-wrap { /*position: relative; display:flex;*/ align-items:center; gap:14px; padding:12px; }
+  .review-chart{ margin: auto; }
+  
+  .bounceRatioDetailDiv .bounceRatioCanvas { width:140px; height:140px; margin:0; flex:0 0 auto; }
+  .bounceRatioDetailDiv .bounceRatioText { margin:0; display:flex; flex-direction:column; gap:4px; flex:1 1 auto; min-width:0; }
+  .bounceRatioText .headline { font-size:13px; font-weight:700; color:#111; }
+  .bounceRatioText .headline .drop { color:#ef4444; font-weight:700; }
+  .bounceRatioText .headline .step-name { color:#6b7280; font-weight:600; }
+  .bounceRatioText .meta { font-size:12px; color:#6b7280; }
+  .bounceRatioText .keep { color:#16a34a; font-weight:700; }
+	
+	
+	/*-----------------*/
+	/* ===== 공통 톤: 카드 헤더, 리스트 아이템 스케일 맞추기 ===== */
 
-	.review-wrap { align-items:center; gap:14px; padding:12px; }
-	.review-chart{ margin: auto; }
-
-	.bounceRatioDetailDiv .bounceRatioCanvas { width:140px; height:140px; margin:0; flex:0 0 auto; }
-	.bounceRatioDetailDiv .bounceRatioText { margin:0; display:flex; flex-direction:column; gap:4px; flex:1 1 auto; min-width:0; }
-	.bounceRatioText .headline { font-size:13px; font-weight:700; color:#111; }
-	.bounceRatioText .headline .drop { color:#ef4444; font-weight:700; }
-	.bounceRatioText .headline .step-name { color:#6b7280; font-weight:600; }
-	.bounceRatioText .meta { font-size:12px; color:#6b7280; }
-	.bounceRatioText .keep { color:#16a34a; font-weight:700; }
+	/* 카드 헤더 정렬/타이포 */
+	.border_detail.confirmDiv h2,
+	#pub-fcm .head span:first-child {
+	  font-size: 14px;
+	  font-weight: 700;
+	  color: #111;
+	}
+	#pub-fcm .head {                 /* FCM 헤더를 결재목록 h2와 비슷하게 */
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  margin-bottom: 10px !important;
+	  padding: 0;
+	  font-size: 14px;
+	}
+	#pub-fcm .head span:last-child { /* (0건) 카운터는 서브톤 */
+	  font-size: 12px;
+	  color: #6b7280;
+	  font-weight: 400;
+	}
+	
+	/* 리스트 아이템 카드화 (FCM과 동일한 박스 스케일) */
+	.border_detail.confirmDiv > div {
+	  margin-top: 8px !important;       /* 기존 inline 15px → 8px */
+	  padding: 12px 14px !important;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 10px;
+	  background: #fff;
+	}
+	
+	/* 날짜 라인 (서브톤) */
+	.border_detail.confirmDiv > div > div:first-child {
+	  font-size: 12px !important;
+	  color: #6b7280;
+	  margin-bottom: 6px !important;
+	}
+	
+	/* 본문 1줄 레이아웃: 파이프(|) 숨기고, 칩/이름/제목 정돈 */
+	.border_detail.confirmDiv .d-flex {
+	  display: flex;
+	  align-items: center;
+	  gap: 10px;
+	  /* 텍스트 노드(파이프 “|”) 숨기기 트릭 */
+	  font-size: 0;                     /* 부모 0 → 파이프 안 보임 */
+	}
+	.border_detail.confirmDiv .d-flex > div {
+	  font-size: 13px !important;       /* 자식만 원래 크기 복구 */
+	  line-height: 1.4;
+	  color: #111;
+	}
+	
+	/* 상태 배지(미결재/반려/상신) – 중립 칩 톤 */
+	.border_detail.confirmDiv .d-flex > div:first-child {
+	  flex: 0 0 auto !important;
+	  width: auto !important;           /* inline width 무시 */
+	  padding: 2px 8px;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 9999px;
+	  background: #f8fafc;
+	  color: #374151;
+	  font-weight: 700;
+	}
+	
+	/* 이름 */
+	.border_detail.confirmDiv .d-flex > div:nth-child(2) {
+	  flex: 0 0 auto !important;
+	  width: auto !important;           /* inline width 무시 */
+	  color: #6b7280;
+	}
+	
+	/* 제목(우측 가변) */
+	.border_detail.confirmDiv .d-flex > div:nth-child(3) {
+	  flex: 1 1 auto !important;
+	  width: auto !important;           /* inline width 무시 */
+	  min-width: 0;
+	  white-space: nowrap;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	}
+	
+	/* FCM 리스트 아이템도 동일 스케일 유지(이미 유사하지만 확실히 고정) */
+	#tpl-list { list-style: none; padding: 0; margin: 0; }
+	#tpl-list .tpl-item {
+	  padding: 12px 14px;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 10px;
+	  background: #fff;
+	  margin-bottom: 8px;
+	}
+	#tpl-list .tpl-title { font-size: 12px; font-weight: 600; color: #6b7280; }
+	#tpl-list .tpl-body  { font-size: 15px; font-weight: 700; line-height: 1.5; margin: 6px 0 4px; word-break: break-word; }
+	#tpl-list .tpl-meta  { font-size: 12px; color: #6b7280; }
+	#tpl-list .tpl-meta span + span::before { content: "·"; margin: 0 6px; color: #d1d5db; }
+	
+	/* Step 이탈율: 차트(좌) + 텍스트(우) */
+	.bounceRatioDetailDiv{
+	  display:flex;              /* ← 이 한 줄이 핵심 */
+	  align-items:center;
+	  gap:14px;
+	  padding:12px;
+	}
+	
+	.bounceRatioDetailDiv .bounceRatioCanvas{
+	  flex:0 0 auto;
+	  width:140px;               /* 필요시 120~160px 조절 */
+	  height:140px;
+	  margin:0;
+	}
+	
+	.bounceRatioDetailDiv .bounceRatioText{
+	  flex:1 1 auto;
+	  min-width:0;
+	  display:flex;
+	  flex-direction:column;
+	  gap:4px;
+	  margin:0;                  /* 세로 배치 때 쓰던 여백 제거 */
+	}
+	a{
+		text-decoration: none;
+		color:inherit;
+	}									
+	
 </style>
-
 <script>
 	var arrDailyVisitorData = [];
 	var arrDailyVisitorLabel = [];
-
+	
 	window.onload = function() {
 		setDataBounceRatio();
 		setDataDailyVisitor();
@@ -111,541 +260,881 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script th:src="@{/admin/sidebar.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-
 <body>
-    <!-- 공통 헤더 (주석 처리됨) -->
-    <!-- <div th:replace="admin/fragments/header :: header" class="header"></div> -->
 
+
+    <!-- 공통 헤더 -->
+    <!-- <div th:replace="admin/fragments/header :: header" class="header"></div> -->
+	
     <div id="body" class="adm-layout">
-		<!-- 토글 버튼 -->
+		<!-- 토글 버튼(페이지 아무 곳에나, 보통 상단 고정) -->
 		<button id="adm-sidebar-toggle" aria-label="사이드바 접기/펼치기" aria-expanded="true" title="메뉴">
 		  <span class="bar"></span><span class="bar"></span><span class="bar"></span>
 		</button>
-
-		<!-- 사이드바 -->
-		<aside class="adm-sidebar">
-			<div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
-		</aside>
-
+	
+          <!-- 사이드바 -->
+		  <aside class="adm-sidebar">
+		    <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+		  </aside>
+		  
         <!-- 본문 -->
         <main class="adm-content">
-
-          <!-- ✅ 리포트 다운로드 바 (여기에 버튼 위치) -->
-          <div class="border_detail" style="display:flex; gap:8px; align-items:center; padding:10px; margin: 6px 0 12px;">
-            <label for="reportYear" style="font-size:12px; color:#6b7280;">연도</label>
-            <input id="reportYear" type="number" min="2000" max="2100" style="width:90px; height:32px; padding:0 8px;">
-            <label for="reportMonth" style="font-size:12px; color:#6b7280;">월</label>
-            <input id="reportMonth" type="number" min="1" max="12" style="width:70px; height:32px; padding:0 8px;">
-
-            <button id="btn-xlsx" type="button"
-                    style="padding:8px 12px; border-radius:8px; border:1px solid #e5e7eb; background:#f5f5f5; cursor:pointer;">
-              엑셀 다운
-            </button>
-            <button id="btn-pdf" type="button"
-                    style="padding:8px 12px; border-radius:8px; border:1px solid #e5e7eb; background:#f5f5f5; cursor:pointer;">
-              PDF 다운
-            </button>
-          </div>
-
-	      <div class="content d-flex w_100p">
-	        <div class="blockLeft">
-	          <div class="bounceRateDiv d-flex w_100p">
-	            <div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_1" class="bounceRatioCanvas"></canvas></div>
-	            <div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_2" class="bounceRatioCanvas"></canvas></div>
-	            <div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_3" class="bounceRatioCanvas"></canvas></div>
-	          </div>
-
-	          <!-- KPI 4개 -->
-	          <div class="adm-kpis">
-	            <div class="adm-card adm-card--short kpi" id="kpi-today">
-	              <div class="kpi-label">금일 방문자 수</div>
-	              <div class="kpi-value" id="kpiTodayVisitors">—</div>
-	              <div class="kpi-sub" id="kpiTodayVisitorsSub">어제 대비 —</div>
+	        <div class="content d-flex w_100p">
+	            
+	            <div class="blockLeft">
+	            	<div class="bounceRateDiv d-flex w_100p">
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_1" class="bounceRatioCanvas"></canvas></div>
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_2" class="bounceRatioCanvas"></canvas></div>
+	            		<div class="bounceRatioDetailDiv border_detail"><canvas id="bounceRate_3" class="bounceRatioCanvas"></canvas></div>
+	            	</div>
+	            	<!-- KPI 4개 -->
+					<div class="adm-kpis">
+					  <div class="adm-card adm-card--short kpi" id="kpi-today">
+					    <div class="kpi-label">금일 방문자 수</div>
+					    <div class="kpi-value" id="kpiTodayVisitors">—</div>
+					    <div class="kpi-sub" id="kpiTodayVisitorsSub">어제 대비 —</div>
+					  </div>
+					
+					  <div class="adm-card adm-card--short kpi">
+					    <div class="kpi-label">푸시 알림 클릭율</div>
+					    <div class="kpi-value"><span id="kpiPushCtr">72</span>%</div>
+					    <!-- <div class="kpi-trend"><i id="kpiPushCtrBar"></i></div> -->
+					    <div class="kpi-sub">최근 캠페인 평균</div>
+					  </div>	
+					
+					  <div class="adm-card adm-card--short kpi">
+					    <div class="kpi-label"><span id="kpiEnrollLabel">최근 7일 가입</span></div>
+					    <div class="kpi-value" id="kpiEnrollCount">66</div>
+					    <div class="kpi-sub" id="kpiEnrollSub">전 기간 대비 —</div>
+					  </div>
+					
+					  <div class="adm-card adm-card--short kpi">
+					    <div class="kpi-label">자동발송 앱푸시 건</div>
+					    <div class="kpi-value" id="kpiActiveTpl">2</div>
+					    <div class="kpi-sub" id="kpiActiveTplSub">자동 발송 설정</div>
+					  </div>
+					</div>
+						            	
+	            	<div class="enrollTrendDiv border_detail w_100p">
+	            		<canvas id="enrollLineChart"></canvas>
+	            	</div>
+	            	<div class="bottomDiv d-flex w_100p">
+		            	<div class="dailyVisitorDiv border_detail">
+	            			<canvas id="dailyVisitorCanvas" class="w_100p"></canvas>
+			           	</div>
+			           	
+			           	<!-- ✅ 리뷰 카드 (그리드 레이아웃) -->
+			            <div class="reviewDiv border_detail">
+			              <div class="review-wrap">
+			                <div class="review-chart">
+			                  <canvas id="reviewCanvas"></canvas>
+			                </div>
+			                <div class="review-text">
+			                  <div class="review-title">리뷰 긍정/부정 비율</div>
+			                  <ul class="review-list">
+			                    <li>
+			                      <span class="review-swatch" style="background:#f87171"></span>
+			                      긍정 <span id="reviewPosPct" class="review-pos">—%</span>
+			                    </li>
+			                    <li>
+			                      <span class="review-swatch" style="background:#e5e7eb"></span>
+			                      부정 <span id="reviewNegPct" class="review-neg">—%</span>
+			                    </li>
+			                  </ul>
+			                </div>
+			              </div>
+			            </div>
+			            <div class="border_detail calendar">
+			            	<div class="calendar-header">
+								<button id="prev">&#10094;</button>
+							  	<h2 id="monthYear"></h2>
+							  	<button id="next">&#10095;</button>
+							</div>
+							<div class="calendar-weekdays">
+							  	<div>MON</div><div>TUE</div><div>WED</div>
+							  	<div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+							</div>
+							<div class="calendar-days" id="calendarDays"></div>
+			            </div>
+	            	</div>
 	            </div>
-
-	            <div class="adm-card adm-card--short kpi">
-	              <div class="kpi-label">푸시 알림 클릭율</div>
-	              <div class="kpi-value"><span id="kpiPushCtr">72</span>%</div>
-	              <div class="kpi-sub">최근 캠페인 평균</div>
+	            <div class="blockRight">
+		            <div class="border_detail confirmDiv">
+		            	<h2>결재목록</h2>
+		            	<div style="margin-top:15px;">
+		            		<a href="">
+			            		<div style="font-size:12px;">2025.08.25 09:54</div>
+			            		<div class="d-flex">
+			            			<div style="width:15%">대기</div>|
+			            			<div style="width:15%">김법진</div>|
+			            			<div style="width:70%">관리자 대시보드 색상 및 디자인 수정요청</div>
+			            		</div>
+		            		</a>
+		            	</div>
+		            	<div style="margin-top:15px;">
+		            		<a href="">
+			            		<div style="font-size:12px;">2025.08.22 12:22</div>
+			            		<div class="d-flex">
+			            			<div style="width:15%">반려</div>|
+			            			<div style="width:15%">관리자</div>|
+			            			<div style="width:70%">[긴급]부산은행 로고디자인 변경 결재요청</div>
+			            		</div>
+		            		</a>
+		            	</div>
+		            	<div style="margin-top:15px;">
+		            		<a href="">
+			            		<div style="font-size:12px;">2025.08.14 13:33</div>
+			            		<div class="d-flex">
+			            			<div style="width:15%">승인</div>|
+			            			<div style="width:15%">김법진</div>|
+			            			<div style="width:70%">광복 80주년 기념 특별 이벤트 행사 주최 결재요청</div>
+			            		</div>
+		            		</a>
+		            	</div>
+		            </div>
+		            <div class="border_detail2 fcmDiv">
+		            	<div id="pub-fcm">
+						  <div class="head">
+						    <span>활성 템플릿</span>
+						    <span id="tpl-count">(0건)</span>
+						  </div>
+						  <ul id="tpl-list"></ul>
+						  <div id="tpl-empty" style="display:none">활성 템플릿이 없습니다.</div>
+						</div>
+		            </div>
+		            <!-- 상품 조회수 TOP 5 -->
+		            <div class="product_top5">
+		            </div>
 	            </div>
-
-	            <div class="adm-card adm-card--short kpi">
-	              <div class="kpi-label"><span id="kpiEnrollLabel">최근 7일 가입</span></div>
-	              <div class="kpi-value" id="kpiEnrollCount">66</div>
-	              <div class="kpi-sub" id="kpiEnrollSub">전 기간 대비 —</div>
-	            </div>
-
-	            <div class="adm-card adm-card--short kpi">
-	              <div class="kpi-label">활성 FCM 템플릿</div>
-	              <div class="kpi-value" id="kpiActiveTpl">2</div>
-	              <div class="kpi-sub" id="kpiActiveTplSub">자동 발송 설정</div>
-	            </div>
-	          </div>
-
-	          <div class="enrollTrendDiv border_detail w_100p">
-	            <canvas id="enrollLineChart"></canvas>
-	          </div>
-
-	          <div class="bottomDiv d-flex w_100p">
-	            <div class="dailyVisitorDiv border_detail">
-	              <canvas id="dailyVisitorCanvas" class="w_100p"></canvas>
-	            </div>
-
-	            <!-- 리뷰 카드 -->
-	            <div class="reviewDiv border_detail">
-	              <div class="review-wrap">
-	                <div class="review-chart">
-	                  <canvas id="reviewCanvas"></canvas>
-	                </div>
-	                <div class="review-text">
-	                  <div class="review-title">리뷰 긍정/부정 비율</div>
-	                  <ul class="review-list">
-	                    <li>
-	                      <span class="review-swatch" style="background:#f87171"></span>
-	                      긍정 <span id="reviewPosPct" class="review-pos">—%</span>
-	                    </li>
-	                    <li>
-	                      <span class="review-swatch" style="background:#e5e7eb"></span>
-	                      부정 <span id="reviewNegPct" class="review-neg">—%</span>
-	                    </li>
-	                  </ul>
-	                </div>
-	              </div>
-	            </div>
-
-	            <div class="border_detail calendar">
-	              <div class="calendar-header">
-	                <button id="prev">&#10094;</button>
-	                <h2 id="monthYear"></h2>
-	                <button id="next">&#10095;</button>
-	              </div>
-	              <div class="calendar-weekdays">
-	                <div>MON</div><div>TUE</div><div>WED</div>
-	                <div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
-	              </div>
-	              <div class="calendar-days" id="calendarDays"></div>
-	            </div>
-	          </div>
 	        </div>
-
-	        <div class="blockRight">
-	          <div class="border_detail confirmDiv">
-	            <h2>결재목록</h2>
-	            <div style="margin-top:15px;">
-	              <div style="font-size:12px;">2025.08.22 12:22:45</div>
-	              <div class="d-flex">
-	                <div style="width:15%">반려</div>|
-	                <div style="width:15%">관리자</div>|
-	                <div style="width:70%">[긴급]부산은행 로고디자인 변경 결재요청</div>
-	              </div>
-	            </div>
-	            <div style="margin-top:15px;">
-	              <div style="font-size:12px;">2025.08.14 13:33:14</div>
-	              <div class="d-flex">
-	                <div style="width:15%">승인</div>|
-	                <div style="width:15%">김법진</div>|
-	                <div style="width:70%">광복 80주년 기념 특별 이벤트 행사 주최 결재요청</div>
-	              </div>
-	            </div>
-	            <div style="margin-top:15px;">
-	              <div style="font-size:12px;">2025.08.25 09:54:</div>
-	              <div class="d-flex">
-	                <div style="width:15%">대기</div>|
-	                <div style="width:15%">김법진</div>|
-	                <div style="width:70%">관리자 대시보드 색상 및 디자인 수정요청</div>
-	              </div>
-	            </div>
-	          </div>
-
-	          <div class="border_detail2 fcmDiv">
-	            <div id="pub-fcm">
-	              <div class="head">
-	                <span>활성 템플릿</span>
-	                <span id="tpl-count">(0건)</span>
-	              </div>
-	              <ul id="tpl-list"></ul>
-	              <div id="tpl-empty" style="display:none">활성 템플릿이 없습니다.</div>
-	            </div>
-	          </div>
-
-	          <div class="product_top5"></div>
-	        </div>
-	      </div>
         </main>
     </div>
 
-<!-- ===== 기존 차트/위젯 스크립트 (네가 준 그대로) ===== -->
 <script>
-/* 기존 유틸/차트/FCM/달력/지표 스크립트 전부 — 생략 없이 그대로 유지 (네가 올린 코드 내용) */
-/* --- 이탈율 데이터 유틸/차트/텍스트 --- */
-async function fetchNdjson(url) {
-  const res = await fetch(url, { cache: 'no-cache' });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text();
-  return text.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
-}
-async function fetchJsonFlexible(url){
-  const res = await fetch(url, {cache:'no-cache'});
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const txt = await res.text();
-  try{
-    const j = JSON.parse(txt);
-    return Array.isArray(j) ? j : [j];
-  }catch(_){
-    return txt.trim().split('\n').filter(Boolean).map(JSON.parse);
-  }
-}
-const base = 'https://storage.googleapis.com/bnk-analytics-static/charts/step_drop_rates/latest-000000000000.ndjson';
-const NDJSON_URL = `${base}?nocache=${Date.now()}`;
-async function setDataBounceRatio() {
-  try {
-    var arrBounceRatio = await fetchNdjson(NDJSON_URL);
-    for (var i = 0; i < arrBounceRatio.length; i++) {
-      setBounceRatioChart((i + 1), arrBounceRatio[i]);
-      setBounceRatioText((i + 1), arrBounceRatio[i]);
+	//json parse
+	async function fetchNdjson(url) {
+	  const res = await fetch(url, { cache: 'no-cache' });
+	  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+	  const text = await res.text();
+	  return text.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
+	}
+	// ✅ JSON 배열 또는 NDJSON 모두 허용하는 유틸
+	async function fetchJsonFlexible(url){
+	  const res = await fetch(url, {cache:'no-cache'});
+	  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+	  const txt = await res.text();
+	  try{
+	    const j = JSON.parse(txt);
+	    return Array.isArray(j) ? j : [j];
+	  }catch(_){
+	    return txt.trim().split('\n').filter(Boolean).map(JSON.parse);
+	  }
+	}
+		
+    // 이탈율 - 도넛차트
+    const base = 'https://storage.googleapis.com/bnk-analytics-static/charts/step_drop_rates/latest-000000000000.ndjson';
+	const NDJSON_URL = `${base}?nocache=${Date.now()}`;
+	
+	// 이탈율 데이터 가져오기
+	async function setDataBounceRatio() {
+	  try {
+	    var arrBounceRatio = await fetchNdjson(NDJSON_URL);
+	    for (var i = 0; i < arrBounceRatio.length; i++) {
+	      setBounceRatioChart((i + 1), arrBounceRatio[i]);   // 기존
+	      setBounceRatioText((i + 1), arrBounceRatio[i]);    // ★ 추가: 텍스트 생성
+	    }
+	  } catch (err) {
+	    console.log("err");
+	  }
+	}
+	
+	// 이탈율 차트 그리기
+	function setBounceRatioChart(idx, arr) {
+		var ctx = document.getElementById('bounceRate_' + idx);
+		var myChart = new Chart(ctx, {
+			type : 'doughnut',
+			data : {
+				labels : ['이탈', '유지'],
+				datasets : [
+					{
+						data : [arr["drop_rate_pct"], 100 - arr["drop_rate_pct"]],
+						backgroundColor: ['#e5e7eb', '#f87171'], 
+						borderWidth: 0,
+						radius: '95%',
+				        cutout: '70%',
+				        rotation: -90 * Math.PI / 180,
+				        borderRadius: 30
+					}
+				]
+			},
+			options : {
+				responsive : false,
+				maintainAspectRatio : false,
+				animation: { duration: 800 },
+			},
+			plugins: [baseRingPlugin]
+		});
+	}
+	
+	// 도넛차트 겹치기
+	const baseRingPlugin = {
+	    id: 'baseRing',
+	    beforeDatasetsDraw(chart, args, pluginOpts) {
+	      const meta = chart.getDatasetMeta(0);   // 첫 데이터셋의 지오메트리
+	      if (!meta?.data?.length) return;
+	      const arc = meta.data[0];               // 첫 번째 호(arc)에서 중심/반지름 참조
+	      const ctx = chart.ctx;
+
+	      ctx.save();
+	      ctx.fillStyle = '#e5e7eb';              // 베이스 링 색상
+	      ctx.beginPath();
+	      // 외곽 원 (시계 방향)
+	      ctx.arc(arc.x, arc.y, arc.outerRadius, 0, Math.PI * 2);
+	      // 내곽 원 (반시계 방향) — 도넛 속을 파냄
+	      ctx.arc(arc.x, arc.y, arc.innerRadius, Math.PI * 2, 0, true);
+	      ctx.closePath();
+	      ctx.fill();
+	      ctx.restore();
+	    }
+	};
+	
+	/* Step 이탈율 텍스트 생성 */
+	function setBounceRatioText(idx, row) {
+	  const canvas = document.getElementById('bounceRate_' + idx);
+	  if (!canvas) return;
+	  const box = canvas.parentElement;
+	
+	  // 컨테이너 준비
+	  let wrap = box.querySelector('.bounceRatioText');
+	  if (!wrap) {
+	    wrap = document.createElement('div');
+	    wrap.className = 'bounceRatioText';
+	    box.appendChild(wrap);
+	  }
+	  wrap.textContent = ''; // 초기화
+	
+	  // 안전 파싱
+	  const stepIndex = String(row.step_index ?? idx);
+	  const stepName  = String(row.step_name ?? '');
+	  const dropPct   = Number(row.drop_rate_pct ?? row.value ?? 0);
+	  const keepPct   = Number(row.conv_rate_pct ?? (100 - dropPct));
+	
+	  // 1) 헤드라인: "Step 1. 이탈율 21.9% (약관동의)"
+	  const head = document.createElement('div');
+	  head.className = 'headline';
+	  const s1 = document.createElement('span');
+	  s1.textContent = `Step ${stepIndex}. `;
+	  const s2 = document.createElement('span');
+	  s2.className = 'drop';
+	  s2.textContent = `이탈율 ${dropPct.toFixed(1)}%`;
+	  const s3 = document.createElement('span');
+	  s3.className = 'step-name';
+	  s3.textContent = ` (${stepName})`;
+	  head.appendChild(s1); head.appendChild(s2); head.appendChild(s3);
+	
+	  // 2) 유지율: "유지율 78.1%"
+	  const meta2 = document.createElement('div');
+	  meta2.className = 'meta';
+	  const keepLabel = document.createElement('span');
+	  keepLabel.textContent = '유지율 ';
+	  const keepVal = document.createElement('span');
+	  keepVal.className = 'keep';
+	  keepVal.textContent = `${keepPct.toFixed(1)}%`;
+	  meta2.appendChild(keepLabel); 
+	  meta2.appendChild(keepVal);
+	
+	  wrap.appendChild(head);
+	  wrap.appendChild(meta2);
+	}
+	
+	
+    
+    // 상품가입추세 - 라인차트
+  	var ctx = document.getElementById('enrollLineChart');
+	var myChart = new Chart(ctx, {
+		type : 'line',
+		data : {
+			labels : ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+			datasets : [{
+				label : '상품가입추세',
+				data : [510,200,350,40,500,62,721,822,955,100,111,12],
+				fill : true,
+				tension: 0.4,
+				borderColor : '#FF9595',
+				backgroundColor : areaGradient
+			}]
+		},
+		options : {
+			responsive : true,
+			maintainAspectRatio : false,
+			devicePixelRatio: 2,
+			scales : {
+				x : { grid : { drawOnChartArea: false } },
+				y : {
+					min : 0,
+					beginAtZero : true,
+					grid : { drawOnChartArea: false }
+				}
+			}
+		
+		}
+	});
+	
+	//
+	function areaGradient(context) {
+	  const {chart} = context;
+	  const {ctx, chartArea} = chart;
+	  if (!chartArea) return 'rgba(179,107,255,0)'; // 초기 렌더 보호
+	  const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+	  g.addColorStop(0, 'rgba(255,167,167,0.1)');   // 아래쪽 투명
+	  g.addColorStop(1, 'rgba(255,167,167,0.75)'); // 위쪽 연보라
+	  return g;
+	}
+	// 일일방문자수 - 막대차트
+    var dailyBase = "https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun";
+	
+	var dailyUrl = `${dailyBase}?nocache=${Date.now()}`;
+	
+	
+	async function setDataDailyVisitor() {
+		try{
+			var arrDailyVisitor = await fetchNdjson(dailyUrl);
+			for(var i=0; i<arrDailyVisitor.length; i++) {
+			 	arrDailyVisitorLabel.push(arrDailyVisitor[i]["event_date"]);
+			 	arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["f0_"]));
+			}
+			
+		} catch (err) {
+			console.log("err");
+		}
+		
+		setDailyVisitorChart(arrDailyVisitorLabel, arrDailyVisitorData);
+	}
+	
+	// 일일방문자수 차트 그리기
+	function setDailyVisitorChart(dailyLabel, dailyData) {
+		var ctx2 = document.getElementById('dailyVisitorCanvas');
+		var myChart2 = new Chart(ctx2, {
+			type : 'bar',
+			data : {
+				labels : dailyLabel,
+				datasets : [{
+					label : '일일방문자수',
+					data : dailyData,
+					backgroundColor:'#FF9595',
+					borderRadius : 10
+				}]
+			},
+			options : {
+				responsive : true,
+				maintainAspectRatio : false,
+				devicePixelRatio: 2,
+				scales : {
+					x : { grid : { drawOnChartArea: false} },
+					y : {
+						beginAtZero : true
+					}
+				}
+			}
+		});
+	}
+	
+	
+	// 반원 베이스링 플러그인
+	const baseHalfRingPlugin = {
+	    id: 'baseHalfRing',
+	    beforeDraw(chart) {
+	      const meta = chart.getDatasetMeta(0);
+	      if (!meta?.data?.length) return;
+	      const arc = meta.data[0], ctx = chart.ctx;
+	      ctx.save();
+	      ctx.fillStyle = '#e5e7eb';
+	      ctx.beginPath();
+	      ctx.arc(arc.x, arc.y, arc.outerRadius, -Math.PI, 0);
+	      ctx.arc(arc.x, arc.y, arc.innerRadius, 0, -Math.PI, true);
+	      ctx.closePath();
+	      ctx.fill();
+	      ctx.restore();
+	    }
+	  };
+	
+	// 리뷰 - 도넛차트
+	(function () {
+    const canvas = document.getElementById('reviewCanvas');
+    const posEl = document.getElementById('reviewPosPct');
+    const negEl = document.getElementById('reviewNegPct');
+
+    const POS = 67.1;               // 긍정 %
+    const NEG = 100 - POS;          // 부정 %
+    const COLORS = ['#f87171', '#e5e7eb'];
+
+    // 픽셀 크기 선택
+    function pickSize() {
+      const w = window.innerWidth;
+      if (w >= 1200) return 220;
+      if (w >= 960)  return 200;
+      if (w >= 640)  return 180;
+      return 150;
     }
-  } catch (err) { console.log("err"); }
-}
-function setBounceRatioChart(idx, arr) {
-  var ctx = document.getElementById('bounceRate_' + idx);
-  var myChart = new Chart(ctx, {
-    type : 'doughnut',
-    data : { labels : ['이탈', '유지'],
-      datasets : [{ data : [arr["drop_rate_pct"], 100 - arr["drop_rate_pct"]],
-        backgroundColor: ['#e5e7eb', '#f87171'], borderWidth: 0, radius: '95%', cutout: '70%', rotation: -90 * Math.PI / 180, borderRadius: 30 }]},
-    options : { responsive : false, maintainAspectRatio : false, animation: { duration: 800 } },
-    plugins: [baseRingPlugin]
-  });
-}
-const baseRingPlugin = {
-  id: 'baseRing',
-  beforeDatasetsDraw(chart) {
-    const meta = chart.getDatasetMeta(0);
-    if (!meta?.data?.length) return;
-    const arc = meta.data[0], ctx = chart.ctx;
-    ctx.save(); ctx.fillStyle = '#e5e7eb'; ctx.beginPath();
-    ctx.arc(arc.x, arc.y, arc.outerRadius, 0, Math.PI * 2);
-    ctx.arc(arc.x, arc.y, arc.innerRadius, Math.PI * 2, 0, true);
-    ctx.closePath(); ctx.fill(); ctx.restore();
-  }
-};
-function setBounceRatioText(idx, row) {
-  const canvas = document.getElementById('bounceRate_' + idx);
-  if (!canvas) return;
-  const box = canvas.parentElement;
-  let wrap = box.querySelector('.bounceRatioText');
-  if (!wrap) { wrap = document.createElement('div'); wrap.className = 'bounceRatioText'; box.appendChild(wrap); }
-  wrap.textContent = '';
-  const stepIndex = String(row.step_index ?? idx);
-  const stepName  = String(row.step_name ?? '');
-  const dropPct   = Number(row.drop_rate_pct ?? row.value ?? 0);
-  const keepPct   = Number(row.conv_rate_pct ?? (100 - dropPct));
-  const head = document.createElement('div'); head.className = 'headline';
-  const s1 = document.createElement('span'); s1.textContent = `Step ${stepIndex}. `;
-  const s2 = document.createElement('span'); s2.className = 'drop'; s2.textContent = `이탈율 ${dropPct.toFixed(1)}%`;
-  const s3 = document.createElement('span'); s3.className = 'step-name'; s3.textContent = ` (${stepName})`;
-  head.appendChild(s1); head.appendChild(s2); head.appendChild(s3);
-  const meta2 = document.createElement('div'); meta2.className = 'meta';
-  const keepLabel = document.createElement('span'); keepLabel.textContent = '유지율 ';
-  const keepVal = document.createElement('span'); keepVal.className = 'keep'; keepVal.textContent = `${keepPct.toFixed(1)}%`;
-  meta2.appendChild(keepLabel); meta2.appendChild(keepVal);
-  wrap.appendChild(head); wrap.appendChild(meta2);
-}
-/* --- 상품가입추세 라인 --- */
-var ctx = document.getElementById('enrollLineChart');
-var myChart = new Chart(ctx, {
-  type : 'line',
-  data : { labels : ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
-    datasets : [{ label : '상품가입추세', data : [510,200,350,40,500,62,721,822,955,100,111,12],
-      fill : true, tension: 0.4, borderColor : '#FF9595', backgroundColor : areaGradient }]},
-  options : { responsive : true, maintainAspectRatio : false, devicePixelRatio: 2,
-    scales : { x : { grid : { drawOnChartArea: false } }, y : { min : 0, beginAtZero : true, grid : { drawOnChartArea: false } } } }
-});
-function areaGradient(context) {
-  const {chart} = context; const {ctx, chartArea} = chart;
-  if (!chartArea) return 'rgba(179,107,255,0)';
-  const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-  g.addColorStop(0, 'rgba(255,167,167,0.1)'); g.addColorStop(1, 'rgba(255,167,167,0.75)');
-  return g;
-}
-/* --- 일일 방문자 --- */
-var dailyBase = "https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun";
-var dailyUrl = `${dailyBase}?nocache=${Date.now()}`;
-async function setDataDailyVisitor() {
-  try{
-    var arrDailyVisitor = await fetchNdjson(dailyUrl);
-    for(var i=0; i<arrDailyVisitor.length; i++) {
-      arrDailyVisitorLabel.push(arrDailyVisitor[i]["event_date"]);
-      arrDailyVisitorData.push(parseInt(arrDailyVisitor[i]["user_count"]));
+    let SIZE = pickSize();
+    // CSS와 일치하도록 실제 픽셀 지정
+    canvas.width = SIZE; canvas.height = SIZE;
+    canvas.style.width  = SIZE + 'px';
+    canvas.style.height = SIZE + 'px';
+
+    const chart = new Chart(canvas, {
+      type: 'doughnut',
+      data: { labels:['긍정','부정'], datasets:[{ data:[POS,NEG], backgroundColor:COLORS, borderRadius:10, radius:'95%', cutout:'70%' }] },
+      options: { responsive:false, maintainAspectRatio:false, rotation:-90, circumference:180, plugins:{ legend:{ display:false } } },
+     /*  plugins: [baseHalfRingPlugin] */
+    });
+
+    if (posEl) posEl.textContent = `${POS.toFixed(1)}%`;
+    if (negEl) negEl.textContent = `${NEG.toFixed(1)}%`;
+
+    // 윈도우 크기 변할 때 재지정
+    window.addEventListener('resize', () => {
+      const s = pickSize();
+      if (s !== SIZE) {
+        SIZE = s;
+        canvas.width = SIZE; canvas.height = SIZE;
+        canvas.style.width  = SIZE + 'px';
+        canvas.style.height = SIZE + 'px';
+        chart.resize();
+      }
+    });
+  })();
+	
+	// FCM 목록
+	document.addEventListener('DOMContentLoaded', () => {
+		  const url   = '/admin/fcm/templates/active';
+		  const list  = document.getElementById('tpl-list');
+		  const count = document.getElementById('tpl-count');
+		  const empty = document.getElementById('tpl-empty');
+		
+		  fetch(url)
+		    .then(res => res.json())
+		    .then(items => {
+		      if (!items || items.length === 0) {
+		        count.textContent = '(0건)';
+		        empty.style.display = 'block';
+		        return;
+		      }
+		
+		      count.textContent = `(${items.length}건)`;
+		      list.innerHTML = items.map(t => `
+		        <li class="tpl-item">
+		      	  <a href="">
+		          <div class="tpl-title">BNK Reframe</div>
+		          <div class="tpl-body">${t.body ?? ''}</div>
+		          <div class="tpl-meta">
+		            <span>발송대상: [${t.groupCode ?? ''}]  / </span>  
+		            <span>발송시간: ${t.cron || '-'}</span>
+		          </div>
+		          </a>
+		        </li>
+		      `).join('');
+		    })
+		    .catch(() => {
+		      count.textContent = '(0건)';
+		      empty.style.display = 'block';
+		      empty.textContent = '불러오기 실패';
+		    });
+		});
+	// 달력
+	const monthYear = document.getElementById("monthYear");
+    const calendarDays = document.getElementById("calendarDays");
+	  const prevBtn = document.getElementById("prev");
+	  const nextBtn = document.getElementById("next");
+	
+	  let today = new Date();
+	  let currentMonth = today.getMonth();
+	  let currentYear = today.getFullYear();
+	
+	  function renderCalendar(month, year) {
+	    const monthNames = [
+	      "January","February","March","April","May","June",
+	      "July","August","September","October","November","December"
+	    ];
+	    monthYear.textContent = `${monthNames[month]}, ${year}`;
+	
+	    calendarDays.innerHTML = "";
+	
+	    // 첫 날 요일 (월요일 시작)
+	    let firstDay = new Date(year, month, 1).getDay();
+	    if (firstDay === 0) firstDay = 7; // Sunday → 7로 보정
+	    let daysInMonth = new Date(year, month+1, 0).getDate();
+	    let prevDays = new Date(year, month, 0).getDate();
+	
+	    // 지난 달
+	    for (let i = firstDay-1; i > 0; i--) {
+	      let div = document.createElement("div");
+	      div.classList.add("other-month");
+	      div.textContent = prevDays - i + 1;
+	      calendarDays.appendChild(div);
+	    }
+	
+	    // 이번 달
+	    for (let i = 1; i <= daysInMonth; i++) {
+	      let div = document.createElement("div");
+	      div.textContent = i;
+	      if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+	        div.classList.add("today");
+	      }
+	      calendarDays.appendChild(div);
+	    }
+	
+	    // 다음 달
+	    let totalCells = (firstDay-1) + daysInMonth;
+	    let nextDays = 42 - totalCells; // 6주 맞추기
+	    for (let i = 1; i <= nextDays; i++) {
+	      let div = document.createElement("div");
+	      div.classList.add("other-month");
+	      div.textContent = i;
+	      calendarDays.appendChild(div);
+	    }
+	  }
+	
+	  prevBtn.addEventListener("click", () => {
+	    currentMonth--;
+	    if (currentMonth < 0) {
+	      currentMonth = 11;
+	      currentYear--;
+	    }
+	    renderCalendar(currentMonth, currentYear);
+	  });
+	
+	  nextBtn.addEventListener("click", () => {
+	    currentMonth++;
+	    if (currentMonth > 11) {
+	      currentMonth = 0;
+	      currentYear++;
+	    }
+	    renderCalendar(currentMonth, currentYear);
+	  });
+	
+	  renderCalendar(currentMonth, currentYear);
+	  
+	  // 사이드바 닫힘
+	  document.addEventListener('DOMContentLoaded', function(){
+	    const layout = document.querySelector('.adm-layout');
+	    const btn    = document.getElementById('adm-sidebar-toggle');
+	    if (!layout || !btn) return;
+	
+	    const KEY = 'adm.sidebar.collapsed';
+	
+	    // 초기 상태 복원
+	    const isCollapsed = localStorage.getItem(KEY) === '1';
+	    if (isCollapsed) {
+	      layout.classList.add('adm-collapsed');
+	      btn.setAttribute('aria-expanded', 'false');
+	    }
+	
+	    // 클릭 토글
+	    btn.addEventListener('click', () => {
+	      const collapsedNow = layout.classList.toggle('adm-collapsed');
+	      btn.setAttribute('aria-expanded', String(!collapsedNow));
+	      localStorage.setItem(KEY, collapsedNow ? '1' : '0');
+	    });
+	  });
+	// 금일 방문자 수
+	  (function () {
+	  const SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun';
+	  const $label = document.querySelector('#kpi-today .kpi-label');
+	  const $value = document.getElementById('kpiTodayVisitors');
+	  const $sub   = document.getElementById('kpiTodayVisitorsSub');
+	
+	  // 유틸
+	  const ymd = (d)=>[d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('');
+	  const ymdDot = (d)=>[d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('.');
+	  const parseYmd = (s)=> new Date(Number(s.slice(0,4)), Number(s.slice(4,6))-1, Number(s.slice(6,8)));
+	  const addDays = (d, n)=> new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+	
+	  // 컬럼명 변화 대응: user_count | count | value | f0_ 등 다양한 키 지원
+	  const getCount = (row) => {
+	    const v = row?.user_count ?? row?.count ?? row?.value ?? row?.f0_;
+	    const n = Number(v);
+	    return Number.isFinite(n) ? n : 0;
+	  };
+	
+	  function render(rows){
+	    if (!Array.isArray(rows)) rows = [];
+	    // event_date가 숫자/문자 혼재 가능 → 문자열 8자리로 통일
+	    const keyed = rows
+	      .filter(r => r && r.event_date)
+	      .map(r => ({ key: String(r.event_date), cnt: getCount(r) }));
+	
+	    if (keyed.length === 0) {
+	      if ($label) $label.textContent = '금일 방문자 수';
+	      if ($value) $value.textContent = '—';
+	      if ($sub)   $sub.textContent   = '데이터 없음';
+	      return;
+	    }
+	
+	    const todayLocal = new Date();
+	    // 기본 타겟은 "오늘", 없으면 최신 날짜로 폴백
+	    const todayKey = ymd(todayLocal);
+	    const latestKey = keyed.map(x => x.key).sort().at(-1);
+	    const useKey = keyed.some(x => x.key === todayKey) ? todayKey : latestKey;
+	    const useDate = (useKey === todayKey) ? todayLocal : parseYmd(useKey);
+	
+	    // 당일/전일 찾기(전일은 기준 useDate-1일)
+	    const yKey = ymd(addDays(useDate, -1));
+	    const tRow = keyed.find(x => x.key === useKey);
+	    const yRow = keyed.find(x => x.key === yKey);
+	    const tCnt = tRow ? tRow.cnt : 0;
+	    const yCnt = yRow ? yRow.cnt : 0;
+	    const diff = tCnt - yCnt;
+	
+	    if ($label) $label.textContent = `금일 방문자 수 (${ymdDot(useDate)})`;
+	    if ($value) $value.textContent = tCnt.toLocaleString();
+	
+	    if ($sub) {
+	      $sub.textContent = '';
+	      const prefix = document.createElement('span');
+	      prefix.textContent = '어제 대비 ';
+	      const trend = document.createElement('span');
+	
+	      let dir = 'flat', arrow = '—', body = '—';
+	      if (diff > 0) {
+	        dir = 'up'; arrow = '▲';
+	        body = yCnt > 0 ? `${arrow} ${diff.toLocaleString()} (${((diff / yCnt) * 100).toFixed(1)}%)`
+	                        : `${arrow} ${diff.toLocaleString()}`;
+	      } else if (diff < 0) {
+	        dir = 'down'; arrow = '▼';
+	        const abs = Math.abs(diff);
+	        body = yCnt > 0 ? `${arrow} ${abs.toLocaleString()} (${((abs / yCnt) * 100).toFixed(1)}%)`
+	                        : `${arrow} ${abs.toLocaleString()}`;
+	      }
+	      trend.className = 'trend ' + dir;
+	      trend.textContent = body;
+	
+	      $sub.appendChild(prefix);
+	      $sub.appendChild(trend);
+	    }
+	  }
+	
+	  // 서버 연동용 훅 유지
+	  window.updateTodayVisitors = render;
+	
+	  fetch(SRC, { cache: 'no-cache', mode: 'cors' })
+	    .then(r => r.text())
+	    .then(t => {
+	      // JSON 배열 or NDJSON 모두 허용
+	      let rows;
+	      try {
+	        rows = JSON.parse(t);
+	      } catch {
+	        rows = t.trim().split('\n').filter(Boolean).map(JSON.parse);
+	      }
+	      render(rows);
+	    })
+	    .catch(() => {
+	      if ($label) $label.textContent = '금일 방문자 수';
+	      if ($value) $value.textContent = '—';
+	      if ($sub)   $sub.textContent   = '데이터 오류';
+	    });
+	})();
+	
+		// 7일 가입자 수 
+	  (function () {
+		  const $count = document.getElementById('kpiEnrollCount');
+		  const $sub   = document.getElementById('kpiEnrollSub');
+
+		  if (!$count || !$sub) return;
+
+		  fetch('/mobile/account/api/stats/signups/7d', { headers: { 'Accept': 'application/json' } })
+		    .then(res => res.ok ? res.json() : Promise.reject(res))
+		    .then(list => {
+		      if (!Array.isArray(list) || list.length === 0) return;
+
+		      // 7일 합계
+		      const total = list.reduce((sum, it) => sum + (Number(it.count) || 0), 0);
+		      $count.textContent = String(total);
+
+		      // 전일 대비 (마지막 일자 vs 그 전날)
+		      const last = Number(list[list.length - 1]?.count) || 0;
+		      const prev = Number(list[list.length - 2]?.count) || 0;
+
+		      $sub.textContent = ''; // 초기화
+
+		      const label = document.createElement('span');
+		      label.textContent = '전일 대비 ';
+
+		      const trend = document.createElement('span');
+		      if (prev > 0) {
+		        const diff = last - prev;
+		        const pct  = Math.abs((diff / prev) * 100);
+		        let dir = 'flat', arrow = '—';
+		        if (diff > 0) { dir = 'up';   arrow = '▲'; }
+		        if (diff < 0) { dir = 'down'; arrow = '▼'; }
+
+		        trend.className = 'trend ' + dir;
+		        trend.textContent = `${arrow} ${Math.abs(diff)} (${pct.toFixed(1)}%)`;
+		      } else {
+		        trend.className = 'trend flat';
+		        trend.textContent = '—';
+		      }
+
+		      $sub.appendChild(label);
+		      $sub.appendChild(trend);
+		    })
+		    .catch(() => { /* 실패 시 화면 침묵 (원하면 콘솔 로그 추가) */ });
+		})();
+		
+		// 7일 가입자 수 - 전월 대비 표시
+	  (function () {
+		  const subEl = document.getElementById('kpiEnrollSub');
+		  if (!subEl) return;
+
+		  // ===== 하드코딩 영역 (필요할 때 숫자/상태만 바꿔줘) =====
+		  const STATE = 'up';     // 'up' | 'down' | 'flat'
+		  const DIFF  = 12;       // 증감 수치 (정수)
+		  const PCT   = 18.2;     // 증감률(%)  소수 1자리까지만 표시됨
+		  // =======================================================
+
+		  // 초기화
+		  subEl.textContent = '';
+
+		  // "전일 대비 " 라벨
+		  const label = document.createElement('span');
+		  label.textContent = '전일 대비 ';
+		  subEl.appendChild(label);
+
+		  // 트렌드 값
+		  const trend = document.createElement('span');
+		  trend.className = 'trend ' + (STATE === 'up' ? 'up' : STATE === 'down' ? 'down' : 'flat');
+
+		  if (STATE === 'flat') {
+		    trend.textContent = '—';
+		  } else {
+		    const arrow = STATE === 'up' ? '▲' : '▼';
+		    trend.textContent = `${arrow} ${Math.abs(DIFF)} (${Math.abs(PCT).toFixed(1)}%)`;
+		  }
+
+		  subEl.appendChild(trend);
+		})();
+		
+	  // 푸시 알림 - 전월 대비 표시
+	  (function () {
+	    // ====== 하드코딩 전월 CTR(%) ======
+	    const PREV_MONTH_CTR = 65.3;  // ← 필요 시 숫자만 바꿔줘
+	    // =================================
+
+	    const currEl = document.getElementById('kpiPushCtr'); // 현재 CTR 숫자(span)
+	    if (!currEl) return;
+
+	    const curr = parseFloat((currEl.textContent || '').replace(',', '.')) || 0;
+	    const card = currEl.closest('.adm-card');
+	    const subEl = card ? card.querySelector('.kpi-sub') : null;
+	    if (!subEl) return;
+
+	    // 전월 대비 계산
+	    const diff = curr - PREV_MONTH_CTR;
+	    const dir  = diff === 0 ? 'flat' : (diff > 0 ? 'up' : 'down');
+	    const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '—';
+
+	    // 상대 변화율(%) – 전월 대비 증감률
+	    let body = '—';
+	    if (dir !== 'flat') {
+	      if (PREV_MONTH_CTR > 0) {
+	        const rel = Math.abs((diff / PREV_MONTH_CTR) * 100);
+	        body = `${arrow} ${rel.toFixed(1)}%`;
+	      } else {
+	        // 전월이 0%라면 상대비 교란 → 절대 차이로 표기
+	        body = `${arrow} ${Math.abs(diff).toFixed(1)}%`;
+	      }
+	    }
+
+	    // UI 업데이트 (XSS 안전: textContent)
+	    subEl.textContent = '';
+	    const prefix = document.createElement('span');
+	    prefix.textContent = '전월 대비 ';
+	    const trend = document.createElement('span');
+	    trend.className = 'trend ' + dir;  // up / down / flat → 색상 포인트
+	    trend.textContent = body;
+
+	    subEl.appendChild(prefix);
+	    subEl.appendChild(trend);
+	  })();
+
+
+  /* ===========================
+     ✅ 상품 조회수 TOP 5 (가로 막대)
+     =========================== */
+  (function(){
+    // ⛳️ 여기에 GCS 경로를 넣어주세요.
+    const PRODUCT_TOP5_SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/topviewproduct'; // ← 교체!
+
+    const host = document.querySelector('.product_top5');
+    if (!host) return;
+
+    // 카드/캔버스 구성
+    const card = document.createElement('div');
+    card.className = 'border_detail productTop5Card';
+    const title = document.createElement('h2');
+    title.textContent = '상품 조회수 TOP 5';
+    const canvas = document.createElement('canvas');
+    canvas.id = 'adm-product-top5-canvas';
+    card.appendChild(title);
+    card.appendChild(canvas);
+    host.appendChild(card);
+
+    function toArray(rows){
+      return rows.map(r => ({
+        product_id: String(r.product_id ?? r.productId ?? r.id ?? ''),
+        detail_views: Number(r.detail_views ?? r.detailView ?? r.views ?? r.count ?? 0)
+      })).filter(x => x.product_id !== '' && !Number.isNaN(x.detail_views));
     }
-  } catch (err) { console.log("err"); }
-  setDailyVisitorChart(arrDailyVisitorLabel, arrDailyVisitorData);
-}
-function setDailyVisitorChart(dailyLabel, dailyData) {
-  var ctx2 = document.getElementById('dailyVisitorCanvas');
-  var myChart2 = new Chart(ctx2, {
-    type : 'bar',
-    data : { labels : dailyLabel, datasets : [{ label : '일일방문자수', data : dailyData, backgroundColor:'#FF9595', borderRadius : 10 }]},
-    options : { responsive : true, maintainAspectRatio : false, devicePixelRatio: 2,
-      scales : { x : { grid : { drawOnChartArea: false} }, y : { beginAtZero : true } } }
-  });
-}
-/* --- 리뷰 도넛 --- */
-(function () {
-  const canvas = document.getElementById('reviewCanvas');
-  const posEl = document.getElementById('reviewPosPct');
-  const negEl = document.getElementById('reviewNegPct');
-  const POS = 67.1, NEG = 100 - POS, COLORS = ['#f87171', '#e5e7eb'];
-  function pickSize() { const w = window.innerWidth; if (w >= 1200) return 220; if (w >= 960) return 200; if (w >= 640) return 180; return 150; }
-  let SIZE = pickSize();
-  canvas.width = SIZE; canvas.height = SIZE; canvas.style.width = SIZE + 'px'; canvas.style.height = SIZE + 'px';
-  const chart = new Chart(canvas, {
-    type: 'doughnut',
-    data: { labels:['긍정','부정'], datasets:[{ data:[POS,NEG], backgroundColor:COLORS, borderRadius:10, radius:'95%', cutout:'70%' }] },
-    options: { responsive:false, maintainAspectRatio:false, rotation:-90, circumference:180, plugins:{ legend:{ display:false } } }
-  });
-  if (posEl) posEl.textContent = `${POS.toFixed(1)}%`;
-  if (negEl) negEl.textContent = `${NEG.toFixed(1)}%`;
-  window.addEventListener('resize', () => {
-    const s = pickSize();
-    if (s !== SIZE) { SIZE = s; canvas.width = SIZE; canvas.height = SIZE; canvas.style.width = SIZE + 'px'; canvas.style.height = SIZE + 'px'; chart.resize(); }
-  });
-})();
-/* --- FCM 목록 --- */
-document.addEventListener('DOMContentLoaded', () => {
-  const url = '/admin/fcm/templates/active';
-  const list = document.getElementById('tpl-list');
-  const count = document.getElementById('tpl-count');
-  const empty = document.getElementById('tpl-empty');
-  fetch(url).then(res => res.json()).then(items => {
-    if (!items || items.length === 0) { count.textContent = '(0건)'; empty.style.display = 'block'; return; }
-    count.textContent = `(${items.length}건)`;
-    list.innerHTML = items.map(t => `
-      <li class="tpl-item">
-        <div class="tpl-title">BNK Reframe</div>
-        <div class="tpl-body">${t.body ?? ''}</div>
-        <div class="tpl-meta"><span>[${t.groupCode ?? ''}]</span><span>cron: ${t.cron || '-'}</span></div>
-      </li>
-    `).join('');
-  }).catch(() => { count.textContent = '(0건)'; empty.style.display = 'block'; empty.textContent = '불러오기 실패'; });
-});
-/* --- 달력/사이드바 --- */
-const monthYear = document.getElementById("monthYear");
-const calendarDays = document.getElementById("calendarDays");
-const prevBtn = document.getElementById("prev");
-const nextBtn = document.getElementById("next");
-let today = new Date(); let currentMonth = today.getMonth(); let currentYear = today.getFullYear();
-function renderCalendar(month, year) {
-  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  monthYear.textContent = `${monthNames[month]}, ${year}`;
-  calendarDays.innerHTML = "";
-  let firstDay = new Date(year, month, 1).getDay(); if (firstDay === 0) firstDay = 7;
-  let daysInMonth = new Date(year, month+1, 0).getDate();
-  let prevDays = new Date(year, month, 0).getDate();
-  for (let i = firstDay-1; i > 0; i--) { let div = document.createElement("div"); div.classList.add("other-month"); div.textContent = prevDays - i + 1; calendarDays.appendChild(div); }
-  for (let i = 1; i <= daysInMonth; i++) { let div = document.createElement("div"); div.textContent = i;
-    if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) div.classList.add("today"); calendarDays.appendChild(div); }
-  let totalCells = (firstDay-1) + daysInMonth; let nextDays = 42 - totalCells;
-  for (let i = 1; i <= nextDays; i++) { let div = document.createElement("div"); div.classList.add("other-month"); div.textContent = i; calendarDays.appendChild(div); }
-}
-prevBtn.addEventListener("click", () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(currentMonth, currentYear); });
-nextBtn.addEventListener("click", () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(currentMonth, currentYear); });
-renderCalendar(currentMonth, currentYear);
-document.addEventListener('DOMContentLoaded', function(){
-  const layout = document.querySelector('.adm-layout'); const btn = document.getElementById('adm-sidebar-toggle'); if (!layout || !btn) return;
-  const KEY = 'adm.sidebar.collapsed';
-  const isCollapsed = localStorage.getItem(KEY) === '1';
-  if (isCollapsed) { layout.classList.add('adm-collapsed'); btn.setAttribute('aria-expanded', 'false'); }
-  btn.addEventListener('click', () => {
-    const collapsedNow = layout.classList.toggle('adm-collapsed');
-    btn.setAttribute('aria-expanded', String(!collapsedNow));
-    localStorage.setItem(KEY, collapsedNow ? '1' : '0');
-  });
-});
-/* --- 금일 방문자 수 KPI --- */
-(function () {
-  const SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/onedaybangmun';
-  const $label = document.querySelector('#kpi-today .kpi-label');
-  const $value = document.getElementById('kpiTodayVisitors');
-  const $sub   = document.getElementById('kpiTodayVisitorsSub');
-  const ymd = (d)=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('');
-  const ymdDot = (d)=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('.');
-  const today = new Date(), yesterday = new Date(Date.now()-86400000);
-  function render(rows){
-    const tKey = ymd(today), yKey = ymd(yesterday);
-    const tRow = rows.find(r=>String(r.event_date)===tKey);
-    const yRow = rows.find(r=>String(r.event_date)===yKey);
-    const tCnt = tRow ? (+tRow.user_count||0) : 0;
-    const yCnt = yRow ? (+yRow.user_count||0) : 0;
-    const diff = tCnt - yCnt;
-    if ($label) $label.textContent = `금일 방문자 수 (${ymdDot(today)})`;
-    if ($value) $value.textContent = tCnt.toLocaleString();
-    if ($sub) {
-      $sub.textContent = '';
-      const prefix = document.createElement('span'); prefix.textContent = '어제 대비 ';
-      const trend = document.createElement('span');
-      let dir = 'flat', arrow = '—', body = '—';
-      if (diff > 0) { dir = 'up'; arrow = '▲'; body = yCnt > 0 ? `${arrow} ${diff.toLocaleString()} (${((diff/yCnt)*100).toFixed(1)}%)` : `${arrow} ${diff.toLocaleString()}`; }
-      else if (diff < 0) { dir = 'down'; arrow = '▼'; const abs = Math.abs(diff); body = yCnt > 0 ? `${arrow} ${abs.toLocaleString()} (${((abs/yCnt)*100).toFixed(1)}%)` : `${arrow} ${abs.toLocaleString()}`; }
-      trend.className = 'trend ' + dir; trend.textContent = body;
-      $sub.appendChild(prefix); $sub.appendChild(trend);
+
+    function drawChart(top5){
+      const labels = top5.map(r => `ID ${r.product_id}`);
+      const data   = top5.map(r => r.detail_views);
+
+      new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: ['매일 출석 적금','함께 걷는 적금','오징어 모임 통장','BNK 내맘대로 예금','사장님 월급통장'],
+          datasets: [{
+            label: '상세조회수',
+            data,
+            backgroundColor: '#f87171',   
+            borderRadius: 8,
+            barThickness: 20
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: 2,
+          indexAxis: 'y',               // ← 가로 막대
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, grid: { drawOnChartArea:false } },
+            y: { grid: { display:false } }
+          }
+        }
+      });
     }
-  }
-  window.updateTodayVisitors = render;
-  fetch(SRC,{cache:'no-cache'}).then(r=>r.text()).then(t=>{
-    let rows; try{ rows = JSON.parse(t); }catch{ rows = t.trim().split('\n').filter(Boolean).map(JSON.parse); }
-    render(rows);
-  }).catch(()=>{
-    if ($label) $label.textContent = '금일 방문자 수';
-    if ($value) $value.textContent = '—';
-    if ($sub)   $sub.textContent   = '데이터 오류';
-  });
-})();
-/* --- 7일 가입자 수 KPI / 전월 대비 표시 --- */
-(function () {
-  const $count = document.getElementById('kpiEnrollCount');
-  const $sub   = document.getElementById('kpiEnrollSub');
-  if (!$count || !$sub) return;
-  fetch('/mobile/account/api/stats/signups/7d', { headers: { 'Accept': 'application/json' } })
-    .then(res => res.ok ? res.json() : Promise.reject(res))
-    .then(list => {
-      if (!Array.isArray(list) || list.length === 0) return;
-      const total = list.reduce((sum, it) => sum + (Number(it.count) || 0), 0);
-      $count.textContent = String(total);
-      const last = Number(list[list.length - 1]?.count) || 0;
-      const prev = Number(list[list.length - 2]?.count) || 0;
-      $sub.textContent = '';
-      const label = document.createElement('span'); label.textContent = '전일 대비 ';
-      const trend = document.createElement('span');
-      if (prev > 0) {
-        const diff = last - prev; const pct  = Math.abs((diff / prev) * 100);
-        let dir = 'flat', arrow = '—'; if (diff > 0) { dir = 'up'; arrow = '▲'; } if (diff < 0) { dir = 'down'; arrow = '▼'; }
-        trend.className = 'trend ' + dir; trend.textContent = `${arrow} ${Math.abs(diff)} (${pct.toFixed(1)}%)`;
-      } else { trend.className = 'trend flat'; trend.textContent = '—'; }
-      $sub.appendChild(label); $sub.appendChild(trend);
-    })
-    .catch(() => {});
-})();
-(function () {
-  const subEl = document.getElementById('kpiEnrollSub');
-  if (!subEl) return;
-  const STATE = 'up', DIFF = 12, PCT = 18.2;
-  subEl.textContent = '';
-  const label = document.createElement('span'); label.textContent = '전일 대비 '; subEl.appendChild(label);
-  const trend = document.createElement('span'); trend.className = 'trend ' + (STATE === 'up' ? 'up' : STATE === 'down' ? 'down' : 'flat');
-  if (STATE === 'flat') { trend.textContent = '—'; }
-  else { const arrow = STATE === 'up' ? '▲' : '▼'; trend.textContent = `${arrow} ${Math.abs(DIFF)} (${Math.abs(PCT).toFixed(1)}%)`; }
-  subEl.appendChild(trend);
-})();
-/* --- 푸시 CTR 전월 대비 --- */
-(function () {
-  const PREV_MONTH_CTR = 65.3;
-  const currEl = document.getElementById('kpiPushCtr'); if (!currEl) return;
-  const curr = parseFloat((currEl.textContent || '').replace(',', '.')) || 0;
-  const card = currEl.closest('.adm-card'); const subEl = card ? card.querySelector('.kpi-sub') : null; if (!subEl) return;
-  const diff = curr - PREV_MONTH_CTR; const dir  = diff === 0 ? 'flat' : (diff > 0 ? 'up' : 'down'); const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '—';
-  let body = '—'; if (dir !== 'flat') { if (PREV_MONTH_CTR > 0) { const rel = Math.abs((diff / PREV_MONTH_CTR) * 100); body = `${arrow} ${rel.toFixed(1)}%`; } else { body = `${arrow} ${Math.abs(diff).toFixed(1)}%`; } }
-  subEl.textContent = ''; const prefix = document.createElement('span'); prefix.textContent = '전월 대비 ';
-  const trend = document.createElement('span'); trend.className = 'trend ' + dir; trend.textContent = body; subEl.appendChild(prefix); subEl.appendChild(trend);
-})();
-/* --- 상품 조회수 TOP5 --- */
-(function(){
-  const PRODUCT_TOP5_SRC = 'https://storage.googleapis.com/bnk-analytics-bangmun/topviewproduct';
-  const host = document.querySelector('.product_top5'); if (!host) return;
-  const card = document.createElement('div'); card.className = 'border_detail productTop5Card';
-  const title = document.createElement('h2'); title.textContent = '상품 조회수 TOP 5';
-  const canvas = document.createElement('canvas'); canvas.id = 'adm-product-top5-canvas';
-  card.appendChild(title); card.appendChild(canvas); host.appendChild(card);
-  function toArray(rows){ return rows.map(r => ({ product_id: String(r.product_id ?? r.productId ?? r.id ?? ''), detail_views: Number(r.detail_views ?? r.detailView ?? r.views ?? r.count ?? 0) })).filter(x => x.product_id !== '' && !Number.isNaN(x.detail_views)); }
-  function drawChart(top5){
-    const labels = top5.map(r => `ID ${r.product_id}`); const data = top5.map(r => r.detail_views);
-    new Chart(canvas, { type: 'bar', data: { labels, datasets: [{ label: '상세조회수', data, backgroundColor: '#f87171', borderRadius: 8, barThickness: 20 }]},
-      options: { responsive: true, maintainAspectRatio: false, devicePixelRatio: 2, indexAxis: 'y', plugins: { legend: { display: false } },
-        scales: { x: { beginAtZero: true, grid: { drawOnChartArea:false } }, y: { grid: { display:false } } } }});
-  }
-  function showError(msg){ const err = document.createElement('div'); err.className = 'err'; err.textContent = msg || '상품 조회수 데이터를 불러오지 못했습니다.'; card.appendChild(err); }
-  fetchJsonFlexible(`${PRODUCT_TOP5_SRC}?nocache=${Date.now()}`)
-    .then(rows => { const arr = toArray(rows); if (arr.length === 0) return showError('데이터가 없습니다.'); arr.sort((a,b) => b.detail_views - a.detail_views); drawChart(arr.slice(0,5)); })
-    .catch(() => showError());
-})();
-</script>
 
-<!-- ===== ✅ 리포트 다운로드 핸들러 (dashboard3 경로 사용) ===== -->
-<script>
-(function(){
-  // 여기만 바꾸면 경로 전환 가능
-  const XLSX_BASE = 'http://localhost:8090/admin/dashboard3/monthly.xlsx';
-  const PDF_BASE  = 'http://localhost:8090/admin/dashboard3/monthly.pdf';
+    function showError(msg){
+      const err = document.createElement('div');
+      err.className = 'err';
+      err.textContent = msg || '상품 조회수 데이터를 불러오지 못했습니다.';
+      card.appendChild(err);
+    }
 
-  function byId(id){ return document.getElementById(id); }
-  function todayYM(){ const now=new Date(); return { y: now.getFullYear(), m: now.getMonth()+1 }; }
-  function buildUrl(base, y, m){ return base + '?year=' + encodeURIComponent(y) + '&month=' + encodeURIComponent(m); }
-
-  const $y   = byId('reportYear');
-  const $m   = byId('reportMonth');
-  const $btnX = byId('btn-xlsx');
-  const $btnP = byId('btn-pdf');
-
-  (function setDefaults(){
-    const t=todayYM();
-    if ($y && !$y.value) $y.value = t.y;
-    if ($m && !$m.value) $m.value = t.m;
+    fetchJsonFlexible(`${PRODUCT_TOP5_SRC}?nocache=${Date.now()}`)
+      .then(rows => {
+        const arr = toArray(rows);
+        if (arr.length === 0) return showError('데이터가 없습니다.');
+        arr.sort((a,b) => b.detail_views - a.detail_views);
+        drawChart(arr.slice(0,5));
+      })
+      .catch(() => showError());
   })();
 
-  if ($btnX) $btnX.addEventListener('click', function(){
-    const t=todayYM();
-    const y = parseInt($y && $y.value,10) || t.y;
-    const m = parseInt($m && $m.value,10) || t.m;
-    location.href = buildUrl(XLSX_BASE, y, m);
-  });
-
-  if ($btnP) $btnP.addEventListener('click', async function(){
-    const t=todayYM();
-    const y = parseInt($y && $y.value,10) || t.y;
-    const m = parseInt($m && $m.value,10) || t.m;
-
-    // 이 페이지에 있는 대표 캔버스 2개를 캡처 (원하면 아이디 추가/변경 가능)
-    const ids = ['reviewCanvas', 'dailyVisitorCanvas'];
-    const images = {}; let captured = 0;
-
-    for (let i=0;i<ids.length;i++){
-      const el = byId(ids[i]);
-      if (!el || !el.toDataURL) continue;
-      try {
-        const b64 = el.toDataURL('image/png').split(',')[1];
-        if (b64) { images[ids[i]] = b64; captured++; }
-      } catch (e) { console.warn('canvas capture failed:', ids[i], e); }
-    }
-
-    if (captured > 0) {
-      try {
-        const res = await fetch(PDF_BASE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year: y, month: m, images })
-        });
-        if (res.ok) {
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `월간리포트_${y}-${String(m).padStart(2,'0')}.pdf`;
-          document.body.appendChild(a); a.click(); a.remove();
-          URL.revokeObjectURL(url);
-          return;
-        }
-        console.warn('POST /monthly.pdf failed, fallback to GET. status=', res.status);
-      } catch(e) {
-        console.warn('POST /monthly.pdf error, fallback to GET.', e);
-      }
-    } else {
-      console.warn('No charts captured, fallback to GET.');
-    }
-    // GET 폴백
-    location.href = buildUrl(PDF_BASE, y, m);
-  });
-})();
-</script>
+    </script>
 
 </body>
 </html>

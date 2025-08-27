@@ -1,67 +1,303 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>푸시 알림 발송 내역</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<meta charset="UTF-8">
+<title>앱푸시 알림 발송 내역</title>
+<link rel="stylesheet" th:href="@{/admin/css/header.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/sidebar.css}" />
+<link rel="stylesheet" th:href="@{/admin/css/base.css}" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+  :root{
+    --fh-accent: var(--adm-accent, #2563eb);
+    --fh-text: #111827;
+    --fh-muted:#6b7280;
+    --fh-border:#e5e7eb;
+    --fh-bg:#ffffff;
+    --fh-row:#fafafa;
+    --fh-chip:#f3f4f6;
+  }
+  /* 페이지 래퍼 */
+  .fh-page{display:block; padding:16px 18px 28px;}
+  .fh-titlebar{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:14px; border-bottom:1px solid var(--fh-border); padding-bottom:10px;}
+  .fh-titlebar .fh-title{font-size:20px; font-weight:700; color:var(--fh-text); }
+  .fh-kpis{display:grid; grid-auto-flow:column; gap:8px;}
+  .fh-kpi{background:var(--fh-bg); border:1px solid var(--fh-border); border-radius:12px; padding:10px 14px; min-width:140px; box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .fh-kpi .fh-kpi-label{font-size:12px; color:var(--fh-muted); margin-bottom:4px;}
+  .fh-kpi .fh-kpi-value{font-size:18px; font-weight:700; color:var(--fh-text);}
+  .fh-kpi .fh-kpi-sub{font-size:11px; color:var(--fh-muted);}
+
+  /* 필터 라인 */
+  .fh-filters{display:grid; grid-template-columns: 1fr 140px 140px 140px auto; gap:8px; align-items:center; margin:14px 0;}
+  .fh-input, .fh-select, .fh-date, .fh-btn{height:36px; border:1px solid var(--fh-border); border-radius:10px; padding:0 10px; background:#fff; color:var(--fh-text); outline:none;}
+  .fh-input::placeholder{color:#9ca3af;}
+  .fh-btn{cursor:pointer; font-weight:600;}
+  .fh-btn-ghost{background:#fff;}
+  .fh-btn-primary{background:#228be6; color:#fff; border-color:var(--fh-accent);}
+
+  /* 테이블 */
+  .fh-table-wrap{background:#fff; border:1px solid var(--fh-border); border-radius:14px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .fh-table{width:100%; border-collapse:separate; border-spacing:0;}
+  .fh-table thead th{position:sticky; top:0; background:#f9fafb; color:#374151; font-weight:700; font-size:13px; text-align:left; padding:12px 12px; border-bottom:1px solid var(--fh-border); z-index:1;}
+  .fh-table tbody td{padding:12px 12px; border-bottom:1px solid var(--fh-border); font-size:14px; color:var(--fh-text); vertical-align:middle;}
+  .fh-table tbody tr:hover{background:var(--fh-row);}
+  .fh-col-id{width:72px;}
+  .fh-col-title{width:22%;}
+  .fh-col-body{width:38%;}
+  .fh-col-group{width:140px;}
+  .fh-col-count{width:120px; text-align:right;}
+  .fh-col-dt{width:180px;}
+
+  /* 말줄임 */
+  .fh-ellipsis{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+  /* 칩/뱃지 */
+  .fh-chip{display:inline-block; padding:4px 8px; border-radius:999px; background:var(--fh-chip); color:#374151; font-size:12px; font-weight:600; border:1px solid var(--fh-border);}
+  .fh-badge-num{display:inline-block; min-width:42px; text-align:center; font-weight:700; font-variant-numeric:tabular-nums; padding:4px 8px; border-radius:8px; background:#eef2ff; color:#3730a3; border:1px solid #e0e7ff;}
+
+  /* 빈 상태 */
+  .fh-empty{padding:28px; text-align:center; color:var(--fh-muted);}
+</style>
 </head>
+
 <body>
+  <script th:src="@{/admin/sidebar.js}"></script>
 
-<h2>푸시 알림 발송 내역 (최신순)</h2>
+  <!-- 공통 헤더 -->
+  <div th:replace="admin/fragments/header :: header" class="header"></div>
 
-<table border="1" width="100%">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>제목</th>
-            <th>내용</th>
-            <th>대상 그룹</th>
-            <th>발송 수</th>
-            <th>발송 시각</th>
-        </tr>
-    </thead>
-    <tbody id="historyTableBody">
-        <!-- 데이터가 여기에 채워짐 -->
-    </tbody>
-</table>
+  <div id="body">
+    <!-- 사이드바 -->
+    <div th:replace="admin/fragments/sidebar :: sidebar" class="sidebar"></div>
+
+    <!-- 본문 -->
+    <div class="content">
+      <div class="fh-page">
+        <div class="fh-titlebar">
+          <div class="fh-title">앱푸시 알림 발송 내역</div>
+          <div class="fh-kpis">
+            <div class="fh-kpi">
+              <div class="fh-kpi-label">총 발송</div>
+              <div class="fh-kpi-value" id="fh-kpi-total">-</div>
+              <div class="fh-kpi-sub">누적</div>
+            </div>
+            <div class="fh-kpi">
+              <div class="fh-kpi-label">금일 발송</div>
+              <div class="fh-kpi-value" id="fh-kpi-today">-</div>
+              <div class="fh-kpi-sub" id="fh-kpi-today-date"></div>
+            </div>
+            <div class="fh-kpi">
+              <div class="fh-kpi-label">마지막 발송 시각</div>
+              <div class="fh-kpi-value" id="fh-kpi-last">-</div>
+              <div class="fh-kpi-sub">최신 1건 기준</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 필터 -->
+        <div class="fh-filters">
+          <input id="fh-q" class="fh-input" type="text" placeholder="제목/내용 검색" />
+          <select id="fh-group" class="fh-select">
+            <option value="">전체 그룹</option>
+          </select>
+          <input id="fh-from" class="fh-date" type="date" />
+          <input id="fh-to" class="fh-date" type="date" />
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button id="fh-reset" class="fh-btn fh-btn-ghost">필터 초기화</button>
+            <button id="fh-reload" class="fh-btn fh-btn-primary">새로고침</button>
+          </div>
+        </div>
+
+        <!-- 표 -->
+        <div class="fh-table-wrap">
+          <table class="fh-table" aria-label="푸시 알림 발송 내역">
+            <thead>
+              <tr>
+                <th class="fh-col-id">ID</th>
+                <th class="fh-col-title">제목</th>
+                <th class="fh-col-body">내용</th>
+                <th class="fh-col-group">대상 그룹</th>
+                <th class="fh-col-count" style="text-align:right;">발송 수</th>
+                <th class="fh-col-dt">발송 시각</th>
+              </tr>
+            </thead>
+            <tbody id="fh-tbody">
+              <tr><td class="fh-empty" colspan="6">로딩 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /content -->
+  </div><!-- /#body -->
 
 <script>
-$(document).ready(function() {
-    loadFcmHistory();
-});
+  // ---- 상태 ----
+  let FH_ALL = [];
 
-function loadFcmHistory() {
-    $.ajax({
-        url: "/admin/fcm/fcm-history",
-        type: "GET",
-        success: function(data) {
-            $("#historyTableBody").empty();
+  $(function(){
+    // 오늘 날짜 표시 (금일 KPI 서브텍스트)
+    $('#fh-kpi-today-date').text(getToday('YYYY.MM.DD'));
 
-            data.forEach(function(item) {
-                let row = `
-                    <tr>
-                        <td>${item.id}</td>
-                        <td>${item.title}</td>
-                        <td>${item.body}</td>
-                        <td>${item.targetGroup}</td>
-                        <td>${item.sentCount}</td>
-                        <td>${formatDateTime(item.createdAt)}</td>
-                    </tr>
-                `;
-                $("#historyTableBody").append(row);
-            });
-        },
-        error: function() {
-            alert("데이터를 불러오는 중 오류가 발생했습니다.");
-        }
+    // 이벤트 바인딩
+    $('#fh-reload').on('click', loadHistory);
+    $('#fh-reset').on('click', () => {
+      $('#fh-q').val('');
+      $('#fh-group').val('');
+      $('#fh-from').val('');
+      $('#fh-to').val('');
+      renderTable();
     });
-}
+    $('#fh-q, #fh-group, #fh-from, #fh-to').on('input change', renderTable);
 
-function formatDateTime(dateTime) {
-    // LocalDateTime을 보기 좋게 변환
-    if (!dateTime) return "";
-    return dateTime.replace("T", " ");
-}
+    // 초기 로드
+    loadHistory();
+  });
+
+  function loadHistory(){
+    const $tbody = $('#fh-tbody');
+    $tbody.html('<tr><td class="fh-empty" colspan="6">로딩 중...</td></tr>');
+
+    $.ajax({
+      url: "/admin/fcm/fcm-history",
+      type: "GET",
+      dataType: "json",
+      success: function(data){
+        // 방어: 배열만 수용
+        FH_ALL = Array.isArray(data) ? data.slice() : [];
+        // 최신순 정렬 (createdAt desc)
+        FH_ALL.sort((a,b)=> toTime(b.createdAt) - toTime(a.createdAt));
+        populateGroupOptions(FH_ALL);
+        updateKpis(FH_ALL);
+        renderTable();
+      },
+      error: function(){
+        $tbody.html('<tr><td class="fh-empty" colspan="6">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>');
+      }
+    });
+  }
+
+  function populateGroupOptions(list){
+    const set = new Set();
+    list.forEach(it => { if(it && it.targetGroup) set.add(String(it.targetGroup)); });
+    const $sel = $('#fh-group');
+    const cur = $sel.val();
+    $sel.empty().append($('<option>').val('').text('전체 그룹'));
+    Array.from(set).sort().forEach(g => {
+      $sel.append($('<option>').val(g).text(g));
+    });
+    // 기존 선택 유지
+    if(set.has(cur) || cur===''){ $sel.val(cur); }
+  }
+
+  function renderTable(){
+    const $tbody = $('#fh-tbody').empty();
+
+    const q = ($('#fh-q').val() || '').trim().toLowerCase();
+    const g = ($('#fh-group').val() || '').trim();
+    const from = $('#fh-from').val() ? new Date($('#fh-from').val() + 'T00:00:00') : null;
+    const to   = $('#fh-to').val()   ? new Date($('#fh-to').val()   + 'T23:59:59.999') : null;
+
+    // 필터링
+    let rows = FH_ALL.filter(it=>{
+      if(!it) return false;
+      const title = (it.title || '').toLowerCase();
+      const body  = (it.body || '').toLowerCase();
+      const grp   = (it.targetGroup || '');
+      const dt    = toDate(it.createdAt);
+
+      if(q && !(title.includes(q) || body.includes(q))) return false;
+      if(g && grp !== g) return false;
+      if(from && dt < from) return false;
+      if(to && dt > to) return false;
+      return true;
+    });
+
+    if(rows.length===0){
+      $tbody.append('<tr><td class="fh-empty" colspan="6">조건에 맞는 내역이 없습니다.</td></tr>');
+      return;
+    }
+
+    // 렌더링 (XSS 방지를 위해 .text() 사용)
+    rows.forEach(item=>{
+      const $tr = $('<tr>');
+
+      $('<td>').addClass('fh-col-id').text(safe(item.id)).appendTo($tr);
+      $('<td>').addClass('fh-col-title fh-ellipsis').attr('title', safe(item.title)).text(safe(item.title)).appendTo($tr);
+
+      const $bodyTd = $('<td>').addClass('fh-col-body');
+      const $ellipsis = $('<div>').addClass('fh-ellipsis').attr('title', safe(item.body)).text(safe(item.body));
+      $bodyTd.append($ellipsis).appendTo($tr);
+
+      const $grpTd = $('<td>').addClass('fh-col-group');
+      const $chip = $('<span>').addClass('fh-chip').text(safe(item.targetGroup || ''));
+      $grpTd.append($chip).appendTo($tr);
+
+      const $cntTd = $('<td>').addClass('fh-col-count');
+      const $badge = $('<span>').addClass('fh-badge-num').text(nf(item.sentCount));
+      $cntTd.append($badge).appendTo($tr);
+
+      $('<td>').addClass('fh-col-dt').text(formatDateTime(item.createdAt)).appendTo($tr);
+
+      $tbody.append($tr);
+    });
+  }
+
+  // ---- KPI ----
+  function updateKpis(list){
+    const total = list.reduce((acc,cur)=> acc + (toInt(cur.sentCount)), 0);
+    $('#fh-kpi-total').text(nf(total));
+
+    const todayStr = getToday('YYYY-MM-DD');
+    const todayRows = list.filter(it => fmtDateOnly(it.createdAt) === todayStr);
+    const today = todayRows.reduce((acc,cur)=> acc + (toInt(cur.sentCount)), 0);
+    $('#fh-kpi-today').text(nf(today));
+
+    const latest = list[0];
+    $('#fh-kpi-last').text(latest ? formatDateTime(latest.createdAt) : '-');
+  }
+
+  // ---- 유틸 ----
+  function safe(v){ return (v===0 || v) ? String(v) : ''; }
+  function toInt(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+  function nf(n){ return new Intl.NumberFormat('ko-KR').format(toInt(n)); }
+
+  function toDate(s){
+    // "2025-08-23T06:27:30.242" 형태를 Date로
+    // 로컬 타임으로 간주
+    return (s) ? new Date(String(s)) : new Date(NaN);
+  }
+  function toTime(s){ return toDate(s).getTime(); }
+
+  function pad(n){ return (n<10?'0':'') + n; }
+
+  function formatDateTime(s){
+    const d = toDate(s);
+    if(isNaN(d)) return '';
+    const yyyy = d.getFullYear();
+    const mm   = pad(d.getMonth()+1);
+    const dd   = pad(d.getDate());
+    const HH   = pad(d.getHours());
+    const MM   = pad(d.getMinutes());
+    return `${yyyy}-${mm}-${dd} ${HH}:${MM}`;
+  }
+
+  function fmtDateOnly(s){
+    const d = toDate(s);
+    if(isNaN(d)) return '';
+    const yyyy = d.getFullYear();
+    const mm   = pad(d.getMonth()+1);
+    const dd   = pad(d.getDate());
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function getToday(fmt){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm   = pad(d.getMonth()+1);
+    const dd   = pad(d.getDate());
+    if(fmt==='YYYY.MM.DD') return `${yyyy}.${mm}.${dd}`;
+    return `${yyyy}-${mm}-${dd}`;
+  }
 </script>
 
 </body>
