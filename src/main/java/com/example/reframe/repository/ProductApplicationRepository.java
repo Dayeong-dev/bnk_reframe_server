@@ -70,5 +70,5 @@ public interface ProductApplicationRepository extends JpaRepository<ProductAppli
 
 	ProductApplication findByProductAccount_IdAndUser_Id(Long accountId, Long uid);
 
-	List<ProductApplication> findByUser_id(Long uid);
+	List<ProductApplication> findByUser_IdOrderByStartAtDesc(Long uid);
 }
