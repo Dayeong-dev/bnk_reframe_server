@@ -28,10 +28,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 	    Long userId, AccountType accountType, AccountStatus status
 	);
 	
-	Optional<Account> findFirstByUser_IdAndAccountTypeAndStatusAndIsDefaultTrue(
-            Long userId, AccountType accountType, AccountStatus status
-    );
-	
 	List<Account> findByUser_IdAndStatusOrderByIsDefaultDescCreatedAtDesc(
 	        Long userId, AccountStatus status);
 
