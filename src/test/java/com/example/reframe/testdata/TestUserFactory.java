@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.reframe.entity.auth.CorporateUser;
 import com.example.reframe.entity.auth.User;
 import com.example.reframe.repository.auth.CorporateUserRepository;
 import com.example.reframe.repository.auth.UserRepository;
@@ -46,11 +45,11 @@ public class TestUserFactory {
 	/* 관리자 회원 더미 데이터 추가 */
 	public void setAdminDummy () {
 		User user = User.builder()
-				.username("1234567")
+				.username("12345678")
 				.password(bCryptPasswordEncoder.encode("1234"))
-				.name("김법진1")
+				.name("관리자1")
 				.phone("01011112222")
-				.email("qkrwjddnjs0715@naver.com")
+				.email("admin1@naver.com")
 				.usertype("P")
 				.role("ROLE_ADMIN")
 				.build();
@@ -62,11 +61,11 @@ public class TestUserFactory {
 	/* 상위 관리자 회원 더미 데이터 추가 */
 	public void setSuperAdminDummy() {
 		User user = User.builder()
-				.username("2345678")
+				.username("23456789")
 				.password(bCryptPasswordEncoder.encode("1234"))
-				.name("김법진2")
+				.name("관리자2")
 				.phone("01011113333")
-				.email("qkrwjddnjs0715@naver.com")
+				.email("admin2@naver.com")
 				.usertype("P")
 				.role("ROLE_SUPERADMIN")
 				.build();
