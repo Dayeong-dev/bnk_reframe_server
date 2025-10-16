@@ -18,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -39,7 +40,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Card {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name = "card_seq_gen", sequenceName = "CARD_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "card_seq_gen")
     @Column(name = "card_id")
     private Long cardId; // 카드 고유 ID, 자동증가
 

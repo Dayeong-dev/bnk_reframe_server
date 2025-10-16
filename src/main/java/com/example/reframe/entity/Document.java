@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,8 @@ public class Document extends BaseEntity {
 		this.documentId = documentId;
 	}
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+	@SequenceGenerator(name = "document_seq_gen", sequenceName = "DOCUMENT_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "document_seq_gen")
     private Integer documentId;		// 문서 아이디(자동증가)
 	private String title;			// 저장 이름
 	private String filename;		// 서버 저장 파일명
