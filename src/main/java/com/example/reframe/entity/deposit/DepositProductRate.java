@@ -47,8 +47,7 @@ public class DepositProductRate {
 	@Column(name = "from_month")
 	private Integer fromMonth;		// 금리 적용 시작 개월
 	
-	@NotNull
-	@Column(name = "to_month", nullable = true)
+	@Column(name = "to_month")
 	private Integer toMonth;		// 금리 적용 종료 개월
 	
 	@NotNull
