@@ -894,7 +894,7 @@
 		
 		/* 상세 설명 입력창 생성 함수 */
 		function createBlock() {
-			const $detail = document.querySelector(".detail");
+			const $detail = document.querySelector(".service");
 			const count = $detail.querySelectorAll("div");
 			
 			if(count.length >= 7) {	// 7개 제한
@@ -904,6 +904,7 @@
 			
 			const div = document.createElement("div");
 			
+			div.classList.add("detail-block")
 			div.innerHTML = `<label>제목: <input type="text" name="title" class="title-input" /></label><br/>
 					<label>내용: <textarea name="content" class="content-textarea"></textarea></label><br/>
 					<label>이미지 URL: <input type="text" name="imageURL" class="image-input" /></label>
@@ -1066,7 +1067,7 @@
 			const rawRate = formData.get("rate").replace("%", "").split("~");
 			
 			// 상세 정보 리스트
-			const details = document.querySelectorAll(".detail div");
+			const details = document.querySelectorAll(".service div");
 		    const titles = formData.getAll("title");
 		    const contents = formData.getAll("content");
 		    const imageURLs = formData.getAll("imageURL");
@@ -1233,7 +1234,7 @@
 		    const formData = new FormData(form);
 		    
 		    // 상세 정보 리스트
-		    const details = document.querySelectorAll(".detail div");
+		    const details = document.querySelectorAll(".service div");
 		    const titles = formData.getAll("title");
 		    const contents = formData.getAll("content");
 		    const imageURLs = formData.getAll("imageURL");
