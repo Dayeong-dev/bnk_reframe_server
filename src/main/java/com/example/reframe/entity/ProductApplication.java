@@ -16,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -30,7 +31,12 @@ public class ProductApplication {
 	}
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(
+	    name = "pa_seq_gen",
+	    sequenceName = "PRODUCT_APPLICATION_ID_SEQ",
+	    allocationSize = 1
+	)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pa_seq_gen")
     private Long id; // 상품 가입 ID
 
     // 회원 고유 ID (FK)
