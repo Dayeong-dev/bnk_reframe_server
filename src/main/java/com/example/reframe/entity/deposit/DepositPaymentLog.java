@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import com.example.reframe.entity.ProductApplication;
 
 import jakarta.persistence.Column;
@@ -45,6 +47,7 @@ public class DepositPaymentLog {
     @JoinColumn(name = "application_id", nullable = false)
     private ProductApplication application;       // 상품 가입(FK)
 
+    @org.hibernate.annotations.CreationTimestamp
     @Column(name = "paid_at", nullable = false)
     private LocalDateTime paidAt;                 // 납입 일시
 
@@ -72,16 +75,17 @@ public class DepositPaymentLog {
         precision = 5,  // NUMBER(5,2)
         scale = 2
     )
-    private BigDecimal walkBonusApplied = BigDecimal.ZERO; // 0.00 or 0.83
+    private BigDecimal walkBonusApplied = BigDecimal.ZERO.setScale(2); // 0.00 or 0.83
 
     @Column(name = "walk_confirmed_yn", nullable = false, length = 1)
+    @ColumnDefault("'N'")
     private String walkConfirmedYn = "N";         // 'Y' / 'N'  (DB CHECK 제약)
 
     @Column(name = "walk_confirmed_at")
     private LocalDateTime walkConfirmedAt;        // 확정 시각
 
     @Column(name = "walk_last_sync_date")
-    private LocalDateTime walkLastSyncDate;       // 마지막 처리 '그 날' (DATE → LocalDate 매핑)
+    private LocalDateTime walkLastSyncDate;       // 마지막 처리 '그 날'
 
     @Column(name = "walk_last_sync_steps", nullable = false)
     private Long walkLastSyncSteps = 0L;          // 마지막 처리 시 그 날의 누적값 (DB: DEFAULT 0 NOT NULL)
