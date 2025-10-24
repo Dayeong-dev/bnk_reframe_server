@@ -1,7 +1,7 @@
 package com.example.reframe.util;
 
-import com.example.reframe.dto.DocumentDTO;
-import com.example.reframe.entity.Document;
+import com.example.reframe.dto.document.DocumentDTO;
+import com.example.reframe.entity.document.Document;
 
 public class DocumentMapper {
 	

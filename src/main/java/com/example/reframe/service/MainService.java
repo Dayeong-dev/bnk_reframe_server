@@ -7,9 +7,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.reframe.dto.CardDto;
-import com.example.reframe.dto.DepositProductDTO;
-import com.example.reframe.dto.SearchResultResponse;
+import com.example.reframe.dto.product.SearchResultResponse;
+import com.example.reframe.dto.product.card.CardDto;
+import com.example.reframe.dto.product.deposit.DepositProductDTO;
+import com.example.reframe.service.product.card.CardService;
+import com.example.reframe.service.product.deposit.DepositProductServiceImpl;
 
 import jakarta.persistence.EntityManager;
 

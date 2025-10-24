@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.dto.account.ProductAccountDetail;
-import com.example.reframe.dto.deposit.DepositPaymentLogDTO;
-import com.example.reframe.entity.ProductApplication;
+import com.example.reframe.dto.product.deposit.DepositPaymentLogDTO;
 import com.example.reframe.entity.account.Account;
-import com.example.reframe.entity.deposit.DepositPaymentLog;
-import com.example.reframe.entity.deposit.PaymentCycle;
-import com.example.reframe.repository.ProductApplicationRepository;
+import com.example.reframe.entity.enroll.ProductApplication;
+import com.example.reframe.entity.product.deposit.DepositPaymentLog;
+import com.example.reframe.enums.PaymentCycle;
 import com.example.reframe.repository.deposit.DepositPaymentLogRepository;
+import com.example.reframe.repository.enroll.ProductApplicationRepository;
 import com.example.reframe.util.AccountMapper;
 import com.example.reframe.util.DepositPaymentLogMapper;
 import com.example.reframe.util.ProductApplicationMapper;

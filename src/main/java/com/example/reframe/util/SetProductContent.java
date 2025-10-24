@@ -3,7 +3,7 @@ package com.example.reframe.util;
 import java.util.Collections;
 import java.util.List;
 
-import com.example.reframe.dto.DepositProductContentDTO;
+import com.example.reframe.dto.product.deposit.DepositProductContentDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;

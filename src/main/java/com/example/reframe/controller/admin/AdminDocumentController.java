@@ -29,8 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
-import com.example.reframe.dto.DocumentDTO;
-import com.example.reframe.service.DocumentService;
+import com.example.reframe.dto.document.DocumentDTO;
+import com.example.reframe.service.document.DocumentService;
 
 @Controller
 @RequestMapping("/admin")

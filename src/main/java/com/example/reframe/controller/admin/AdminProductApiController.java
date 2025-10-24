@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.reframe.dto.AdminProductListItemDto;
-import com.example.reframe.service.AdminProductApplicationService;
+import com.example.reframe.dto.admin.AdminProductListItemDto;
+import com.example.reframe.service.admin.AdminProductApplicationService;
 
 import lombok.RequiredArgsConstructor;
 

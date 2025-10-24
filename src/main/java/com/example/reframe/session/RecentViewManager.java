@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.example.reframe.dto.RecentViewDTO;
+import com.example.reframe.dto.product.RecentViewDTO;
 
 import jakarta.servlet.http.HttpSession;
 

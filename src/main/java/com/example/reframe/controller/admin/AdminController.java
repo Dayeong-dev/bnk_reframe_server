@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.reframe.service.AdminProductApplicationService;
+import com.example.reframe.service.admin.AdminProductApplicationService;
 
 @Controller
 @RequestMapping("/admin")

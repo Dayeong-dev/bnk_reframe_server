@@ -2,8 +2,8 @@ package com.example.reframe.util;
 
 import java.text.SimpleDateFormat;
 
-import com.example.reframe.dto.DepositProductDTO;
-import com.example.reframe.entity.DepositProduct;
+import com.example.reframe.dto.product.deposit.DepositProductDTO;
+import com.example.reframe.entity.product.deposit.DepositProduct;
 
 public class DepositProductMapper {
 	private DocumentMapper documentMapper = new DocumentMapper();

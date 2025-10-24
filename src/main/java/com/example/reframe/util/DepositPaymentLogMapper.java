@@ -1,7 +1,7 @@
 package com.example.reframe.util;
 
-import com.example.reframe.dto.deposit.DepositPaymentLogDTO;
-import com.example.reframe.entity.deposit.DepositPaymentLog;
+import com.example.reframe.dto.product.deposit.DepositPaymentLogDTO;
+import com.example.reframe.entity.product.deposit.DepositPaymentLog;
 
 public class DepositPaymentLogMapper {
 	ProductApplicationMapper productApplicationMapper = new ProductApplicationMapper();

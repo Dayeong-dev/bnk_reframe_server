@@ -2,8 +2,8 @@ package com.example.reframe.dto.account;
 
 import java.time.LocalDateTime;
 
-import com.example.reframe.entity.account.TransactionDirection;
-import com.example.reframe.entity.account.TransactionType;
+import com.example.reframe.enums.TransactionDirection;
+import com.example.reframe.enums.TransactionType;
 
 import lombok.Data;
 

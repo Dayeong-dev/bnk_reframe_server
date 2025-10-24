@@ -1,10 +1,11 @@
 package com.example.reframe.api.qna;
 
 import com.example.reframe.auth.CurrentUser;
-import com.example.reframe.entity.Qna;
 import com.example.reframe.entity.auth.User;
-import com.example.reframe.repository.QnaRepository;
+import com.example.reframe.entity.customer.Qna;
 import com.example.reframe.repository.auth.UserRepository;
+import com.example.reframe.repository.customer.QnaRepository;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

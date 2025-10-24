@@ -1,7 +1,6 @@
 package com.example.reframe.entity.enroll;
 
-import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.entity.ProductApplication;
+import com.example.reframe.entity.product.deposit.DepositProduct;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -2,7 +2,7 @@ package com.example.reframe.dto.auth;
 
 import java.time.LocalDate;
 
-import com.example.reframe.entity.auth.Gender;
+import com.example.reframe.enums.Gender;
 
 import lombok.Data;
 

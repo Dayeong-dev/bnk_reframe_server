@@ -8,11 +8,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.reframe.dto.CardDto;
-import com.example.reframe.dto.DepositProductDTO;
-import com.example.reframe.dto.SearchResultResponse;
-import com.example.reframe.service.AccessLogService;
+import com.example.reframe.dto.product.SearchResultResponse;
+import com.example.reframe.dto.product.card.CardDto;
+import com.example.reframe.dto.product.deposit.DepositProductDTO;
 import com.example.reframe.service.MainService;
+import com.example.reframe.service.audit.AccessLogService;
 
 import jakarta.servlet.http.HttpServletRequest;
 

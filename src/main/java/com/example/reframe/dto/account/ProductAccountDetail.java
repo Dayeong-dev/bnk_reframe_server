@@ -2,9 +2,9 @@ package com.example.reframe.dto.account;
 
 import java.util.List;
 
-import com.example.reframe.dto.deposit.DepositPaymentLogDTO;
-import com.example.reframe.dto.deposit.DepositProductRateDTO;
 import com.example.reframe.dto.enroll.ProductApplicationDTO;
+import com.example.reframe.dto.product.deposit.DepositPaymentLogDTO;
+import com.example.reframe.dto.product.deposit.DepositProductRateDTO;
 
 import lombok.Data;
 

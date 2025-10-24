@@ -3,9 +3,9 @@ package com.example.reframe.dto.account;
 import java.time.LocalDateTime;
 
 import com.example.reframe.dto.auth.UserDTO;
-import com.example.reframe.entity.account.AccountStatus;
-import com.example.reframe.entity.account.AccountType;
-import com.example.reframe.entity.account.ProductType;
+import com.example.reframe.enums.AccountStatus;
+import com.example.reframe.enums.AccountType;
+import com.example.reframe.enums.ProductType;
 
 import lombok.Data;
 

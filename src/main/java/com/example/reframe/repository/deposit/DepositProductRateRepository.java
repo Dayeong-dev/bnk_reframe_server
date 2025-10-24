@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.entity.deposit.DepositProductRate;
+import com.example.reframe.entity.product.deposit.DepositProduct;
+import com.example.reframe.entity.product.deposit.DepositProductRate;
 
 public interface DepositProductRateRepository extends JpaRepository<DepositProductRate, Long> {
 

@@ -1,9 +1,10 @@
 package com.example.reframe.repository.enroll;
 
-import com.example.reframe.domain.enroll.EnrollProductApplication;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.example.reframe.domain.EnrollProductApplication;
 
 import java.util.List;
 

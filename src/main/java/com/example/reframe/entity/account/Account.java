@@ -3,6 +3,9 @@ package com.example.reframe.entity.account;
 import java.time.LocalDateTime;
 
 import com.example.reframe.entity.auth.User;
+import com.example.reframe.enums.AccountStatus;
+import com.example.reframe.enums.AccountType;
+import com.example.reframe.enums.ProductType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

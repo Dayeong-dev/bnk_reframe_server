@@ -12,8 +12,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StreamUtils;
 
-import com.example.reframe.entity.Card;
-import com.example.reframe.repository.CardRepository;
+import com.example.reframe.entity.product.card.Card;
+import com.example.reframe.repository.product.card.CardRepository;
 
 @SpringBootTest
 public class TestCardFactory {

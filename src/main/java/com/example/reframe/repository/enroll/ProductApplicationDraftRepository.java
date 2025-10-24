@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.reframe.entity.enroll.DraftStatus;
 import com.example.reframe.entity.enroll.ProductApplicationDraft;
+import com.example.reframe.enums.DraftStatus;
 
 public interface ProductApplicationDraftRepository extends JpaRepository<ProductApplicationDraft, Long> {
 

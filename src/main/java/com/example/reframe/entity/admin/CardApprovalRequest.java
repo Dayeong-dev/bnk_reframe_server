@@ -3,7 +3,7 @@ package com.example.reframe.entity.admin;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.reframe.entity.Card;
+import com.example.reframe.entity.product.card.Card;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;

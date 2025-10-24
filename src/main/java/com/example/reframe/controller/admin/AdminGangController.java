@@ -19,20 +19,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.example.reframe.dto.ProductReviewAdminDTO;
-import com.example.reframe.dto.QnaDTO;
-import com.example.reframe.entity.AdminAlert;
-import com.example.reframe.entity.DepositProduct;        // ▼ 신규: 상품
-import com.example.reframe.entity.Faq;
-import com.example.reframe.entity.ProductReview;         // ▼ 신규: 상품 리뷰
-import com.example.reframe.entity.Qna;
-import com.example.reframe.entity.Review;                 // (기존 사이트 리뷰 엔티티)
-import com.example.reframe.repository.AdminAlertRepository;
-import com.example.reframe.repository.DepositProductRepository;   // ▼
-import com.example.reframe.repository.FaqRepository;
-import com.example.reframe.repository.ProductReviewRepository;    // ▼
-import com.example.reframe.repository.QnaRepository;
-import com.example.reframe.repository.ReviewRepository;
+import com.example.reframe.dto.admin.ProductReviewAdminDTO;
+import com.example.reframe.dto.customer.QnaDTO;
+import com.example.reframe.entity.admin.AdminAlert;
+import com.example.reframe.entity.customer.Faq;
+import com.example.reframe.entity.customer.Qna;
+import com.example.reframe.entity.product.deposit.DepositProduct;
+import com.example.reframe.entity.review.ProductReview;
+import com.example.reframe.entity.review.Review;
+import com.example.reframe.repository.admin.AdminAlertRepository;
+import com.example.reframe.repository.customer.FaqRepository;
+import com.example.reframe.repository.customer.QnaRepository;
+import com.example.reframe.repository.product.deposit.DepositProductRepository;
+import com.example.reframe.repository.review.ProductReviewRepository;
+import com.example.reframe.repository.review.ReviewRepository;
 
 @Controller
 @RequestMapping("/admin")

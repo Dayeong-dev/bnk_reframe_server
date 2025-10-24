@@ -3,6 +3,8 @@ package com.example.reframe.entity.auth;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.example.reframe.enums.Gender;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

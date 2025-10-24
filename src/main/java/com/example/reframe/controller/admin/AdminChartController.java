@@ -10,14 +10,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.reframe.dto.DailyVisitDTO;
-import com.example.reframe.dto.GenderRatioResponseDTO;
-import com.example.reframe.dto.ProductViewDTO;
-import com.example.reframe.service.AccessLogService;
-import com.example.reframe.service.AnalyticsService;
-import com.example.reframe.service.ProductService;
-import com.example.reframe.service.ReviewService;
-import com.example.reframe.service.TestResultService;
+import com.example.reframe.dto.admin.GenderRatioResponseDTO;
+import com.example.reframe.dto.audit.DailyVisitDTO;
+import com.example.reframe.dto.product.ProductViewDTO;
+import com.example.reframe.service.admin.AnalyticsService;
+import com.example.reframe.service.audit.AccessLogService;
+import com.example.reframe.service.product.ProductService;
+import com.example.reframe.service.product.card.TestResultService;
+import com.example.reframe.service.review.ReviewService;
 
 @Controller
 @RequestMapping("/admin/chart")

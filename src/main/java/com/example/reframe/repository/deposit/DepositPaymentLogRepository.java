@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.example.reframe.entity.ProductApplication;
-import com.example.reframe.entity.deposit.DepositPaymentLog;
-import com.example.reframe.entity.deposit.PaymentStatus;
+import com.example.reframe.entity.enroll.ProductApplication;
+import com.example.reframe.entity.product.deposit.DepositPaymentLog;
+import com.example.reframe.enums.PaymentStatus;
 
 import jakarta.persistence.LockModeType;
 

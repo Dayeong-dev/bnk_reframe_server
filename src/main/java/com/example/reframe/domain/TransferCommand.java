@@ -2,7 +2,7 @@ package com.example.reframe.domain;
 
 import java.time.LocalDateTime;
 
-import com.example.reframe.entity.account.TransactionType;
+import com.example.reframe.enums.TransactionType;
 
 import lombok.Data;
 

@@ -1,8 +1,8 @@
 package com.example.reframe.util;
 
-import com.example.reframe.dto.deposit.DepositProductRateDTO;
-import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.entity.deposit.DepositProductRate;
+import com.example.reframe.dto.product.deposit.DepositProductRateDTO;
+import com.example.reframe.entity.product.deposit.DepositProduct;
+import com.example.reframe.entity.product.deposit.DepositProductRate;
 
 public class DepositProductRateMapper {
 	public DepositProductRate toEntity(DepositProductRateDTO dto) {

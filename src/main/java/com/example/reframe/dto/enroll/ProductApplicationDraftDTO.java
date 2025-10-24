@@ -1,8 +1,8 @@
 package com.example.reframe.dto.enroll;
 
-import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.auth.UserDTO;
-import com.example.reframe.entity.enroll.DraftStatus;
+import com.example.reframe.dto.product.deposit.DepositProductDTO;
+import com.example.reframe.enums.DraftStatus;
 
 import lombok.Data;
 

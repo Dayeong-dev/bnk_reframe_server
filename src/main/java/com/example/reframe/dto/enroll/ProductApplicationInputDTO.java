@@ -1,6 +1,6 @@
 package com.example.reframe.dto.enroll;
 
-import com.example.reframe.entity.ProductApplication;
+import com.example.reframe.entity.enroll.ProductApplication;
 
 import lombok.Data;
 

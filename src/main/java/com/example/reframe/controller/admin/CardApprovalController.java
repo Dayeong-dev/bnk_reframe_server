@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.reframe.dto.BenefitItem;
-import com.example.reframe.dto.CardApprovalRequestDTO;
-import com.example.reframe.dto.CardDto;
+import com.example.reframe.dto.product.card.BenefitItem;
+import com.example.reframe.dto.product.card.CardApprovalRequestDTO;
+import com.example.reframe.dto.product.card.CardDto;
 import com.example.reframe.entity.admin.CardApprovalRequest;
 import com.example.reframe.entity.admin.CardApprovalRequestDetail;
-import com.example.reframe.repository.CardApprovalRequestRepository;
-import com.example.reframe.service.CardApprovalService;
+import com.example.reframe.repository.admin.CardApprovalRequestRepository;
+import com.example.reframe.service.admin.CardApprovalService;
 import com.example.reframe.util.SessionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

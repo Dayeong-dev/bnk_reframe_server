@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+import com.example.reframe.enums.Gender;
+
 @Entity
 @Table(name = "realname_verification")
 @Data

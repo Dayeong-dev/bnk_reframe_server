@@ -1,10 +1,11 @@
 package com.example.reframe.api.qna;
 
-import com.example.reframe.entity.Qna;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+
+import com.example.reframe.entity.customer.Qna;
 
 @Data
 @Builder

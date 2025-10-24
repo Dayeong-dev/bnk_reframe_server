@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.reframe.dto.CorporateDTO;
-import com.example.reframe.dto.CorporateUserDTO;
+import com.example.reframe.dto.auth.CorporateDTO;
+import com.example.reframe.dto.auth.CorporateUserDTO;
 import com.example.reframe.dto.auth.RefreshIssueResult;
 import com.example.reframe.dto.auth.TokenResponse;
 import com.example.reframe.dto.auth.UserDTO;
@@ -16,7 +16,6 @@ import com.example.reframe.entity.auth.CorporateUser;
 import com.example.reframe.entity.auth.User;
 import com.example.reframe.repository.auth.CorporateUserRepository;
 import com.example.reframe.repository.auth.UserRepository;
-import com.example.reframe.service.PublicApiService;
 import com.example.reframe.service.account.AccountService;
 import com.example.reframe.util.CorpUserMapper;
 import com.example.reframe.util.JWTUtil;

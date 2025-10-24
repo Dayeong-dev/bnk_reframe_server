@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.example.reframe.dto.RecentViewDTO;
+import com.example.reframe.dto.product.RecentViewDTO;
 
 import java.util.LinkedHashSet;
 import java.util.List;

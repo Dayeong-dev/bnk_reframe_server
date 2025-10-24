@@ -1,7 +1,7 @@
 package com.example.reframe.util;
 
-import com.example.reframe.dto.deposit.ProductInputFormatDTO;
-import com.example.reframe.entity.deposit.ProductInputFormat;
+import com.example.reframe.dto.product.deposit.ProductInputFormatDTO;
+import com.example.reframe.entity.product.deposit.ProductInputFormat;
 
 public class ProductInputFormatMapper {
 

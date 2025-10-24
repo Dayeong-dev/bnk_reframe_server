@@ -3,10 +3,10 @@ package com.example.reframe.dto.enroll;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.reframe.dto.DepositProductDTO;
 import com.example.reframe.dto.account.AccountDTO;
 import com.example.reframe.dto.auth.UserDTO;
-import com.example.reframe.entity.ProductApplication.ApplicationStatus;
+import com.example.reframe.dto.product.deposit.DepositProductDTO;
+import com.example.reframe.entity.enroll.ProductApplication.ApplicationStatus;
 
 import lombok.Data;
 

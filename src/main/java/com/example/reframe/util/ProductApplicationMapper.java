@@ -1,7 +1,7 @@
 package com.example.reframe.util;
 
 import com.example.reframe.dto.enroll.ProductApplicationDTO;
-import com.example.reframe.entity.ProductApplication;
+import com.example.reframe.entity.enroll.ProductApplication;
 
 public class ProductApplicationMapper {
 	

@@ -4,7 +4,8 @@ import com.example.reframe.dto.report.AdminReport;
 import com.example.reframe.dto.report.ChartPdfRequest;
 import com.example.reframe.export.ExcelReportWriter;
 import com.example.reframe.export.PdfReportWriter;
-import com.example.reframe.service.ReportService;
+import com.example.reframe.service.admin.ReportService;
+
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

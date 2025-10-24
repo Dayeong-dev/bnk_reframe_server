@@ -1,9 +1,10 @@
 package com.example.reframe.repository.deposit;
 
-import com.example.reframe.entity.deposit.ProductViewLog;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
+
+import com.example.reframe.entity.product.deposit.ProductViewLog;
 
 import java.time.LocalDateTime;
 import java.util.List;

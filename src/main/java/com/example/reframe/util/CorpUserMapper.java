@@ -1,6 +1,6 @@
 package com.example.reframe.util;
 
-import com.example.reframe.dto.CorporateUserDTO;
+import com.example.reframe.dto.auth.CorporateUserDTO;
 import com.example.reframe.entity.auth.CorporateUser;
 
 public class CorpUserMapper {

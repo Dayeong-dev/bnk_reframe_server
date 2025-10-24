@@ -1,8 +1,9 @@
 package com.example.reframe.entity.enroll;
 
-import com.example.reframe.entity.BaseEntity;
-import com.example.reframe.entity.DepositProduct;
 import com.example.reframe.entity.auth.User;
+import com.example.reframe.entity.common.BaseEntity;
+import com.example.reframe.entity.product.deposit.DepositProduct;
+import com.example.reframe.enums.DraftStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.reframe.domain.TransferCommand;
 import com.example.reframe.domain.TransferResult;
 import com.example.reframe.entity.account.Account;
-import com.example.reframe.entity.account.AccountStatus;
 import com.example.reframe.entity.account.AccountTransaction;
-import com.example.reframe.entity.account.TransactionDirection;
-import com.example.reframe.entity.account.TransactionType;
-import com.example.reframe.repository.AccountRepository;
+import com.example.reframe.enums.AccountStatus;
+import com.example.reframe.enums.TransactionDirection;
+import com.example.reframe.enums.TransactionType;
+import com.example.reframe.repository.account.AccountRepository;
 import com.example.reframe.repository.account.AccountTransactionRepository;
 
 @Service

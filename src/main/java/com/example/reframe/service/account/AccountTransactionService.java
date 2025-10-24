@@ -14,7 +14,7 @@ import com.example.reframe.auth.CurrentUser;
 import com.example.reframe.dto.account.AccountTransactionDTO;
 import com.example.reframe.entity.account.Account;
 import com.example.reframe.entity.account.AccountTransaction;
-import com.example.reframe.repository.AccountRepository;
+import com.example.reframe.repository.account.AccountRepository;
 import com.example.reframe.repository.account.AccountTransactionRepository;
 import com.example.reframe.util.AccountTransactionMapper;
 

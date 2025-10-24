@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+import com.example.reframe.enums.TransactionDirection;
+import com.example.reframe.enums.TransactionType;
+
 
 @Entity
 @Table(name = "account_transaction",

@@ -7,10 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.example.reframe.entity.account.AccountStatus;
-import com.example.reframe.entity.account.AccountType;
 import com.example.reframe.entity.auth.User;
-import com.example.reframe.repository.GenderCountView;
+import com.example.reframe.enums.AccountStatus;
+import com.example.reframe.enums.AccountType;
+import com.example.reframe.repository.admin.GenderCountView;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 

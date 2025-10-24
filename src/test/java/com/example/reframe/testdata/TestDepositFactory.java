@@ -12,8 +12,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StreamUtils;
 
-import com.example.reframe.entity.DepositProduct;
-import com.example.reframe.repository.DepositProductRepository;
+import com.example.reframe.entity.product.deposit.DepositProduct;
+import com.example.reframe.repository.product.deposit.DepositProductRepository;
 
 @SpringBootTest
 public class TestDepositFactory {

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.reframe.entity.auth.User;
 import com.example.reframe.repository.auth.UserRepository;
-import com.example.reframe.service.AdminSignInService;
+import com.example.reframe.service.admin.AdminSignInService;
 
 import jakarta.servlet.http.HttpSession;
 
