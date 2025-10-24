@@ -1,4 +1,4 @@
-package com.example.reframe.repository.deposit;
+package com.example.reframe.repository.product.deposit;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -19,9 +19,9 @@ import com.example.reframe.dto.product.deposit.ProductInputFormatDTO;
 import com.example.reframe.entity.product.deposit.DepositProduct;
 import com.example.reframe.entity.product.deposit.ProductInputFormat;
 import com.example.reframe.entity.product.deposit.ProductViewLog;
-import com.example.reframe.repository.deposit.ProductInputFormatRepository;
-import com.example.reframe.repository.deposit.ProductViewLogRepository;    // ✅ 추가
 import com.example.reframe.repository.product.deposit.DepositProductRepository;
+import com.example.reframe.repository.product.deposit.ProductInputFormatRepository;
+import com.example.reframe.repository.product.deposit.ProductViewLogRepository;
 import com.example.reframe.service.document.DocumentService;
 import com.example.reframe.util.DocumentMapper;
 import com.example.reframe.util.MarkdownUtil;

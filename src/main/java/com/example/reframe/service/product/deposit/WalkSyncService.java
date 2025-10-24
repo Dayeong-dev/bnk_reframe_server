@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reframe.entity.enroll.ProductApplication;
 import com.example.reframe.entity.product.deposit.DepositPaymentLog;
-import com.example.reframe.repository.deposit.DepositPaymentLogRepository;
 import com.example.reframe.repository.enroll.ProductApplicationRepository;
+import com.example.reframe.repository.product.deposit.DepositPaymentLogRepository;
 
 import lombok.RequiredArgsConstructor;
 

@@ -3,8 +3,8 @@ package com.example.reframe.service.admin;
 import com.example.reframe.dto.report.AdminReport;
 import com.example.reframe.dto.report.AdminReport.TopItem;
 import com.example.reframe.repository.auth.UserRepository;
-import com.example.reframe.repository.deposit.ProductViewLogRepository;   // ✅ 추가
 import com.example.reframe.repository.product.deposit.DepositProductRepository;
+import com.example.reframe.repository.product.deposit.ProductViewLogRepository;
 import com.example.reframe.repository.review.ProductReviewRepository;
 
 import org.springframework.data.domain.PageRequest;  // ✅ 추가

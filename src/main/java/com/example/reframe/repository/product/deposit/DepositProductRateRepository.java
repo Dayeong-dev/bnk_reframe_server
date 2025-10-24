@@ -1,4 +1,4 @@
-package com.example.reframe.repository.deposit;
+package com.example.reframe.repository.product.deposit;
 
 import java.util.List;
 import java.util.Optional;
