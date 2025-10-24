@@ -72,7 +72,7 @@ public interface DepositProductRepository extends JpaRepository<DepositProduct, 
     List<DepositProduct> findActive();
     
     @Query("""
-    		select new com.example.reframe.dto.AdminProductListItemDto(
+    		select new com.example.reframe.dto.admin.AdminProductListItemDto(
     		  dp.id, dp.name, dp.purpose, dp.category, dp.period,
     		  count(pa.id),
     		  sum(case when upper(pa.status) in ('IN_PROGRESS','STARTED') then 1 else 0 end),                         
